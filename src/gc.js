@@ -35,8 +35,12 @@ const gc = {
     ROLE_FOLLOW: "follow",
     ROLE_BOOST_AND_SWITCH: "boost.and.switch",
 
-    // economies
-    ECONOMY_PEACE: "peace",
+    // Room policies
+    POLICY_PEACE: "peace",
+    POLICY_DEFENCE: "defence",
+    POLICY_RESCUE: "rescue",
+    POLICY_NEUTRAL_ROOM: "neutral_room",
+    POLICY_BUILD_SPAWN: "build_spawn",
 
     // flags
     FLAG_SOURCE: "source",

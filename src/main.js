@@ -8,7 +8,7 @@ const inserted = require("inserted");
 const gc = require("gc");
 const role = require("role");
 const rooms = require("rooms");
-const economy = require("economy");
+const policy = require("policy");
 
 
 module.exports.loop = function () {
@@ -18,7 +18,7 @@ module.exports.loop = function () {
 
     freeCreeps();
     flagRooms();
-    runEconomies();
+    policy.enactPolicies();
     moveCreeps();
 
     inserted.bottom();
@@ -52,11 +52,5 @@ function flagRooms() {
         if ( (Game.rooms[room].memory && !Game.rooms[room].memory.flagged) || force ) {
             rooms.flag(Game.rooms[room]);
         }
-    }
-}
-
-function runEconomies() {
-    for ( let room in Game.rooms) {
-        economy.run(room);
     }
 }
