@@ -6,34 +6,8 @@
 const gc = {
 
     //Roles
-    ROLE_HARVESTER: "harvester",
-    ROLE_UPGRADER: "upgrader",
-    ROLE_BUILDER: "builder",
-    ROLE_REPAIRER: "repairer",
-    ROLE_LINKER: "linker",
-    ROLE_CLAIMER: "claimer",
-    ROLE_NEUTRAL_BUILDER: "neutral.builder",
-    ROLE_NEUTRAL_HARVESTER: "neutral.harvester",
-    ROLE_UNASSIGNED: "unassigned",
-    ROLE_SPAWN_BUILDER: "spawn.builder",
-    ROLE_MINER: "miner",
-    ROLE_TRAVELLER: "traveller",
-    ROLE_ENERGY_PORTER: "energy.porter",
-    ROLE_LINKER_SOURCE: "linker.source",
-    ROLE_LINKER_MINER_STORAGE:  "linker.miner.storage",
-    ROLE_STORAGE_REPAIRER: "storage.repairer",
-    ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
-    ROLE_PATROL_ROOM: "patrol.room",
-    ROLE_GIFT: "gift",
-    ROLE_NEUTRAL_PORTER: "neutral.porter",
-    ROLE_SCOUT: "scout",
-    ROLE_WALL_BUILDER: "wall.builder",
-    ROLE_SUPPRESS_KEEPERS: "suppress.keepers",
-    ROLE_DISMANTLE_ROOM: "dismantle.room",
-    ROLE_ATTACK_ROOM: "attack.room",
-    ROLE_MOVE_RESOURCE: "move.resource",
-    ROLE_FOLLOW: "follow",
-    ROLE_BOOST_AND_SWITCH: "boost.and.switch",
+
+    ROLE_WORKER: "worker",
 
     // Room policies
     POLICY_PEACE: "peace",
@@ -68,6 +42,16 @@ const gc = {
     FLAG_LAB_COLOUR: COLORS_ALL[COLOR_GREY],
     FLAG_WALL_COLOUR: COLORS_ALL[COLOR_BROWN],
     FLAG_IGNORE_COLOR: COLORS_ALL[COLOR_RED],
+
+    // Sizes
+    LINKING_WORKER_SIZE: 5,
+    REPAIRER_WORKER_SIZE: 5,
+    LINKING_MINER_SIZE: 5,
+    WORKER_SLOW_MAX_SIZE: 16,
+    WORKER_FAST_MAX_SIZE: 12,
+    PORTER_SLOW_MAX_SIZE: 32,
+    PORTER_FAST_MAX_SIZE: 25,
+    SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,

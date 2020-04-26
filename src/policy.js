@@ -8,7 +8,7 @@ const gc = require("gc");
 const policy = {
 
     enactPolicies: function() {
-        console.log("before Memory.policies", Memory.policies)
+        //console.log("before Memory.policies", Memory.policies)
         if (undefined === Memory.policies) {
             Memory.policies = {};
             console.log("after Memory.policies", Memory.policies)
@@ -24,8 +24,8 @@ const policy = {
         const policyData = Memory.policies[policyId];
         const policyConstructor = require("policy_" + policyData.type);
         const policy = new policyConstructor(policyData);
-        //console.log("enact policy", JSON.stringify(policyData));
-        policy.enact()
+        //console.log("enact policy", JSON.stringify(policy));
+        policy.enact();
     },
 
     checkRoomPolicies: function() {
