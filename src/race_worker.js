@@ -46,11 +46,11 @@ const race_worker = {
         let workerBodyPartLimit;
         if (fast) {
             workerBodyPartLimit = Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
-            console.log("fast workerBodyPartLimit", workerBodyPartLimit)
+            //console.log("fast workerBodyPartLimit", workerBodyPartLimit)
             return Math.min(workerBodyPartLimit, gc.WORKER_FAST_MAX_SIZE);
         } else {
             workerBodyPartLimit =  Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
-            console.log("slow workerBodyPartLimit", workerBodyPartLimit, room.energyCapacityAvailable, this.BLOCKSIZE)
+            //console.log("slow workerBodyPartLimit", workerBodyPartLimit, room.energyCapacityAvailable, this.BLOCKSIZE)
             return Math.min(workerBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
         }
     }

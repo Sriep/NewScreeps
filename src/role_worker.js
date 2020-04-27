@@ -5,8 +5,6 @@
  */
 
 const gc = require("gc");
-const race_worker = require("race_worker");
-const role = require("role");
 
 function Role (data) {
     console.log("new role worker", JSON.stringify(data))

@@ -5,9 +5,11 @@
  */
 const gc = {
 
-    //Roles
-
+    // Roles
     ROLE_WORKER: "worker",
+
+    // Races
+    RACE_WORKER: "worker",
 
     // Room policies
     POLICY_PEACE: "peace",
@@ -28,6 +30,18 @@ const gc = {
     FLAG_TOWER: STRUCTURE_TOWER,
     FLAG_WALL: "wall",
 
+    // states
+    STATE_EMPTY_IDLE: "empty_idle",
+    STATE_MOVE_PATH: "move_path",
+    STATE_HARVEST: "harvest",
+    STATE_FULL_IDEL: "full_idle",
+    STATE_BUILD: "build",
+    STATE_PORTER: "porter",
+    STATE_UPGRADE: "upgrade",
+
+    SAY_IDLE_MOVE: "move source",
+    SAY_MOVE_HARVEST: "harvesting",
+
     //flag colours
     FLAG_PERMANENT_COLOUR: COLORS_ALL[COLOR_BLUE],
     FLAG_SOURCE_COLOUR: COLORS_ALL[COLOR_YELLOW],
@@ -43,6 +57,17 @@ const gc = {
     FLAG_WALL_COLOUR: COLORS_ALL[COLOR_BROWN],
     FLAG_IGNORE_COLOR: COLORS_ALL[COLOR_RED],
 
+    //Ranges
+    RANGE_HARVEST: 1,
+    RANGE_BUILD: 3,
+    RANGE_REPAIR: 3,
+    RANGE_UPGRADE: 3,
+    RANGE_TRANSFER: 1,
+    RANGE_ATTACK: 1,
+    RANGE_RANGED_ATTACK: 3,
+    RANGE_HEAL: 3,
+    RANGE_REACTION: 2,
+
     // Sizes
     LINKING_WORKER_SIZE: 5,
     REPAIRER_WORKER_SIZE: 5,
@@ -55,6 +80,9 @@ const gc = {
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,
+
+    // Thresholds
+    TOWER_REFILL_THRESHOLD: 0.8,
 
     // Game constants
     NOTIFY_INTERVAL: 10,

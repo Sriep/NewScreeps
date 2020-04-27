@@ -4,7 +4,6 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const race = require("race");
 const rooms = {
 
     flag: function (room) {
@@ -12,7 +11,7 @@ const rooms = {
         let myRoom = room.controller && room.controller.my;
         this.flagPermanents(room, myRoom);
         if (myRoom) {
-            console.log("is my room ", room, myRoom)
+            //console.log("is my room ", room, myRoom)
             this.flagMyRoomStructures(room);
         }
     },
@@ -100,7 +99,7 @@ const rooms = {
             }
         });
         for ( let i = 0 ; i < links.length ; i++ ) {
-            var flagName = links[i].id;
+            const flagName = links[i].id;
             if (!Game.flags[flagName])
                 links[i].pos.createFlag(flagName, gc.FLAG_STRUCTURE_COLOUR, gc.FLAG_LINK_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_LINK;

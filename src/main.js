@@ -6,29 +6,30 @@
 
 const inserted = require("inserted");
 const gc = require("gc");
-const role = require("role");
+const state = require("state");
 const rooms = require("rooms");
 const policy = require("policy");
 
 
 module.exports.loop = function () {
-    console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
-    console.log("************************ Start ", Game.time," *********************************");
+    //console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
+    //console.log("************************ Start ", Game.time," *********************************");
     inserted.top();
 
     freeCreeps();
     flagRooms();
     policy.enactPolicies();
+    console.log("************************ Move creeps start *********************************");
     moveCreeps();
-
+    console.log("************************ Move creeps finish *********************************");
     inserted.bottom();
     console.log("************************ End ",  Game.time, " *********************************");
 }
 
 function freeCreeps() {
-    for(let name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            Memory.creeps[name] = undefined;
+    for(let c in Memory.creeps) {
+        if(!Game.creeps[c]) {
+            delete Memory.creeps[c];
         }
     }
 }
@@ -36,7 +37,8 @@ function freeCreeps() {
 function moveCreeps() {
     //console.log("main in moveCreeps")
     for (let name in Game.creeps) {
-        role.enact(Game.creeps[name]);
+        console.log("creep", name)
+        state.enact(Game.creeps[name]);
     }
 }
 

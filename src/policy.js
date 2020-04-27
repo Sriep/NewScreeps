@@ -11,7 +11,7 @@ const policy = {
         //console.log("before Memory.policies", Memory.policies)
         if (undefined === Memory.policies) {
             Memory.policies = {};
-            console.log("after Memory.policies", Memory.policies)
+            //console.log("after Memory.policies", Memory.policies)
         }
         this.checkRoomPolicies();
         for (let policyId in Memory.policies) {
