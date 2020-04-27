@@ -19,7 +19,15 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-
+    if (this.creep.room.controller.ticksToDowngrade
+        < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
+        state.switchToMovePath(
+            this.creep,
+            this.creep.room.controller.id,
+            gc.RANGE_UPGRADE,
+            gc.STATE_UPGRADE
+        );
+    }
     let nextSourceContainer = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
             filter: function(structure)  {
                 return ((structure.structureType === STRUCTURE_TOWER
@@ -41,7 +49,7 @@ State.prototype.enact = function () {
         );
     }
     let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
-    if (nextSourceContainer != null) {
+    if (nextConstructionSite != null) {
         return state.switchToMovePath(
             this.creep,
             nextConstructionSite.id,

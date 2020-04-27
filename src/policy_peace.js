@@ -8,8 +8,6 @@ const economy = require("economy");
 const role = require("role");
 const construction = require("construction");
 
-const PEACE_BUILD_INTERVAL = 1;
-
 function Policy  (data) {
     //console.log("new policy peace", JSON.stringify(data))
     this.type = gc.POLICY_PEACE;
@@ -50,14 +48,21 @@ Policy.prototype.build = function () {
     const rcl = room.controller.level
     console.log("policy build rcl", rcl)
     if (Memory.policies[this.id].rcl === room.controller.level) {
-        if (Game.time % PEACE_BUILD_INTERVAL !== 0) {
+        if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
             return
         }
-    } else {
-        Memory.policies[this.id].rcl = rcl;
     }
-    console.log("policy build about to call buildMissingExtensions")
+    if (rcl >= gc.BUILD_ROAD_SOURCE_SPAWN) {
+        construction.buildRoadSourceSpawn(room)
+    }
+    if (rcl >= gc.BUILD_ROAD_SOURCE_CONTROLLER) {
+        construction.buildRoadSourceController(room)
+    }
+    if (rcl >= gc.BUILD_ROAD_SOURCE_EXTENSIONS) {
+        construction.buildRoadSourceExtensions(room)
+    }
     construction.buildMissingExtensions(room, rcl);
+    Memory.policies[this.id].rcl = rcl;
 }
 
 module.exports = Policy;

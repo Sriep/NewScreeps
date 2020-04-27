@@ -19,22 +19,14 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log("state move enact");
-    const targetPos = Game.getObjectById(this.creep.memory.targetId).pos
-    if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
+    const target = Game.getObjectById(this.creep.memory.targetId);
+    if (!target) { // probably target build got built!
+        return state.switchToFullIdel(this.creep);
+    }
+    if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
         return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    //if (this.creep.pos.x === this.creep.memory.lastx && this.creep.pos.y === this.creep.memory.lasty) {
-    //    this.stuck();
-    //}
-    //this.creep.memory.lastx = this.creep.pos.x;
-    //this.creep.memory.lasty = this.creep.pos.y;
-
-    //path = creep.room.deserializePath(this.creep.memory.path)
-    //console.log("creep move path",JSON.stringify(path))
-    //const result = this.creep.moveByPath(this.creep.memory.path);
-
-    const result = this.creep.moveTo(targetPos, {reusePath: 5})
+    const result = this.creep.moveTo(target.pos, {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -43,7 +35,6 @@ State.prototype.enact = function () {
         case ERR_BUSY:                  // The creep is still being spawned.
             console.log("moveTo returns strange ERR_BUSY error")
             return ERR_BUSY;
-            //return gf.fatalError("ERR_BUSY");
         case ERR_NOT_FOUND:     // The specified path doesn't match the creep's location.
             return ERR_NOT_ENOUGH_ENERGY
         case ERR_INVALID_ARGS:          // path is not a valid path array.
