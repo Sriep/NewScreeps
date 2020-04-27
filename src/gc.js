@@ -39,6 +39,7 @@ const gc = {
     STATE_BUILD: "build",
     STATE_PORTER: "porter",
     STATE_UPGRADE: "upgrade",
+    STATE_REPAIR: "repair",
 
     SAY_IDLE_MOVE: "move source",
     SAY_MOVE_HARVEST: "harvesting",
@@ -91,6 +92,8 @@ const gc = {
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
     EMERGENCY_DOWNGRADING_THRESHOLD: 1500,
+    STRUCTURE_REPAIR_THRESHOLD: 0.5,
+
 
     // Game constants
     NOTIFY_INTERVAL: 10,

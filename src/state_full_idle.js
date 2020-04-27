@@ -28,7 +28,8 @@ State.prototype.enact = function () {
             gc.STATE_UPGRADE
         );
     }
-    let nextSourceContainer = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+
+    const nextSourceContainer = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
             filter: function(structure)  {
                 return ((structure.structureType === STRUCTURE_TOWER
                             && structure.store[RESOURCE_ENERGY]
@@ -48,6 +49,21 @@ State.prototype.enact = function () {
             gc.STATE_PORTER
         );
     }
+
+    const damagedStructure = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: function(s)  {
+            return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
+        }
+    });
+    if (damagedStructure != null) {
+        return state.switchToMovePath(
+            this.creep,
+            damagedStructure.id,
+            gc.RANGE_REPAIR,
+            gc.STATE_REPAIR
+        );
+    }
+
     let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite != null) {
         return state.switchToMovePath(
@@ -57,6 +73,7 @@ State.prototype.enact = function () {
             gc.STATE_BUILD
         );
     }
+
     state.switchToMovePath(
         this.creep,
         this.creep.room.controller.id,
