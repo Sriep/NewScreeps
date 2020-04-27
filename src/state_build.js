@@ -1,24 +1,28 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
+
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in state upgrade constuctor")
-    this.type = gc.STATE_UPGRADE;
+    //console.log("in state build constructor")
+    this.type = gc.STATE_BUILD;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdel(this.creep)
+        return state.switchToEmptyIdel(this.creep);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
-    const result = this.creep.upgradeController(target);
+    if (!target) {
+        return state.switchToFullIdel(this.creep);
+    }
+    const result = this.creep.build(target);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;

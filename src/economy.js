@@ -36,9 +36,9 @@ const economy = {
         //console.log("energyForUpgrading",energyForUpgrading)
         const numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
         //console.log("numPortersPartsNeeded",numPortersPartsNeeded)
-        const porterShortfall = numPortersPartsNeeded - existingPorterParts;
+        return numPortersPartsNeeded - existingPorterParts;
         //console.log("porterShortfall", porterShortfall);
-        return porterShortfall;
+        //return porterShortfall;
     },
 
     existingPorterParts: function (policy) {

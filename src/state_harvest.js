@@ -12,19 +12,16 @@ function State (creep) {
     if (!creep)
         console.log("Creat creep state with no creep object")
     if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-        console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
+       // console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
     if (creep.memory.targetId)
-        console.log("In move path, creep has no target")
+        //console.log("In move path, creep has no target")
     this.type = gc.STATE_HARVEST;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        this.creep.memory.state = gc.STATE_FULL_IDEL;
-        this.creep.targetId = undefined;
-        this.creep.say("full");
-        return state.enact(this.creep);
+        return state.switchToFullIdel(this.creep)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (target.energy > 0) {

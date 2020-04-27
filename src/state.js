@@ -3,7 +3,7 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
-
+const gc = require("gc");
 const economy = require("economy");
 
 const state = {
@@ -18,7 +18,7 @@ const state = {
         //console.log("enact creep name| ", creep.name, " |state| ", creep.memory.state)
 
         requireString = "state_" + creep.memory.state;
-        console.log("require string", requireString)
+        //console.log("require string", requireString)
         const stateConstructor = require(requireString)
         //const stateConstructor = require("state_" + creep.memory.state)
         const creepState = new stateConstructor(creep)
@@ -46,6 +46,41 @@ const state = {
                     return sources[i];
         }
         return undefined;
+    },
+
+    switchToMovePath(creep, targetId, range, nextState) {
+        creep.memory.targetId = targetId;
+        creep.memory.state = gc.STATE_MOVE_PATH;
+        creep.memory.moveRange = range;
+        creep.memory.next_state = nextState;
+        creep.say("go " + nextState)
+        return state.enact(creep);
+    },
+
+    switchToFullIdel: function (creep) {
+        creep.memory.state = gc.STATE_FULL_IDEL;
+        delete creep.targetId;
+        creep.say("full");
+        return state.enact(creep);
+    },
+
+    switchToEmptyIdel: function (creep) {
+        creep.memory.state = gc.STATE_EMPTY_IDLE;
+        creep.targetId = undefined;
+        creep.say("empty");
+        return state.enact(creep);
+    },
+
+    switchTo: function(creep, newState) {
+        creep.memory.state = newState;
+        creep.say("arrived");
+        delete creep.memory.next_state;
+        delete creep.memory.moveRange;
+        return state.enact(creep);
+    },
+
+    switchToContoler: function(creep) {
+
     }
 }
 

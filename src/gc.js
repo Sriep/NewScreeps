@@ -15,6 +15,7 @@ const gc = {
     POLICY_PEACE: "peace",
     POLICY_DEFENCE: "defence",
     POLICY_RESCUE: "rescue",
+    POLICY_BUILD: "build",
     POLICY_NEUTRAL_ROOM: "neutral_room",
     POLICY_BUILD_SPAWN: "build_spawn",
 

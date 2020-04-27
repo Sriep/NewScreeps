@@ -52,7 +52,7 @@ const policy = {
     },
 
     activatePolicy: function(policyType, data) {
-        console.log("activating policy", policyType, "with data", JSON.stringify(data))
+        //console.log("activating policy", policyType, "with data", JSON.stringify(data))
 
         const policyConstructor = require("policy_" + policyType);
         data.id = this.getNextPolicyId();

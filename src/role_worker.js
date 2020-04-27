@@ -7,7 +7,7 @@
 const gc = require("gc");
 
 function Role (data) {
-    console.log("new role worker", JSON.stringify(data))
+    //console.log("new role worker", JSON.stringify(data))
     this.type = gc.ROLE_WORKER;
     if (data) {
         this.id = data.id;
@@ -16,7 +16,7 @@ function Role (data) {
 }
 
 Role.prototype.enact = function () {
-    console.log("enact role worker")
+    //console.log("enact role worker")
 }
 
 module.exports = Role;

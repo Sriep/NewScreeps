@@ -6,6 +6,9 @@
 const gc = require("gc");
 const economy = require("economy");
 const role = require("role");
+const construction = require("construction");
+
+const PEACE_BUILD_INTERVAL = 1;
 
 function Policy  (data) {
     //console.log("new policy peace", JSON.stringify(data))
@@ -17,27 +20,22 @@ function Policy  (data) {
 }
 
 Policy.prototype.enact = function () {
-    //console.log("enacting policy peace this", JSON.stringify(this));
-    const room = Game.rooms[this.roomId]
-    //console.log("roomid", this.roomId, "room object", Game.rooms[this.roomId]);
+    this.build()
+    this.spawn()
+}
 
-    const spawns = Game.rooms[this.roomId].find(FIND_MY_SPAWNS);
+Policy.prototype.spawn = function () {
+    const room = Game.rooms[this.roomId];
+    const spawns = room.find(FIND_MY_SPAWNS);
     for (let spawn in spawns) {
-         if (spawns[spawn].spawning === null) {
-            //console.log("run economyPeace nextSpawn", this.roomId, spawn, "porterShortfall", economy.porterShortfall(this));
+        if (spawns[spawn].spawning === null) {
             if (0 < economy.porterShortfall(this)) {
                 let creepCount = 0;
                 for (let creep in Game.creeps) {
                     if (Game.creeps[creep].memory.policyId === this.id)
                         creepCount++;
                 }
-                //console.log("policy peace id", this.id, "cc", creepCount);
-
-                //const creeps = _.filter(Game.creeps, function (creep) {
-                //    console.log("in filter creeps", creep,"the creep", Game.creeps[creep], "duh", creep[0])
-                //    return Game.creeps[creep].memory.policyId === this.id});
-
-                console.log("maxCreepsCanFitRoundSources", economy.sourceAccessPointsRoom(room), "num creeps", creepCount);
+                //console.log("maxCreepsCanFitRoundSources", economy.sourceAccessPointsRoom(room), "num creeps", creepCount);
                 if (creepCount < economy.sourceAccessPointsRoom(room)) {
                     //console.log("spawn creep energy capacity", Game.rooms[this.roomId].energyCapacityAvailable);
                     role.spawnWorker(spawns[spawn], this);
@@ -45,6 +43,21 @@ Policy.prototype.enact = function () {
             }
         }
     }
+}
+
+Policy.prototype.build = function () {
+    const room = Game.rooms[this.roomId];
+    const rcl = room.controller.level
+    console.log("policy build rcl", rcl)
+    if (Memory.policies[this.id].rcl === room.controller.level) {
+        if (Game.time % PEACE_BUILD_INTERVAL !== 0) {
+            return
+        }
+    } else {
+        Memory.policies[this.id].rcl = rcl;
+    }
+    console.log("policy build about to call buildMissingExtensions")
+    construction.buildMissingExtensions(room, rcl);
 }
 
 module.exports = Policy;

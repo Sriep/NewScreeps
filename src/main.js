@@ -12,17 +12,19 @@ const policy = require("policy");
 
 
 module.exports.loop = function () {
-    //console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
-    //console.log("************************ Start ", Game.time," *********************************");
+     //console.log("************************ Start ", Game.time," *********************************");
     inserted.top();
 
     freeCreeps();
     flagRooms();
     policy.enactPolicies();
-    console.log("************************ Move creeps start *********************************");
+    //console.log("************************ Move creeps start *********************************");
     moveCreeps();
-    console.log("************************ Move creeps finish *********************************");
+    //console.log("************************ Move creeps finish *********************************");
     inserted.bottom();
+
+    console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
+    console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
     console.log("************************ End ",  Game.time, " *********************************");
 }
 
@@ -37,7 +39,7 @@ function freeCreeps() {
 function moveCreeps() {
     //console.log("main in moveCreeps")
     for (let name in Game.creeps) {
-        console.log("creep", name)
+        //console.log("creep", name)
         state.enact(Game.creeps[name]);
     }
 }

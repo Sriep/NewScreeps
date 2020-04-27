@@ -13,7 +13,7 @@ function State (creep) {
     if (!creep)
         console.log("Creat creep state with no creep object")
     if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-        console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
+       // console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
     this.type = gc.STATE_MOVE_PATH;
     this.creep = creep
 }
@@ -22,17 +22,13 @@ State.prototype.enact = function () {
     //console.log("state move enact");
     const targetPos = Game.getObjectById(this.creep.memory.targetId).pos
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        this.creep.memory.state = this.creep.memory.next_state;
-        this.creep.memory.next_state = undefined;
-        this.creep.say("arrived");
-        delete this.creep.memory.moveRange;
-        return state.enact(this.creep);
+        return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    if (this.creep.pos.x === this.creep.memory.lastx && this.creep.pos.y === this.creep.memory.lasty) {
-        this.stuck();
-    }
-    this.creep.memory.lastx = this.creep.pos.x;
-    this.creep.memory.lasty = this.creep.pos.y;
+    //if (this.creep.pos.x === this.creep.memory.lastx && this.creep.pos.y === this.creep.memory.lasty) {
+    //    this.stuck();
+    //}
+    //this.creep.memory.lastx = this.creep.pos.x;
+    //this.creep.memory.lasty = this.creep.pos.y;
 
     //path = creep.room.deserializePath(this.creep.memory.path)
     //console.log("creep move path",JSON.stringify(path))
@@ -45,7 +41,8 @@ State.prototype.enact = function () {
         case  ERR_NOT_OWNER:            // You are not the owner of this spawn.
             return gf.fatalError("ERR_NOT_OWNER");
         case ERR_BUSY:                  // The creep is still being spawned.
-            return gf.fatalError("moveTo returns strange ERR_BUSY error");
+            console.log("moveTo returns strange ERR_BUSY error")
+            return ERR_BUSY;
             //return gf.fatalError("ERR_BUSY");
         case ERR_NOT_FOUND:     // The specified path doesn't match the creep's location.
             return ERR_NOT_ENOUGH_ENERGY
@@ -60,8 +57,8 @@ State.prototype.enact = function () {
     }
 }
 
-State.prototype.stuck = function () {
-    this.creep.say("stuck");
-}
+//State.prototype.stuck = function () {
+//    this.creep.say("stuck");
+//}
 
 module.exports = State;

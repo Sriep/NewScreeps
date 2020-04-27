@@ -22,7 +22,7 @@ const role = {
     },
 
     spawn: function(spawn, body, race, memory) {
-        console.log("spawn creep| ", JSON.stringify(body), " |race| ", race, " |memory| ", JSON.stringify(memory));
+        //console.log("spawn creep| ", JSON.stringify(body), " |race| ", race, " |memory| ", JSON.stringify(memory));
         const name = race + "_" + role.nextCreepId();
         const result = spawn.spawnCreep(body, name, {memory: memory });
         //console.log("spawnCreep result", result);
