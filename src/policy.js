@@ -24,7 +24,6 @@ const policy = {
         const policyData = Memory.policies[policyId];
         const policyConstructor = require("policy_" + policyData.type);
         const policy = new policyConstructor(policyData);
-        //console.log("enact policy", JSON.stringify(policy));
         policy.enact();
     },
 

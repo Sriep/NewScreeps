@@ -8,16 +8,16 @@ const gc = require("gc");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_UPGRADE;
+    this.type = gc.STATE_WORKER_HARVEST;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    if (!state.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(creep, gc.STATE_UPGRADE_EMPTY);
+    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchState(this.creep, gc.STATE_FULL_IDLE);
     }
-    const source = Game.getObjectById(this.creep.memory.targetId)
-    if (source.energy > 0) {
+    const target = Game.getObjectById(this.creep.memory.targetId);
+    if (target.energy > 0) {
         const result = this.creep.harvest(target);
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.
@@ -41,10 +41,10 @@ State.prototype.enact = function () {
             default:
                 throw("harvest unrecognised return value");
         }
-    } else {
-        //state.switchState(creep, gc.STATE_HARVESTER_IDLE); todo not implemented
     }
-
+    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchState(this.creep, gc.STATE_FULL_IDLE);
+    }
 }
 
 module.exports = State;

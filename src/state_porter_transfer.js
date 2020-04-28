@@ -1,25 +1,28 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
+
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in porter constructor", creep.name)
-    this.type = gc.STATE_PORTER;
+    this.type = gc.STATE_PORTER_TRANSFER;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdle(this.creep)
+        return state.switchState(this.creep, gc.STATE_PORTER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
+    if (!target) {
+        return state.switchState(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    }
     if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToFullIdle(this.creep);
+        return state.switchState(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
     const result = this.creep.transfer(target, RESOURCE_ENERGY);
     switch (result) {
@@ -43,8 +46,9 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToFullIdle(this.creep);
+        return state.switchState(this.creep, gc.STATE_PORTER_IDLE)
     }
+    state.switchState(this.creep, gc.STATE_PORTER_FULL_IDLE);
 }
 
 module.exports = State;

@@ -7,17 +7,14 @@ const gc = require("gc");
 const rooms = {
 
     flag: function (room) {
-        //console.log("in flag room", room)
         let myRoom = room.controller && room.controller.my;
         this.flagPermanents(room, myRoom);
         if (myRoom) {
-            //console.log("is my room ", room, myRoom)
             this.flagMyRoomStructures(room);
         }
     },
 
     flagPermanents: function (room, myRoom) {
-        //console.log("flagPermanents room", room, "myRoom", myRoom);
         let flagName;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
@@ -65,7 +62,7 @@ const rooms = {
             //Game.flags[flagName].memory.extractor = gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR);
             if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
-
+/*
         const walls = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_WALL }
         });
@@ -75,7 +72,7 @@ const rooms = {
                 walls[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_WALL_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_WALL;
         }
-
+*/
         const portals = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_PORTAL }
         });

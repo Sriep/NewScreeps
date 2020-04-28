@@ -1,6 +1,6 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
 
@@ -9,24 +9,15 @@ const gc = require("gc");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in state_move_path constructor", creep.name)
-    if (!creep)
-        console.log("Creat creep state with no creep object")
-    if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-       // console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
-    this.type = gc.STATE_MOVE_PATH;
+    this.type = gc.STATE_MOVE_POS;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target) { // probably target build got built!
-        return state.switchToFullIdel(this.creep);
-    }
-    if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
+    if (this.creep.pos.inRangeTo(this.creep.memory.targetPos, this.creep.memory.moveRange)) {
         return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    const result = this.creep.moveTo(target.pos, {reusePath: 5})
+    const result = this.creep.moveTo(this.creep.memory.targetPos, {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -47,9 +38,5 @@ State.prototype.enact = function () {
             return gf.fatalError("moveByPath unrecognised return value");
     }
 }
-
-//State.prototype.stuck = function () {
-//    this.creep.say("stuck");
-//}
 
 module.exports = State;

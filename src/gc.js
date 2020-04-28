@@ -5,11 +5,10 @@
  */
 const gc = {
 
-    // Roles
-    ROLE_WORKER: "worker",
-
     // Races
     RACE_WORKER: "worker",
+    RACE_HARVESTER: "harvester",
+    RACE_PORTER: "porter",
 
     // Room policies
     POLICY_PEACE: "peace",
@@ -32,17 +31,40 @@ const gc = {
     FLAG_WALL: "wall",
 
     // states
+    // states common
     STATE_EMPTY_IDLE: "empty_idle",
-    STATE_MOVE_PATH: "move_path",
+    STATE_MOVE_TARGET: "move_target",
+    STATE_MOVE_BETWEEN: "move_between",
+    STATE_MOVE_POS: "move_pos",
+    // states harvester
+    STATE_HARVESTER_IDLE: "harvester_idle",
+    STATE_HARVESTER_BUILD: "harvester_build",
+    STATE_HARVESTER_REPAIR: "harvester_repair",
+    STATE_HARVESTER_FULL: "harvester_full",
+    STATE_HARVESTER_TRANSFER: "harvester_transfer",
     STATE_HARVEST: "harvest",
-    STATE_FULL_IDEL: "full_idle",
-    STATE_BUILD: "build",
-    STATE_PORTER: "porter",
-    STATE_UPGRADE: "upgrade",
+    // states worker
+    STATE_WORKER_UPGRADE: "upgrade",
     STATE_REPAIR: "repair",
+    STATE_PORTER: "porter",
+    STATE_FULL_IDLE: "full_idle",
+    STATE_BUILD: "build",
+    STATE_WORKER_HARVEST: "worker_harvest",
+    STATE_TRANSFER: "transfer",
+    // states porter
+    STATE_PORTER_IDLE: "porter_idle",
+    STATE_PORTER_PICKUP: "pickup",
+    STATE_PORTER_FULL_IDLE: "porter_full_idle",
+    STATE_PORTER_TRANSFER: "porter_transfer",
+    // states upgrader
+    STATE_UPGRADE: "upgrade",
+    STATE_UPGRADE_EMPTY: "upgrade_empty",
+    STATE_UPGRADE_WITHDRAW: "upgrade_withdraw",
+    STATE_UPGRADE_REPAIR: "upgrade_withdraw",
 
-    SAY_IDLE_MOVE: "move source",
-    SAY_MOVE_HARVEST: "harvesting",
+    // Economy settings
+    RPC_HARVESTERS: [0, 7, 7, 5, 3, 3, 3, 2, 2],
+    RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLORS_ALL[COLOR_BLUE],
@@ -56,7 +78,7 @@ const gc = {
     FLAG_PORTAL_COLOUR: COLORS_ALL[COLOR_BLUE],
     FLAG_TERMINAL_COLOUR: COLORS_ALL[COLOR_PURPLE],
     FLAG_LAB_COLOUR: COLORS_ALL[COLOR_GREY],
-    FLAG_WALL_COLOUR: COLORS_ALL[COLOR_BROWN],
+    FLAG_CONTAINER_COLOUR: COLORS_ALL[COLOR_BROWN],
     FLAG_IGNORE_COLOR: COLORS_ALL[COLOR_RED],
 
     //Ranges
@@ -71,11 +93,11 @@ const gc = {
     RANGE_REACTION: 2,
 
     // Sizes
-    LINKING_WORKER_SIZE: 5,
-    REPAIRER_WORKER_SIZE: 5,
+    LINKING_BUILDER_SIZE: 5,
+    REPAIRER_BUILDER_SIZE: 5,
     LINKING_MINER_SIZE: 5,
-    WORKER_SLOW_MAX_SIZE: 16,
-    WORKER_FAST_MAX_SIZE: 12,
+    BUILDER_SLOW_MAX_SIZE: 16,
+    BUILDER_FAST_MAX_SIZE: 12,
     PORTER_SLOW_MAX_SIZE: 32,
     PORTER_FAST_MAX_SIZE: 25,
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
@@ -84,6 +106,7 @@ const gc = {
     BUILD_ROAD_SOURCE_SPAWN: 2,
     BUILD_ROAD_SOURCE_CONTROLLER: 2,
     BUILD_ROAD_SOURCE_EXTENSIONS: 2,
+    BUILD_ROAD_SOURCE_SOURCE: 2,
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,
@@ -100,6 +123,32 @@ const gc = {
     DEBUG: true,
 
     TICK_NUMBER: "tick number",
+
+    DELTA_MOVES: [[{x:0, y:0}], this.ONE_MOVE, this.TWO_MOVES, this.THREE_MOVES],
+
+    THREE_MOVES: [
+        {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
+        {x:2, y:3}, {x:2,y:2}, {x:2, y:1}, {x:2,y:0}, {x:2, y:-1}, {x:2, y:-2}, {x:2,y:-3},
+        {x:1, y:3}, {x:1,y:2}, {x:1, y:1}, {x:1,y:0}, {x:1, y:-1}, {x:1, y:-2}, {x:1,y:-3},
+        {x:0, y:3}, {x:0,y:2}, {x:0, y:1}, {x:0,y:0}, {x:0, y:-1}, {x:0, y:-2}, {x:0,y:-3},
+        {x:-1, y:3}, {x:-1,y:2}, {x:-1, y:1}, {x:-1,y:0}, {x:-1, y:-1}, {x:-1, y:-2}, {x:-1,y:-3},
+        {x:-2, y:3}, {x:-2,y:2}, {x:-2, y:1}, {x:-2,y:0}, {x:-2, y:-1}, {x:-2, y:-2}, {x:-2,y:-3},
+        {x:-3, y:3}, {x:-3,y:2}, {x:-3, y:1}, {x:-3,y:0}, {x:-3, y:-1}, {x:-3, y:-2}, {x:-3,y:-3},
+    ],
+
+    TWO_MOVES: [
+        {x :2, y:2}, {x:2,y:1}, {x :2, y:0}, {x:2,y:-1}, {x :2, y:-2},
+        {x :1, y:2}, {x:1,y:1}, {x :1, y:0}, {x:1,y:-1}, {x :1, y:-2},
+        {x :0, y:2}, {x:0,y:1}, {x :0, y:0}, {x:0,y:-1}, {x :0, y:-2},
+        {x :-1, y:2}, {x:-1,y:1}, {x :-1, y:0}, {x:-1,y:-1}, {x :-1, y:-2},
+        {x :-2, y:2}, {x:-2,y:1}, {x :-2, y:0}, {x:-2,y:-1}, {x :-2, y:-2},
+    ],
+
+    ONE_MOVE: [
+        {x:1, y:1}, {x:1, y:0}, {x:1, y:-1},
+        {x:0, y:1}, {x:0, y:0}, {x:0, y:-1},
+        {x:-1, y:1}, {x:-1, y:0}, {x:-1, y:-1},
+    ],
 
     END : "end"
 };

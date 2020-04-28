@@ -5,31 +5,36 @@
  */
 
 const gc = require("gc");
+const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in creep constructor", creep.name)
     if (!creep)
-        //throw("Creat creep state with no creep object")
-    if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-        //throw("In empty idele state with creep wrong state: " + JSON.stringify(creep))
-    if (creep.store.getCapacity(RESOURCE_ENERGY)
-        !== creep.store.getFreeCapacity(RESOURCE_ENERGY))
-        //throw("In empty idle state with non empty creep: " + JSON.stringify(creep));
+        return gf.fatalError("Create creep state with no creep object")
     this.type = gc.STATE_EMPTY_IDLE;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    const source = state.findTargetSource(this.creep.room)
-    if (source) {
-        state.switchToMovePath(
-            this.creep,
-            source.id,
-            gc.RANGE_HARVEST,
-            gc.STATE_HARVEST
-        );
+    switch (race.getRace(this.creep)) {
+        case gc.RACE_PORTER:
+            return state.switchState(this.creep, gc.STATE_PORTER_IDLE)
+        case gc.RACE_WORKER:
+        {
+            const source = state.findTargetSource(this.creep.room)
+            return state.switchToMoveTarget(
+                this.creep,
+                source.id,
+                gc.RANGE_HARVEST,
+                gc.STATE_WORKER_HARVEST
+            );
+        }
+        case gc.RACE_HARVESTER:
+            return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);
+        default:
+            creep.say("help? do?")
     }
+
 }
 
 module.exports = State;

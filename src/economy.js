@@ -15,53 +15,83 @@ const economy = {
     OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50
         , "energy.porter" : 40 , "worker" : 40},
 
+    findMostFreeNeighbours: function (room, pos, range) {
+        const terrain = room.getTerrain()
+        let bestSpots = [];
+        let maxSoFar = -1
+        const delta = gc.DELTA_MOVES[range];
+        for (let i in delta) {
+            const x = pos.x + delta[i].x;
+            const y = post.y + delta[i].y;
+            if (terrain.get(x,y) !== TERRAIN_MASK_WALL) {
+                const nonWalls = countNonWallNeighbours(x, y, terrain)
+                if (nonWalls > maxSoFar) {
+                    bestSpots = [{x:x, y:y}]
+                    maxSoFar = nonWalls;
+                } else if (nonWalls === maxSoFar) {
+                    bestSpots.push({x:x, y:y})
+                }
+            }
+        }
+        return bestSpots;
+    },
+
+    countNonWallNeighbours: function(x, y, terrain) {
+        let count = 0;
+        for (let i in gc.ONE_MOVE) {
+            const X = x + gc.ONE_MOVE[i];
+            const Y = y + gc.ONE_MOVE[i];
+            if (terrain.get(X,Y) !== TERRAIN_MASK_WALL) {
+                count++
+            }
+        }
+        return count;
+    },
+
+    constructionLeft: function (room) {
+        const sites = room.find(FIND_CONSTRUCTION_SITES);
+        let construction = 0;
+        for (let i in sites) {
+            construction += sites[i].progressTotal - sites[i].progress
+        }
+        return construction;
+    },
+
+    estimatePorters : function(room, energy) {
+        rcl = room.controller.level;
+        const carryParts = gc.RPC_PORTER_CARRY_PARTS[rcl];
+        const roundTrip = roundTripLength(room, gc.RACE_PORTER)
+        const tripsPerLife = (CREEP_LIFE_TIME - roundTrip) / roundTrip
+
+        energyPerPorter = carryParts * CARRY_CAPACITY * tripsPerLife;
+        return Math.ceil(energy / energyPerPorter);
+    },
+
     porterShortfall: function (policy) {
-        //console.log("In porterShortfall policy", JSON.stringify(policy))
         const existingPorterParts = this.existingPorterParts(policy);
-        //console.log("existingPorterParts", existingPorterParts)
-        //let energyInStorage;
-        //if ( Game.rooms[policy.roomId].storage !== undefined) {
-        //    energyInStorage = Game.rooms[policy.roomId].storage.store[RESOURCE_ENERGY];
-        //} else {
-        //    energyInStorage = 0;
-        //}
-        //console.log("energyInStorage", energyInStorage)
         const portersNoCommitmentsEnergyLT = this.energyLifeTime(Game.rooms[policy.roomId], 1, "upgrader"); //todo what should this be?
-        //console.log("portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT)
         const sourceEnergyLT  = this.allSourcesEnergy(Game.rooms[policy.roomId]) *5;
-        //console.log("sourceEnergyLT",sourceEnergyLT)
         const energyBuildLinkersAndRepairer = 4*1000;
-        //console.log("energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer)
         const energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer;
-        //console.log("energyForUpgrading",energyForUpgrading)
         const numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
-        //console.log("numPortersPartsNeeded",numPortersPartsNeeded)
         return numPortersPartsNeeded - existingPorterParts;
-        //console.log("porterShortfall", porterShortfall);
-        //return porterShortfall;
     },
 
     existingPorterParts: function (policy) {
         const porters = _.filter(Game.creeps, function (creep) {
             return (creep.memory.policyId === policy.id);
         });
-        //console.log("existingPorterParts number creeps",porters.length);
         let parts = 0;
         for (let i in porters) {
             parts = parts + porters[i].getActiveBodyparts(WORK);
         }
-        //console.log("existingPorterParts  parts", parts);
-        return parts;
+         return parts;
     },
 
     energyLifeTime: function (room, workerSize, role) {
-        //console.log("energy lifetime role", role, "Load Time", JSON.stringify(this.LoadTime));
         const loadTime = this.LoadTime[role];
-        //console.log("energyLifeTime loadTime", loadTime);
         const offloadTime = this.OffloadTime[role];
-        //console.log("energyLifeTime offloadTime", offloadTime);
         const roundTripTime = this.roundTripLength(room, role);
-        //console.log("energyLifeTime roundTripTime", roundTripTime);
         const timePerTrip = loadTime + offloadTime + roundTripTime;
         const tripsPerLife = CREEP_LIFE_TIME / timePerTrip;
         const energyPerTrip = CARRY_CAPACITY * workerSize;
@@ -70,8 +100,16 @@ const economy = {
 
     roundTripLength: function(room, role) {
         switch (role) {
-            case gc.ROLE_WORKER:
-                return this.getUpgradeRoundTripLength(room);
+            case gc.RACE_WORKER:
+                if (!room.memory.worker_round_trip) {
+                    room.memory.worker_round_trip = this.getUpgradeRoundTripLength(room);
+                }
+                return room.memory.worker_round_trip;
+            case gc.RACE_PORTER:
+                if (!room.memory.porter_round_trip) {
+                    room.memory.porter_round_trip = this.getUpgradeRoundTripLength(room);
+                }
+                return room.memory.worker_round_trip;
             default:
                 return this.getUpgradeRoundTripLength(room);
         }
@@ -87,20 +125,37 @@ const economy = {
         return  room.memory.upgradeTrip;
     },
 
+
+    avDistanceBetweenObjs: function(room, objArray) {
+        let distance = 0, paths = 0;
+        for (let i in objArray) {
+            for (let j in objArray) {
+                if (i !== j) {
+                    const path = room.findPath(objArray1[i].pos, objArray2[j].pos,  {
+                        ignoreCreeps: true,
+                        ignoreRoads: true,
+                        ignoreDestructibleStructures: true});
+                    distance += path.length;
+                    paths++
+                }
+            }
+        }
+        return distance / paths;
+    },
+
     avDistanceBetweenObjects: function (room, objArray1, objArray2) {
         let distance = 0;
         let journeys = 0;
         for ( let i in objArray1 ) {
             for ( let j in objArray2 ) {
-                const path = room.findPath(objArray1[i].pos, objArray2[j].pos,  {
-                    ignoreCreeps: true,
-                    ignoreRoads: true,
-                    ignoreDestructibleStructures: true});
-                //   console.log("two points " + objArray1[i].pos + objArray2[j].pos);
-                distance = distance + path.length;
-                journeys = journeys + 1;
-                // console.log("avDistanceBetweenObjects path len " + path.length + " distance "
-                //           + distance + " journeys " + journeys);
+                if (!room.findPath(objArray1[i].pos.isEqualTo(objArray2[j].pos))) {
+                    const path = room.findPath(objArray1[i].pos, objArray2[j].pos,  {
+                        ignoreCreeps: true,
+                        ignoreRoads: true,
+                        ignoreDestructibleStructures: true});
+                    distance = distance + path.length;
+                    journeys = journeys + 1;
+                }
             }
         }
         return distance/journeys;

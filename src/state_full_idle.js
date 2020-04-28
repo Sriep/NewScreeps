@@ -5,6 +5,7 @@
  */
 const gc = require("gc");
 const state = require("state");
+const race = require("race");
 
 function State (creep) {
     //console.log("in full idle constructor", creep.name)
@@ -14,18 +15,21 @@ function State (creep) {
         //console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
     //if (0  !== creep.store.getFreeCapacity(RESOURCE_ENERGY))
     //    console.log("In full idle state with non empty creep: " + JSON.stringify(creep));
-    this.type = gc.STATE_FULL_IDEL;
+    this.type = gc.STATE_FULL_IDLE;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
+    if (race.getRace(this.creep) === gc.RACE_HARVESTER)
+        state.switchToHarvesterIdle(this.creep)
+
     if (this.creep.room.controller.ticksToDowngrade
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
-        state.switchToMovePath(
+        state.switchToMoveTarget(
             this.creep,
             this.creep.room.controller.id,
             gc.RANGE_UPGRADE,
-            gc.STATE_UPGRADE
+            gc.STATE_WORER_UPGRADE
         );
     }
 
@@ -42,7 +46,7 @@ State.prototype.enact = function () {
             }
         });
     if (nextSourceContainer != null) {
-        return state.switchToMovePath(
+        return state.switchToMoveTarget(
             this.creep,
             nextSourceContainer.id,
             gc.RANGE_TRANSFER,
@@ -56,7 +60,7 @@ State.prototype.enact = function () {
         }
     });
     if (damagedStructure != null) {
-        return state.switchToMovePath(
+        return state.switchToMoveTarget(
             this.creep,
             damagedStructure.id,
             gc.RANGE_REPAIR,
@@ -66,7 +70,7 @@ State.prototype.enact = function () {
 
     let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite != null) {
-        return state.switchToMovePath(
+        return state.switchToMoveTarget(
             this.creep,
             nextConstructionSite.id,
             gc.RANGE_BUILD,
@@ -74,11 +78,11 @@ State.prototype.enact = function () {
         );
     }
 
-    state.switchToMovePath(
+    state.switchToMoveTarget(
         this.creep,
         this.creep.room.controller.id,
         gc.RANGE_UPGRADE,
-        gc.STATE_UPGRADE
+        gc.STATE_WORER_UPGRADE
     );
 }
 

@@ -1,31 +1,29 @@
 /**
  * @fileOverview screeps
- * Created by piers on 27/04/2020
+ * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const race = require("race");
 
 function State (creep) {
-    //console.log("in state repair constructor")
-    this.type = gc.STATE_REPAIR;
+    this.type = gc.STATE_UPGRADE_REPAIR;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdle(this.creep);
+    if (this.creep.state.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        state.switchState(creep, gc.STATE_UPGRADE_EMPTY)
     }
-    const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target) {
-        return state.switchToFullIdle(this.creep);
+
+    const container = Game.getObjectById(this.creep.memory.containerId);
+    if (container.hitsMax - container.hits < race.repairPower(this.creep)) {
+        state.switchState(this.creep, gc.STATE_UPGRADE);
     }
-    if (target.hits === target.hitsMax) {
-        this.creep.say("fixed")
-        return state.switchToFullIdle(this.creep);
-    }
-    const result = this.creep.repair(target);
+
+    const result = this.creep.repair(container);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -43,10 +41,6 @@ State.prototype.enact = function () {
             return gf.fatalError("ERR_NO_BODYPART");
         default:
             return gf.fatalError("no valid result");
-    }
-    if (target.hits === target.hitsMax) {
-        this.creep.say("fixed")
-        return state.switchToFullIdle(this.creep);
     }
 }
 

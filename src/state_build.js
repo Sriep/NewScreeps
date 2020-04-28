@@ -16,11 +16,11 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdel(this.creep);
+        return state.switchToEmptyIdle(this.creep);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
-        return state.switchToFullIdel(this.creep);
+        return state.switchToFullIdle(this.creep);
     }
     const result = this.creep.build(target);
     switch (result) {

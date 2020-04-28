@@ -1,6 +1,6 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
 const gc = require("gc");
@@ -8,20 +8,26 @@ const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in porter constructor", creep.name)
-    this.type = gc.STATE_PORTER;
+    //console.log("in porter pickup constructor", creep.name)
+    this.type = gc.STATE_PORTER_PICKUP;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdle(this.creep)
+    let target;
+    if (this.creep.memory.targetId) {
+        target = Game.getObjectById(this.creep.memory.targetId);
+    } else {
+        const resourcesAt = this.creep.memory.targetPos.lookFor(LOOK_RESOURCES);
+        if (resourcesAt.length > 0) {
+            target = resourcesAt[0];
+        }
     }
-    const target = Game.getObjectById(this.creep.memory.targetId);
-    if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToFullIdle(this.creep);
+    if (!target) {
+        return state.switchState(creep, gc.STATE_PORTER_IDLE);
     }
-    const result = this.creep.transfer(target, RESOURCE_ENERGY);
+
+    const result = this.creep.pickup(target);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -43,7 +49,7 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToFullIdle(this.creep);
+        return state.switchState(creep, gc.STATE_PORTER_FULL_IDLE);
     }
 }
 

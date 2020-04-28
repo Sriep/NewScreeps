@@ -22,6 +22,17 @@ const construction = {
         }
     },
 
+    buildRoadSources: function(room) {
+        const sources = room.find(FIND_SOURCES);
+        for (let i = 0 ; i < sources.length ; i++ ){
+            for (let j = 0 ; j < sources.length ; j++ ){
+                if (i !== j) {
+                    this.buildRoad(sources[i].pos, sources[j].pos);
+                }
+            }
+        }
+    },
+
     buildRoadSourceExtensions: function(room) {
         const sources = room.find(FIND_SOURCES);
         const extensions = room.find(FIND_MY_STRUCTURES, {

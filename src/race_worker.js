@@ -6,12 +6,21 @@
 const gc = require("gc");
 
 const race_worker = {
-
+    WORKER_SLOW_MAX_SIZE: 16,
+    WORKER_FAST_MAX_SIZE: 12,
     BLOCKSIZE: 100 + 50 + 50,
     BLOCKSIZE_FAST: 100 + 50 + 50 + 50,
     BLOCKSIZE_PARTS: 3,
 
-    body: function (size, fast) {
+    body: function (ec) {
+        let size;
+        if (fast) {
+            const parts = Math.floor(ec/this.BLOCKSIZE_FAST);
+            size = Math.min(parts, this.WORKER_FAST_MAX_SIZE);
+        } else {
+            const parts =  Math.floor(ec/this.BLOCKSIZE);
+            size = Math.min(parts, this.WORKER_SLOW_MAX_SIZE);
+        }
         let body = [];
 
         if (undefined === fast || !fast)
@@ -53,8 +62,7 @@ const race_worker = {
             //console.log("slow workerBodyPartLimit", workerBodyPartLimit, room.energyCapacityAvailable, this.BLOCKSIZE)
             return Math.min(workerBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
         }
-    }
-
+    },
 }
 
 module.exports = race_worker;
