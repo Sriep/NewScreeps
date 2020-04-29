@@ -34,7 +34,7 @@ const policy = {
                 if (room.controller && room.controller.my) {
                     room.memory.policy = this.activatePolicy(gc.POLICY_PEACE, {roomId: roomId})
                 } else {
-                    room.memory.policy = this.activatePolicy(gc.POLICY_NEUTRAL_ROOM, {roomId: roomId})
+                    //room.memory.policy = this.activatePolicy(gc.POLICY_NEUTRAL_ROOM, {roomId: roomId})
                 }
             }
         }

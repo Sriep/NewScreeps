@@ -43,7 +43,7 @@ State.prototype.enact = function () {
     // todo check creep lifetime, check lives long enough to reach target.
     state.switchToMoveTarget(
         this.creep,
-        source.id,
+        source,
         gc.RANGE_HARVEST,
         gc.STATE_HARVEST
     );
@@ -59,7 +59,7 @@ State.prototype.goUpgrade = function () {
         this.creep,
         ccPos,
         gc.RANGE_TRANSFER,
-        gc.STATE_UPGRADE_EMPTY
+        gc.STATE_UPGRADE
     );
 }
 

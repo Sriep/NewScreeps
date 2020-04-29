@@ -70,10 +70,12 @@ const state = {
         }
     },
 
-    switchToMoveTarget(creep, targetId, range, nextState) {
-        creep.memory.targetId = targetId;
-        const target = Game.getObjectById(this.creep.memory.targetId);
-        return switchToMovePos(creep, target.pos, range, nextState)
+    switchToMoveTarget(creep, target, range, nextState) {
+        creep.memory.targetId = target.id;
+        if (!target.id){
+            gf.fatalError("switchToMoveTarget " + creep.name + " no target id "+ JSON.stringify(target))
+        }
+        return state.switchToMovePos(creep, target.pos, range, nextState)
     },
 
     switchToMovePos(creep, targetPos, range, nextState) {
@@ -86,6 +88,7 @@ const state = {
     },
 
     switchState: function (creep, newState, targetId) {
+        console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
         //console.log("creep", creep.name,"changes state from ",
         //    creep.memroy.state, " to ", newState);
         creep.memory.state = newState;
@@ -97,6 +100,7 @@ const state = {
             //console.log("state", newState, "gives say", this.creepSay[newState]);
             //console.log("creepSay", JSON.stringify(this.creepSay))
         //}
+        console.log("Switch", creep.name,"from",creep.memory.state, "to", newState)
         return state.enact(creep);
     },
 

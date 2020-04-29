@@ -33,7 +33,7 @@ const race_harvester = {
         for (let i = 0; i < Cs; i++) {
             body.push(CARRY);
         }
-        console.log("######################## made harvester ec",ec, "bdoy", JSON.stringify(body) );
+        //console.log("######################## made harvester ec",ec, "bdoy", JSON.stringify(body) );
 
         return body;
     }

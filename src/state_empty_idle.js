@@ -24,11 +24,12 @@ State.prototype.enact = function () {
         {
             const source = state.findTargetSource(this.creep.room)
             if (source) {
-                return state.switchToMoveTarget(
+                this.creep.memory.targetId = source.id;
+                return state.switchToMovePos(
                     this.creep,
-                    source.id,
+                    source.pos,
                     gc.RANGE_HARVEST,
-                    gc.STATE_WORKER_HARVEST
+                    gc.STATE_WORKER_HARVEST,
                 );
             }
             break;

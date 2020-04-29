@@ -12,7 +12,7 @@ const policy = require("policy");
 
 
 module.exports.loop = function () {
-     //console.log("************************ Start ", Game.time," *********************************");
+    console.log("************************ Start ", Game.time," *********************************");
     inserted.top();
 
     freeCreeps();

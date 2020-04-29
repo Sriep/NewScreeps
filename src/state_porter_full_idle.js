@@ -24,7 +24,7 @@ State.prototype.enact = function () {
     if (nextDelivery != null) {
         return state.switchToMoveTarget(
             this.creep,
-            nextSourceContainer.id,
+            nextSourceContainer,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER
         );

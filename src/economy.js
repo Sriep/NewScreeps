@@ -85,14 +85,14 @@ const economy = {
         return sourceTotalCapacity;
     },
 
-    estimateHomePorters : function(room, energy) {
+    estimateHomePorters : function(room) {
         rcl = room.controller.level;
         const carryParts = gc.RPC_PORTER_CARRY_PARTS[rcl];
-        const roundTrip = roundTripLength(room, gc.RACE_PORTER)
+        const roundTrip = this.roundTripLength(room, gc.RACE_PORTER)
         const tripsPerLife = (CREEP_LIFE_TIME - roundTrip) / roundTrip
 
-        energyPerPorter = carryParts * CARRY_CAPACITY * tripsPerLife;
-        return Math.ceil(totalSourceCapacity(room) / energyPerPorter);
+        const energyPerPorter = carryParts * CARRY_CAPACITY * tripsPerLife;
+        return Math.ceil(this.totalSourceCapacity(room) / energyPerPorter);
     },
 
     estimateHomeHarvesters : function(room) {

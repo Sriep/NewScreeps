@@ -47,13 +47,13 @@ Policy.prototype.doNextSpawn = function (spawn) {
 Policy.prototype.getLocalSpawn = function () {
     const room = Game.rooms[this.roomId];
     const policyId = this.id;
-    let hLife = 0, pLife = 0, wLife = 0, workers = 0, harvesters = 0;
+    let hLife = 0, pLife = 0, wLife = 0, workers = 0, harvesters = 0, porters=0;
     const creeps = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId
     });
 
-    console.log("num creeps", Object.getOwnPropertyNames(Game.creeps).length)
-    console.log("creeps policy", creeps.length, "all creeps length", )
+    //console.log("num creeps", Object.getOwnPropertyNames(Game.creeps).length)
+    //console.log("creeps policy", creeps.length, "all creeps length", )
     for (let i in creeps) {
         switch (race.getRace(creeps[i])) {
             case gc.RACE_HARVESTER:
@@ -62,6 +62,7 @@ Policy.prototype.getLocalSpawn = function () {
                 break;
             case gc.RACE_PORTER:
                 pLife += creeps[i].ticksToLive;
+                porters++;
                 break;
             case gc.RACE_WORKER:
                 wLife += creeps[i].ticksToLive;
@@ -69,32 +70,32 @@ Policy.prototype.getLocalSpawn = function () {
                 break;
         }
     }
-    console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
-    console.log("workers", workers, "harvesters",harvesters)
+    //console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
+    //console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
     const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-    console.log("constructionLeft", economy.constructionLeft(room));
-    console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
+    //console.log("constructionLeft", economy.constructionLeft(room));
+    //console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
     if (wLife < buildTicksNeeded || workers === 0) {
-        console.log("workers", 1, "access pts", economy.sourceAccessPointsRoom(room));
+        //console.log("workers", 1, "access pts", economy.sourceAccessPointsRoom(room));
         if (workers === 0 || workers <= economy.sourceAccessPointsRoom(room)) {
-            console.log("spawn worker");
+            //console.log("spawn worker");
             return gc.RACE_WORKER;
         }
     }
-    console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
+    //console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
     if (harvesters < economy.estimateHomeHarvesters(room)) {
-        console.log("spawn harvesters")
+        //console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
 
-    console.log("estimatePorters", economy.estimateHomePorters(room))
+    //console.log("estimatePorters", economy.estimateHomePorters(room))
     if (porters < economy.estimateHomePorters(room)) {
-        console.log("spawn porter")
+        //console.log("spawn porter")
         return gc.RACE_PORTER
     }
 
     if (harvesters < 2*economy.estimateHomeHarvesters(room)) {
-        console.log("spawn harvesters")
+        //console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
 
@@ -104,7 +105,7 @@ Policy.prototype.getLocalSpawn = function () {
 Policy.prototype.build = function () {
     const room = Game.rooms[this.roomId];
     const rcl = room.controller.level
-    console.log("policy build rcl", rcl)
+    //console.log("policy build rcl", rcl)
     if (Memory.policies[this.id].rcl === room.controller.level) {
         if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
             return

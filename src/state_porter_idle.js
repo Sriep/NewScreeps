@@ -17,7 +17,7 @@ State.prototype.enact = function () {
     if (target) {
         state.switchToMoveTarget(
             this.creep,
-            target.id,
+            target,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_TRANSFER,
         );
@@ -35,7 +35,7 @@ State.prototype.enact = function () {
     }
     // todo follow harvester
     const policyId = this.creep.policyId
-    const creeps = _.filter(Game.creeps, function (c) {
+    let creeps = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId
             && (c.memory.state === gc.STATE_HARVEST
                 || c.memory.state === gc.STATE_HARVESTER_FULL
@@ -43,6 +43,20 @@ State.prototype.enact = function () {
                 || c.memory.state === gc.STATE_HARVESTER_REPAIR
                 || c.memory.state === gc.STATE_HARVESTER_BUILD )
     });
+    if (creeps.length > 0) {
+        creeps = creeps.sort( function (a,b)  {
+            return b.store.getUsedCapacity(RESOURCE_ENERGY)
+                - a.store.getUsedCapacity(RESOURCE_ENERGY);
+        } );
+        state.switchToMoveTarget(
+            this.creep,
+            creeps[0],
+            gc.RANGE_TRANSFER,
+            gc.STATE_PORTER_RECEIVE
+        )
+    }
+
+
 }
 
 module.exports = State;

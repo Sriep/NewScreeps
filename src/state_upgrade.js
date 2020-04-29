@@ -15,38 +15,36 @@ function State (creep) {
 //    return state.switchState(this.creep, gc.STATE_UPGRADE_REPAIR)
 //}
 State.prototype.enact = function () {
-    if (!state.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(creep, gc.STATE_UPGRADE_EMPTY);
+    console.log("creep", this.creep.name, "store", JSON.stringify(this.creep.store))
+    console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) )
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);
     }
+    const result = this.creep.upgradeController(this.creep.room.controller);
+    switch (result) {
+        case OK:                        // The operation has been scheduled successfully.
+            break;
+        case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
+            return gf.fatalError("ERR_NOT_OWNER");
+        case ERR_BUSY:                  // The creep is still being spawned.
+            return gf.fatalError("ERR_BUSY");
+        case ERR_NOT_FOUND:     // Extractor not found. You must build an extractor structure to harvest minerals. Learn more.
+            return gf.fatalError(ERR_NOT_FOUND);
+        case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
+            console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) )
+            console.log("creep",JSON.stringify(this.creep.name))
+            return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES" + JSON.stringify(this.creep.store));
+        case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
+            return gf.fatalError("ERR_INVALID_TARGET");
+        case ERR_NOT_IN_RANGE:          // The target is too far away.
+            gf.fatalError("ERR_NOT_IN_RANGE");
+            return state.switchState(creep, gc.STATE_HARVESTER_IDLE);
 
-    if (source.energy > 0) {
-        const result = this.creep.upgradeController(creep.room.controller);
-        switch (result) {
-            case OK:                        // The operation has been scheduled successfully.
-                break;
-            case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
-                return gf.fatalError("ERR_NOT_OWNER");
-            case ERR_BUSY:                  // The creep is still being spawned.
-                return gf.fatalError("ERR_BUSY");
-            case ERR_NOT_FOUND:     // Extractor not found. You must build an extractor structure to harvest minerals. Learn more.
-                return gf.fatalError(ERR_NOT_FOUND);
-            case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-                return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
-            case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-                return gf.fatalError("ERR_INVALID_TARGET");
-            case ERR_NOT_IN_RANGE:          // The target is too far away.
-                gf.fatalError("ERR_NOT_IN_RANGE");
-                return state.switchState(creep, gc.STATE_HARVESTER_IDLE);
-
-            case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
-                return gf.fatalError("ERR_NO_BODYPART");
-            default:
-                return gf.fatalError("upgradeController unrecognised return value" + result.toString());
-        }
-    } else {
-        //state.switchState(creep, gc.STATE_HARVESTER_IDLE); todo not implemented
+        case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
+            return gf.fatalError("ERR_NO_BODYPART");
+        default:
+            return gf.fatalError("upgradeController unrecognised return value" + result.toString());
     }
-
 }
 
 module.exports = State;

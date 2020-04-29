@@ -27,7 +27,7 @@ State.prototype.enact = function () {
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
         state.switchToMoveTarget(
             this.creep,
-            this.creep.room.controller.id,
+            this.creep.room.controller,
             gc.RANGE_UPGRADE,
             gc.STATE_WORER_UPGRADE
         );
@@ -48,7 +48,7 @@ State.prototype.enact = function () {
     if (nextSourceContainer != null) {
         return state.switchToMoveTarget(
             this.creep,
-            nextSourceContainer.id,
+            nextSourceContainer,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER
         );
@@ -62,7 +62,7 @@ State.prototype.enact = function () {
     if (damagedStructure != null) {
         return state.switchToMoveTarget(
             this.creep,
-            damagedStructure.id,
+            damagedStructure,
             gc.RANGE_REPAIR,
             gc.STATE_REPAIR
         );
@@ -72,7 +72,7 @@ State.prototype.enact = function () {
     if (nextConstructionSite != null) {
         return state.switchToMoveTarget(
             this.creep,
-            nextConstructionSite.id,
+            nextConstructionSite,
             gc.RANGE_BUILD,
             gc.STATE_BUILD
         );
@@ -80,7 +80,7 @@ State.prototype.enact = function () {
 
     state.switchToMoveTarget(
         this.creep,
-        this.creep.room.controller.id,
+        this.creep.room.controller,
         gc.RANGE_UPGRADE,
         gc.STATE_WORER_UPGRADE
     );

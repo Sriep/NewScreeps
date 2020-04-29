@@ -57,9 +57,9 @@ const gc = {
     STATE_PORTER_FULL_IDLE: "porter_full_idle",
     STATE_PORTER_TRANSFER: "porter_transfer",
     STATE_PORTER_WITHDRAW: "porter_withdraw",
+    STATE_PORTER_RECEIVE: "porter-receive",
     // states upgrader
     STATE_UPGRADE: "upgrade",
-    STATE_UPGRADE_EMPTY: "upgrade_empty",
     STATE_UPGRADE_WITHDRAW: "upgrade_withdraw",
 
     // Economy settings

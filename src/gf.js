@@ -14,7 +14,7 @@ const gf = {
     },
 
     roomPosFromPos(pos) {
-        return new RoomPosition(pos.x, pos.h, pos.roomName)
+        return new RoomPosition(pos.x, pos.y, pos.roomName)
     },
 
     needsRepair : function (s) {
@@ -26,7 +26,6 @@ const gf = {
         const deltaY = pos1.y - pos2.y;
         const offsets = gc.ADJACENCIES[deltaX][deltaY];
         const joinPos = [];
-        const terrain = Game.rooms[pos1.roomName].getTerrain()
         for (let i = 0 ; i < offsets.length ; i++ ) {
             const pos = new RoomPosition( pos2.x + offsets[i].dx,
                 pos2.y + offsets[i].dy,
@@ -53,9 +52,7 @@ const gf = {
                     break;
                 case LOOK_CREEPS:
                 case LOOK_POWER_CREEPS:
-                    if (creepsAreObsticals)
-                        return true
-                    return false;
+                    return !!creepsAreObsticals;
                 case LOOK_SOURCES:
                 case LOOK_MINERALS:
                 case LOOK_NUKES:
