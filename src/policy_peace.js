@@ -112,15 +112,35 @@ Policy.prototype.build = function () {
     }
 
     const controllerFlag = Game.flags[room.controller.id];
-    ccPos = controllerFlag.memory.container
-    console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
+    let ccPos = controllerFlag.memory.container;
     if (!ccPos) {
-        const spots = economy.findMostFreeNeighbours(
+        let spots = economy.findMostFreeNeighbours(
             room, room.controller.pos, 2
         )
-        console.log("spots", JSON.stringify(spots));
-        ccPos = new RoomPosition(spots[0].x, spots[0].y, room.name);
-        controllerFlag.memory.container = ccPos;
+        console.log("spots", JSON.stringify(spots))
+        if (spots.length === 0) {
+            return gf.fatalError("findMostFreeNeighbours return no spots");
+        }
+        let bestIndex = 0;
+        if (spots.length > 1) {
+            console.log("spots length", spots. length);
+            const spawns = room.find(FIND_MY_SPAWNS)
+            let bestSoFar = 9999;
+            // todo this bit is expensive so maybe check cpu?
+            for (let i in spots) {
+                const pathLength = spots[i].findPathTo(spawns[0].pos).length
+                console.log("i", i, "spots", JSON.stringify(spots[i]), "length", pathLength)
+                if (pathLength < bestSoFar) {
+                    bestIndex = i;
+                    bestSoFar = pathLength;
+                }
+            }
+            console.log("bestIndex", bestIndex)
+            ccPos = new RoomPosition(spots[bestIndex].x, spots[bestIndex].y, room.name);
+            controllerFlag.memory.container = ccPos;
+        }
+
+        console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
         const result = ccPos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
             gf.fatalError("construction failed " + result.toString())
@@ -140,6 +160,7 @@ Policy.prototype.build = function () {
         }
     }
 */
+
     if (rcl >= gc.BUILD_ROAD_SOURCE_SPAWN) {
         construction.buildRoadSourceSpawn(room)
     }
@@ -151,6 +172,9 @@ Policy.prototype.build = function () {
     }
     if (rcl >= gc.BUILD_ROAD_SOURCE_SOURCE) {
         construction.buildRoadSources(room)
+    }
+    if (rcl >= gc.BUILD_ROAD_SPAWN_CONTROLLER) {
+        construction.buildRoadSpawnController(room)
     }
     construction.buildMissingExtensions(room, rcl);
     Memory.policies[this.id].rcl = rcl;

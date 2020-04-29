@@ -11,7 +11,7 @@ const gf = {
         console.log(Error().stack)
         if (gc.DEBUG)
             throw(msg);
-    }
+    },
 }
 
 module.exports = gf;

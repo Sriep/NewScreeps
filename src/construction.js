@@ -6,9 +6,24 @@
 
 const construction = {
     buildRoadSourceController: function(room) {
+        const controllerFlag = Game.flags[room.controller.id];
+        ccPos = controllerFlag.memory.container;
         const sources = room.find(FIND_SOURCES);
+
         for (let j = 0 ; j < sources.length ; j++ ){
             this.buildRoad(sources[i].pos, room.controller.pos);
+            this.buildRoad(sources[i].pos, ccPos);
+        }
+    },
+
+    buildRoadSpawnController: function(room) {
+        const controllerFlag = Game.flags[room.controller.id];
+        ccPos = controllerFlag.memory.container;
+        const spawns = room.find(FIND_MY_SPAWNS);
+
+        for (let j = 0 ; j < spawns.length ; j++ ){
+            this.buildRoad(spawns[i].pos, room.controller.pos);
+            this.buildRoad(spawns[i].pos, ccPos);
         }
     },
 

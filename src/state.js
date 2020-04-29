@@ -164,20 +164,25 @@ const state = {
     findContainerConstructionNear : function (creep, range) {
         if (!range) range = 0;
         const pos = creep.pos;
-        const sites = creep.room.lookForAt(
-            pos.y+range, pos.x-range, pos.y-range, pos.x+range, true
+        console.log("lookForAtArea points",pos.y+range, pos.x-range, pos.y-range,pos.x+range)
+        const sites = creep.room.lookForAtArea(
+            LOOK_CONSTRUCTION_SITES,
+            pos.y-range,
+            pos.x-range,
+            pos.y+range,
+            pos.x+range,
+            pos.y+range,
+            true
         )
+        console.log("findContainerConstructionNear newrby sites", JSON.stringify(sites))
         for (let i in sites) {
             console.log("site i", i, "obj", JSON.stringify(sites[i]))
-            if (sites[i].type === LOOK_CONSTRUCTION_SITES) {
+            if (sites[i].structureType === STRUCTURE_CONTAINER) {
+                console.log("findContainerConstructionNear found site");
                 return sites[i]
             }
         }
-
-        console.log("findContainerConstructionNear sites", JSON.stringify(sites));
-        if (sites.length > 0) {
-            return sites[0];
-        }
+        console.log("findContainerConstructionNear not found any");
         return undefined;
     },
 

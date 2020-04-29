@@ -32,23 +32,25 @@ const economy = {
         //console.log("delta", JSON.stringify(delta))
         //console.log("gc.DELTA_MOVES)", JSON.stringify(gc.DELTA_MOVES))
         //console.log("ONE_MOVE", JSON.stringify(gc.ONE_MOVE))
-        console.log("delta", JSON.stringify(delta))
+        //console.log("delta", JSON.stringify(delta))
         for (let i in delta) {
-            console.log("i", i, "delta[i]", JSON.stringify(delta[i]));
+            //console.log("i", i, "delta[i]", JSON.stringify(delta[i]));
             const x = pos.x + delta[i].x;
             const y = pos.y + delta[i].y;
             if (terrain.get(x,y) !== TERRAIN_MASK_WALL) {
                 const nonWalls = this.countNonWallNeighbours(x, y, terrain)
-                console.log("countNonWallNeighbours nonWalls", nonWalls)
+                //console.log("countNonWallNeighbours nonWalls", nonWalls)
                 if (nonWalls > maxSoFar) {
-                    bestSpots = [{x:x, y:y}]
+                    bestSpots.length = 0;
+                    bestSpots = [new RoomPosition(x, y, room.name)]
                     maxSoFar = nonWalls;
                 } else if (nonWalls === maxSoFar) {
-                    bestSpots.push({x:x, y:y})
+                    bestSpots.push(new RoomPosition(x, y, room.name))
+                    //bestSpots.push({x:x, y:y})
                 }
             }
         }
-        console.log("bestSpots", bestSpots, "maxSoFar", maxSoFar)
+        //console.log("bestSpots", bestSpots, "maxSoFar", maxSoFar)
         return bestSpots;
     },
 
