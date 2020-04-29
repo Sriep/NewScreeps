@@ -1,24 +1,28 @@
 /**
  * @fileOverview screeps
- * Created by piers on 28/04/2020
+ * Created by piers on 29/04/2020
  * @author Piers Shepperson
  */
+
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in porter pickup constructor", creep.name)
-    this.type = gc.STATE_PORTER_PICKUP;
+    this.type = gc.STATE_PORTER_WITHDRAW;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    const drop = this.creep.room.findClosestByRange(FIND_STRUCTURES, {
-        filter: { structureType: FIND_DROPPED_RESOURCES }
-    });
+    let target;
+    if (this.creep.memory.targetId) {
+        target = Game.getObjectById(this.creep.memory.targetId);
+    }
+    if (!target) {
+        return state.switchState(creep, gc.STATE_PORTER_IDLE);
+    }
 
-    const result = this.creep.pickup(drop);
+    const result = this.creep.withdraw(target, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;

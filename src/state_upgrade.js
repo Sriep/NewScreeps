@@ -11,14 +11,16 @@ function State (creep) {
     this.type = gc.STATE_UPGRADE;
     this.creep = creep
 }
-
+//if (gf.needsRepair(container)) {
+//    return state.switchState(this.creep, gc.STATE_UPGRADE_REPAIR)
+//}
 State.prototype.enact = function () {
     if (!state.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchState(creep, gc.STATE_UPGRADE_EMPTY);
     }
-    const source = Game.getObjectById(this.creep.memory.targetId)
+
     if (source.energy > 0) {
-        const result = this.creep.harvest(target);
+        const result = this.creep.upgradeController(creep.room.controller);
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.
                 break;
@@ -33,13 +35,13 @@ State.prototype.enact = function () {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
-                return gf.fatalError("ERR_NOT_IN_RANGE");
-            case ERR_TIRED:        // The extractor or the deposit is still cooling down.
-                return ERR_TIRED;
+                gf.fatalError("ERR_NOT_IN_RANGE");
+                return state.switchState(creep, gc.STATE_HARVESTER_IDLE);
+
             case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
                 return gf.fatalError("ERR_NO_BODYPART");
             default:
-                throw("harvest unrecognised return value");
+                return gf.fatalError("upgradeController unrecognised return value" + result.toString());
         }
     } else {
         //state.switchState(creep, gc.STATE_HARVESTER_IDLE); todo not implemented

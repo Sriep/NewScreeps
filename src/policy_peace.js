@@ -82,18 +82,18 @@ Policy.prototype.getLocalSpawn = function () {
         }
     }
     console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
-    if (harvesters < gc.RPC_HARVESTERS[room.controller.level]) {
+    if (harvesters < economy.estimateHomeHarvesters(room)) {
         console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
 
-    console.log("estimatePorters", economy.estimatePorters(room))
-    if (porters < economy.estimatePorters(room)) {
+    console.log("estimatePorters", economy.estimateHomePorters(room))
+    if (porters < economy.estimateHomePorters(room)) {
         console.log("spawn porter")
         return gc.RACE_PORTER
     }
 
-    if (harvesters < 3*gc.RPC_HARVESTERS[room.controller.level]) {
+    if (harvesters < 2*economy.estimateHomeHarvesters(room)) {
         console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
@@ -123,24 +123,24 @@ Policy.prototype.build = function () {
         }
         let bestIndex = 0;
         if (spots.length > 1) {
-            console.log("spots length", spots. length);
+            //console.log("spots length", spots. length);
             const spawns = room.find(FIND_MY_SPAWNS)
             let bestSoFar = 9999;
             // todo this bit is expensive so maybe check cpu?
             for (let i in spots) {
                 const pathLength = spots[i].findPathTo(spawns[0].pos).length
-                console.log("i", i, "spots", JSON.stringify(spots[i]), "length", pathLength)
+                //console.log("i", i, "spots", JSON.stringify(spots[i]), "length", pathLength)
                 if (pathLength < bestSoFar) {
                     bestIndex = i;
                     bestSoFar = pathLength;
                 }
             }
-            console.log("bestIndex", bestIndex)
+            //console.log("bestIndex", bestIndex)
             ccPos = new RoomPosition(spots[bestIndex].x, spots[bestIndex].y, room.name);
             controllerFlag.memory.container = ccPos;
         }
 
-        console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
+        //console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
         const result = ccPos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
             gf.fatalError("construction failed " + result.toString())

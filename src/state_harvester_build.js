@@ -14,15 +14,11 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log("STATE_HARVESTER_BUILD creep name", this.creep.name)
     if (state.spaceForHarvest(this.creep)) {
         console.log("in STATE_HARVESTER_BUILD space for harvest", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) )
         state.switchState(this.creep, gc.STATE_HARVEST);
     }
 
-    //if (state.isBuilt(this.creep.pos)) {
-    //    state.switchState(this.creep, gc.STATE_HARVESTER_TRANSFER);
-    //}
     console.log("STATE_HARVESTER_BUILD creep memory", JSON.stringify(this.creep.memory));
     let site = undefined;
     if (this.creep.memory.siteId) {
@@ -30,6 +26,7 @@ State.prototype.enact = function () {
     }
     if (!site) {
         site = state.findContainerConstructionNear(this.creep, 1);
+        console.log("site returned", JSON.stringify(site));
     }
     if (!site) {
         const result = this.creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
@@ -40,6 +37,7 @@ State.prototype.enact = function () {
             const sourceFlag =  Game.flags[this.creep.memory.targetId];
             sourceFlag.memory.container = this.creep.pos;
         } else {
+            this.creep.say("cant build")
             return gf.fatalError("Help cant start harvester construction error " + result.toString());
         }
     }

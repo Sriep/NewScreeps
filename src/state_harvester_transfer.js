@@ -5,6 +5,7 @@
  */
 const gc = require("gc");
 const gf = require("gf");
+const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_HARVESTER_TRANSFER;
@@ -12,7 +13,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    if (state.spaceForHarvest(creep)) {
+    if (state.spaceForHarvest(this.creep)) {
         return state.switchState(this.creep, gc.STATE_HARVEST)
     }
 

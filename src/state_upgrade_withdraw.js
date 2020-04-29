@@ -4,21 +4,23 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in porter pickup constructor", creep.name)
-    this.type = gc.STATE_PORTER_PICKUP;
+    this.type = gc.STATE_UPGRADE_WITHDRAW;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    const drop = this.creep.room.findClosestByRange(FIND_STRUCTURES, {
-        filter: { structureType: FIND_DROPPED_RESOURCES }
-    });
+    if (this.creep.store.getUsedCapacity() > 0) {
+        return state.switchState(this.creep, gc.STATE_UPGRADE)
+    }
+    const container = state.findUpgradeContainer();
+    if (!container) {
+        return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE)
+    }
 
-    const result = this.creep.pickup(drop);
+    const result = this.creep.withdraw(container, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -39,10 +41,8 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(creep, gc.STATE_PORTER_IDLE);
-    }
-    state.switchState(creep, gc.STATE_PORTER_FULL_IDLE);
 }
+
+
 
 module.exports = State;

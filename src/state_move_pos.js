@@ -17,7 +17,7 @@ State.prototype.enact = function () {
     if (this.creep.pos.inRangeTo(this.creep.memory.targetPos, this.creep.memory.moveRange)) {
         return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    const result = this.creep.moveTo(this.creep.memory.targetPos, {reusePath: 5})
+    const result = this.creep.moveTo(gf.roomPosFromPos(this.creep.memory.targetPos), {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -35,7 +35,8 @@ State.prototype.enact = function () {
         case ERR_NO_BODYPART:        // There are no MOVE body parts in this creep’s body.
             return ERR_RCL_NOT_ENOUGH;
         default:
-            return gf.fatalError("moveByPath unrecognised return value");
+            console.log("target", JSON.stringify(this.creep.memory.targetPos))
+            return gf.fatalError("moveByPath unrecognised return|", result,"|");
     }
 }
 

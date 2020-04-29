@@ -9,7 +9,7 @@ const race_harvester = {
     WWM_COST: 250,
 
     body: function (ec) {
-        let Ws = 1, Ms = 1, Cs = 1;
+        let Ws = 2, Ms = 1, Cs = 1;
         const wwmBlocks = Math.floor((ec -this.WWCM_COST)/this.WWM_COST);
         Ws += 2*wwmBlocks;
         Ms += wwmBlocks;
@@ -33,6 +33,8 @@ const race_harvester = {
         for (let i = 0; i < Cs; i++) {
             body.push(CARRY);
         }
+        console.log("######################## made harvester ec",ec, "bdoy", JSON.stringify(body) );
+
         return body;
     }
 }

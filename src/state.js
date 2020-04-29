@@ -72,11 +72,8 @@ const state = {
 
     switchToMoveTarget(creep, targetId, range, nextState) {
         creep.memory.targetId = targetId;
-        creep.memory.state = gc.STATE_MOVE_TARGET;
-        creep.memory.moveRange = range;
-        creep.memory.next_state = nextState;
-        creep.say("go " + nextState)
-        return state.enact(creep);
+        const target = Game.getObjectById(this.creep.memory.targetId);
+        return switchToMovePos(creep, target.pos, range, nextState)
     },
 
     switchToMovePos(creep, targetPos, range, nextState) {
@@ -140,25 +137,31 @@ const state = {
     },
 
     spaceForHarvest: function (creep) {
-        //console.log("spaceForHarvest creep", creep.name);
-        //console.log("spaceForHarvest race.workParts(creep)", race.workParts(creep));
-        //console.log("creep.store.getFreeCapacity(RESOURCE_ENERGY)",
-        //    creep.store.getFreeCapacity(RESOURCE_ENERGY));
-        //console.log("race.workParts(creep)*HARVEST_POWER",
-        //    race.workParts(creep)*HARVEST_POWER);
         return creep.store.getFreeCapacity(RESOURCE_ENERGY)
             > race.workParts(creep)*HARVEST_POWER;
     },
 
     findContainerAt : function (pos) {
-        const stuffAt = pos.look()
-        for (let i in stuffAt) {
-            if (stuffAt[i].type === LOOK_STRUCTURES
-                && stuffAt[i].structure.type === STRUCTURE_CONTAINER) {
-                return stuffAt[i];
-            }
+        const StructAt = pos.lookFor(LOOK_STRUCTURES)
+        if (StructAt && StructAt.structureType === STRUCTURE_CONTAINER) {
+            return StructAt;
         }
         return undefined;
+    },
+
+    findContainerConstructionAt : function (pos) {
+        const StructAt = pos.lookFor(LOOK_CONSTRUCTION_SITES)
+        if (StructAt && StructAt.structureType === STRUCTURE_CONTAINER) {
+            return StructAt;
+        }
+        return undefined;
+    },
+
+    findContainerOrConstructionAt : function (pos) {
+        const container = this.findContainerAt(pos);
+        if (container)
+            return container;
+        return this.findContainerConstructionAt(pos)
     },
 
     findContainerConstructionNear : function (creep, range) {
@@ -174,17 +177,24 @@ const state = {
             pos.y+range,
             true
         )
-        console.log("findContainerConstructionNear newrby sites", JSON.stringify(sites))
         for (let i in sites) {
-            console.log("site i", i, "obj", JSON.stringify(sites[i]))
-            if (sites[i].structureType === STRUCTURE_CONTAINER) {
+            if (sites[i].constructionSite.structureType === STRUCTURE_CONTAINER) {
                 console.log("findContainerConstructionNear found site");
-                return sites[i]
+                return sites[i].constructionSite
             }
         }
         console.log("findContainerConstructionNear not found any");
         return undefined;
     },
+
+    findUpgradeContainer : function (room) {
+        return this.findContainerAt(findUpgradeContainerPos(room));
+    },
+
+    findUpgradeContainerPos : function (room) {
+        const controllerFlag = Game.flags[room.controller.id];
+        return gf.roomPosFromPos(controllerFlag.memory.container);
+    }
 
 }
 

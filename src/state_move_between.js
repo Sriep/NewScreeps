@@ -1,6 +1,6 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 29/04/2020
  * @author Piers Shepperson
  */
 
@@ -8,26 +8,36 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
-//depreciated, use STATE_MOVE_POSITION instead
 function State (creep) {
-    //console.log("in state_move_path constructor", creep.name)
-    if (!creep)
-        console.log("Creat creep state with no creep object")
-    if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-       // console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
-    this.type = gc.STATE_MOVE_TARGET;
+    this.type = gc.STATE_MOVE_POS;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target) { // probably target build got built!
-        return state.switchToFullIdle(this.creep);
+    const pos1 = gf.roomPosFromPos(this.creep.memory.targetPos);
+    const pos2 = gf.roomPosFromPos(this.creep.memory.targetPos2);
+    const range1 = this.creep.memory.moveRange;
+    const range2 = this.creep.memory.moveRange2;
+
+    if (this.creep.pos.inRangeTo(pos1, range1)) {
+        if (this.creep.pos.inRangeTo(pos2, range2)) {
+            return state.switchTo(this.creep, this.creep.memory.next_state)
+        }
+        const joins = joinPointsBetween(pos1, pos2, true);
+        if (joins.length > 0) {
+            return state.switchToMovePos(
+                this.creep,
+                joins[0],
+                0,
+                this.creep.memory.next_state,
+            );
+        } else {
+            creep.say("blocked!")
+            return // todo maybe should return to idle
+        }
     }
-    if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
-        return state.switchTo(this.creep, this.creep.memory.next_state)
-    }
-    const result = this.creep.moveTo(target.pos, {reusePath: 5})
+
+    const result = this.creep.moveTo(gf.roomPosFromPos(this.creep.memory.targetPos), {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -45,8 +55,42 @@ State.prototype.enact = function () {
         case ERR_NO_BODYPART:        // There are no MOVE body parts in this creep’s body.
             return ERR_RCL_NOT_ENOUGH;
         default:
-            return gf.fatalError("moveByPath unrecognised return", result);
+            console.log("target", JSON.stringify(this.creep.memory.targetPos))
+            return gf.fatalError("moveByPath unrecognised return|", result,"|");
     }
 }
 
 module.exports = State;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

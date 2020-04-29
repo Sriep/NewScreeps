@@ -34,7 +34,7 @@ const gc = {
     // states common
     STATE_EMPTY_IDLE: "empty_idle",
     STATE_MOVE_TARGET: "move_target",
-    STATE_MOVE_BETWEEN: "move_between",
+    STATE_MOVE_BETWEEN: "move_between", //depreciated, use move to position
     STATE_MOVE_POS: "move_pos",
     // states harvester
     STATE_HARVESTER_IDLE: "harvester_idle",
@@ -56,11 +56,11 @@ const gc = {
     STATE_PORTER_PICKUP: "pickup",
     STATE_PORTER_FULL_IDLE: "porter_full_idle",
     STATE_PORTER_TRANSFER: "porter_transfer",
+    STATE_PORTER_WITHDRAW: "porter_withdraw",
     // states upgrader
     STATE_UPGRADE: "upgrade",
     STATE_UPGRADE_EMPTY: "upgrade_empty",
     STATE_UPGRADE_WITHDRAW: "upgrade_withdraw",
-    STATE_UPGRADE_REPAIR: "upgrade_withdraw",
 
     // Economy settings
     RPC_HARVESTERS: [0, 7, 7, 5, 3, 3, 3, 2, 2],
@@ -150,6 +150,49 @@ const gc = {
         {x:0, y:1}, {x:0, y:0}, {x:0, y:-1},
         {x:-1, y:1}, {x:-1, y:0}, {x:-1, y:-1},
     ],
+
+    // For find spots to put a linker. B
+    // Between resource node and resource dump
+    ADJACENCIES: {
+        "2" : {
+            "2"  : [ { dx : 1, dy : 1 } ],
+            "1"  : [ { dx : 1, dy : 1 } , { dx : 1, dy : 0 } ],
+            "0"  : [ { dx : 1, dy : 1 } , { dx : 1, dy : 0 }, { dx : 1 , dy : -1 } ],
+            "-1" : [ { dx : 1, dy : 0 } , { dx : 1, dy : -1 } ],
+            "-2" : [ { dx : 1, dy : -1 } ]
+        },
+        "1" : {
+            "2"  : [ { dx : 1, dy : 1 } , { dx : 0 , dy : 1 } ],
+            "1"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1, dy : 0 }, { dx : 0, dy : 0 } ],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1, dy : 1 }, { dx : 1 , dy : -1 },
+                { dx : 0 , dy : -1 }, { dx : 0, dy : 0 } ],
+            "-1" : [ { dx : 1, dy : 0 } , { dx : 1, dy : -1 }, { dx : 0, dy : -1 }, { dx : 0, dy : 0 } ],
+            "-2" : [ { dx : 1, dy : -1 }, { dx : 0 , dy : -1 } ]
+        },
+        "0" : {
+            "2"  : [ { dx : -1, dy : 1 } , { dx : 0, dy : 1 }, { dx : 1 , dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 } , { dx : 0, dy : 1 },
+                { dx : 1 , dy : 1 }, { dx : 1 , dy : 0 }, { dx : 0, dy : 0 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } , { dx : 0, dy : 1 }, { dx : 1 , dy : -1 },
+                { dx : 1 , dy : 0 }, { dx : 0, dy : 0 } ],
+            "-2" : [ { dx : -1, dy : -1 } , { dx : 0, dy : -1 }, { dx : 1 , dy : -1 } ]
+        },
+        "-1" : {
+            "2"  : [ { dx : -1, dy : 1 } , { dx : 0 , dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 }, { dx : 0, dy : 1 } , { dx : 0, dy : 0 }],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : -1, dy : 1 }, { dx : -1, dy : 0 }, { dx : -1 , dy : -1 },
+                { dx : 0 , dy : -1 } , { dx : 0, dy : 0 }],
+            "-1" : [ { dx : -1, dy : 0 }, { dx : -1, dy : -1 } , { dx : 0, dy : -1 }, { dx : 0, dy : 0 } ],
+            "-2" : [ { dx : -1, dy : -1 }, { dx : 0 , dy : -1 } ]
+        },
+        "-2" : {
+            "2"  : [ { dx : -1, dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 1 } , { dx : -1, dy : 0 } ],
+            "0"  : [ { dx : -1, dy : 1 } , { dx : -1, dy : 0 }, { dx : -1 , dy : -1 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } ],
+            "-2" : [ { dx : -1, dy : -1 } ]
+        }
+    },
 
     END : "end"
 };

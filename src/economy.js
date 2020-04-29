@@ -75,14 +75,28 @@ const economy = {
         return construction;
     },
 
-    estimatePorters : function(room, energy) {
+    totalSourceCapacity: function(room) {
+        const sources = room.find(FIND_SOURCES);
+        let sourceTotalCapacity = 0;
+        for (let i in sources) {
+            sourceTotalCapacity += source[i].energyCapacity;
+        }
+        console.log("total source", room.name, sourceTotalCapacity);
+        return sourceTotalCapacity;
+    },
+
+    estimateHomePorters : function(room, energy) {
         rcl = room.controller.level;
         const carryParts = gc.RPC_PORTER_CARRY_PARTS[rcl];
         const roundTrip = roundTripLength(room, gc.RACE_PORTER)
         const tripsPerLife = (CREEP_LIFE_TIME - roundTrip) / roundTrip
 
         energyPerPorter = carryParts * CARRY_CAPACITY * tripsPerLife;
-        return Math.ceil(energy / energyPerPorter);
+        return Math.ceil(totalSourceCapacity(room) / energyPerPorter);
+    },
+
+    estimateHomeHarvesters : function(room) {
+        return gc.RPC_HARVESTERS[room.controller.level]
     },
 
     porterShortfall: function (policy) {

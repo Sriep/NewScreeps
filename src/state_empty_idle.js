@@ -23,15 +23,19 @@ State.prototype.enact = function () {
         case gc.RACE_WORKER:
         {
             const source = state.findTargetSource(this.creep.room)
-            return state.switchToMoveTarget(
-                this.creep,
-                source.id,
-                gc.RANGE_HARVEST,
-                gc.STATE_WORKER_HARVEST
-            );
+            if (source) {
+                return state.switchToMoveTarget(
+                    this.creep,
+                    source.id,
+                    gc.RANGE_HARVEST,
+                    gc.STATE_WORKER_HARVEST
+                );
+            }
+            break;
         }
         case gc.RACE_HARVESTER:
             return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);
+
         default:
             console.log("race in STATE_EMPTY_IDLE", race.getRace(this.creep));//,"creep", JSON.stringify(this.creep));
             this.creep.say("help? do?");
