@@ -14,9 +14,9 @@ function State (creep) {
 State.prototype.enact = function () {
     if (this.findAdjacentContainer()) {
         if (this.needsRepair()) {
-            return state.switchState(creep, gc.STATE_UPGRADE_REPAIR)
+            return state.switchState(this.creep, gc.STATE_UPGRADE_REPAIR)
         }
-        return state.switchState(creep, gc.STATE_UPGRADE_WITHDRAW)
+        return state.switchState(this.creep, gc.STATE_UPGRADE_WITHDRAW)
     }
     //state.switchState(creep, gc.STATE_UPGRADE_BUILD) todo what if container missing?
 }

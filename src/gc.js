@@ -125,7 +125,7 @@ const gc = {
     TICK_NUMBER: "tick number",
 
     DELTA_MOVES: [[{x:0, y:0}], this.ONE_MOVE, this.TWO_MOVES, this.THREE_MOVES],
-
+    AAAA: this.ONE_MOVE,
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
         {x:2, y:3}, {x:2,y:2}, {x:2, y:1}, {x:2,y:0}, {x:2, y:-1}, {x:2, y:-2}, {x:2,y:-3},

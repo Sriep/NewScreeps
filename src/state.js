@@ -6,6 +6,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const economy = require("economy");
+const race = require("race");
 
 const state = {
     enact : function(creep) {
@@ -88,15 +89,17 @@ const state = {
     },
 
     switchState: function (creep, newState, targetId) {
+        //console.log("creep", creep.name,"changes state from ",
+        //    creep.memroy.state, " to ", newState);
         creep.memory.state = newState;
         if (targetId) {
             creep.memory.targetId = targetId;
         }
         creep.say(this.creepSay[newState]);
-        if (!this.creepSay[newState]) {
-            console.log("state", newState, "gives say", this.creepSay[newState]);
-            console.log("creepSay", JSON.stringify(this.creepSay))
-        }
+        //if (!this.creepSay[newState]) {
+            //console.log("state", newState, "gives say", this.creepSay[newState]);
+            //console.log("creepSay", JSON.stringify(this.creepSay))
+        //}
         return state.enact(creep);
     },
 
@@ -137,7 +140,14 @@ const state = {
     },
 
     spaceForHarvest: function (creep) {
-        return creep.store.getFreeCapacity(RESOURCE_ENERGY) > race.workParts(this.creep)*HARVEST_POWER;
+        //console.log("spaceForHarvest creep", creep.name);
+        //console.log("spaceForHarvest race.workParts(creep)", race.workParts(creep));
+        //console.log("creep.store.getFreeCapacity(RESOURCE_ENERGY)",
+        //    creep.store.getFreeCapacity(RESOURCE_ENERGY));
+        //console.log("race.workParts(creep)*HARVEST_POWER",
+        //    race.workParts(creep)*HARVEST_POWER);
+        return creep.store.getFreeCapacity(RESOURCE_ENERGY)
+            > race.workParts(creep)*HARVEST_POWER;
     },
 
     findContainerAt : function (pos) {
@@ -153,12 +163,18 @@ const state = {
 
     findContainerConstructionNear : function (creep, range) {
         if (!range) range = 0;
-        const sites = _.filter(creep.room.lookForAt(
-            LOOK_CONSTRUCTION_SITES, pos.y+range, pos.x-range, pos.y-range, pos.x+range, true),
-            function(c) {
-                return c.structureType === STRUCTURE_CONTAINER;
-            }
+        const pos = creep.pos;
+        const sites = creep.room.lookForAt(
+            pos.y+range, pos.x-range, pos.y-range, pos.x+range, true
         )
+        for (let i in sites) {
+            console.log("site i", i, "obj", JSON.stringify(sites[i]))
+            if (sites[i].type === LOOK_CONSTRUCTION_SITES) {
+                return sites[i]
+            }
+        }
+
+        console.log("findContainerConstructionNear sites", JSON.stringify(sites));
         if (sites.length > 0) {
             return sites[0];
         }

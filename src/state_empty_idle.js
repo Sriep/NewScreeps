@@ -7,6 +7,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const race = require("race");
 
 function State (creep) {
     if (!creep)
@@ -32,7 +33,8 @@ State.prototype.enact = function () {
         case gc.RACE_HARVESTER:
             return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);
         default:
-            creep.say("help? do?")
+            console.log("race in STATE_EMPTY_IDLE", race.getRace(this.creep));//,"creep", JSON.stringify(this.creep));
+            this.creep.say("help? do?");
     }
 
 }

@@ -14,17 +14,17 @@ const race_worker = {
 
     body: function (ec) {
         let size;
-        if (fast) {
-            const parts = Math.floor(ec/this.BLOCKSIZE_FAST);
-            size = Math.min(parts, this.WORKER_FAST_MAX_SIZE);
-        } else {
+        //if (fast) {
+        //    const parts = Math.floor(ec/this.BLOCKSIZE_FAST);
+        //    size = Math.min(parts, this.WORKER_FAST_MAX_SIZE);
+        //} else {
             const parts =  Math.floor(ec/this.BLOCKSIZE);
             size = Math.min(parts, this.WORKER_SLOW_MAX_SIZE);
-        }
+        //}
         let body = [];
 
-        if (undefined === fast || !fast)
-        {
+        //if (undefined === fast || !fast)
+        //{
             size = Math.min(16,size);
             for (let i = 0; i < size; i++) {
                 body.push(CARRY);
@@ -34,7 +34,8 @@ const race_worker = {
             } // for           
             for (let i = 0; i < size; i++) {
                 body.push(MOVE);
-            } // for
+            }
+        /*
         } else {
             size = Math.min(12,size);
             for (let i = 0; i < size; i++) {
@@ -48,6 +49,7 @@ const race_worker = {
                 body.push(MOVE);
             } // for
         }
+        */
         return body;
     },
 

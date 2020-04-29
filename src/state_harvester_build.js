@@ -10,31 +10,33 @@ const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_HARVESTER_BUILD;
-    this.creep = creep
+    this.creep = creep;
 }
 
 State.prototype.enact = function () {
-    if (state.spaceForHarvest(creep)) {
-        state.switchState(creep, gc.STATE_HARVEST);
+    //console.log("STATE_HARVESTER_BUILD creep name", this.creep.name)
+    if (state.spaceForHarvest(this.creep)) {
+        state.switchState(this.creep, gc.STATE_HARVEST);
     }
 
-    if (state.isBuilt(this.creep.memory.site.pos)) {
-        state.switchState(creep, gc.STATE_HARVESTER_TRANSFER);
-    }
-
+    //if (state.isBuilt(this.creep.pos)) {
+    //    state.switchState(this.creep, gc.STATE_HARVESTER_TRANSFER);
+    //}
+    console.log("STATE_HARVESTER_BUILD creep memeroy", JSON.stringify(this.creep.memory));
     let site = undefined;
-    if (this.creep.memory.constructionId) {
+    if (this.creep.memory.siteId) {
         site = Game.getObjectById(this.creep.memory.siteId)
     }
     if (!site) {
-        site = state.findContainerConstructionNear(creep, 1);
+        site = state.findContainerConstructionNear(this.creep, 1);
     }
     if (!site) {
         const result = this.creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result === OK) {
-            sitesAtPos = creep.pos.lookFor(LOOK_CONSTRUCTION_SITES)
-            site = sitesAtPos[0]
-            const sourceFlag =  Games.Flags[creep.memory.targetId];
+            sitesAtPos = this.creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+            site = sitesAtPos[0];
+            this.creep.memory.siteId = site.id;
+            const sourceFlag =  Game.Flags[this.creep.memory.targetId];
             sourceFlag.memory.container = this.creep.pos;
         } else {
             return gf.fatalError("Help cant start harvester consturction error " + result.toString());
@@ -54,7 +56,11 @@ State.prototype.enact = function () {
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-            return gf.fatalError("ERR_INVALID_TARGET");
+            // assume target is invalid because its built.
+            console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
+            state.switchState(this.creep, gc.STATE_HARVESTER_TRANSFER);
+            break;
+            //return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("ERR_NOT_IN_RANGE");
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.

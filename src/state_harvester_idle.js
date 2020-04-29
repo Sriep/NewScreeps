@@ -18,22 +18,23 @@ State.prototype.enact = function () {
     const harvesters = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId
             && race.getRace(c) === gc.RACE_HARVESTER
-            && (c.memory.state === STATE_HARVESTER_BUILD
-                || c.memory.state === STATE_HARVESTER_REPAIR
-                || c.memory.state === STATE_HARVESTER_FULL
-                || c.memory.state === STATE_HARVESTER_TRANSFER
-                || c.memory.state === STATE_HARVEST)
+            && (c.memory.state === gc.STATE_HARVESTER_BUILD
+                || c.memory.state === gc.STATE_HARVESTER_REPAIR
+                || c.memory.state === gc.STATE_HARVESTER_FULL
+                || c.memory.state === gc.STATE_HARVESTER_TRANSFER
+                || c.memory.state === gc.STATE_HARVEST)
     });
-    if (harvesters >= gc.RPC_HARVESTERS[creep.room.controller.level]) {
+    if (harvesters >= gc.RPC_HARVESTERS[this.creep.room.controller.level]) {
         this.goUpgrade()
     }
-    const source = state.findTargetSource();
+    const source = state.findTargetSource(this.creep.room);
     if (!source)
         this.goUpgrade();
     if (source.energy === 0 && this.creep.lifetime < ticksToRegeneration)
         this.goUpgrade()
-    creep.say("go harvest")
-    console.log("Say table", JSON.stringify(stare.creepSay))
+    this.creep.say("go harvest")
+    //console.log("Say table", JSON.stringify(state.creepSay))
+    //console.log("Say table", this.creep.say(state.CreepSay[gc.STATE_HARVEST]))
     // todo check creep lifetime, check lives long enough to reach target.
     return state.switchToMoveTarget(
         this.creep,
@@ -44,13 +45,13 @@ State.prototype.enact = function () {
 }
 
 State.prototype.goUpgrade = function () {
-    const controllerFlag = Games.flags[creep.room.contoller.id];
+    const controllerFlag = Game.flags[this.creep.room.contoller.id];
     console.log("contoler flag", JSON.stringify(controllerFlag));
     const container = state.findContainerAt(ccPos);
     if (container) {
         this.creep.memory.containerId = container.id;
     }
-    creep.say("go upgrade")
+    this.creep.say("go upgrade")
     return state.switchToMovePos(
         this.creep,
         ccPos,

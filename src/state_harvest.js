@@ -13,11 +13,11 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    if (!state.spaceForHarvest(creep)) {
-        return state.switchState(creep, gc.STATE_HARVESTER_FULL);
+    if (!state.spaceForHarvest(this.creep)) {
+        return state.switchState(this.creep, gc.STATE_HARVESTER_FULL);
     }
-    const controller = Game.getObjectById(this.creep.memory.targetId);
-    const result = this.creep.upgradeController(controller);
+    const source = Game.getObjectById(this.creep.memory.targetId);
+    const result = this.creep.harvest(source );
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;

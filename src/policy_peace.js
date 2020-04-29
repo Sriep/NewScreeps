@@ -17,8 +17,9 @@ function Policy  (data) {
 }
 
 Policy.prototype.enact = function () {
-    this.build()
-    this.spawnDepreciated()
+    this.build();
+    this.spawn();
+    //this.spawnDepreciated();
 }
 
 Policy.prototype.spawn = function () {
@@ -45,10 +46,14 @@ Policy.prototype.doNextSpawn = function (spawn) {
 
 Policy.prototype.getLocalSpawn = function () {
     const room = Game.rooms[this.roomId];
+    const policyId = this.id;
     let hLife = 0, pLife = 0, wLife = 0, workers = 0, harvesters = 0;
-    const creeps = _.filter(Game.creeps, function (creep) {
-        return creep.memory.policyId === this.id
+    const creeps = _.filter(Game.creeps, function (c) {
+        return c.memory.policyId === policyId
     });
+
+    console.log("num creeps", Object.getOwnPropertyNames(Game.creeps).length)
+    console.log("creeps policy", creeps.length, "all creeps length", )
     for (let i in creeps) {
         switch (race.getRace(creeps[i])) {
             case gc.RACE_HARVESTER:
@@ -67,22 +72,29 @@ Policy.prototype.getLocalSpawn = function () {
     console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
     console.log("workers", workers, "harvesters",harvesters)
     const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-    console.log("buildTicksNeeded", buildTicksNeeded)
+    console.log("constructionLeft", economy.constructionLeft(room));
+    console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
     if (wLife < buildTicksNeeded || workers === 0) {
-        if (workers > 1 && workers <= economy.sourceAccessPointsRoom(room))
-        return gc.RACE_WORKER;
+        console.log("workers", 1, "access pts", economy.sourceAccessPointsRoom(room));
+        if (workers === 0 || workers <= economy.sourceAccessPointsRoom(room)) {
+            console.log("spawn worker");
+            return gc.RACE_WORKER;
+        }
     }
-
+    console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
     if (harvesters < gc.RPC_HARVESTERS[room.controller.level]) {
+        console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
+
     console.log("estimatePorters", economy.estimatePorters(room))
     if (porters < economy.estimatePorters(room)) {
+        console.log("spawn porter")
         return gc.RACE_PORTER
     }
 
-
     if (harvesters < 3*gc.RPC_HARVESTERS[room.controller.level]) {
+        console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
 
@@ -99,13 +111,14 @@ Policy.prototype.build = function () {
         }
     }
 
-    const controllerFlag = Games.flags[room.contoller.id];
+    const controllerFlag = Game.flags[room.controller.id];
     ccPos = controllerFlag.memory.container
     console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
     if (!ccPos) {
         const spots = economy.findMostFreeNeighbours(
             room, room.controller.pos, 2
         )
+        console.log("spots", JSON.stringify(spots));
         ccPos = new RoomPosition(spots[0].x, spots[0].y, room.name);
         controllerFlag.memory.container = ccPos;
         const result = ccPos.createConstructionSite(STRUCTURE_CONTAINER);
@@ -116,7 +129,7 @@ Policy.prototype.build = function () {
 /* todo decide if I need this
     const sources = room.find(FIND_SOURCES);
     for (let s in sources) {
-        const sourceFlag =  Games.flags[room.sources[s].id]
+        const sourceFlag =  Game.flags[room.sources[s].id]
         scPos = sourceFlag.memory.container
         if (!scPos) {
             const spots = economy.findMostFreeNeighbours(
@@ -155,13 +168,12 @@ Policy.prototype.spawnDepreciated = function () {
                         creepCount++;
                 }
                 if (creepCount < economy.sourceAccessPointsRoom(room)) {
-                    role.spawnWorker(spawns[spawn], this);
+                    race.spawnWorker(spawns[spawn], this);
                 }
             }
         }
     }
 }
-
 
 module.exports = Policy;
 

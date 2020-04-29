@@ -19,12 +19,27 @@ const economy = {
         const terrain = room.getTerrain()
         let bestSpots = [];
         let maxSoFar = -1
-        const delta = gc.DELTA_MOVES[range];
+        //let delta = gc.DELTA_MOVES[range];
+        let delta
+        switch (range) {
+            case 0: delta = [{x:0, y:0}]; break;
+            case 1: delta = gc.ONE_MOVE; break;
+            case 2: delta = gc.TWO_MOVES; break;
+            case 3: delta = gc.THREE_MOVES; break;
+            default: return gf.fatalError("findMostFreeNeighbours range to big = " + range.toString());
+        }
+        //let delta = gc.TWO_MOVES;
+        //console.log("delta", JSON.stringify(delta))
+        //console.log("gc.DELTA_MOVES)", JSON.stringify(gc.DELTA_MOVES))
+        //console.log("ONE_MOVE", JSON.stringify(gc.ONE_MOVE))
+        console.log("delta", JSON.stringify(delta))
         for (let i in delta) {
+            console.log("i", i, "delta[i]", JSON.stringify(delta[i]));
             const x = pos.x + delta[i].x;
-            const y = post.y + delta[i].y;
+            const y = pos.y + delta[i].y;
             if (terrain.get(x,y) !== TERRAIN_MASK_WALL) {
-                const nonWalls = countNonWallNeighbours(x, y, terrain)
+                const nonWalls = this.countNonWallNeighbours(x, y, terrain)
+                console.log("countNonWallNeighbours nonWalls", nonWalls)
                 if (nonWalls > maxSoFar) {
                     bestSpots = [{x:x, y:y}]
                     maxSoFar = nonWalls;
@@ -33,6 +48,7 @@ const economy = {
                 }
             }
         }
+        console.log("bestSpots", bestSpots, "maxSoFar", maxSoFar)
         return bestSpots;
     },
 

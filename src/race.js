@@ -15,11 +15,13 @@ const race = {
         , "energy.porter" : 40 , "flexi.storage.porter" : 40},
 
     getRace: function (creep) {
-       return creep.name.split(" ")[0];
+        return creep.name.split("_")[0];
     },
 
     workParts: function(creep) {
-        const body = creep.body();
+        //console.log("creep", creep);
+        //console.log("creep name", creep.name);
+        const body = creep.body;
         let Ws = 0;
         for (let i in body) {
             if (body[i] === WORK) {
@@ -44,16 +46,11 @@ const race = {
     },
 
     spawnWorker: function (spawn, policyId) {
-        const body = race_worker.body(spawn.room.energyCapacityAvailable);
-        const memory =  {
-            policyId: policyId,
-            state: gc.STATE_EMPTY_IDLE
-        }
-        return this.spawn(spawn, body, gc.RACE_WORKER, memory);
+        this.spawnCreep(spawn, policyId, gc.RACE_WORKER, gc.STATE_EMPTY_IDLE)
     },
 
     spawn: function(spawn, body, race, memory) {
-        const name = race + "_" + race.nextCreepId();
+        const name = race + "_" + this.nextCreepId();
         const result = spawn.spawnCreep(body, name, {memory: memory });
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.

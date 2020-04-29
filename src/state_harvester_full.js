@@ -16,11 +16,11 @@ function State (creep) {
 State.prototype.enact = function () {
     if (this.findContainer()) {
         if (this.needsRepair()) {
-            return state.switchState(creep, gc.STATE_HARVESTER_REPAIR)
+            return state.switchState(this.creep, gc.STATE_HARVESTER_REPAIR)
         }
-        return state.switchState(creep, gc.STATE_HARVESTER_TRANSFER)
+        return state.switchState(this.creep, gc.STATE_HARVESTER_TRANSFER)
     }
-    state.switchState(creep, gc.STATE_HARVESTER_BUILD)
+    state.switchState(this.creep, gc.STATE_HARVESTER_BUILD)
 }
 
 State.prototype.needsRepair = function () {
@@ -33,8 +33,8 @@ State.prototype.needsRepair = function () {
 State.prototype.findContainer = function () {
     if (this.creep.memory.containerId)
         return true;
-
-    const closeBy = this.creep.room.lookAtArea(pos.y+1, pos.x-1, pos.y-1, pos.x+1, true)
+    const pos = this.creep.pos;
+    const closeBy = this.creep.room.lookAtArea(pos.y+1, pos.x-1, pos.y-1, pos.x+1, true);
     const containers = _.filter(closeBy, function(o) {
             return  o.type === LOOK_STRUCTURES
                 && o.structure.structureType === STRUCTURE_CONTAINER;

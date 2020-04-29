@@ -15,7 +15,7 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.state.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        state.switchState(creep, gc.STATE_UPGRADE_EMPTY)
+        state.switchState(this.creep, gc.STATE_UPGRADE_EMPTY)
     }
 
     const container = Game.getObjectById(this.creep.memory.containerId);
