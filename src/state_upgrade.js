@@ -15,7 +15,7 @@ function State (creep) {
 //    return state.switchState(this.creep, gc.STATE_UPGRADE_REPAIR)
 //}
 State.prototype.enact = function () {
-    console.log("creep", this.creep.name, "store", JSON.stringify(this.creep.store))
+    console.log("creep", this.creep.name, "store", this.creep.store)
     console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) )
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);

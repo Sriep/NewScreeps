@@ -9,6 +9,21 @@ const race_harvester = {
     WWM_COST: 250,
 
     body: function (ec) {
+        const bodyCounts = this.bodyCounts(ec)
+        let body = [];
+        for (let i = 0; i < bodyCounts.WORK; i++) {
+            body.push(WORK);
+        }
+        for (let i = 0; i < bodyCounts.MOVE; i++) {
+            body.push(MOVE);
+        }
+        for (let i = 0; i < bodyCounts.CARRY; i++) {
+            body.push(CARRY);
+        }
+        return body;
+    },
+
+    bodyCounts: function (ec) {
         let Ws = 2, Ms = 1, Cs = 1;
         const wwmBlocks = Math.floor((ec -this.WWCM_COST)/this.WWM_COST);
         Ws += 2*wwmBlocks;
@@ -22,20 +37,7 @@ const race_harvester = {
         } else if (Ws > 25) {
             Ws--; Cs++;
         }
-
-        let body = [];
-        for (let i = 0; i < Ws; i++) {
-            body.push(WORK);
-        }
-        for (let i = 0; i < Ms; i++) {
-            body.push(MOVE);
-        }
-        for (let i = 0; i < Cs; i++) {
-            body.push(CARRY);
-        }
-        //console.log("######################## made harvester ec",ec, "bdoy", JSON.stringify(body) );
-
-        return body;
+        return {WORK: Ws, CARRY: Cs, MOVE : Ms}
     }
 }
 

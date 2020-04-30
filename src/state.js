@@ -57,7 +57,7 @@ const state = {
             sources = sources.sort( function (a,b)  {
                 return b.store.getUsedCapacity()  - a.store.getUsedCapacity();
             });
-            console.log("sorted containers", JSON.stringify(sources));
+            //console.log("sorted containers", JSON.stringify(sources));
             for ( let s in sources) {
                 const flags = sources[s].pos.lookFor(LOOK_FLAGS)
                 if (flags > 0) {
@@ -88,7 +88,7 @@ const state = {
     },
 
     switchState: function (creep, newState, targetId) {
-        console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
+        //console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
         //console.log("creep", creep.name,"changes state from ",
         //    creep.memroy.state, " to ", newState);
         creep.memory.state = newState;
@@ -100,7 +100,7 @@ const state = {
             //console.log("state", newState, "gives say", this.creepSay[newState]);
             //console.log("creepSay", JSON.stringify(this.creepSay))
         //}
-        console.log("Switch", creep.name,"from",creep.memory.state, "to", newState)
+        //console.log("Switch", creep.name,"from",creep.memory.state, "to", newState)
         return state.enact(creep);
     },
 
@@ -171,7 +171,7 @@ const state = {
     findContainerConstructionNear : function (creep, range) {
         if (!range) range = 0;
         const pos = creep.pos;
-        console.log("lookForAtArea points",pos.y+range, pos.x-range, pos.y-range,pos.x+range)
+        //console.log("lookForAtArea points",pos.y+range, pos.x-range, pos.y-range,pos.x+range)
         const sites = creep.room.lookForAtArea(
             LOOK_CONSTRUCTION_SITES,
             pos.y-range,
@@ -183,11 +183,11 @@ const state = {
         )
         for (let i in sites) {
             if (sites[i].constructionSite.structureType === STRUCTURE_CONTAINER) {
-                console.log("findContainerConstructionNear found site");
+                //console.log("findContainerConstructionNear found site");
                 return sites[i].constructionSite
             }
         }
-        console.log("findContainerConstructionNear not found any");
+        //console.log("findContainerConstructionNear not found any");
         return undefined;
     },
 

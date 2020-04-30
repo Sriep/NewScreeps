@@ -17,9 +17,14 @@ function Policy  (data) {
 }
 
 Policy.prototype.enact = function () {
+    const room = Game.rooms[this.roomId];
+    const rcl = Game.rooms[this.roomId].controller.level
     this.build();
-    this.spawn();
-    //this.spawnDepreciated();
+    if (rcl === 1) {
+        this.spawnWorkers();
+    } else {
+        this.spawn();
+    }
 }
 
 Policy.prototype.spawn = function () {
@@ -70,25 +75,25 @@ Policy.prototype.getLocalSpawn = function () {
                 break;
         }
     }
-    //console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
-    //console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
+    console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
+    console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
     const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-    //console.log("constructionLeft", economy.constructionLeft(room));
-    //console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
+    console.log("constructionLeft", economy.constructionLeft(room));
+    console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
     if (wLife < buildTicksNeeded || workers === 0) {
-        //console.log("workers", 1, "access pts", economy.sourceAccessPointsRoom(room));
-        if (workers === 0 || workers <= economy.sourceAccessPointsRoom(room)) {
+        //console.log("workers", 1, "access pts", economy.totalSourceAccessPointsRoom(room));
+        if (workers === 0 || workers <= economy.totalSourceAccessPointsRoom(room)) {
             //console.log("spawn worker");
             return gc.RACE_WORKER;
         }
     }
-    //console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
+    console.log("rpc", gc.RPC_HARVESTERS[room.controller.level])
     if (harvesters < economy.estimateHomeHarvesters(room)) {
         //console.log("spawn harvesters")
         return gc.RACE_HARVESTER
     }
 
-    //console.log("estimatePorters", economy.estimateHomePorters(room))
+    console.log("estimatePorters", economy.estimateHomePorters(room))
     if (porters < economy.estimateHomePorters(room)) {
         //console.log("spawn porter")
         return gc.RACE_PORTER
@@ -112,55 +117,22 @@ Policy.prototype.build = function () {
         }
     }
 
-    const controllerFlag = Game.flags[room.controller.id];
-    let ccPos = controllerFlag.memory.container;
-    if (!ccPos) {
-        let spots = economy.findMostFreeNeighbours(
-            room, room.controller.pos, 2
-        )
-        console.log("spots", JSON.stringify(spots))
-        if (spots.length === 0) {
-            return gf.fatalError("findMostFreeNeighbours return no spots");
+    if (rcl >= gc.BUILD_CONTROLLER_CONTAINERS) {
+        const controllerFlag = Game.flags[room.controller.id];
+        if (!controllerFlag.memory.container) {
+            this.buildControllerContainer(room, controllerFlag)
         }
-        let bestIndex = 0;
-        if (spots.length > 1) {
-            //console.log("spots length", spots. length);
-            const spawns = room.find(FIND_MY_SPAWNS)
-            let bestSoFar = 9999;
-            // todo this bit is expensive so maybe check cpu?
-            for (let i in spots) {
-                const pathLength = spots[i].findPathTo(spawns[0].pos).length
-                //console.log("i", i, "spots", JSON.stringify(spots[i]), "length", pathLength)
-                if (pathLength < bestSoFar) {
-                    bestIndex = i;
-                    bestSoFar = pathLength;
-                }
-            }
-            //console.log("bestIndex", bestIndex)
-            ccPos = new RoomPosition(spots[bestIndex].x, spots[bestIndex].y, room.name);
-            controllerFlag.memory.container = ccPos;
-        }
+    }
 
-        //console.log("controler flag memory", JSON.stringify(controllerFlag.memory))
-        const result = ccPos.createConstructionSite(STRUCTURE_CONTAINER);
-        if (result !== OK) {
-            gf.fatalError("construction failed " + result.toString())
+    if (rcl >= gc.BUILD_ROAD_SOURCE_CONTROLLER) {
+        const sources = room.find(FIND_SOURCES);
+        for (let i in sources) {
+            const flag = Game.flags[sources[i].id];
+            if (!flag.memory.container) {
+                this.buildSourceContainer(sources[i], flag);
+            }
         }
     }
-/* todo decide if I need this
-    const sources = room.find(FIND_SOURCES);
-    for (let s in sources) {
-        const sourceFlag =  Game.flags[room.sources[s].id]
-        scPos = sourceFlag.memory.container
-        if (!scPos) {
-            const spots = economy.findMostFreeNeighbours(
-                room, room.source[s].pos, 1
-            )
-            sourceFlag.memory.container = ccPos;
-            const result = scPos.createConstructionSite(STRUCTURE_CONTAINER);
-        }
-    }
-*/
 
     if (rcl >= gc.BUILD_ROAD_SOURCE_SPAWN) {
         construction.buildRoadSourceSpawn(room)
@@ -181,19 +153,80 @@ Policy.prototype.build = function () {
     Memory.policies[this.id].rcl = rcl;
 }
 
-Policy.prototype.spawnDepreciated = function () {
+Policy.prototype.buildControllerContainer = function (room, controllerFlag) {
+    let spots = economy.findMostFreeNeighbours(
+        room, room.controller.pos, 2
+    )
+    //console.log("spots", JSON.stringify(spots))
+    if (spots.length === 0) {
+        return gf.fatalError("findMostFreeNeighbours cant get to controller");
+    }
+    let bestIndex = 0;
+    let ccPos = new RoomPosition(spots[0].x, spots[0].y, room.name);
+    if (spots.length > 1) {
+        const spawns = room.find(FIND_MY_SPAWNS)
+        let bestSoFar = 9999;
+        for (let i in spots) {
+            const pathLength = spots[i].findPathTo(spawns[0].pos).length
+             if (pathLength < bestSoFar) {
+                bestIndex = i;
+                bestSoFar = pathLength;
+            }
+        }
+        ccPos = new RoomPosition(spots[bestIndex].x, spots[bestIndex].y, room.name);
+    }
+    controllerFlag.memory.container = ccPos;
+    const result = ccPos.createConstructionSite(STRUCTURE_CONTAINER);
+    if (result !== OK) {
+        gf.fatalError("construction failed " + result.toString())
+    }
+}
+
+Policy.prototype.buildSourceContainer = function (source, flag) {
+    let spots = economy.findMostFreeNeighbours(
+        source.room, source.pos, 1
+    )
+    if (spots.length === 0) {
+        return gf.fatalError("findMostFreeNeighbours cant get to source");
+    }
+    let bestIndex = 0;
+    let scPos = new RoomPosition(spots[0].x, spots[0].y, source.room.name);
+    if (spots.length > 1) {
+        let bestSoFar = 9999;
+        const controller = source.room.controller;
+        for (let i in spots) {
+            const pathLength = spots[i].findPathTo(controller.pos).length
+             if (pathLength < bestSoFar) {
+                bestIndex = i;
+                bestSoFar = pathLength;
+            }
+        }
+        scPos = new RoomPosition(spots[bestIndex].x, spots[bestIndex].y, source.room.name);
+    }
+    flag.memory.container = scPos;
+    const result = scPos.createConstructionSite(STRUCTURE_CONTAINER);
+    if (result !== OK) {
+        gf.fatalError("construction failed " + result.toString())
+    }
+    flag.memory.haversterPosts = gf.joinPointsBetween(source.pos, scPos, false);
+}
+
+Policy.prototype.spawnWorkers = function () {
     const room = Game.rooms[this.roomId];
     const spawns = room.find(FIND_MY_SPAWNS);
     for (let spawn in spawns) {
         if (spawns[spawn].spawning === null) {
+            console.log("porterShortfall",economy.porterShortfall(this))
             if (0 < economy.porterShortfall(this)) {
                 let creepCount = 0;
+                //const policyId = this.id;
                 for (let creep in Game.creeps) {
                     if (Game.creeps[creep].memory.policyId === this.id)
                         creepCount++;
                 }
-                if (creepCount < economy.sourceAccessPointsRoom(room)) {
-                    race.spawnWorker(spawns[spawn], this);
+                console.log("creep count", creepCount, "accesspoints", economy.totalSourceAccessPointsRoom(room))
+                if (creepCount < economy.totalSourceAccessPointsRoom(room)) {
+                    race.spawnWorker(spawns[spawn], this.id);
                 }
             }
         }

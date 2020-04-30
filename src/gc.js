@@ -44,7 +44,7 @@ const gc = {
     STATE_HARVESTER_TRANSFER: "harvester_transfer",
     STATE_HARVEST: "harvest",
     // states worker
-    STATE_WORKER_UPGRADE: "upgrade",
+    STATE_WORKER_UPGRADE: "worker-upgrade",
     STATE_REPAIR: "repair",
     STATE_PORTER: "porter",
     STATE_FULL_IDLE: "full_idle",
@@ -102,12 +102,17 @@ const gc = {
     PORTER_FAST_MAX_SIZE: 25,
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
 
+    // Economy
     // Building by RCL
     BUILD_ROAD_SOURCE_SPAWN: 2,
     BUILD_ROAD_SOURCE_CONTROLLER: 2,
     BUILD_ROAD_SOURCE_EXTENSIONS: 2,
     BUILD_ROAD_SOURCE_SOURCE: 2,
     BUILD_ROAD_SPAWN_CONTROLLER: 2,
+    BUILD_SOURCE_CONTAINERS: 2,
+    BUILD_CONTROLLER_CONTAINERS: 2,
+
+    MAX_HARVESTER_ROUTE_LENGTH: 300,
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,
@@ -125,8 +130,11 @@ const gc = {
 
     TICK_NUMBER: "tick number",
 
+    RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
+
+
     DELTA_MOVES: [[{x:0, y:0}], this.ONE_MOVE, this.TWO_MOVES, this.THREE_MOVES],
-    AAAA: this.ONE_MOVE,
+
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
         {x:2, y:3}, {x:2,y:2}, {x:2, y:1}, {x:2,y:0}, {x:2, y:-1}, {x:2, y:-2}, {x:2,y:-3},

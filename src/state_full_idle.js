@@ -29,7 +29,16 @@ State.prototype.enact = function () {
             this.creep,
             this.creep.room.controller,
             gc.RANGE_UPGRADE,
-            gc.STATE_WORER_UPGRADE
+            gc.STATE_WORKER_UPGRADE
+        );
+    }
+
+    if (this.creep.room.controller.level === 2) {
+        state.switchToMoveTarget(
+            this.creep,
+            this.creep.room.controller,
+            gc.RANGE_UPGRADE,
+            gc.STATE_WORKER_UPGRADE
         );
     }
 

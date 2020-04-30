@@ -80,7 +80,7 @@ const construction = {
         structures.concat(spawns);
         structures.push(controller);
 
-        console.log(room,"buildroads betwen",structures);
+        //console.log(room,"buildroads betwen",structures);
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < structures.length ; j++ ){
                 if ( i !== j) {
@@ -107,9 +107,9 @@ const construction = {
         beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_EXTENSION }
         })
-        console.log("allowedExtensions",allowedExtensions,"extensions",extensions.length,"beingBuilt",beingBuilt.length)
+        //console.log("allowedExtensions",allowedExtensions,"extensions",extensions.length,"beingBuilt",beingBuilt.length)
         const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
-        console.log("buildMissingExtensions wantedExtensions", wantedExtensions, "allowed extensions", allowedExtensions)
+        //console.log("buildMissingExtensions wantedExtensions", wantedExtensions, "allowed extensions", allowedExtensions)
         if (wantedExtensions > 0) {
             this.buildExtensions(room, wantedExtensions);
         }
@@ -138,7 +138,7 @@ const construction = {
         }
 
         const extensionPos = this.looseSpiralFromAvoid(start, numNeeded, avoid)
-        console.log("extensions sites", JSON.stringify(extensionPos))
+        //console.log("extensions sites", JSON.stringify(extensionPos))
         for (let i in extensionPos) {
             room.createConstructionSite(extensionPos[i], STRUCTURE_EXTENSION)
         }

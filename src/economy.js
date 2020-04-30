@@ -79,9 +79,8 @@ const economy = {
         const sources = room.find(FIND_SOURCES);
         let sourceTotalCapacity = 0;
         for (let i in sources) {
-            sourceTotalCapacity += source[i].energyCapacity;
+            sourceTotalCapacity += sources[i].energyCapacity;
         }
-        console.log("total source", room.name, sourceTotalCapacity);
         return sourceTotalCapacity;
     },
 
@@ -251,14 +250,17 @@ const economy = {
         return habitableSourceEnergy;
     },
 
-    sourceAccessPointsRoom: function (room) {
+    sourceAccessPointsArray: function (room, findType, opts) {
+        const sites = room.find(findType,opts);
+        const accessPoints = [];
+        for ( let i = 0 ; i < sites.length ; i++ ) {
+            accessPoints.push(this.countAccessPoints(sites[i].pos));
+        }
+        return accessPoints;
+    },
+
+    totalSourceAccessPointsRoom: function (room) {
         return this.accessPointsType(room, FIND_SOURCES);
-        //if (!room.storage) {
-        //    return this.accessPointsType(room, FIND_SOURCES) +  room.find(FIND_SOURCES).length;
-        //} else {
-        //    return this.accessPointsType(room, FIND_SOURCES)
-        //        +  room.find(FIND_SOURCES).length + 6;
-        //}
     },
 
     accessPointsType: function (room, findType, opts) {
@@ -266,9 +268,7 @@ const economy = {
         let accessPoints = 0;
         for ( let i = 0 ; i < sites.length ; i++ ) {
             accessPoints += this.countAccessPoints(sites[i].pos);
-            //console.log("accessPoints", sites[i].id, accessPoints);
         }
-        //console.log("accessPoints", accessPoints, room.name)
         return accessPoints;
     },
 

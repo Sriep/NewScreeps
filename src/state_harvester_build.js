@@ -15,18 +15,18 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (state.spaceForHarvest(this.creep)) {
-        console.log("in STATE_HARVESTER_BUILD space for harvest", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) )
+        //console.log("in STATE_HARVESTER_BUILD space for harvest", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) )
         state.switchState(this.creep, gc.STATE_HARVEST);
     }
 
-    console.log("STATE_HARVESTER_BUILD creep memory", JSON.stringify(this.creep.memory));
+    //console.log("STATE_HARVESTER_BUILD creep memory", JSON.stringify(this.creep.memory));
     let site = undefined;
     if (this.creep.memory.siteId) {
         site = Game.getObjectById(this.creep.memory.siteId)
     }
     if (!site) {
         site = state.findContainerConstructionNear(this.creep, 1);
-        console.log("site returned", JSON.stringify(site));
+        //console.log("site returned", JSON.stringify(site));
     }
     if (!site) {
         const result = this.creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
