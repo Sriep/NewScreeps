@@ -28,11 +28,6 @@ const economy = {
             case 3: delta = gc.THREE_MOVES; break;
             default: return gf.fatalError("findMostFreeNeighbours range to big = " + range.toString());
         }
-        //let delta = gc.TWO_MOVES;
-        //console.log("delta", JSON.stringify(delta))
-        //console.log("gc.DELTA_MOVES)", JSON.stringify(gc.DELTA_MOVES))
-        //console.log("ONE_MOVE", JSON.stringify(gc.ONE_MOVE))
-        //console.log("delta", JSON.stringify(delta))
         for (let i in delta) {
             //console.log("i", i, "delta[i]", JSON.stringify(delta[i]));
             const x = pos.x + delta[i].x;

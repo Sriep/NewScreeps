@@ -14,7 +14,7 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdle(this.creep)
+    return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     const result = this.creep.upgradeController(target);

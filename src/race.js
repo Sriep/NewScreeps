@@ -35,12 +35,12 @@ const race = {
         return workParts(creep) * REPAIR_POWER;
     },
 
-    spawnCreep: function (spawn, policyId, race, startState) {
+    spawnCreep: function (spawn, policyId, race) {
         const raceModule = require("race_" + race);
         const body = raceModule.body(spawn.room.energyCapacityAvailable);
         const memory =  {
             policyId: policyId,
-            state: startState
+            state: race + "_idle"
         }
         return this.spawn(spawn, body, race, memory);
     },

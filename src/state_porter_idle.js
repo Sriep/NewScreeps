@@ -13,7 +13,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    const target = state.findResourceToMove(this.creep)
+    const target = state.findCollectContainer(this.creep)
     if (target) {
         state.switchToMoveTarget(
             this.creep,
@@ -22,6 +22,7 @@ State.prototype.enact = function () {
             gc.STATE_PORTER_TRANSFER,
         );
     }
+
     const drop = creep.room.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
@@ -33,15 +34,11 @@ State.prototype.enact = function () {
             gc.STATE_PORTER_PICKUP,
         );
     }
-    // todo follow harvester
+
     const policyId = this.creep.policyId
     let creeps = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId
-            && (c.memory.state === gc.STATE_HARVEST
-                || c.memory.state === gc.STATE_HARVESTER_FULL
-                || c.memory.state === gc.STATE_HARVESTER_TRANSFER
-                || c.memory.state === gc.STATE_HARVESTER_REPAIR
-                || c.memory.state === gc.STATE_HARVESTER_BUILD )
+            && state.isHarvestingHarvester(c)
     });
     if (creeps.length > 0) {
         creeps = creeps.sort( function (a,b)  {
@@ -55,8 +52,6 @@ State.prototype.enact = function () {
             gc.STATE_PORTER_RECEIVE
         )
     }
-
-
 }
 
 module.exports = State;

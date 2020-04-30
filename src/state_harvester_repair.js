@@ -7,7 +7,6 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
-const race = require("race");
 
 function State (creep) {
     this.type = gc.STATE_HARVESTER_REPAIR;
@@ -15,10 +14,19 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-   const container = Game.getObjectById(this.creep.memory.containerId);
-   if (container.hitsMax - container.hits < race.repairPower(this.creep)) {
-       state.switchState(this.creep, gc.STATE_HARVEST);
-   }
+    if (state.spaceForHarvest(this.creep)) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
+    }
+
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].container);
+    const container = state.findContainerAt(scPos);
+    if (!container) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
+    }
+
+    if (container.hits === container.hitsMax) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
+    }
 
     const result = this.creep.repair(container);
     switch (result) {

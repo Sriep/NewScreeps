@@ -8,18 +8,17 @@ const gc = require("gc");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_UPGRADE;
+    this.type = gc.STATE_UPGRADER_UPGRADE;
     this.creep = creep
 }
 //if (gf.needsRepair(container)) {
-//    return state.switchState(this.creep, gc.STATE_UPGRADE_REPAIR)
+//    return state.switchTo(this.creep, gc.STATE_UPGRADE_REPAIR)
 //}
 State.prototype.enact = function () {
-    console.log("creep", this.creep.name, "store", this.creep.store)
-    console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) )
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(this.creep, gc.STATE_HARVESTER_IDLE);
-    }
+     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
+     }
+
     const result = this.creep.upgradeController(this.creep.room.controller);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
@@ -38,7 +37,7 @@ State.prototype.enact = function () {
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             gf.fatalError("ERR_NOT_IN_RANGE");
-            return state.switchState(creep, gc.STATE_HARVESTER_IDLE);
+            return state.switchTo(creep, gc.STATE_HARVESTER_IDLE);
 
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");

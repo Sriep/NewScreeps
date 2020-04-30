@@ -1,23 +1,31 @@
 /**
  * @fileOverview screeps
- * Created by piers on 26/04/2020
+ * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
 const gc = require("gc");
+const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_HARVEST;
+    this.type = gc.STATE_WORKER_REPAIR;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    if (!state.spaceForHarvest(this.creep)) {
-        return state.switchState(this.creep, gc.STATE_HARVESTER_FULL);
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchState(this.creep, gc.STATE_WORKER_IDLE);
     }
-    const source = Game.getObjectById(this.creep.memory.targetId);
-    const result = this.creep.harvest(source );
+    const target = Game.getObjectById(this.creep.memory.targetId);
+    if (!target) {
+        return state.switchState(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    }
+    if (target.hits === target.hitsMax) {
+        this.creep.say("fixed")
+        return state.switchState(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    }
+
+    const result = this.creep.repair(target);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -25,20 +33,20 @@ State.prototype.enact = function () {
             return gf.fatalError("ERR_NOT_OWNER");
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("ERR_BUSY");
-        case ERR_NOT_FOUND:     // Extractor not found. You must build an extractor structure to harvest minerals. Learn more.
-            return gf.fatalError(ERR_NOT_FOUND);
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("ERR_NOT_IN_RANGE");
-        case ERR_TIRED:        // The extractor or the deposit is still cooling down.
-            return ERR_TIRED;
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");
         default:
-            throw("harvest unrecognised return value");
+            return gf.fatalError("no valid result");
+    }
+    if (target.hits === target.hitsMax) {
+        this.creep.say("fixed")
+        return state.switchToFullIdle(this.creep);
     }
 }
 

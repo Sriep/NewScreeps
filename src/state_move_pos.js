@@ -15,13 +15,17 @@ function State (creep) {
 
 State.prototype.enact = function () {
     const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos)
-    //console.log(this.creep, "move towards", JSON.stringify(targetPos));
+    console.log(this.creep, "move towards", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
+    console.log("check creep pos", JSON.stringify(this.creep.pos),
+        "is in rage",  this.creep.memory.moveRange, "of target", JSON.stringify(targetPos))
+    console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
+
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        //console.log("creep at", JSON.stringify(this.creep.pos), "in range of target",
-        //    JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+        console.log("creep at", JSON.stringify(this.creep.pos), "in range of target",
+            JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
         return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    //console.log("about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
+    console.log("about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
     const result = this.creep.moveTo(targetPos, {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.

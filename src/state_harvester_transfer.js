@@ -14,15 +14,20 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (state.spaceForHarvest(this.creep)) {
-        return state.switchState(this.creep, gc.STATE_HARVEST)
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
     }
 
-    const target = Game.getObjectById(this.creep.memory.containerId);
-    if (!target) {
-        return gf.fatalError("missing target for transfer creeps memory", JSON.stringify(this.creep.memory));
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].container);
+    const container = state.findContainerAt(scPos);
+    if (!container) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
     }
 
-    const result = this.creep.transfer(target, RESOURCE_ENERGY);
+    if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_REPAIR)
+    }
+
+    const result = this.creep.transfer(container, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -44,7 +49,7 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
 
-    state.switchState(this.creep, gc.STATE_HARVEST);
+    state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
 }
 
 module.exports = State;

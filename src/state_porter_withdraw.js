@@ -19,7 +19,7 @@ State.prototype.enact = function () {
         target = Game.getObjectById(this.creep.memory.targetId);
     }
     if (!target) {
-        return state.switchState(creep, gc.STATE_PORTER_IDLE);
+        return state.switchTo(creep, gc.STATE_PORTER_IDLE);
     }
 
     const result = this.creep.withdraw(target, RESOURCE_ENERGY);
@@ -44,9 +44,9 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(creep, gc.STATE_PORTER_IDLE);
+        return state.switchTo(creep, gc.STATE_PORTER_IDLE);
     }
-    state.switchState(creep, gc.STATE_PORTER_FULL_IDLE);
+    state.switchTo(creep, gc.STATE_PORTER_FULL_IDLE);
 }
 
 module.exports = State;

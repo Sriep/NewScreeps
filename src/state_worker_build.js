@@ -9,18 +9,17 @@ const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    //console.log("in state build constructor")
-    this.type = gc.STATE_BUILD;
+    this.type = gc.STATE_WORKER_BUILD;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToEmptyIdle(this.creep);
+        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
-        return state.switchToFullIdle(this.creep);
+        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
     const result = this.creep.build(target);
     switch (result) {

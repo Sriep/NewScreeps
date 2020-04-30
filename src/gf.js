@@ -7,8 +7,8 @@ const gc = require("gc");
 
 const gf = {
     fatalError: function (msg) {
-        console.log("Fatal error!",msg);
-        console.log(Error().stack)
+        console.log("\x1b[36m%s\x1b[0m", "Fatal error!",msg);
+        console.log("\x1b[36m%s\x1b[0m", Error().stack)
         if (gc.DEBUG)
             throw(msg);
     },

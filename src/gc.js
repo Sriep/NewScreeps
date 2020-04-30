@@ -32,35 +32,36 @@ const gc = {
 
     // states
     // states common
-    STATE_EMPTY_IDLE: "empty_idle",
+    //STATE_EMPTY_IDLE: "empty_idle",
     STATE_MOVE_TARGET: "move_target",
-    STATE_MOVE_BETWEEN: "move_between", //depreciated, use move to position
+    STATE_MOVE_BETWEEN: "move_between",
     STATE_MOVE_POS: "move_pos",
+    // states worker
+    STATE_WORKER_IDLE: this.RACE_WORKER + "_idle",
+    STATE_WORKER_UPGRADE: "worker-upgrade",
+    STATE_WORKER_REPAIR: "worker_repair",
+    STATE_WORKER_FULL_IDLE: "worker_full_idle",
+    STATE_WORKER_BUILD: "worker_build",
+    STATE_WORKER_HARVEST: "worker_harvest",
+    STATE_WORKER_TRANSFER: "worker_transfer",
+    // states porter
+    STATE_PORTER_IDLE: this.RACE_PORTER + "_idle",
+    STATE_PORTER_PICKUP: "porter_pickup",
+    STATE_PORTER_FULL_IDLE: "porter_full_idle",
+    STATE_PORTER_TRANSFER: "porter_transfer",
+    STATE_PORTER_WITHDRAW: "porter_withdraw",
+    STATE_PORTER_RECEIVE: "porter_receive",
+
     // states harvester
-    STATE_HARVESTER_IDLE: "harvester_idle",
+    STATE_HARVESTER_IDLE: this.STATE_HARVEST + "_idle",
     STATE_HARVESTER_BUILD: "harvester_build",
     STATE_HARVESTER_REPAIR: "harvester_repair",
     STATE_HARVESTER_FULL: "harvester_full",
     STATE_HARVESTER_TRANSFER: "harvester_transfer",
-    STATE_HARVEST: "harvest",
-    // states worker
-    STATE_WORKER_UPGRADE: "worker-upgrade",
-    STATE_REPAIR: "repair",
-    STATE_PORTER: "porter",
-    STATE_FULL_IDLE: "full_idle",
-    STATE_BUILD: "build",
-    STATE_WORKER_HARVEST: "worker_harvest",
-    STATE_TRANSFER: "transfer",
-    // states porter
-    STATE_PORTER_IDLE: "porter_idle",
-    STATE_PORTER_PICKUP: "pickup",
-    STATE_PORTER_FULL_IDLE: "porter_full_idle",
-    STATE_PORTER_TRANSFER: "porter_transfer",
-    STATE_PORTER_WITHDRAW: "porter_withdraw",
-    STATE_PORTER_RECEIVE: "porter-receive",
+    STATE_HARVESTER_HARVEST: "harvester_harvest",
     // states upgrader
-    STATE_UPGRADE: "upgrade",
-    STATE_UPGRADE_WITHDRAW: "upgrade_withdraw",
+    STATE_UPGRADER_UPGRADE: "upgrader_upgrade",
+    STATE_UPGRADER_WITHDRAW: "upgrader_withdraw",
 
     // Economy settings
     RPC_HARVESTERS: [0, 7, 7, 5, 3, 3, 3, 2, 2],
@@ -122,6 +123,7 @@ const gc = {
     TOWER_REFILL_THRESHOLD: 0.8,
     EMERGENCY_DOWNGRADING_THRESHOLD: 1500,
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
+    CONTAINER_REPAIR_THRESHOLD: 0.5,
 
 
     // Game constants

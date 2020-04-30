@@ -5,24 +5,16 @@
  */
 const gc = require("gc");
 const state = require("state");
-const race = require("race");
 
 function State (creep) {
-    //console.log("in full idle constructor", creep.name)
-    if (!creep)
-        console.log("Creat creep state with no creep object")
-    if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-        //console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
-    //if (0  !== creep.store.getFreeCapacity(RESOURCE_ENERGY))
-    //    console.log("In full idle state with non empty creep: " + JSON.stringify(creep));
-    this.type = gc.STATE_FULL_IDLE;
+    if (0  !== creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+        console.log(creep.name,"In STATE_WORKER_FULL_IDLE with empty creep");
+    }
+    this.type = gc.STATE_WORKER_FULL_IDLE;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    if (race.getRace(this.creep) === gc.RACE_HARVESTER)
-        state.switchToHarvesterIdle(this.creep)
-
     if (this.creep.room.controller.ticksToDowngrade
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
         state.switchToMoveTarget(
@@ -33,7 +25,7 @@ State.prototype.enact = function () {
         );
     }
 
-    if (this.creep.room.controller.level === 2) {
+    if (this.creep.room.controller.level <= 2) {
         state.switchToMoveTarget(
             this.creep,
             this.creep.room.controller,
@@ -59,7 +51,7 @@ State.prototype.enact = function () {
             this.creep,
             nextSourceContainer,
             gc.RANGE_TRANSFER,
-            gc.STATE_PORTER
+            gc.STATE_WORKER_TRANSFER
         );
     }
 
@@ -73,7 +65,7 @@ State.prototype.enact = function () {
             this.creep,
             damagedStructure,
             gc.RANGE_REPAIR,
-            gc.STATE_REPAIR
+            gc.STATE_WORKER_REPAIR
         );
     }
 
@@ -83,7 +75,7 @@ State.prototype.enact = function () {
             this.creep,
             nextConstructionSite,
             gc.RANGE_BUILD,
-            gc.STATE_BUILD
+            gc.STATE_WORKER_BUILD
         );
     }
 
@@ -91,7 +83,7 @@ State.prototype.enact = function () {
         this.creep,
         this.creep.room.controller,
         gc.RANGE_UPGRADE,
-        gc.STATE_WORER_UPGRADE
+        gc.STATE_WORKER_UPGRADE
     );
 }
 

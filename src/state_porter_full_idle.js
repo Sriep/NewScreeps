@@ -12,26 +12,38 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    if (this.creep.store.getFreeCapacity() === 0) {
+        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+    }
+
     const nextDelivery = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
         filter: function(s)  {
             return (s.structureType === STRUCTURE_TOWER
                 || s.structureType === STRUCTURE_EXTENSION
                 || s.structureType === STRUCTURE_SPAWN
-                || s.structureType === STRUCTURE_CONTAINER)
-                && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY);
+                && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY))
         }
     });
-    if (nextDelivery != null) {
+    if (nextDelivery) {
         return state.switchToMoveTarget(
             this.creep,
-            nextSourceContainer,
+            nextDelivery,
             gc.RANGE_TRANSFER,
-            gc.STATE_PORTER
+            gc.STATE_PORTER_TRANSFER
         );
     }
-    if (this.creep.store.getFreeCapacity() > 0) {
-        return state.switchState(this.creep, gc.STATE_PORTER_IDLE);
+
+    const controllerFlag = Game.flags[room.controller.id];
+    containerPos = findContainerAt(gf.roomPosFromPos(controllerFlag.memory.container))
+    if (nextDelivery) {
+        return state.switchToMoveTarget(
+            this.creep,
+            containerPos,
+            gc.RANGE_TRANSFER,
+            gc.STATE_PORTER_TRANSFER
+        );
     }
+
 }
 
 module.exports = State;

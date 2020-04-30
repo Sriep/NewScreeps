@@ -7,8 +7,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
-const race = require("race");
-const economy = require("economy");
+const budget = require("budget");
 
 function State (creep) {
     this.creep = creep
@@ -16,49 +15,29 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    const policyId = this.creep.memory.policyId;
-    const harvesters = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
-            && race.getRace(c) === gc.RACE_HARVESTER
-            && (c.memory.state === gc.STATE_HARVESTER_BUILD
-                || c.memory.state === gc.STATE_HARVESTER_REPAIR
-                || c.memory.state === gc.STATE_HARVESTER_FULL
-                || c.memory.state === gc.STATE_HARVESTER_TRANSFER
-                || c.memory.state === gc.STATE_HARVEST)
-    });
-    if (harvesters >= economy.estimateHomeHarvesters(this.creep.room)) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
+    const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId)
+    if (wsHarvesting >= budget.harvesterWsRoom(this.creep.room, this.creep.room)) {
             return this.goUpgrade();
-        }
     }
-    const source = state.findTargetSource(this.creep.room);
-    if (!source) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
-            return this.goUpgrade();
-        }
-        return;
+    const post = state.findFreeHarvesterPost(this.creep.room);
+    if (!post) {
+        return this.goUpgrade();
     }
-    //console.log("source STATE_HARVESTER_IDLE", source)
-    //console.log("source energy STATE_HARVESTER_IDLE", source.energy)
-    if (source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
-            return this.goUpgrade();
-        }
+
+    if (post.source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration) {
+        return this.goUpgrade();
     }
     // todo check creep lifetime, check lives long enough to reach target.
-    state.switchToMoveTarget(
+    this.creep.memory.targetId = post.source.id;
+    state.switchToMovePos(
         this.creep,
-        source,
-        gc.RANGE_HARVEST,
-        gc.STATE_HARVEST
+        post.pos,
+        gc.RANGE_TRANSFER,
+        gc.STATE_HARVESTER_HARVEST,
     );
 }
 
 State.prototype.goUpgrade = function () {
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return;
-    }
-
     this.creep.targetId = this.creep.room.controller.id;
     const controllerFlag = Game.flags[this.creep.room.controller.id];
     let ccPos = gf.roomPosFromPos(controllerFlag.memory.container);
@@ -68,7 +47,7 @@ State.prototype.goUpgrade = function () {
         this.creep,
         ccPos,
         gc.RANGE_TRANSFER,
-        gc.STATE_UPGRADE
+        gc.STATE_UPGRADER_UPGRADE
     );
 }
 

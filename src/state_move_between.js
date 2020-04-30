@@ -9,7 +9,7 @@ const gc = require("gc");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_MOVE_POS;
+    this.type = gc.STATE_MOVE_BETWEEN;
     this.creep = creep
 }
 

@@ -14,7 +14,7 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(this.creep, gc.STATE_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (target.energy > 0) {
@@ -43,7 +43,7 @@ State.prototype.enact = function () {
         }
     }
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(this.creep, gc.STATE_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_FULL_IDLE);
     }
 }
 

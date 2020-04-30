@@ -15,34 +15,19 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (state.spaceForHarvest(this.creep)) {
-        //console.log("in STATE_HARVESTER_BUILD space for harvest", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) )
-        state.switchState(this.creep, gc.STATE_HARVEST);
+         state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
     }
 
-    //console.log("STATE_HARVESTER_BUILD creep memory", JSON.stringify(this.creep.memory));
-    let site = undefined;
-    if (this.creep.memory.siteId) {
-        site = Game.getObjectById(this.creep.memory.siteId)
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].container);
+    const container = state.findContainerAt(scPos);
+    if (container) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
     }
+
+    let site = state.findContainerConstructionAt(scPos);
     if (!site) {
-        site = state.findContainerConstructionNear(this.creep, 1);
-        //console.log("site returned", JSON.stringify(site));
+        site = scPos.createConstructionSite(STRUCTURE_CONTAINER);
     }
-    if (!site) {
-        const result = this.creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
-        if (result === OK) {
-            sitesAtPos = this.creep.pos.lookFor(LOOK_CONSTRUCTION_SITES);
-            site = sitesAtPos[0];
-            this.creep.memory.siteId = site.id;
-            const sourceFlag =  Game.flags[this.creep.memory.targetId];
-            sourceFlag.memory.container = this.creep.pos;
-        } else {
-            this.creep.say("cant build")
-            return gf.fatalError("Help cant start harvester construction error " + result.toString());
-        }
-    }
-    this.creep.memory.siteId = site.id;
-    this.creep.memory.sitePos = site.pos;
 
     const result = this.creep.build(site);
     switch (result) {
@@ -57,7 +42,7 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             // assume target is invalid because its built.
             console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
-            state.switchState(this.creep, gc.STATE_HARVESTER_TRANSFER);
+            state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
             break;
             //return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
