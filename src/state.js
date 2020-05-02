@@ -33,6 +33,19 @@ const state = {
         creepState.enact()
     },
 
+    countHarvesterPosts: function(room) {
+        const sources = room.find(FIND_SOURCES);
+        let posts = 0;
+        for (let i in sources) {
+            posts += Game.flags[source.id].harvesterPosts.length;
+        }
+        return posts;
+    },
+
+    countUpgraderPosts: function(room) {
+        return Game.flags[room.controller.id].upgraderPosts.length
+    },
+
     // todo combine findFreeHarvesterPost and findFreeUpgraderPost
     findFreeHarvesterPost: function(room) {
         let sources = room.find(FIND_SOURCES);
@@ -151,11 +164,13 @@ const state = {
     },
 
     switchToMovePos(creep, targetPos, range, nextState) {
-        if (!range) {
+        if (range !== 0 && !range) {
+            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
             gf.fatalError(creep.name + " move to position with no range selected."
                 + " target pos" + JSON.stringify(targetPos) + " next state " + nextState);
         }
         if (!targetPos) {
+            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
             gf.fatalError(creep.name + " move to position but no postion given"
                 + " range " + range.toString() + " next state " + nextState);
         }
@@ -244,6 +259,13 @@ const state = {
     },
 
     spaceForHarvest: function (creep) {
+        const freeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
+        if (!freeCapacity) {
+            return true;
+            //console.log("creep", JSON.stringify(creep))
+        }
+        const workparts = race.workParts(creep)*HARVEST_POWER;
+        console.log("spaceForHarvest freeCapacity", freeCapacity, "> workparts", workparts)
         return creep.store.getFreeCapacity(RESOURCE_ENERGY)
             > race.workParts(creep)*HARVEST_POWER;
     },

@@ -5,6 +5,7 @@
  */
 
 const gc = require("gc");
+const gf = require("gf");
 const state = require("state");
 const budget = require("budget");
 
@@ -50,10 +51,15 @@ State.prototype.enact = function () {
         }
     }
     // todo check creep lifetime, check lives long enough to reach target.
-    this.creep.memory.targetId = post.sourceId;
+    this.creep.memory.targetId = post.source.id;
+    if (!post.source.id) {
+        console.log("STATE_HARVESTER_IDLE post", JSON.stringify(post));
+        gf.fatalError(this.creep.name, "no target source id for harvester");
+    }
+
     state.switchToMovePos(
         this.creep,
-        post.pos,
+        gf.roomPosFromPos({x: post.x, y:post.y, roomName: post.roomName}),
         0,
         gc.STATE_HARVESTER_HARVEST,
     );
@@ -66,7 +72,7 @@ State.prototype.goUpgrade = function () {
     this.creep.say("go upgrade")
     return state.switchToMovePos(
         this.creep,
-        post.pos,
+        gf.roomPosFromPos({x: post.x, y:post.y, roomName: post.roomName}),
         0,
         gc.STATE_UPGRADER_UPGRADE
     );

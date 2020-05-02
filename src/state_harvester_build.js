@@ -18,7 +18,7 @@ State.prototype.enact = function () {
          state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
     }
 
-    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].containerPos);
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].memory.containerPos);
     const container = state.findContainerAt(scPos);
     if (container) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
@@ -30,8 +30,9 @@ State.prototype.enact = function () {
         if (!ok) {
             gf.fatalError("cant create container", JSON.stringify(scPos), "result", ok)
         }
-        site = findContainerConstructionAt(scPos);
+        site = state.findContainerConstructionAt(scPos);
     }
+
 
     const result = this.creep.build(site);
     switch (result) {
@@ -42,6 +43,9 @@ State.prototype.enact = function () {
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
+            console.log(this.creep.name,"details",JSON.stringify(this.creep))
+            console.log("store", JSON.stringify(this.creep.store))
+            console.log("space for harvest", state.spaceForHarvest(this.creep))
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             // assume target is invalid because its built.

@@ -18,7 +18,7 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
     }
 
-    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].containerPos);
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].memory.containerPos);
     const container = state.findContainerAt(scPos);
     if (!container) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)

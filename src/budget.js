@@ -12,17 +12,17 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let wsRoom = 0;
         for (let i in sources) {
-            wsRoom += this.harvesterWsSource(sources[i], homeRoom);
+            const distance = cache.distanceSourceSpawn(source, homeRoom)
+            wsRoom += this.harvesterWsSource(sources[i], distance);
         }
         //console.log("harvesterWsRoom result", wsRoom)
         return wsRoom;
     },
 
     // Ws needed for Energy =  Energy/(Lifetime * HarvestPower)
-    harvesterWsSource: function (source, homeRoom) {
-        const travel = cache.distanceSourceSpawn(source, homeRoom)
+    harvesterWsSource: function (source, distance) {
         //console.log("harvesterWsSource travel", travel)
-        const workLifetime = CREEP_LIFE_TIME - travel;
+        const workLifetime = CREEP_LIFE_TIME - distance;
         //console.log("harvesterWsSource workLifetime", workLifetime, "harvest power", HARVEST_POWER)
         const energyCollectedPerWorkPart = workLifetime * HARVEST_POWER;
         const maxEnergy = source.energyCapacity * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
@@ -34,16 +34,16 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let csRoom = 0;
         for (let i in sources) {
-            csRoom += this.porterCsSource(sources[i], homeRoom);
+            const initial = cache.distanceSourceSpawn(source, homeRoom)
+            const repeat = cache.distanceSourceController(source, homeRoom)
+            csRoom += this.porterCsSource(sources[i], initial, repeat);
         }
         //console.log("portersCsRoom result", csRoom)
         return csRoom;
     },
 
     // Cs need for Energh = Energy * Trips per life / (Lifetime + carry amount)
-    porterCsSource: function (source, homeRoom) {
-        const initial = cache.distanceSourceSpawn(source, homeRoom)
-        const repeat = cache.distanceSourceController(source, homeRoom)
+    porterCsSource: function (source, initial, repeat) {
         //console.log("porterCsSource initial", initial, "repeat",repeat)
         const workLifetime = CREEP_LIFE_TIME - initial;
         const tripsPerLife = workLifetime / repeat;
@@ -70,9 +70,17 @@ const budget = {
         };
     },
 
-    valueRoom(room, home, status) {
+    valueRoom(room, home) {
         const owned = "username" in room.controller.owner;
+        let sourceEnergy = 0
+        const sources = room.find(FIND_SOURCES);
+        for (let i in sources) {
+            this.valueSource(source[i], home)
+        }
+    },
 
+    valueSource(source, home) {
+        hWs = this.harvesterWsRoom()
     }
 
 }

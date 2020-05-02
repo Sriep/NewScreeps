@@ -146,46 +146,35 @@ Policy.prototype.getLocalSpawn = function () {
             }
         }
     }
-    //console.log("check harverers");
+
+    const PCs = race_porter.bodyCounts(room.energyCapacityAvailable)[CARRY] // todo hacky
+
+    let maxHarvesterWs = 0;
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
-        //console.log("energyCapacity", room.energyCapacityAvailable)
-        //console.log("bogycounts",JSON.stringify(race_harvester.bodyCounts(room.energyCapacityAvailable)));
-        const body = race_harvester.bodyCounts(room.energyCapacityAvailable);
-        const HWs = body[WORK];
-        //console.log("HWs",HWs, "body", JSON.stringify(body),"WORK",WORK);
-        //const HWs = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
-
-        //console.log("HWs",HWs,"budget Ws",budget.harvesterWsRoom(room, room));
-        console.log("check harvesters",harvesters,"budget.harvesterWsRoom(room, room)/HWs)",
-            budget.harvesterWsRoom(room, room)/HWs)
-
-        if (harvesters < Math.ceil(budget.harvesterWsRoom(room, room)/HWs)) {
-            //console.log("spawn harvesters")
-            return gc.RACE_HARVESTER
-        }
+        maxHarvesterWs += budget.harvesterWsRoom(room, room);
     }
+    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)) {
+        let maxEnergy = 3000 * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
+        maxEnergy -= 2 * maxHarvesterWs * 125 + PCs * 75 + 100; // todo fix quick hack
+        maxHarvesterWs += budget.upgradersWsRoom(room, maxEnergy)
+    }
+    const Hws = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
+    //console.log("harvesters", harvesters, "maxharvestres",Math.ceil(maxHarvesterWs/Hws), "maxHarvestersWs", maxHarvesterWs, "Hws", Hws,)
+    if (harvesters < Math.ceil(maxHarvesterWs/Hws)) {
+        return gc.RACE_HARVESTER
+    }
+
     //console.log("check porters");
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)) {
         //console.log("checking porters");
-        const PCs = race_porter.bodyCounts(room.energyCapacityAvailable)["CARRY"]
+
         //console.log("estimatePorters", budget.portersCsRoom(room, room), "Porter Cs")
         if (porters < budget.portersCsRoom(room, room) / PCs) {
             //console.log("spawn porter")
             return gc.RACE_PORTER
         }
     }
-    //console.log("check upgraders");
-    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
-        //console.log("checking upgraders");
-        let maxEnergy = 3000 * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
-        maxEnergy -= 2 * HWs * 125 + PCs * 75 + 100; // todo fix quick hack
-        const UCs = race_harvester.bodyCounts(room.energyCapacityAvailable)["WORK"]
-        //console.log("maxEnergy", maxEnergy, "UCs", UCs)
-        if (UCs < budget.upgradersWsRoom(room, maxEnergy)) {
-            //console.log("spawn harvesters")
-            return gc.RACE_HARVESTER
-        }
-    }
+
     //console.log("no builds")
     return undefined;
 }
@@ -327,13 +316,13 @@ buildControllerContainer = function (room) {
     controllerFlag.memory.upgraderPosts = spots[0].neighbours;
     spots[0].pos.roomName = room.name;
     controllerFlag.memory.containerPos = spots[0].pos;
-    if (state.findContainerOrConstructionAt(spots[0].pos)) {
+    if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
         return;
     }
     const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
     if (result !== OK) {
         console.log("spot", JSON.stringify(spots[0]));
-        gf.fatalError("controller contaienr construction failed " + result.toString());
+        gf.fatalError("controller container construction failed " + result.toString());
     }
 }
 
@@ -356,11 +345,11 @@ areSourceContainersFinished = function (room) {
 }
 
 buildSourceContainers = function (room) {
-    console.log("in buildSourceContainers")
+    //console.log("in buildSourceContainers")
     const sources = room.find(FIND_SOURCES);
     for (let i in sources) {
         const flag = Game.flags[sources[i].id];
-        console.log("buildSourceContainers flag", JSON.stringify(flag.memory))
+        //console.log("buildSourceContainers flag", JSON.stringify(flag.memory))
         if (!flag.memory.containerPos) {
             buildSourceContainer(sources[i], flag);
         }
@@ -368,19 +357,19 @@ buildSourceContainers = function (room) {
 }
 
 buildSourceContainer = function (source, flag) {
-    console.log("in buildSourceContainer no es")
+    //console.log("in buildSourceContainer no es")
 
     let spots = economy.findMostFreeNeighbours(
         source.room, source.pos, 1
     )
-    console.log("buildSourceContainer spots", JSON.stringify(spots))
+    //console.log("buildSourceContainer spots", JSON.stringify(spots))
     if (spots.length === 0) {
         return gf.fatalError("findMostFreeNeighbours cant get to source");
     }
     flag.memory.harvesterPosts = spots[0].neighbours;
     spots[0].pos.roomName = source.room.name;
     flag.memory.containerPos = spots[0].pos;
-    if (state.findContainerOrConstructionAt(spots[0].pos)) {
+    if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
         return;
     }
     const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);

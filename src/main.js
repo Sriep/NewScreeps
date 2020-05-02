@@ -21,7 +21,7 @@ module.exports.loop = function () {
     //console.log("************************ Move creeps start *********************************");
     moveCreeps();
     //console.log("************************ Move creeps finish *********************************");
-    console.log("cpu used before policies act", Game.cpu.getUsed());
+    //console.log("cpu used before policies act", Game.cpu.getUsed());
 
     policy.enactPolicies();
     inserted.bottom();

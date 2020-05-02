@@ -32,6 +32,8 @@ State.prototype.enact = function () {
             break;
         case  ERR_NOT_OWNER:            // You are not the owner of this spawn.
             return gf.fatalError("ERR_NOT_OWNER");
+        case ERR_NO_PATH:
+            return this.creep.moveTo(targetPos, {reusePath: 0});
         case ERR_BUSY:                  // The creep is still being spawned.
             console.log("moveTo returns strange ERR_BUSY error") // todo investigate this
             return ERR_BUSY;
