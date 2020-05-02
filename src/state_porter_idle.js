@@ -13,7 +13,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    const target = state.findCollectContainer(this.creep)
+    const target = state.findCollectContainer(this.creep.room)
     if (target) {
         state.switchToMoveTarget(
             this.creep,

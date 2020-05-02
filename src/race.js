@@ -18,6 +18,22 @@ const race = {
         return creep.name.split("_")[0];
     },
 
+    body: function (race, ec) {
+        const raceModule = require("race_" + race);
+        const bodyCounts = raceModule.bodyCounts(ec)
+        let body = [];
+        for (let i = 0; i < bodyCounts[WORK]; i++) {
+            body.push(WORK);
+        }
+        for (let i = 0; i < bodyCounts[MOVE]; i++) {
+            body.push(MOVE);
+        }
+        for (let i = 0; i < bodyCounts[CARRY]; i++) {
+            body.push(CARRY);
+        }
+        return body;
+    },
+
     workParts: function(creep) {
         //console.log("creep", creep);
         //console.log("creep name", creep.name);
@@ -36,8 +52,7 @@ const race = {
     },
 
     spawnCreep: function (spawn, policyId, race) {
-        const raceModule = require("race_" + race);
-        const body = raceModule.body(spawn.room.energyCapacityAvailable);
+        const body = this.body(race, spawn.room.energyCapacityAvailable);
         if (!race)
             return gf.fatalError("trying to spawn creep with no race, spawn", spawn.name, "policy", policyId);
         const memory =  {

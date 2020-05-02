@@ -44,7 +44,7 @@ function moveCreeps() {
     //console.log("main in moveCreeps")
     for (let name in Game.creeps) {
         //console.log("creep", name)
-        state.enact(Game.creeps[name]);
+        state.enactCreep(Game.creeps[name]);
     }
 }
 

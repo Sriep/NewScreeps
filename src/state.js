@@ -9,7 +9,20 @@ const economy = require("economy");
 const race = require("race");
 
 const state = {
+    stackDepth: 0,
+
+    enactCreep : function(creep) {
+        this.stackDepth = 0;
+        this.enact(creep, true)
+    },
+
     enact : function(creep) {
+        //console.log("state stack depth", this.stackDepth)
+        if (this.stackDepth > gc.MAX_STATE_STACK) {
+            //console.log("state stack too big");
+            return;
+        }
+        this.stackDepth++
         if (!creep.memory.policyId)
             return gf.fatalError("error! creep" + creep.name  +" with no policy " + JSON.stringify(creep.memroy));
         if (!creep.memory.state)
@@ -102,8 +115,8 @@ const state = {
         return containersPos;
     },
 
-    findCollectContainer: function(creep) {
-        const containerPos = this.getHarvestContainersPos(creep.room)
+    findCollectContainer: function(room) {
+        const containerPos = this.getHarvestContainersPos(room)
         let containers = [];
         for (let i in containerPos) {
              const container = this.findContainerAt(containerPos[i]);
@@ -113,13 +126,15 @@ const state = {
         }
         if (containers.length === 0)
             return undefined;
-        if (containers.length > 1) {
-            containers = containers.sort( function (a,b)  {
-                return b.store.getUsedCapacity(RESOURCE_ENERGY)
-                    - a.store.getUsedCapacity(RESOURCE_ENERGY);
-            });
+        let maxSoFar = -1;
+        let maxIndex = -1;
+        for (let i in containers) {
+            if (containers[0].store.getUsedCapacity(RESOURCE_ENERGY) > maxSoFar) {
+                maxSoFar = containers[0].store.getUsedCapacity(RESOURCE_ENERGY);
+                maxIndex = i;
+            }
         }
-       return containers[0]
+        return containers[i];
     },
 
     switchToMoveTarget(creep, target, range, nextState) {
@@ -234,6 +249,8 @@ const state = {
     },
 
     findContainerAt : function (pos) {
+        if (!pos)
+            return undefined;
         const StructAt = pos.lookFor(LOOK_STRUCTURES)
         //console.log("findContainerAt", JSON.stringify(pos),"StructAt", JSON.stringify(StructAt))
         //console.log("findContainerAt StructAT.type", StructAt.structureType, "SC", STRUCTURE_CONTAINER);
@@ -282,12 +299,17 @@ const state = {
     },
 
     findUpgradeContainer : function (room) {
-        return this.findContainerAt(findUpgradeContainerPos(room));
+        console.log("room", room.name);
+        return this.findContainerAt(this.findUpgradeContainerPos(room));
     },
 
     findUpgradeContainerPos : function (room) {
         const controllerFlag = Game.flags[room.controller.id];
-        return gf.roomPosFromPos(controllerFlag.memory.containerPos);
+        if (controllerFlag.memory.containerPos) {
+            return gf.roomPosFromPos(controllerFlag.memory.containerPos);
+        } else {
+            return undefined
+        }
     }
 
 }

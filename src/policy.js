@@ -57,7 +57,7 @@ const policy = {
         data.id = this.getNextPolicyId();
         const policy = new policyConstructor(data);
         Memory.policies[policy.id] = policy;
-
+        policy.initilise();
         return policy.id;
     }
 }

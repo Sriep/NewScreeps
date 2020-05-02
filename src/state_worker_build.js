@@ -34,6 +34,7 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
+            console.log("target id", target.id,"target pos", target.pos, "creep pos", JSON.stringify(this.creep.pos),"state", gc.STATE_WORKER_BUILD);
             return gf.fatalError("ERR_NOT_IN_RANGE");
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");

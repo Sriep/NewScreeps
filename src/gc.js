@@ -3,6 +3,56 @@
  * Created by piers on 24/04/2020
  * @author Piers Shepperson
  */
+
+const pgc = {
+    // Economy
+    INITIATIVE_WORKER: "worker",
+    INITIATIVE_HARVESTER: "harvester",
+    INITIATIVE_PORTER: "porter",
+    INITIATIVE_UPGRADER: "upgrader",
+    // builds
+    // storage structures
+    BUILD_EXTENSIONS: "build_extensions",
+    BUILD_SOURCE_CONTAINERS: "build_source_containers",
+    BUILD_CONTROLLER_CONTAINERS: "build_controller_containers",
+    BUILD_TOWERL: "build_tower",
+    // roads
+    BUILD_ROAD_SOURCE_SPAWN: "build_road_source_spawn",
+    BUILD_ROAD_SOURCE_CONTROLLER: "build_road_source_controller",
+    BUILD_ROAD_SOURCE_EXTENSIONS: "build_road_source_extension",
+    BUILD_ROAD_SOURCE_SOURCE: "build_road_source_source",
+    BUILD_ROAD_SPAWN_CONTROLLER: "build_road_spawn_controller",
+    BUILD_ROAD_SOURCE_TOWERS: "build_road_source_towers",
+    // Msc
+    ACTIVITY_FINISHED: "finished",
+
+    THREE_MOVES: [
+        {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
+        {x:2, y:3}, {x:2,y:2}, {x:2, y:1}, {x:2,y:0}, {x:2, y:-1}, {x:2, y:-2}, {x:2,y:-3},
+        {x:1, y:3}, {x:1,y:2}, {x:1, y:1}, {x:1,y:0}, {x:1, y:-1}, {x:1, y:-2}, {x:1,y:-3},
+        {x:0, y:3}, {x:0,y:2}, {x:0, y:1}, {x:0,y:0}, {x:0, y:-1}, {x:0, y:-2}, {x:0,y:-3},
+        {x:-1, y:3}, {x:-1,y:2}, {x:-1, y:1}, {x:-1,y:0}, {x:-1, y:-1}, {x:-1, y:-2}, {x:-1,y:-3},
+        {x:-2, y:3}, {x:-2,y:2}, {x:-2, y:1}, {x:-2,y:0}, {x:-2, y:-1}, {x:-2, y:-2}, {x:-2,y:-3},
+        {x:-3, y:3}, {x:-3,y:2}, {x:-3, y:1}, {x:-3,y:0}, {x:-3, y:-1}, {x:-3, y:-2}, {x:-3,y:-3},
+    ],
+
+    TWO_MOVES: [
+        {x :2, y:2}, {x:2,y:1}, {x :2, y:0}, {x:2,y:-1}, {x :2, y:-2},
+        {x :1, y:2}, {x:1,y:1}, {x :1, y:0}, {x:1,y:-1}, {x :1, y:-2},
+        {x :0, y:2}, {x:0,y:1}, {x :0, y:0}, {x:0,y:-1}, {x :0, y:-2},
+        {x :-1, y:2}, {x:-1,y:1}, {x :-1, y:0}, {x:-1,y:-1}, {x :-1, y:-2},
+        {x :-2, y:2}, {x:-2,y:1}, {x :-2, y:0}, {x:-2,y:-1}, {x :-2, y:-2},
+    ],
+
+    ONE_MOVE: [
+        {x:1, y:1}, {x:1, y:0}, {x:1, y:-1},
+        {x:0, y:1}, {x:0, y:0}, {x:0, y:-1},
+        {x:-1, y:1}, {x:-1, y:0}, {x:-1, y:-1},
+    ],
+
+    ZERO_MOVES: [{x:0, y:0}],
+}
+
 const gc = {
 
     // Races
@@ -63,6 +113,8 @@ const gc = {
     STATE_UPGRADER_UPGRADE: "upgrader_upgrade",
     STATE_UPGRADER_WITHDRAW: "upgrader_withdraw",
 
+    MAX_STATE_STACK: 5,
+
     // Economy settings
     RPC_HARVESTERS: [0, 7, 7, 5, 3, 3, 3, 2, 2],
     RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
@@ -106,41 +158,53 @@ const gc = {
     // Economy
     // Building by RCL
     BUILD_ORDER_RCL: [
-        [ "economy_worker", "finished" ],
-        [ "economy_worker", "finished" ],
+        [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
+        [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [
-            "economy_specialist",
-            "build_source_containers",
-            "build_extensions",
-            "build_road_source_extension",
-            "build_road_source_spawn",
-            "build_road_source_source",
-            "build_controller_containers",
-            "build_road_source_controller",
-            "build_road_spawn_controller",
-            "finished"
+            pgc.INITIATIVE_HARVESTER,
+            pgc.BUILD_SOURCE_CONTAINERS,
+            pgc.INITIATIVE_PORTER,
+            pgc.BUILD_EXTENSIONS,
+            pgc.BUILD_CONTROLLER_CONTAINERS,
+            pgc.INITIATIVE_UPGRADER,
+            pgc.ACTIVITY_FINISHED
         ],
-        [ "economy_specialist", "finished" ],
-        [ "economy_specialist", "finished" ],
-        [ "economy_specialist", "finished" ],
-        [ "economy_specialist", "finished" ],
-        [ "economy_specialist", "finished" ],
-        [ "economy_specialist", "finished" ],
+        [
+            "build_tower",
+            pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
+            pgc.BUILD_ROAD_SOURCE_SPAWN,
+            pgc.BUILD_ROAD_SOURCE_SOURCE,
+            pgc.BUILD_ROAD_SOURCE_CONTROLLER,
+            pgc.BUILD_ROAD_SPAWN_CONTROLLER,
+            // "build_road_source_towers", todo
+            pgc.ACTIVITY_FINISHED
+        ],
+        [  pgc.ACTIVITY_FINISHED ],
+        [  pgc.ACTIVITY_FINISHED ],
+        [  pgc.ACTIVITY_FINISHED ],
+        [  pgc.ACTIVITY_FINISHED ],
+        [  pgc.ACTIVITY_FINISHED ],
     ],
     // Economy
-    ECONOMY_WORKER: "economy_worker",
-    ECONOMY_SPECIALIST: "economy_specialist",
-    //builds
-    BUILD_EXTENSIONS: "build_extensions",
-    BUILD_ROAD_SOURCE_SPAWN: "build_road_source_spawn",
-    BUILD_ROAD_SOURCE_CONTROLLER: "build_road_source_controller",
-    BUILD_ROAD_SOURCE_EXTENSIONS: "build_road_source_extension",
-    BUILD_ROAD_SOURCE_SOURCE: "build_road_source_source",
-    BUILD_ROAD_SPAWN_CONTROLLER: "build_road_spawn_controller",
-    BUILD_SOURCE_CONTAINERS: "build_source_containers",
-    BUILD_CONTROLLER_CONTAINERS: "build_controller_containers",
-
-    BUILDS_FINISHED: "finished",
+    INITIATIVE_WORKER: pgc.INITIATIVE_WORKER,
+    INITIATIVE_HARVESTER: pgc.INITIATIVE_HARVESTER,
+    INITIATIVE_PORTER: pgc.INITIATIVE_PORTER,
+    INITIATIVE_UPGRADER: pgc.INITIATIVE_UPGRADER,
+    // builds
+    // storage structures
+    BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
+    BUILD_SOURCE_CONTAINERS: pgc.BUILD_SOURCE_CONTAINERS,
+    BUILD_CONTROLLER_CONTAINERS: pgc.BUILD_CONTROLLER_CONTAINERS,
+    BUILD_TOWERL: "build_tower",
+    // roads
+    BUILD_ROAD_SOURCE_SPAWN: pgc.BUILD_ROAD_SOURCE_SPAWN,
+    BUILD_ROAD_SOURCE_CONTROLLER: pgc.BUILD_ROAD_SOURCE_CONTROLLER,
+    BUILD_ROAD_SOURCE_EXTENSIONS: pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
+    BUILD_ROAD_SOURCE_SOURCE: pgc.BUILD_ROAD_SOURCE_SOURCE,
+    BUILD_ROAD_SPAWN_CONTROLLER: pgc.BUILD_ROAD_SPAWN_CONTROLLER,
+    BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
+    // Msc
+    ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
 
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 
@@ -154,6 +218,13 @@ const gc = {
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,
 
+    // ownership
+    ROOM_ENEMY: "enemy",
+    ROOM_NEUTRAL: "neutral",
+    ROOM_RESERVED: "reserved",
+    ROOM_RESERVED_ROADS: "reserved_roads",
+    ROOM_OWNED: "owned",
+    ROOM_OWNED_ROADS: "owned_roads",
 
     // Game constants
     NOTIFY_INTERVAL: 10,

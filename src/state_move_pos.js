@@ -23,7 +23,7 @@ State.prototype.enact = function () {
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
         //console.log("creep at", JSON.stringify(this.creep.pos), "in range of target",
         //    JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
-        return state.switchTo(this.creep, this.creep.memory.next_state)
+            return state.switchTo(this.creep, this.creep.memory.next_state)
     }
     //console.log("about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
     const result = this.creep.moveTo(targetPos, {reusePath: 5})

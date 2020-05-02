@@ -44,7 +44,7 @@ const budget = {
     porterCsSource: function (source, homeRoom) {
         const initial = cache.distanceSourceSpawn(source, homeRoom)
         const repeat = cache.distanceSourceController(source, homeRoom)
-        console.log("porterCsSource initial", initial, "repeat",repeat)
+        //console.log("porterCsSource initial", initial, "repeat",repeat)
         const workLifetime = CREEP_LIFE_TIME - initial;
         const tripsPerLife = workLifetime / repeat;
         const energyPortedPerCarryPart = tripsPerLife * CARRY_CAPACITY;
@@ -59,6 +59,20 @@ const budget = {
         const energySentPerWorkPart = workLifetime * UPGRADE_CONTROLLER_POWER;
         const maxEnergy = energy * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME);
         return maxEnergy / energySentPerWorkPart;
+    },
+
+    spawnPartsLT(room) {
+        energyCapacity = room.energyCapacity(room)
+        spawns = room.find(FIND_MY_SPAWNS);
+        return { // { 15000, 500 }
+            energyLT: energyCapacity * CREEP_LIFE_TIME,
+            creepPartsLT: Math.floor(CREEP_LIFE_TIME / CREEP_SPAWN_TIME)
+        };
+    },
+
+    valueRoom(room, home, status) {
+        const owned = "username" in room.controller.owner;
+
     }
 
 }
