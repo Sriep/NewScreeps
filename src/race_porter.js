@@ -5,10 +5,13 @@
  */
 
 const race_porter = {
-
+    MIN_PORTER_EC: 150,
     CCM_COST: 150,
 
     bodyCounts: function (ec) {
+        if (ec < this.CCM_COST)
+            return undefined;
+
         let Cs = 0, Ms = 0;
         const ccmBlocks = Math.floor(ec/this.CCM_COST);
         Cs += 2*ccmBlocks;

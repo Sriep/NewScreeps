@@ -4,9 +4,25 @@
  * @autohor Piers Shepperson
  */
 // const economy = require("economy")
+    //const race_harvester = require("race_harvester");
 
 const inserted = {
     top: function () {
+/*
+        let bc = race_harvester.bodyCounts(300)
+        console.log("bodycounts harvester 300", JSON.stringify(bc));
+        bc = race_harvester.bodyCounts(250)
+        console.log("bodycounts harvester 250", JSON.stringify(bc));
+        bc = race_harvester.bodyCounts(200)
+        console.log("bodycounts harvester 200", JSON.stringify(bc));
+        bc = race_harvester.bodyCounts(150)
+        console.log("bodycounts harvester 150", JSON.stringify(bc));
+*/
+
+
+
+
+
         //room = Game.rooms["W7N7"]
         //console.log("room",JSON.stringify(room))
         //console.log("controller",JSON.stringify(room.controller));

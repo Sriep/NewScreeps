@@ -45,12 +45,18 @@ Policy.prototype.enact = function () {
     this.build();
     const initiatives = Memory.policies[this.id].initiatives;
     //console.log("initiatives", JSON.stringify(initiatives));
-    if (initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
-        this.spawn();
-    } else {
-        this.spawnWorkers();
+
+    const room = Game.rooms[this.roomId];
+    const avaliable = room.energyAvailable;
+    const maxCapacity = room.energyCapacityAvailable
+    console.log("spawn energy",avaliable, "room capacity",  maxCapacity)
+    if (avaliable === maxCapacity) { // todo can be done better
+        if (initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
+            this.spawn();
+        } else {
+            this.spawnWorkers();
+        }
     }
-    buildSourceContainers(Game.rooms[this.roomId]);
 }
 
 Policy.prototype.spawn = function () {
@@ -129,7 +135,7 @@ Policy.prototype.getLocalSpawn = function () {
     }
 
     //console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
-    //console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
+    console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
 
     //console.log("initiatives", JSON.stringify(Memory.policies[policyId].initiatives));
     //console.log("check workers");
@@ -198,9 +204,13 @@ Policy.prototype.actionActivityQueue = function (room) {
     //console.log("gc.BUILD_ORDER_RCL", JSON.stringify(gc.BUILD_ORDER_RCL))
     //console.log("memory rcl",Memory.policies[this.id].rcl);
 
+    if (!Memory.policies[this.id].rcl) {
+        Memory.policies[this.id].rcl = room.controller.level;
+    }
     if (!Memory.policies[this.id].activityIndex) {
         Memory.policies[this.id].activityIndex = 0;
     }
+
     //console.log("memory rcl activity", gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex]);
     //console.log("activity index", Memory.policies[this.id].activityIndex);
     //console.log("gc.BUILD_ORDER_RCL[1][0]",gc.BUILD_ORDER_RCL[1][0] )

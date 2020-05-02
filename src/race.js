@@ -21,6 +21,8 @@ const race = {
     body: function (race, ec) {
         const raceModule = require("race_" + race);
         const bodyCounts = raceModule.bodyCounts(ec)
+        if (!bodyCounts)
+            return undefined;
         let body = [];
         for (let i = 0; i < bodyCounts[WORK]; i++) {
             body.push(WORK);
@@ -53,6 +55,8 @@ const race = {
 
     spawnCreep: function (spawn, policyId, race) {
         const body = this.body(race, spawn.room.energyCapacityAvailable);
+        if (!body)
+            return undefined;
         if (!race)
             return gf.fatalError("trying to spawn creep with no race, spawn", spawn.name, "policy", policyId);
         const memory =  {

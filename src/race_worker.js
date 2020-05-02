@@ -3,7 +3,6 @@
  * Created by piers on 25/04/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
 
 const race_worker = {
     WORKER_SLOW_MAX_SIZE: 16,
@@ -11,8 +10,12 @@ const race_worker = {
     BLOCKSIZE: 100 + 50 + 50,
     BLOCKSIZE_FAST: 100 + 50 + 50 + 50,
     BLOCKSIZE_PARTS: 3,
+    WMC_COST: 200,
 
     body: function (ec) {
+        if (ec < WMC_COST)
+            return undefined;
+
         let size;
         //if (fast) {
         //    const parts = Math.floor(ec/this.BLOCKSIZE_FAST);

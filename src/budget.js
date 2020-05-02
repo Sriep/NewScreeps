@@ -12,7 +12,7 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let wsRoom = 0;
         for (let i in sources) {
-            const distance = cache.distanceSourceSpawn(source, homeRoom)
+            const distance = cache.distanceSourceSpawn(sources[i], homeRoom)
             wsRoom += this.harvesterWsSource(sources[i], distance);
         }
         //console.log("harvesterWsRoom result", wsRoom)
@@ -34,8 +34,8 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let csRoom = 0;
         for (let i in sources) {
-            const initial = cache.distanceSourceSpawn(source, homeRoom)
-            const repeat = cache.distanceSourceController(source, homeRoom)
+            const initial = cache.distanceSourceSpawn(source[i], homeRoom)
+            const repeat = cache.distanceSourceController(source[i], homeRoom)
             csRoom += this.porterCsSource(sources[i], initial, repeat);
         }
         //console.log("portersCsRoom result", csRoom)
@@ -80,7 +80,8 @@ const budget = {
     },
 
     valueSource(source, home) {
-        hWs = this.harvesterWsRoom()
+        const path = pathSourceSpawn(source, home);
+
     }
 
 }

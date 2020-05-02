@@ -4,14 +4,16 @@
  * @author Piers Shepperson
  */
 
-const race = require("race")
-
 const race_harvester = {
 
+    MIN_HARVESTER_EC: 300,
     WWCM_COST: 300,
     WWM_COST: 250,
 
     bodyCounts: function (ec) {
+        if (ec < this.WWCM_COST)
+            return undefined;
+
         let Ws = 2, Ms = 1, Cs = 1;
         const wwmBlocks = Math.floor((ec -this.WWCM_COST)/this.WWM_COST);
         Ws += 2*wwmBlocks;

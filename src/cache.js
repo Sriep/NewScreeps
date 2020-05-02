@@ -7,7 +7,7 @@ const gc = require("gc");
 
 const cache = {
 
-    distance(from, toArray, name, range) {
+    path(from, toArray, name, range) {
         if (toArray.length === 0) {
             return undefined;
         }
@@ -41,11 +41,17 @@ const cache = {
             ops: pfPath.ops,
             cost: pfPath.cost,
         }
-        //console.log("distanceSourceSpawn flag", JSON.stringify(flag.memory))
-        return pfPath.cost;
+        return flag.memory[name].path;
+    },
+
+    distance(from, toArray, name, range) {
+        return this.path(from, toArray, name, range).cost
     },
 
     distanceSourceSpawn: function (source, room) {
+        this.pathSourceSpawn(source, room).cost;
+    },
+    pathSourceSpawn(source, room) {
         const roomName = room.name
         const flag = Game.flags[source.id];
         if (!flag.memory.roomName) {
@@ -54,9 +60,9 @@ const cache = {
         //console.log("room flag", JSON.stringify(room.memory))
         if (!flag.memory.roomName.path) {
             const spawns = room.find(FIND_MY_SPAWNS);
-            return this.distance(source, spawns, roomName, 1);
+            return this.path(source, spawns, roomName, 1);
         }
-        return flag.memory.roomName.path.cost;
+        return flag.memory.roomName.path;
     },
 
     distanceSourceController: function (source, room) {

@@ -18,9 +18,10 @@ function State (creep) {
 
 State.prototype.enact = function () {
     const home = Game.rooms[this.homeId];
-    console.log("homeId", this.homeId)
+    console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
     if (home.controller.ticksToDowngrade
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
+        console.log("swith to emergency upgrade")
         state.switchToMoveTarget(
             this.creep,
             home.controller,
