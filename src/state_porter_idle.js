@@ -23,7 +23,7 @@ State.prototype.enact = function () {
         );
     }
 
-    const drop = creep.room.findClosestByRange(FIND_STRUCTURES, {
+    const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
     if (drop) {

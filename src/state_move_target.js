@@ -3,10 +3,11 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
-
+/*
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
+const race = require("race");
 
 //depreciated, use STATE_MOVE_POSITION instead
 function State (creep) {
@@ -21,8 +22,8 @@ function State (creep) {
 
 State.prototype.enact = function () {
     const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target) { // probably target build got built!
-        return state.switchToFullIdle(this.creep);
+    if (!target) {
+        return state.switchTo(this.creep, race.getRace(this.creep) + "_idle");
     }
     if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
         return state.switchTo(this.creep, this.creep.memory.next_state)
@@ -50,3 +51,4 @@ State.prototype.enact = function () {
 }
 
 module.exports = State;
+*/

@@ -18,7 +18,7 @@ State.prototype.enact = function () {
          state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
     }
 
-    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].container);
+    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].containerPos);
     const container = state.findContainerAt(scPos);
     if (container) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
@@ -26,7 +26,11 @@ State.prototype.enact = function () {
 
     let site = state.findContainerConstructionAt(scPos);
     if (!site) {
-        site = scPos.createConstructionSite(STRUCTURE_CONTAINER);
+        const ok = scPos.createConstructionSite(STRUCTURE_CONTAINER);
+        if (!ok) {
+            gf.fatalError("cant create container", JSON.stringify(scPos), "result", ok)
+        }
+        site = findContainerConstructionAt(scPos);
     }
 
     const result = this.creep.build(site);

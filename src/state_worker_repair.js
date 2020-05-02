@@ -14,15 +14,15 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(this.creep, gc.STATE_WORKER_IDLE);
+        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
-        return state.switchState(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
     if (target.hits === target.hitsMax) {
         this.creep.say("fixed")
-        return state.switchState(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
 
     const result = this.creep.repair(target);

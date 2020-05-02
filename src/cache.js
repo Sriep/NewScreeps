@@ -7,53 +7,80 @@ const gc = require("gc");
 
 const cache = {
 
-    distanceSourceSpawn: function (source, room) {
-        const flag = Game.flags[source.id];
-        if (!flag.memory.roomName.spawn) {
-            const spawns = room.find(FIND_MY_SPAWNS);
-            console.log("distanceSourceSpawn sawns", spawns)
-            let goals = _.map(room.find(FIND_MY_SPAWNS), function(spawn) {
-                return { pos: spawn.pos, range: 1 };
-            });
-            pfPath = PathFinder.search(source.pos, goals, {
-                maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH
-            })
-            console.log("distanceSourceSpawn path", JSTON.toString(path))
-            if (ret.incomplete) {
-                return undefined;
-            }
-            flag.memory.roomName.spawn = {
-                path: this.serialisePath(pfPath.path),
-                ops: pfPath.ops,
-                cost: pfPath.cost,
-            }
-            console.log("distanceSourceSpawn flag", JSTON.toString(flag.memory))
-            return pfPath.cost;
+    distance(from, toArray, name, range) {
+        if (toArray.length === 0) {
+            return undefined;
         }
-        return flag.memory.roomName.spawn.cost;
+        if (!name) {
+            name = toArrya[0].id;
+        }
+        if (!range) {
+            range = 1
+        }
+
+        flag = Game.flags[from.id];
+        if (!flag.memory[name]) {
+            flag.memory[name] ={};
+        }
+        if (flag.memory[name].path) {
+            return flag.memory[name].path.cost;
+        }
+        let goals = _.map(toArray, function(to) {
+            return { pos: to.pos, range: range };
+        });
+        pfPath = PathFinder.search(from.pos, goals, {
+            maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH
+        })
+        console.log("distanceSourceSpawn path", JSON.stringify(pfPath))
+        if (pfPath.incomplete) {
+            delete flag.memory[to.id];
+            return undefined;
+        }
+        flag.memory[name].path = {
+            path: this.serialisePath(pfPath.path),
+            ops: pfPath.ops,
+            cost: pfPath.cost,
+        }
+        console.log("distanceSourceSpawn flag", JSON.stringify(flag.memory))
+        return pfPath.cost;
+    },
+
+    distanceSourceSpawn: function (source, room) {
+        const roomName = room.name
+        const flag = Game.flags[source.id];
+        if (!flag.memory.roomName) {
+            flag.memory.roomName = {};
+        }
+        //console.log("room flag", JSON.stringify(room.memory))
+        if (!flag.memory.roomName.path) {
+            const spawns = room.find(FIND_MY_SPAWNS);
+            return this.distance(source, spawns, roomName, 1);
+        }
+        return flag.memory.roomName.path.cost;
     },
 
     distanceSourceController: function (source, room) {
         const flag = Game.flags[source.id];
-        if (!flag.memory.roomName.controller) {
-            console.log("distanceSourceSpawn con", spawns);
-            let goal = { pos: room.contorller.pos, range: 1 }
-            pfPath = PathFinder.search(source.pos, goal, {
-                maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH
-            })
-            console.log("distanceSourceSpawn path", JSTON.toString(path))
-            if (ret.incomplete) {
-                return undefined;
-            }
-            flag.memory.roomName.controller = {
-                path: this.serialisePath(pfPath.path),
-                ops: pfPath.ops,
-                cost: pfPath.cost,
-            }
-            console.log("distanceSourceSpawn flag", JSTON.toString(flag.memory))
-            return pfPath.cost;
+        if (!flag.memory[room.controller.id]) {
+            flag.memory[room.controller.id] = {};
         }
-        return flag.memory.roomName.controller.cost;
+        if (!flag.memory[room.controller.id] || !flag.memory[room.controller.id].path) {
+            return this.distance(source, [room.controller], room.controller.id, 1);
+        }
+        console.log("distanceSourceController", flag.memory[room.controller.id].cost)
+        return flag.memory[room.controller.id].path.cost;
+    },
+
+    distanceUpgraderSpawn: function (fromRoom, spawnRoom) {
+        const flag = Game.flags[fromRoom.controller.id];
+        if (!flag.memory.roomName) {
+            flag.memory.roomName = {};
+        }
+        if (!flag.memory.roomName.path) {
+            const spawns = spawnRoom.find(FIND_MY_SPAWNS);
+            return this.distance(fromRoom.controller.id, spawns, spawnRoom, 1);
+        }
+        return flag.memory.roomName.path.cost;
     },
 
     serialisePath: function (path) {

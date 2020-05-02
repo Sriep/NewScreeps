@@ -33,19 +33,19 @@ const gc = {
     // states
     // states common
     //STATE_EMPTY_IDLE: "empty_idle",
-    STATE_MOVE_TARGET: "move_target",
+    //STATE_MOVE_TARGET: "move_target",
     STATE_MOVE_BETWEEN: "move_between",
     STATE_MOVE_POS: "move_pos",
     // states worker
-    STATE_WORKER_IDLE: this.RACE_WORKER + "_idle",
-    STATE_WORKER_UPGRADE: "worker-upgrade",
+    STATE_WORKER_IDLE: "worker_idle",
+    STATE_WORKER_UPGRADE: "worker_upgrade",
     STATE_WORKER_REPAIR: "worker_repair",
     STATE_WORKER_FULL_IDLE: "worker_full_idle",
     STATE_WORKER_BUILD: "worker_build",
     STATE_WORKER_HARVEST: "worker_harvest",
     STATE_WORKER_TRANSFER: "worker_transfer",
     // states porter
-    STATE_PORTER_IDLE: this.RACE_PORTER + "_idle",
+    STATE_PORTER_IDLE:  "porter_idle",
     STATE_PORTER_PICKUP: "porter_pickup",
     STATE_PORTER_FULL_IDLE: "porter_full_idle",
     STATE_PORTER_TRANSFER: "porter_transfer",
@@ -53,7 +53,7 @@ const gc = {
     STATE_PORTER_RECEIVE: "porter_receive",
 
     // states harvester
-    STATE_HARVESTER_IDLE: this.STATE_HARVEST + "_idle",
+    STATE_HARVESTER_IDLE: "harvester_idle",
     STATE_HARVESTER_BUILD: "harvester_build",
     STATE_HARVESTER_REPAIR: "harvester_repair",
     STATE_HARVESTER_FULL: "harvester_full",
@@ -105,19 +105,48 @@ const gc = {
 
     // Economy
     // Building by RCL
-    BUILD_ROAD_SOURCE_SPAWN: 2,
-    BUILD_ROAD_SOURCE_CONTROLLER: 2,
-    BUILD_ROAD_SOURCE_EXTENSIONS: 2,
-    BUILD_ROAD_SOURCE_SOURCE: 2,
-    BUILD_ROAD_SPAWN_CONTROLLER: 2,
-    BUILD_SOURCE_CONTAINERS: 2,
-    BUILD_CONTROLLER_CONTAINERS: 2,
+    BUILD_ORDER_RCL: [
+        [ "economy_worker", "finished" ],
+        [ "economy_worker", "finished" ],
+        [
+            "economy_specialist",
+            "build_source_containers",
+            "build_extensions",
+            "build_road_source_extension",
+            "build_road_source_spawn",
+            "build_road_source_source",
+            "build_controller_containers",
+            "build_road_source_controller",
+            "build_road_spawn_controller",
+            "finished"
+        ],
+        [ "economy_specialist", "finished" ],
+        [ "economy_specialist", "finished" ],
+        [ "economy_specialist", "finished" ],
+        [ "economy_specialist", "finished" ],
+        [ "economy_specialist", "finished" ],
+        [ "economy_specialist", "finished" ],
+    ],
+    // Economy
+    ECONOMY_WORKER: "economy_worker",
+    ECONOMY_SPECIALIST: "economy_specialist",
+    //builds
+    BUILD_EXTENSIONS: "build_extensions",
+    BUILD_ROAD_SOURCE_SPAWN: "build_road_source_spawn",
+    BUILD_ROAD_SOURCE_CONTROLLER: "build_road_source_controller",
+    BUILD_ROAD_SOURCE_EXTENSIONS: "build_road_source_extension",
+    BUILD_ROAD_SOURCE_SOURCE: "build_road_source_source",
+    BUILD_ROAD_SPAWN_CONTROLLER: "build_road_spawn_controller",
+    BUILD_SOURCE_CONTAINERS: "build_source_containers",
+    BUILD_CONTROLLER_CONTAINERS: "build_controller_containers",
+
+    BUILDS_FINISHED: "finished",
 
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,
-    BUILD_CHECK_RATE: 10000,
+    BUILD_QUEUE_CHECK_RATE: 50,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -133,9 +162,6 @@ const gc = {
     TICK_NUMBER: "tick number",
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
-
-
-    DELTA_MOVES: [[{x:0, y:0}], this.ONE_MOVE, this.TWO_MOVES, this.THREE_MOVES],
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},

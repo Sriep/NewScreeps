@@ -20,6 +20,7 @@ const state = {
         creepState.enact()
     },
 
+    // todo combine findFreeHarvesterPost and findFreeUpgraderPost
     findFreeHarvesterPost: function(room) {
         let sources = room.find(FIND_SOURCES);
         sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
@@ -27,28 +28,50 @@ const state = {
             const flag = Game.flags[sources[i].id];
             const posts = flag.memory.harvesterPosts;
             for (let i in posts) {
-                for (let j in Game.creeps) {
-                    targetPos = gf.roomPosFromPos(Game.creeps[j].memory.targetPos)
-                    if (targetPos && posts[i].isEqualTo(targetPos)) {
-                        if (Game.creeps[j].memory.targertId !== sources[s].id
-                            || !this.isHarvestingHarvester(Game.creeps[j])) {
-                            return {source: source[s], pos: post[i]}
-                        } //if
-                    } //if
-                } // for j
+                const post = gf.roomPosFromPos(posts[i], room.name);
+                if (this.isHarvesterPostFree(post)) {
+                    post.source = sources[s];
+                    return post;
+                }
             } // for i
         } // for s
         return undefined;
     },
 
-    getHarvesterPosts: function (room) {
-        const sources = room.find(FIND_SOURCES);
-        let posts = [];
-        for (let i in sources) {
-            const flag = Game.flags[sources[i].id];
-            posts.concat(flag.memory.harvesterPosts);
+    findFreeUpgraderPost: function(room) {
+        const flag = Game.flags[room.controller.id];
+        const posts = flag.memory.upgraderPosts;
+        for (let i in posts) {
+            const post = gf.roomPosFromPos(post[i]);
+            if (this.isUpgraderPostFree(post)) {
+                return post;
+            }
         }
-        return posts
+        return undefined;
+    },
+
+    isHarvesterPostFree: function (pos) {
+        for (let j in Game.creeps) {
+            if (this.isHarvestingHarvester(Game.creeps[j])) {
+                targetPos = gf.roomPosFromPos(Game.creeps[j].memory.targetPos)
+                if (pos.isEqualTo(targetPos)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    },
+
+    isUpgraderPostFree: function (pos) {
+        for (let j in Game.creeps) {
+            if (this.isUpgradingHarvester(Game.creeps[j])) {
+                targetPos = gf.roomPosFromPos(Game.creeps[j].memory.targetPos)
+                if (pos.isEqualTo(targetPos)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     },
 
     findTargetSource: function(room) {
@@ -74,7 +97,7 @@ const state = {
         const containersPos = [];
         for (let s in sources) {
             const flag = Game.flags[sources[i].id];
-            containersPos.push(flag.memory.container);
+            containersPos.push(gf.roomPosFromPos(flag.memory.containerPos));
         }
         return containersPos;
     },
@@ -121,7 +144,7 @@ const state = {
             gf.fatalError(creep.name + " move to position but no postion given"
                 + " range " + range.toString() + " next state " + nextState);
         }
-        if (!newState) {
+        if (!nextState) {
             gf.fatalError(creep.name + " move to position with no next sate provided."
                 + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
         }
@@ -138,7 +161,7 @@ const state = {
         if (!creep) {
             gf.fatalError(" no creep given when changing state to", newState, "targetId", targetId);
         }
-        if (!newState) {
+        if (!newState || newState === "undefined_idle") {
             gf.fatalError(creep.name + " no state to change to, targetId ", targetId);
         }
         if (targetId) {
@@ -148,29 +171,6 @@ const state = {
         creep.say(this.creepSay[newState]);
         return state.enact(creep);
     },
-/*
-    switchToHarvest: function (creep) {
-        return this.switchTo(creep, gc.STATE_HARVEST, creep.memory.targetId);
-    },
-
-    switchToHarvesterIdle: function (creep) {
-        return this.switchTo(creep, gc.STATE_HARVESTER_IDLE, creep.memory.targetId);
-    },
-
-    switchToFullIdle: function (creep) {
-        return this.switchTo(creep, gc.STATE_FULL_IDLE);
-    },
-
-    switchToEmptyIdle: function (creep) {
-        return this.switchTo(creep, gc.STATE_EMPTY_IDLE);
-    },
-
-    switchTo: function(creep, newState) {
-        delete creep.memory.next_state;
-        delete creep.memory.moveRange;
-        return this.switchTo(creep, newState, creep.memory.targetId);
-    },
-        */
 
     isHarvestingHarvester: function(creep) {
        return  race.getRace(creep) === gc.RACE_HARVESTER
@@ -180,6 +180,12 @@ const state = {
                 || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
                 || creep.memory.state === gc.STATE_HARVESTER_HARVEST
                 || creep.memory.next_state === gc.STATE_HARVESTER_HARVEST)
+    },
+
+    isUpgradingHarvester: function(creep) {
+        return  race.getRace(creep) === gc.RACE_HARVESTER
+            && (creep.memory.state === gc.STATE_UPGRADER_UPGRADE
+                || creep.memory.state === gc.STATE_UPGRADER_WITHDRAW)
     },
 
     numHarvestersHarvesting: function(policyId) {
@@ -200,9 +206,10 @@ const state = {
                     || c.memory.state === gc.STATE_HARVESTER_HARVEST
                     || c.memory.next_state === gc.STATE_HARVESTER_HARVEST)
         });
+        //console.log("in wsHarvesting harvesters", harvesters.length)
         let ws = 0;
         for (let i in harvesters) {
-            ws += workParts(harvesters[i]);
+            ws += race.workParts(harvesters[i]);
         }
         return ws;
     },
@@ -228,15 +235,17 @@ const state = {
 
     findContainerAt : function (pos) {
         const StructAt = pos.lookFor(LOOK_STRUCTURES)
-        if (StructAt && StructAt.structureType === STRUCTURE_CONTAINER) {
-            return StructAt;
+        //console.log("findContainerAt", JSON.stringify(pos),"StructAt", JSON.stringify(StructAt))
+        //console.log("findContainerAt StructAT.type", StructAt.structureType, "SC", STRUCTURE_CONTAINER);
+        if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
+            return StructAt[0];
         }
         return undefined;
     },
 
     findContainerConstructionAt : function (pos) {
         const StructAt = pos.lookFor(LOOK_CONSTRUCTION_SITES)
-        if (StructAt && StructAt.structureType === STRUCTURE_CONTAINER) {
+        if (StructAt.length > 0 && StructAt.structureType === STRUCTURE_CONTAINER) {
             return StructAt;
         }
         return undefined;
@@ -278,7 +287,7 @@ const state = {
 
     findUpgradeContainerPos : function (room) {
         const controllerFlag = Game.flags[room.controller.id];
-        return gf.roomPosFromPos(controllerFlag.memory.container);
+        return gf.roomPosFromPos(controllerFlag.memory.containerPos);
     }
 
 }

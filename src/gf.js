@@ -7,14 +7,25 @@ const gc = require("gc");
 
 const gf = {
     fatalError: function (msg) {
-        console.log("\x1b[36m%s\x1b[0m", "Fatal error!",msg);
-        console.log("\x1b[36m%s\x1b[0m", Error().stack)
+        console.log("Fatal error: ",msg);
+        console.log(Error().stack)
         if (gc.DEBUG)
             throw(msg);
     },
 
-    roomPosFromPos(pos) {
-        return new RoomPosition(pos.x, pos.y, pos.roomName)
+    assert: function (a, b, msg) {
+        if (a !== b) {
+            console.log("assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
+            this.fatalError("assert failed: " + msg)
+        }
+    },
+
+    roomPosFromPos(pos, roomName) {
+        if (roomName) {
+            return new RoomPosition(pos.x, pos.y, roomName)
+        } else {
+            return new RoomPosition(pos.x, pos.y, pos.roomName)
+        }
     },
 
     needsRepair : function (s) {

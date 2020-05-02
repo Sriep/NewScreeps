@@ -10,16 +10,17 @@ const state = require("state");
 function State (creep) {
     this.type = gc.STATE_UPGRADER_UPGRADE;
     this.creep = creep
+    this.policyId = creep.memory.policyId
+    this.homeId = Memory.policies[this.policyId].roomId;
 }
-//if (gf.needsRepair(container)) {
-//    return state.switchTo(this.creep, gc.STATE_UPGRADE_REPAIR)
-//}
+
 State.prototype.enact = function () {
      if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
      }
 
-    const result = this.creep.upgradeController(this.creep.room.controller);
+    const home = Game.rooms[this.homeId];
+    const result = this.creep.upgradeController(home.controller);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;

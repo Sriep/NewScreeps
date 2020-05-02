@@ -15,11 +15,11 @@ function State (creep) {
 
 State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchState(this.creep, gc.STATE_WORKER_IDLE)
+        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
-        return state.switchState(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
 
     const result = this.creep.transfer(target, RESOURCE_ENERGY);
@@ -35,7 +35,7 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchToFullIdle();
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -44,7 +44,7 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchToFullIdle(this.creep);
+        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
 }
 

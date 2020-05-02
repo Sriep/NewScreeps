@@ -5,48 +5,69 @@
  */
 
 const gc = require("gc");
-const gf = require("gf");
 const state = require("state");
 const budget = require("budget");
 
 function State (creep) {
     this.creep = creep
     this.state = gc.STATE_HARVESTER_IDLE
+    this.policyId = creep.memory.policyId
+    this.homeId = Memory.policies[this.policyId].roomId;
 }
 
 State.prototype.enact = function () {
+    const home = Game.rooms[this.homeId];
     const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId)
-    if (wsHarvesting >= budget.harvesterWsRoom(this.creep.room, this.creep.room)) {
-            return this.goUpgrade();
-    }
-    const post = state.findFreeHarvesterPost(this.creep.room);
-    if (!post) {
-        return this.goUpgrade();
-    }
+    const wBudget = budget.harvesterWsRoom(home, home);
 
+    containerId = Game.flags[home.controller.id].memory.container;
+    //console.log(wsHarvesting, "ws vrs harvesters budget",wBudget)
+    if (wsHarvesting >= wBudget) {
+        //console.log("wsHarvesting >= wBudget")
+        if (!!containerId) {
+            return this.goUpgrade();
+        } else {
+            return
+        }
+
+    }
+    const post = state.findFreeHarvesterPost(home);
+    if (!post) {
+        //console.log("!post")
+        if (!!containerId) {
+            return this.goUpgrade();
+        } else {
+            return
+        }
+    }
+    console.log("source post",JSON.stringify(post))
     if (post.source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration) {
-        return this.goUpgrade();
+        //console.log("post.source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration");
+        if (!!containerId) {
+            return this.goUpgrade();
+        } else {
+            this.creep.suicide()
+        }
     }
     // todo check creep lifetime, check lives long enough to reach target.
-    this.creep.memory.targetId = post.source.id;
+    this.creep.memory.targetId = post.sourceId;
     state.switchToMovePos(
         this.creep,
         post.pos,
-        gc.RANGE_TRANSFER,
+        0,
         gc.STATE_HARVESTER_HARVEST,
     );
 }
 
 State.prototype.goUpgrade = function () {
-    this.creep.targetId = this.creep.room.controller.id;
-    const controllerFlag = Game.flags[this.creep.room.controller.id];
-    let ccPos = gf.roomPosFromPos(controllerFlag.memory.container);
-
+    const home = Game.rooms[this.homeId];
+    post =  state.findFreeUpgraderPost(home);
+    this.creep.targetId = home.controller.id;
     this.creep.say("go upgrade")
     return state.switchToMovePos(
         this.creep,
-        ccPos,
-        gc.RANGE_TRANSFER,
+        post.pos,
+        0,
         gc.STATE_UPGRADER_UPGRADE
     );
 }

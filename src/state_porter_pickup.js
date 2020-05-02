@@ -11,10 +11,14 @@ function State (creep) {
     //console.log("in porter pickup constructor", creep.name)
     this.type = gc.STATE_PORTER_PICKUP;
     this.creep = creep
+    this.policyId = creep.memory.policyId
+    this.homeId = Memory.policies[this.policyId].roomId;
 }
 
+
 State.prototype.enact = function () {
-    const drop = this.creep.room.findClosestByRange(FIND_STRUCTURES, {
+    const home = Game.rooms[this.homeId];
+    const drop = home.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
 

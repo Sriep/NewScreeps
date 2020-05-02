@@ -38,6 +38,8 @@ const race = {
     spawnCreep: function (spawn, policyId, race) {
         const raceModule = require("race_" + race);
         const body = raceModule.body(spawn.room.energyCapacityAvailable);
+        if (!race)
+            return gf.fatalError("trying to spawn creep with no race, spawn", spawn.name, "policy", policyId);
         const memory =  {
             policyId: policyId,
             state: race + "_idle"

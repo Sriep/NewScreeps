@@ -98,8 +98,14 @@ const construction = {
         }
     },
 
+    roadsBuilt: function(room) {
+        return room.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: { structureType: STRUCTURE_ROAD }
+        }) === 0;
+    },
 
-    buildMissingExtensions: function(room, rcl) {
+    finishBuildingMissingExtensions: function(room) {
+        const rcl = room.controller.level;
         const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
         const extensions = room.find(FIND_MY_STRUCTURES, {
             filter: { structureType: STRUCTURE_EXTENSION }
@@ -107,12 +113,11 @@ const construction = {
         beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_EXTENSION }
         })
-        //console.log("allowedExtensions",allowedExtensions,"extensions",extensions.length,"beingBuilt",beingBuilt.length)
         const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
-        //console.log("buildMissingExtensions wantedExtensions", wantedExtensions, "allowed extensions", allowedExtensions)
         if (wantedExtensions > 0) {
             this.buildExtensions(room, wantedExtensions);
         }
+        return extensions === wantedExtensions;
     },
 
     buildExtensions: function (room, numNeeded) {

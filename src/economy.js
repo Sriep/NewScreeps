@@ -28,37 +28,85 @@ const economy = {
             case 3: delta = gc.THREE_MOVES; break;
             default: return gf.fatalError("findMostFreeNeighbours range to big = " + range.toString());
         }
+        //console.log("one move", JSON.toString(gc.ONE_MOVE))
+
+        const nonWallPos = [];
         for (let i in delta) {
-            //console.log("i", i, "delta[i]", JSON.stringify(delta[i]));
             const x = pos.x + delta[i].x;
             const y = pos.y + delta[i].y;
             if (terrain.get(x,y) !== TERRAIN_MASK_WALL) {
-                const nonWalls = this.countNonWallNeighbours(x, y, terrain)
-                //console.log("countNonWallNeighbours nonWalls", nonWalls)
-                if (nonWalls > maxSoFar) {
-                    bestSpots.length = 0;
-                    bestSpots = [new RoomPosition(x, y, room.name)]
-                    maxSoFar = nonWalls;
-                } else if (nonWalls === maxSoFar) {
-                    bestSpots.push(new RoomPosition(x, y, room.name))
-                    //bestSpots.push({x:x, y:y})
-                }
+                //console.log(x,y,"x y non wall")
+                nonWallPos.push({ x:delta[i].x, y: delta[i].y })
             }
         }
-        //console.log("bestSpots", bestSpots, "maxSoFar", maxSoFar)
+        //console.log("nonWallPos", JSON.stringify(nonWallPos))
+        for (let i in nonWallPos) {
+            let rebase = _.map(nonWallPos, function(d) {
+                return { x: d.x - nonWallPos[i].x, y: d.y - nonWallPos[i].y };
+            });
+            //console.log("rebase", JSON.stringify(rebase))
+            const x = pos.x + nonWallPos[i].x;
+            const y = pos.y + nonWallPos[i].y;
+            ///console.log("delta", JSON.stringify(delta));
+            //console.log(x,y,"rebase", JSON.stringify(rebase))
+            const join = this.intersect(rebase, gc.ONE_MOVE);
+            //console.log(x,y,"xy join", JSON.stringify(join))
+
+            const nonWalls = this.countNonWallNeighbours(x, y, terrain, join)
+            //console.log(x,y, "maxSoFar", maxSoFar,"nonWalls",JSON.stringify(nonWalls))
+            if (nonWalls.count > maxSoFar) {
+                bestSpots.length = 0;
+                bestSpots = []
+                bestSpots.push({
+                    pos: new RoomPosition(x, y, room.name),
+                    neighbours: nonWalls.neighbours
+                })
+                maxSoFar = nonWalls.count;
+            } else if (nonWalls.count === maxSoFar) {
+                bestSpots.push({
+                    pos: new RoomPosition(x, y, room.name),
+                    neighbours: nonWalls.neighbours
+                })
+                //bestSpots.push({x:x, y:y})
+            }
+            //console.log("best spots", JSON.stringify(bestSpots))
+
+        }
+        //console.log("bestSpots", JSON.stringify(bestSpots))
         return bestSpots;
     },
 
-    countNonWallNeighbours: function(x, y, terrain) {
-        let count = 0;
-        for (let i in gc.ONE_MOVE) {
-            const X = x + gc.ONE_MOVE[i];
-            const Y = y + gc.ONE_MOVE[i];
-            if (terrain.get(X,Y) !== TERRAIN_MASK_WALL) {
-                count++
+    intersect: function(A, B) {
+        //console.log("intersect A", JSON.stringify(A), "B", JSON.stringify(B))
+        let intersect = [];
+        for ( let i in A) {
+            for ( let j in B) {
+                if (A[i].x === B[j].x && A[i].y === B[j].y) {
+                    intersect.push(A[i]);
+                    break;
+                }
             }
         }
-        return count;
+        return intersect;
+    },
+
+    countNonWallNeighbours: function(x, y, terrain, delta) {
+        let count = 0;
+        let neighbours = [];
+        //const join = this.intersect(delta, gc.ONE_MOVE);
+        //console.log(x,y,"delta", JSON.stringify(delta))
+        for (let i in delta) {
+            const X = x + delta[i].x;
+            const Y = y + delta[i].y;
+            //console.log(i,"i one move", gc.ONE_MOVE[i], "x",x,"X",x,"Y",Y,"y",y)
+            //console.log("PIERS",X,Y,"terrain", terrain.get(X,Y), "wall",TERRAIN_MASK_WALL)
+            if (terrain.get(X,Y) !== TERRAIN_MASK_WALL) {
+                count++
+                neighbours.push({x: X, y:Y})
+            }
+            //console.log("count", count);
+        }
+        return { count: count, neighbours: neighbours};
     },
 
     constructionLeft: function (room) {

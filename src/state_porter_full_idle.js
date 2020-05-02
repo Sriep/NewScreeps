@@ -34,7 +34,7 @@ State.prototype.enact = function () {
     }
 
     const controllerFlag = Game.flags[room.controller.id];
-    containerPos = findContainerAt(gf.roomPosFromPos(controllerFlag.memory.container))
+    containerPos = findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
     if (nextDelivery) {
         return state.switchToMoveTarget(
             this.creep,
