@@ -94,6 +94,7 @@ const gc = {
     STATE_WORKER_BUILD: "worker_build",
     STATE_WORKER_HARVEST: "worker_harvest",
     STATE_WORKER_TRANSFER: "worker_transfer",
+    STATE_WORKER_WITHDRAW: "worker_withdraw",
     // states porter
     STATE_PORTER_IDLE:  "porter_idle",
     STATE_PORTER_PICKUP: "porter_pickup",
@@ -162,11 +163,11 @@ const gc = {
         [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [
             pgc.INITIATIVE_HARVESTER,
-            pgc.BUILD_SOURCE_CONTAINERS,
             pgc.INITIATIVE_PORTER,
-            pgc.BUILD_EXTENSIONS,
+            pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
             pgc.INITIATIVE_UPGRADER,
+            pgc.BUILD_EXTENSIONS,
             pgc.ACTIVITY_FINISHED
         ],
         [

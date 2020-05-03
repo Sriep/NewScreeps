@@ -32,7 +32,7 @@ const construction = {
         const spawns = room.find(FIND_MY_SPAWNS);
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < spawns.length ; j++ ){
-               this.buildRoad(sources[i].pos, spawns[j].pos);
+                this.buildRoad(sources[i].pos, spawns[j].pos);
             }
         }
     },
@@ -105,6 +105,7 @@ const construction = {
     },
 
     finishBuildingMissingExtensions: function(room) {
+        console.log("finishBuildingMissingExtensions")
         const rcl = room.controller.level;
         const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
         const extensions = room.find(FIND_MY_STRUCTURES, {
@@ -115,116 +116,131 @@ const construction = {
         })
         const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
         if (wantedExtensions > 0) {
-            this.buildExtensions(room, wantedExtensions);
+            //buildExtensions(room, wantedExtensions);
+            buildExtensions(room, 1);
         }
         return extensions === wantedExtensions;
     },
+}
 
-    buildExtensions: function (room, numNeeded) {
-        //console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
-        const sources = room.find(FIND_SOURCES);
-        const spawns  = room.find(FIND_MY_SPAWNS);
-        let keyPts = []
-        for (let i in sources) {
-            keyPts.push(sources[i].pos)
-        }
-        let avoid = keyPts;
-        for (let i in spawns) {
-            keyPts.push(spawns[i].pos)
-        }
-        //console.log("keypts", JSON.stringify(keyPts))
-        //console.log("keypts 0", JSON.stringify(keyPts[0]))
-        let start = this.centerMass(keyPts);
-        //console.log("start", start);
+buildExtensions = function (room, numNeeded) {
+    console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
+    const sources = room.find(FIND_SOURCES);
+    const spawns  = room.find(FIND_MY_SPAWNS);
+    let keyPts = []
+    for (let i in sources) {
+        keyPts.push(sources[i].pos)
+    }
+    let avoid = keyPts;
+    for (let i in spawns) {
+        keyPts.push(spawns[i].pos)
+    }
+    let start = centerMass(keyPts);
+    start = closestNonWall(start, terrain);
+    console.log("centerMass at", JSON.stringify(start));
 
-        const structs = room.find(FIND_MY_STRUCTURES)
-        for (let i in structs) {
-            avoid.push(structs[i].pos)
-        }
+    const structs = room.find(FIND_MY_STRUCTURES)
+    for (let i in structs) {
+        avoid.push(structs[i].pos)
+    }
 
-        const extensionPos = this.looseSpiralFromAvoid(start, numNeeded, avoid)
-        //console.log("extensions sites", JSON.stringify(extensionPos))
-        for (let i in extensionPos) {
-            room.createConstructionSite(extensionPos[i], STRUCTURE_EXTENSION)
-        }
-    },
+    const extensionPos = looseSpiralFromAvoid(start, numNeeded, avoid, 1)
+    for (let i in extensionPos) {
+        room.createConstructionSite(extensionPos[i], STRUCTURE_EXTENSION)
+    }
+}
 
-    looseSpiralFromAvoid: function (pos, numNeeded, avoid) {
-        const terrain = Game.rooms[pos.roomName].getTerrain(pos.RoomName);
-        const start = this.closestNonWall(pos, terrain);
-        let range = 0;
-        let spiral = [start];
-        while (spiral.length < numNeeded) {
-            range++;
-            for (let dx = -1*range; dx <= range ; dx+=2 ) {
-                    for (let dy = -1*range; dy <= range ; dy+=2 ) {
-                    if (dx !== range && dy !== range)
-                        continue;
-                    if (this.pointOK(start.x +dx, start.y+dy, avoid, terrain)) {
-                        spiral.push(new RoomPosition(start.x+dx, start.y+dy, pos.roomName))
-                        if (spiral.length >= numNeeded) {
-                            return spiral
-                        }
+looseSpiral = function (start, numNeeded, avoid) {
+    const terrain = Game.rooms[pos.roomName].getTerrain(pos.RoomName);
+    //const start = closestNonWall(pos, terrain);
+    let range = 0;
+    let spiral = [start];
+    console.log("about to start lose spiral loop")
+    while (spiral.length < numNeeded) {
+        range++;
+        for (let dx = -1*range; dx <= range ; dx+=2 ) {
+            if (x+dx < 5 || 45 < x+dx) {
+                continue
+            }
+            for (let dy = -1*range; dy <= range ; dy+=2 ) {
+                if (y+dy < 5 || 45 < y+dy) {
+                    continue
+                }
+                if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
+                    spiral.push({x: start.x+dx, y: start.y+dy})
+                    if (spiral.length >= numNeeded) {
+                        return spiral
                     }
                 }
             }
         }
-        //console.log("fallen though", JSON.stringify(spiral))
-    },
-
-    pointOK: function(x, y, avoid, terrain) {
-        const avoidRange = 1
-        if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
-            //console.log("not ok xy is wall", x, y)
+    }
+}
+/*
+looseSpiralFromAvoid = function (pos, numNeeded, avoid, avoidRange) {
+    const terrain = Game.rooms[pos.roomName].getTerrain(pos.RoomName);
+    const start = closestNonWall(pos, terrain);
+    let range = 0;
+    let spiral = [start];
+    while (spiral.length < numNeeded) {
+        range++;
+        for (let dx = -1*range; dx <= range ; dx+=2 ) {
+            for (let dy = -1*range; dy <= range ; dy+=2 ) {
+                if (dx !== range && dy !== range)
+                    continue;
+                if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
+                    spiral.push(new RoomPosition(start.x+dx, start.y+dy, pos.roomName))
+                    if (spiral.length >= numNeeded) {
+                        return spiral
+                    }
+                }
+            }
+        }
+    }
+}
+*/
+pointOK = function(x, y, avoid, terrain, avoidRange) {
+    if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
+        return false;
+    }
+    for (let i in avoid) {
+        if (Math.abs(avoid[i].x - x) <= avoidRange && Math.abs(avoid[i].y - y) <= avoidRange) {
             return false;
         }
-        for (let i in avoid) {
-            if (Math.abs(avoid[i].x - x) <= avoidRange && Math.abs(avoid[i].y - y) <= avoidRange) {
-                //console.log("not ok", x, y, " to close to ", JSON.stringify(avoid[i]))
-                return false;
-            }
-        }
-        //console.log("point",x,y,"is ok")
-        return true
-    },
+    }
+    return true
+}
 
-    centerMass: function(points) { // need points.length > 0
-      let totalX = 0
-      let totalY = 0;
-      for (let i in points) {
-          totalX += points[i].x;
-          totalY += points[i].y
-          //console.log("i",i,"totalx", totalX, "totalY", totalY, JSON.stringify(points[i]))
-          //console.log("i",i,"points i", JSON.stringify(points[i]))
-      }
-      //console.log("center mass totalx", totalX, "totalY", totalY, "points.length", points.length)
-      cx = Math.round(totalX/points.length);
-      cy = Math.round(totalY/points.length);
-      //console.log("center of room points", JSON.stringify(points[0]), JSON.stringify(points))
-      //console.log("center of room cx", cx, "cy", cy, "room postion", points[0].roomName)
-      //const center = new RoomPosition(cx, cy, points[0].roomName);
-      return new RoomPosition(cx, cy, points[0].roomName);
-    },
+centerMass = function(points) { // need points.length > 0
+    let totalX = 0
+    let totalY = 0;
+    for (let i in points) {
+        totalX += points[i].x;
+        totalY += points[i].y
+    }
+    cx = Math.round(totalX/points.length);
+    cy = Math.round(totalY/points.length);
+    return {x: cx, y: cy };
+}
 
-    closestNonWall: function (pos, terrain) {
-        if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
-            return pos
-        }
-        let range = 0
-        while (true) {
-            range++
-            for (let dx = -1*range; dx <= range ; range++ ) {
-                for (let dy = -1*range; dy <= range ; range++ ) {
-                    if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
-                        return pos;
-                    }
+closestNonWall = function (pos, terrain) {
+    if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
+        return pos
+    }
+    let range = 0
+    while (true) {
+        range++
+        for (let dx = -1*range; dx <= range ; range++ ) {
+            for (let dy = -1*range; dy <= range ; range++ ) {
+                if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
+                    return pos;
                 }
             }
-            if (range > 50) {
-                return gf.fatalError("cant find non wall point within " + range.toString() + " of " + pos.toString());
-            }
         }
-    },
+        if (range > 50) {
+            return gf.fatalError("cant find non wall point within " + range.toString() + " of " + pos.toString());
+        }
+    }
 }
 
 module.exports = construction;

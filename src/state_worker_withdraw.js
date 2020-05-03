@@ -1,42 +1,28 @@
 /**
  * @fileOverview screeps
- * Created by piers on 28/04/2020
+ * Created by piers on 02/05/2020
  * @author Piers Shepperson
  */
+
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_HARVESTER_TRANSFER;
+    this.type = gc.STATE_WORKER_WITHDRAW;
     this.creep = creep
 }
 
 State.prototype.enact = function () {
-    //console.log(this.creep.name,"in STATE_HARVESTER_TRANSFER")
-    if (state.spaceForHarvest(this.creep)) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
+    let target;
+    if (this.creep.memory.targetId) {
+        target = Game.getObjectById(this.creep.memory.targetId);
+    }
+    if (!target) {
+        return state.switchTo(creep, gc.STATE_WORKER_IDLE);
     }
 
-    if (!this.creep.memory.targetId) {
-        //console.log(this.creep.nane,"no target id")
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
-    }
-
-    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].memory.containerPos);
-    const container = state.findContainerAt(scPos);
-    //console.log("in STATE_HARVESTER_TRANSFER container", JSON.stringify(container))
-    if (!container) {
-        //console.log("build")
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
-    }
-
-    if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
-        //console.log("repair")
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_REPAIR)
-    }
-    //console.log("transfer")
-    const result = this.creep.transfer(container, RESOURCE_ENERGY);
+    const result = this.creep.withdraw(target, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -57,8 +43,10 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-
-    state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
+    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(creep, gc.STATE_WORKER_IDLE);
+    }
+    state.switchTo(creep, gc.STATE_WORKER_FULL_IDLE);
 }
 
 module.exports = State;

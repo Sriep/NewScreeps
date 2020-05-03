@@ -31,7 +31,6 @@ const cache = {
         pfPath = PathFinder.search(from.pos, goals, {
             maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH
         })
-        //console.log("distanceSourceSpawn path", JSON.stringify(pfPath))
         if (pfPath.incomplete) {
             delete flag.memory[to.id];
             return undefined;
@@ -49,7 +48,9 @@ const cache = {
     },
 
     distanceSourceSpawn: function (source, room) {
-        this.pathSourceSpawn(source, room).cost;
+        const d = this.pathSourceSpawn(source, room);
+        //console.log("pathSourceSpawn", JSON.stringify(d))
+        return d;
     },
     pathSourceSpawn(source, room) {
         const roomName = room.name
@@ -57,11 +58,13 @@ const cache = {
         if (!flag.memory.roomName) {
             flag.memory.roomName = {};
         }
-        //console.log("room flag", JSON.stringify(room.memory))
         if (!flag.memory.roomName.path) {
             const spawns = room.find(FIND_MY_SPAWNS);
-            return this.path(source, spawns, roomName, 1);
+            const d = this.path(source, spawns, roomName, 1)
+            //console.log("path", JSON.stringify(d));
+            return d;
         }
+        //console.log("cached path", JSON.stringify(flag.memory.roomName.path))
         return flag.memory.roomName.path;
     },
 
@@ -73,7 +76,6 @@ const cache = {
         if (!flag.memory[room.controller.id] || !flag.memory[room.controller.id].path) {
             return this.distance(source, [room.controller], room.controller.id, 1);
         }
-        //console.log("distanceSourceController", flag.memory[room.controller.id].cost)
         return flag.memory[room.controller.id].path.cost;
     },
 

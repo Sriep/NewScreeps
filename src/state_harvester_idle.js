@@ -41,7 +41,7 @@ State.prototype.enact = function () {
             return
         }
     }
-    console.log("source post",JSON.stringify(post))
+    //console.log("source post",JSON.stringify(post))
     if (post.source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration) {
         //console.log("post.source.energy === 0 && this.creep.lifetime < source.ticksToRegeneration");
         if (!!containerId) {
@@ -53,7 +53,7 @@ State.prototype.enact = function () {
     // todo check creep lifetime, check lives long enough to reach target.
     this.creep.memory.targetId = post.source.id;
     if (!post.source.id) {
-        console.log("STATE_HARVESTER_IDLE post", JSON.stringify(post));
+        //console.log("STATE_HARVESTER_IDLE post", JSON.stringify(post));
         gf.fatalError(this.creep.name, "no target source id for harvester");
     }
 

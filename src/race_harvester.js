@@ -27,7 +27,11 @@ const race_harvester = {
         } else if (Ws > 25) {
             Ws--; Cs++;
         }
-        return {"work": Ws, "cary": Cs, "move" : Ms};
+
+        //console.log("havester bodycounts W",Ws,"Cs",Cs,"Ms",Ms);
+        if (Cs === 0)
+            gf.fatalError("bodycounts Cs are zero ec",ec )
+        return {"work": Ws, "carry": Cs, "move" : Ms};
     }
 }
 

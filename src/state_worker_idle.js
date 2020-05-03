@@ -15,6 +15,16 @@ function State (creep) {
 
 State.prototype.enact = function () {
     const home = Game.rooms[this.homeId];
+    const target = state.findCollectContainer(this.creep.room)
+    if (target && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+        state.switchToMoveTarget(
+            this.creep,
+            target,
+            gc.RANGE_TRANSFER,
+            gc.STATE_WORKER_WITHDRAW,
+        );
+    }
+
     const source = state.findTargetSource(home)
     if (source) {
         this.creep.memory.targetId = source.id;

@@ -19,7 +19,7 @@ State.prototype.enact = function () {
             this.creep,
             target,
             gc.RANGE_TRANSFER,
-            gc.STATE_PORTER_TRANSFER,
+            gc.STATE_PORTER_WITHDRAW,
         );
     }
 

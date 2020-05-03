@@ -37,13 +37,15 @@ const state = {
         const sources = room.find(FIND_SOURCES);
         let posts = 0;
         for (let i in sources) {
-            posts += Game.flags[source.id].harvesterPosts.length;
+            //console.log("sources[i].id",sources[i].id,"memory", JSON.stringify(Game.flags[sources[i].id].memory))
+            posts += Game.flags[sources[i].id].memory.harvesterPosts.length;
         }
+        //console.log("countHarvesterPosts posts",posts )
         return posts;
     },
 
     countUpgraderPosts: function(room) {
-        return Game.flags[room.controller.id].upgraderPosts.length
+        return Game.flags[room.controller.id].memory.upgraderPosts.length
     },
 
     // todo combine findFreeHarvesterPost and findFreeUpgraderPost
@@ -123,9 +125,21 @@ const state = {
         const containersPos = [];
         for (let s in sources) {
             const flag = Game.flags[sources[i].id];
-            containersPos.push(gf.roomPosFromPos(flag.memory.containerPos));
+            if (flag.memory.containerPos) {
+                containersPos.push(gf.roomPosFromPos(flag.memory.containerPos));
+            }
         }
         return containersPos;
+    },
+
+    isHarvesterContainer: function(room) {
+        const positions =  this.getHarvestContainersPos(room);
+        for (let i in positions) {
+            if (this.findContainerAt(positions[i])) {
+                return true;
+            }
+        }
+        return false;
     },
 
     findCollectContainer: function(room) {
@@ -259,13 +273,14 @@ const state = {
     },
 
     spaceForHarvest: function (creep) {
+        //console.log("spaceForHarvest freeCapacity", creep.store.getFreeCapacity(RESOURCE_ENERGY));
         const freeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
-        if (!freeCapacity) {
-            return true;
-            //console.log("creep", JSON.stringify(creep))
+        if (freeCapacity === 0) {
+            //console.log("spaceForHarvest is false");
+            return false;
         }
-        const workparts = race.workParts(creep)*HARVEST_POWER;
-        console.log("spaceForHarvest freeCapacity", freeCapacity, "> workparts", workparts)
+        //const workparts = race.workParts(creep)*HARVEST_POWER;
+        //console.log("spaceForHarvest freeCapacity", freeCapacity, "> workparts", workparts)
         return creep.store.getFreeCapacity(RESOURCE_ENERGY)
             > race.workParts(creep)*HARVEST_POWER;
     },
@@ -284,8 +299,11 @@ const state = {
 
     findContainerConstructionAt : function (pos) {
         const StructAt = pos.lookFor(LOOK_CONSTRUCTION_SITES)
-        if (StructAt.length > 0 && StructAt.structureType === STRUCTURE_CONTAINER) {
-            return StructAt;
+        //console.log("findContainerConstructionAt stricts", JSON.stringify(StructAt))
+        //console.log("StructAt.length", StructAt.length);
+        //concole.log("StructAt.structureType",StructAt.structureType,"StructAt.")
+        if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
+            return StructAt[0];
         }
         return undefined;
     },
@@ -321,7 +339,7 @@ const state = {
     },
 
     findUpgradeContainer : function (room) {
-        console.log("room", room.name);
+        //console.log("room", room.name);
         return this.findContainerAt(this.findUpgradeContainerPos(room));
     },
 
