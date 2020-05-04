@@ -18,7 +18,7 @@ function State (creep) {
 State.prototype.enact = function () {
     console.log(this.creep.name, "in STATE_MOVE_POS");
     const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos)
-    //console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
+    console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
     //console.log("check creep pos", JSON.stringify(this.creep.pos),
     //    "is in rage",  this.creep.memory.moveRange, "of target", JSON.stringify(targetPos))
     //console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
@@ -32,13 +32,13 @@ State.prototype.enact = function () {
         const lastPos =  cache.dPoint(this.creep.memory.lastpositon);
         console.log(this.creep.name,"pos", JSON.stringify(lastPos), "cached",this.creep.memory.lastpositon)
         if (this.creep.pos.x === lastPos.x && this.creep.pos.y === lastPos.y) {
-            //this.creep.say("stuck");
+            delete this.creep.memory.lastpositon;
             console.log("STATE_MOVE_POS stuck");
             return this.pathLost();
         }
     }
 
-    //console.log(this.creep.name, "about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
+    console.log(this.creep.name, "about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
     const result = this.creep.moveTo(targetPos, {reusePath: 5})
     //if (result != OK) {
         console.log("STATE_MOVE_POS result of move by",this.creep.name , "is", result);
@@ -58,9 +58,9 @@ State.prototype.enact = function () {
             return ERR_BUSY;
         case ERR_NOT_FOUND:     // The specified path doesn't match the creep's location.
             return gf.fatalError("ERR_NOT_FOUND");
-            return ERR_NOT_ENOUGH_ENERGY
+            //return ERR_NOT_ENOUGH_ENERGY//
         case ERR_INVALID_ARGS:          // path is not a valid path array.
-            return gf.fatalError("ERR_INVALID_ARGS");
+            //return gf.fatalError("ERR_INVALID_ARGS");
         case ERR_TIRED:        // The fatigue indicator of the creep is non-zero.
             return ERR_TIRED;
         case ERR_NO_BODYPART:        // There are no MOVE body parts in this creep’s body.
@@ -71,7 +71,7 @@ State.prototype.enact = function () {
             return gf.fatalError("moveByPath unrecognised return|", result,"|");
     }
     this.creep.memory.lastpositon = cache.sPoint(this.creep.pos);
-    this.creep.memory.lastroomName = cache.sPoint(this.creep.room.name);
+    //this.creep.memory.lastroomName = cache.sPoint(this.creep.room.name);
 
 }
 
@@ -86,12 +86,40 @@ State.prototype.pathLost = function () {
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 return state.switchTo(this.creep, creepRace + "_idle")
             } else {
+                // porter hack approaching crowed upgarde container
+                const UpgradeContainerPos = Game.flags[this.creep.room.controller.id].memory.containerPos;
+                if (this.creep.targetPos
+                    && (this.creep.targetPos.x === UpgradeContainerPos.x
+                        && this.creep.targetPos.y === UpgradeContainerPos.y)) {
+                    if (this.creep.pos.inRangeTo(targetPos,1)) {
+                        const pos = gf.roomPosFromPos(this.creep.targetPos, this.creep.room.name)
+                        const path = pos.findPathTo(UpgradeContainerPos.x, UpgradeContainerPos.y);
+                        console.log(this.creep.name,"pos",this.creep.pos,"path",JSON.stringify(path));
+                        inTheWay = getCreepAt(path[1].x, path[2].y, this.creep.room.name);
+                        console.log(this.creep.name,"swap with", inTheWay.name);
+                        state.switchToMovePos(
+                            inTheWay,
+                            this.creep.pos,
+                            0,
+                            race.getRace(inTheWay) + "_idle"
+                        );
+                        return state.switchToMovePos(
+                            this.creep,
+                            inTheWay.pos,
+                            0,
+                            gc.STATE_PORTER_TRANSFER,
+                        );
+                    }
+                }
+
                 return state.switchTo(this.creep, creepRace + "_full_idle")
             }
         default:
             return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);
     }
 }
+
+
 
 
 

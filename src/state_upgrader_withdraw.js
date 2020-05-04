@@ -22,6 +22,10 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE)
     }
 
+    if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
+    }
+
     const result = this.creep.withdraw(container, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.

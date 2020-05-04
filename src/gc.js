@@ -82,9 +82,6 @@ const gc = {
 
     // states
     // states common
-    //STATE_EMPTY_IDLE: "empty_idle",
-    //STATE_MOVE_TARGET: "move_target",
-    STATE_MOVE_BETWEEN: "move_between",
     STATE_MOVE_POS: "move_pos",
     // states worker
     STATE_WORKER_IDLE: "worker_idle",

@@ -19,7 +19,7 @@ State.prototype.enact = function () {
      if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
      }
-
+    this.creep.memory.targetPos = this.creep.pos;
     const home = Game.rooms[this.homeId];
     const result = this.creep.upgradeController(home.controller);
     switch (result) {

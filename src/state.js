@@ -33,6 +33,58 @@ const state = {
         creepState.enact()
     },
 
+    switchToMoveTarget(creep, target, range, nextState) {
+        if (!target){
+            gf.fatalError("switchToMoveTarget " + creep.name
+                + " no target next state " + nextState)
+        }
+        if (!target.id){
+            gf.fatalError("switchToMoveTarget " + creep.name
+                + " no target id next state " + nextState + "target" + JSON.stringify(target))
+        }
+        creep.memory.targetId = target.id;
+        return state.switchToMovePos(creep, target.pos, range, nextState)
+    },
+
+    switchToMovePos(creep, targetPos, range, nextState) {
+        if (range !== 0 && !range) {
+            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
+            gf.fatalError(creep.name + " move to position with no range selected."
+                + " target pos" + JSON.stringify(targetPos) + " next state " + nextState);
+        }
+        if (!targetPos) {
+            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
+            gf.fatalError(creep.name + " move to position but no postion given"
+                + " range " + range.toString() + " next state " + nextState);
+        }
+        if (!nextState) {
+            gf.fatalError(creep.name + " move to position with no next sate provided."
+                + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
+        }
+        creep.memory.targetPos = targetPos;
+        creep.memory.state = gc.STATE_MOVE_POS;
+        creep.memory.moveRange = range;
+        creep.memory.next_state = nextState;
+        //creep.say("go " + nextState)
+        return state.enact(creep);
+    },
+
+    switchTo: function (creep, newState, targetId) {
+        //console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
+        if (!creep) {
+            gf.fatalError(" no creep given when changing state to", newState, "targetId", targetId);
+        }
+        if (!newState || newState === "undefined_idle") {
+            gf.fatalError(creep.name + " no state to change to, targetId ", targetId);
+        }
+        if (targetId) {
+            creep.memory.targetId = targetId;
+        }
+        creep.memory.state = newState;
+        //creep.say(this.creepSay[newState]);
+        return state.enact(creep);
+    },
+
     countHarvesterPosts: function(room) {
         const sources = room.find(FIND_SOURCES);
         let posts = 0;
@@ -53,16 +105,28 @@ const state = {
         let sources = room.find(FIND_SOURCES);
         sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
         for (let s in sources) {
-            const flag = Game.flags[sources[i].id];
+            const flag = Game.flags[sources[s].id];
             const posts = flag.memory.harvesterPosts;
             for (let i in posts) {
-                const post = gf.roomPosFromPos(posts[i], room.name);
-                if (this.isHarvesterPostFree(post)) {
+                const post = posts[i];
+                console.log("findFreeHarvesterPost check post", JSON.stringify(post));
+                //const post = gf.roomPosFromPos(posts[i], room.name);
+                if (this.isHarvesterPostFree(post, room.name)) {
                     post.source = sources[s];
                     return post;
                 }
             } // for i
         } // for s
+        return undefined;
+    },
+
+    getCreepAt: function(x,y,roomname) {
+        for (let j in Game.creeps) {
+            const creep = Game.creeps[j].pos;
+            if (creep.pos.x === x && creep.pos.y === y && creep.pos.roomName === roomname) {
+                return Game.creeps[j]
+            }
+        }
         return undefined;
     },
 
@@ -98,21 +162,34 @@ const state = {
     findFreeUpgraderPost: function(room) {
         const flag = Game.flags[room.controller.id];
         const posts = flag.memory.upgraderPosts;
+        console.log("findFreeUpgraderPost","posts", JSON.stringify(posts))
+        let freePosts = 0;
+        let foundPost
         for (let i in posts) {
-            const post = gf.roomPosFromPos(posts[i], room.name);
-            if (this.isUpgraderPostFree(post)) {
-                console.log("findFreeUpgraderPost found", JSON.stringify(post))
-                return post;
+            //const post = gf.roomPosFromPos(posts[i], room.name);
+            //console.log(i,"posts", JSON.stringify(posts[i]))
+            if (this.isUpgraderPostFree(posts[i], room.name)) {
+                console.log(i, "findFreeUpgraderPost found", JSON.stringify(posts[i]))
+                foundPost = posts[i];
+                freePosts++;
+            } else {
+                console.log(i, "ocuppied post", JSON.stringify(posts[i]))
             }
+        }
+        console.log("findFreeUpgraderPost freepost found at!!", freePosts, "found", foundPost.x, foundPost.y)
+        if (freePosts > 1) {
+            return foundPost;
         }
         return undefined;
     },
 
-    isHarvesterPostFree: function (pos) {
+    isHarvesterPostFree: function (pos, roomName) {
         for (let j in Game.creeps) {
             if (this.isHarvestingHarvester(Game.creeps[j])) {
-                targetPos = gf.roomPosFromPos(Game.creeps[j].memory.targetPos)
-                if (pos.isEqualTo(targetPos)) {
+                console.log("isHarvesterPostFree", pos.x, pos.y, roomName)
+                if (Game.creeps[j].memory.targetPos.x === pos.x
+                    && Game.creeps[j].memory.targetPos.y === pos.y
+                    && Game.creeps[j].room.name === roomName) {
                     return false;
                 }
             }
@@ -120,13 +197,21 @@ const state = {
         return true;
     },
 
-    isUpgraderPostFree: function (pos) {
+    isUpgraderPostFree: function (pos, roomName) {
+        console.log("isUpgraderPostFree checking pos", pos.x, pos.y, roomName);
         for (let j in Game.creeps) {
+            //console.log("isUpgraderPostFree", Game.creeps[j].name,"checking if upgrader at",JSON.stringify(Game.creeps[j].pos) )
             if (this.isUpgradingHarvester(Game.creeps[j])) {
-                targetPos = gf.roomPosFromPos(Game.creeps[j].memory.targetPos)
-                if (pos.isEqualTo(targetPos)) {
+                console.log("isUpgradingHarvester true", Game.creeps[j].name, "found upgrading harvester at xy", Game.creeps[j].pos.x, Game.creeps[j].pos.y)
+                console.log("isUpgradingHarvester true target pos", Game.creeps[j].memory.targetPos.x,  Game.creeps[j].memory.targetPos.y)
+                if (Game.creeps[j].memory.targetPos.x === pos.x
+                    && Game.creeps[j].memory.targetPos.y === pos.y
+                    && Game.creeps[j].room.name === roomName) {
+                    console.log("isUpgraderPostFree return false found upgrader at", pos.x, pos.y, roomName)
                     return false;
                 }
+            } else {
+                console.log("isUpgradingHarvester false not upgrading",Game.creeps[j].name, "creep pos at",  Game.creeps[j].pos.x, Game.creeps[j].pos.y )
             }
         }
         return true;
@@ -211,57 +296,7 @@ const state = {
         return containers[maxIndex];
     },
 
-    switchToMoveTarget(creep, target, range, nextState) {
-        if (!target){
-            gf.fatalError("switchToMoveTarget " + creep.name
-                + " no target next state " + nextState)
-        }
-        if (!target.id){
-            gf.fatalError("switchToMoveTarget " + creep.name
-                + " no target id next state " + nextState + "target" + JSON.stringify(target))
-        }
-        creep.memory.targetId = target.id;
-        return state.switchToMovePos(creep, target.pos, range, nextState)
-    },
 
-    switchToMovePos(creep, targetPos, range, nextState) {
-        if (range !== 0 && !range) {
-            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
-            gf.fatalError(creep.name + " move to position with no range selected."
-                + " target pos" + JSON.stringify(targetPos) + " next state " + nextState);
-        }
-        if (!targetPos) {
-            console.log("switchToMovePos", creep.name,targetPos,"range", range,"next",nextState);
-            gf.fatalError(creep.name + " move to position but no postion given"
-                + " range " + range.toString() + " next state " + nextState);
-        }
-        if (!nextState) {
-            gf.fatalError(creep.name + " move to position with no next sate provided."
-                + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
-        }
-        creep.memory.targetPos = targetPos;
-        creep.memory.state = gc.STATE_MOVE_POS;
-        creep.memory.moveRange = range;
-        creep.memory.next_state = nextState;
-        //creep.say("go " + nextState)
-        return state.enact(creep);
-    },
-
-    switchTo: function (creep, newState, targetId) {
-        //console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
-        if (!creep) {
-            gf.fatalError(" no creep given when changing state to", newState, "targetId", targetId);
-        }
-        if (!newState || newState === "undefined_idle") {
-            gf.fatalError(creep.name + " no state to change to, targetId ", targetId);
-        }
-        if (targetId) {
-            creep.memory.targetId = targetId;
-        }
-        creep.memory.state = newState;
-        //creep.say(this.creepSay[newState]);
-        return state.enact(creep);
-    },
 
     isHarvestingHarvester: function(creep) {
        return  race.getRace(creep) === gc.RACE_HARVESTER
@@ -269,13 +304,17 @@ const state = {
                 || creep.memory.state === gc.STATE_HARVESTER_REPAIR
                 || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
                 || creep.memory.state === gc.STATE_HARVESTER_HARVEST
-                || creep.memory.next_state === gc.STATE_HARVESTER_HARVEST)
+                || ( creep.memory.state === gc.STATE_MOVE_POS
+                   && creep.memory.next_state === gc.STATE_HARVESTER_HARVEST))
     },
 
     isUpgradingHarvester: function(creep) {
         return  race.getRace(creep) === gc.RACE_HARVESTER
-            && (creep.memory.state === gc.STATE_UPGRADER_UPGRADE
-                || creep.memory.state === gc.STATE_UPGRADER_WITHDRAW)
+                && (creep.memory.state === gc.STATE_UPGRADER_UPGRADE
+                || creep.memory.state === gc.STATE_UPGRADER_WITHDRAW
+                || ( creep.memory.state === gc.STATE_MOVE_POS
+                    && creep.memory.next_state === gc.STATE_UPGRADER_UPGRADE))
+        //console.log(creep.name, "is",upgrading,"upgrading" )
     },
 
     numHarvestersHarvesting: function(policyId) {
