@@ -16,7 +16,7 @@ function State (creep) {
 State.prototype.enact = function () {
     //console.log(this.creep.namne, "in", "STATE_HARVESTER_BUILD")
     if (state.spaceForHarvest(this.creep)) {
-        //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity())
+        //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity(RESOURCE_ENERGY))
          state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
     }
 
@@ -35,6 +35,12 @@ State.prototype.enact = function () {
             gf.fatalError("cant create container", JSON.stringify(scPos), "result", ok)
         }
         site = state.findContainerConstructionAt(scPos);
+        if (!site) {
+           // console.log("targetId", this.creep.memory.targetId, "memory", JSON.stringify(Game.flags[this.creep.memory.targetId].memory))
+            //console.log("creep", this.creep.name, "flag", Game.flags[this.creep.memory.targetId])
+            return;
+            //gf.fatalError("cant find construction at|", JSON.stringify(scPos),"|");
+        }
     }
 
     const result = this.creep.build(site);
@@ -55,7 +61,8 @@ State.prototype.enact = function () {
             // assume target is invalid because its built.
             //console.log(this.creep.name,"details",JSON.stringify(this.creep.store))
             //console.log("site", JSON.stringify(site));
-            console.log("pos", JSON.stringify(site.pos), "site", JSON.stringify(site));
+            console.log("site", JSON.stringify(site));
+            console.log("pos", JSON.stringify(site.pos));
             //console.log("store", JSON.stringify(this.creep.store))
             //console.log("space for harvest", state.spaceForHarvest(this.creep))
             //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");

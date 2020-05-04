@@ -14,12 +14,17 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    console.log(this.creep.name, "in STATE_PORTER_WITHDRAW");
     let target;
     if (this.creep.memory.targetId) {
         target = Game.getObjectById(this.creep.memory.targetId);
     }
     if (!target) {
-        return state.switchTo(creep, gc.STATE_PORTER_IDLE);
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
+            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+        } else {
+            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+        }
     }
 
     const result = this.creep.withdraw(target, RESOURCE_ENERGY);
@@ -31,11 +36,11 @@ State.prototype.enact = function () {
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("transfer ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-            return gf.fatalError("transfer ERR_NOT_ENOUGH_RESOURCES");
+            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchToFullIdle();
+            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -43,8 +48,8 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(creep, gc.STATE_PORTER_IDLE);
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
     state.switchTo(creep, gc.STATE_PORTER_FULL_IDLE);
 }

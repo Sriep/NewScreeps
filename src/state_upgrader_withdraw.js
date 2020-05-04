@@ -12,11 +12,12 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    if (this.creep.store.getUsedCapacity() > 0) {
+    console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
     }
 
-    const container = state.findUpgradeContainer();
+    const container = state.findUpgradeContainer(this.creep.room);
     if (!container) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE)
     }
@@ -29,11 +30,11 @@ State.prototype.enact = function () {
             return gf.fatalError("transfer ERR_NOT_OWNER");
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("transfer ERR_BUSY");
-        case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-            return gf.fatalError("transfer ERR_NOT_ENOUGH_RESOURCES");
+        case ERR_NOT_ENOUGH_RESOURCES:           // upgraders' bucket is empty
+            return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
-        case ERR_FULL:        // The extractor or the deposit is still cooling down.
+        case ERR_FULL:
             return state.switchToFullIdle();
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
@@ -43,7 +44,5 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
 }
-
-
 
 module.exports = State;

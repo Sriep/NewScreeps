@@ -14,6 +14,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    //console.log(this.creep.name, "in STATE_WORKER_BUILD")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
@@ -34,8 +35,9 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE)
             console.log("target id", target.id,"target pos", target.pos, "creep pos", JSON.stringify(this.creep.pos),"state", gc.STATE_WORKER_BUILD);
-            return gf.fatalError("ERR_NOT_IN_RANGE");
+            //return gf.fatalError("ERR_NOT_IN_RANGE");
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");
         default:

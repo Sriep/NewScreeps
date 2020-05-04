@@ -11,8 +11,8 @@ const construction = {
         const sources = room.find(FIND_SOURCES);
 
         for (let j = 0 ; j < sources.length ; j++ ){
-            this.buildRoad(sources[i].pos, room.controller.pos);
-            this.buildRoad(sources[i].pos, ccPos);
+            buildRoad(sources[i].pos, room.controller.pos);
+            buildRoad(sources[i].pos, ccPos);
         }
     },
 
@@ -22,8 +22,8 @@ const construction = {
         const spawns = room.find(FIND_MY_SPAWNS);
 
         for (let j = 0 ; j < spawns.length ; j++ ){
-            this.buildRoad(spawns[i].pos, room.controller.pos);
-            this.buildRoad(spawns[i].pos, ccPos);
+            buildRoad(spawns[i].pos, room.controller.pos);
+            buildRoad(spawns[i].pos, ccPos);
         }
     },
 
@@ -32,7 +32,7 @@ const construction = {
         const spawns = room.find(FIND_MY_SPAWNS);
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < spawns.length ; j++ ){
-                this.buildRoad(sources[i].pos, spawns[j].pos);
+                buildRoad(sources[i].pos, spawns[j].pos);
             }
         }
     },
@@ -42,7 +42,7 @@ const construction = {
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < sources.length ; j++ ){
                 if (i !== j) {
-                    this.buildRoad(sources[i].pos, sources[j].pos);
+                    buildRoad(sources[i].pos, sources[j].pos);
                 }
             }
         }
@@ -55,7 +55,7 @@ const construction = {
         });
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < extensions.length ; j++ ){
-                this.buildRoad(sources[i].pos, extensions[j].pos);
+                buildRoad(sources[i].pos, extensions[j].pos);
             }
         }
         const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
@@ -63,7 +63,7 @@ const construction = {
         })
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < beingBuilt.length ; j++ ){
-                this.buildRoad(sources[i].pos, beingBuilt[j].pos);
+                buildRoad(sources[i].pos, beingBuilt[j].pos);
             }
         }
     },
@@ -84,17 +84,9 @@ const construction = {
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < structures.length ; j++ ){
                 if ( i !== j) {
-                    this.buildRoad(structures[i].pos, structures[j].pos);
+                    buildRoad(structures[i].pos, structures[j].pos);
                 }
             }
-        }
-    },
-
-    buildRoad: function(from, to) {
-        const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
-        const room = Game.rooms[from.roomName];
-        for(let step in path) {
-            room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
         }
     },
 
@@ -104,8 +96,20 @@ const construction = {
         }) === 0;
     },
 
+    areExtensionsBuilt: function(room) {
+        const rcl = room.controller.level;
+        const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
+        const extensions = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_EXTENSION }
+        });
+        //beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
+        //    filter: { structureType: STRUCTURE_EXTENSION }
+        //})
+        return allowedExtensions === extensions.length;
+    },
+
     finishBuildingMissingExtensions: function(room) {
-        console.log("finishBuildingMissingExtensions")
+        //console.log("finishBuildingMissingExtensions room", JSON.stringify(room))
         const rcl = room.controller.level;
         const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
         const extensions = room.find(FIND_MY_STRUCTURES, {
@@ -116,15 +120,24 @@ const construction = {
         })
         const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
         if (wantedExtensions > 0) {
-            //buildExtensions(room, wantedExtensions);
-            buildExtensions(room, 1);
+            buildExtensions(room, wantedExtensions);
+            //buildExtensions(room, 1);
         }
         return extensions === wantedExtensions;
     },
 }
 
+buildRoad = function(from, to) {
+    const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
+    const room = Game.rooms[from.roomName];
+    for(let step in path) {
+        room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+    }
+}
+
+// todo refactor for when extensions are built
 buildExtensions = function (room, numNeeded) {
-    console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
+    //console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
     const sources = room.find(FIND_SOURCES);
     const spawns  = room.find(FIND_MY_SPAWNS);
     let keyPts = []
@@ -136,34 +149,39 @@ buildExtensions = function (room, numNeeded) {
         keyPts.push(spawns[i].pos)
     }
     let start = centerMass(keyPts);
+    const terrain = room.getTerrain();
     start = closestNonWall(start, terrain);
-    console.log("centerMass at", JSON.stringify(start));
+   // console.log("centerMass at", JSON.stringify(start));
 
     const structs = room.find(FIND_MY_STRUCTURES)
     for (let i in structs) {
         avoid.push(structs[i].pos)
     }
 
-    const extensionPos = looseSpiralFromAvoid(start, numNeeded, avoid, 1)
-    for (let i in extensionPos) {
-        room.createConstructionSite(extensionPos[i], STRUCTURE_EXTENSION)
+    const extensionPos = looseSpiral(start, numNeeded, avoid, terrain,1)
+    if (extensionPos) {
+        for (let i in extensionPos) {
+            result = room.createConstructionSite(extensionPos[i].x, extensionPos[i].y, STRUCTURE_EXTENSION);
+            if (result !== OK) {
+                //console.log("build extension",i,"result",result,"at",JSON.stringify(extensionPos[i]));
+                //console.log("buildExtensions build extensino failed result", result.toString());
+            }
+        }
     }
 }
 
-looseSpiral = function (start, numNeeded, avoid) {
-    const terrain = Game.rooms[pos.roomName].getTerrain(pos.RoomName);
-    //const start = closestNonWall(pos, terrain);
+looseSpiral = function (start, numNeeded, avoid, terrain, avoidRange) {
     let range = 0;
-    let spiral = [start];
-    console.log("about to start lose spiral loop")
+    let spiral = [];
+    //console.log("about to start lose spiral loop")
     while (spiral.length < numNeeded) {
         range++;
         for (let dx = -1*range; dx <= range ; dx+=2 ) {
-            if (x+dx < 5 || 45 < x+dx) {
+            if (start.x+dx < 5 || 45 < start.x+dx) {
                 continue
             }
             for (let dy = -1*range; dy <= range ; dy+=2 ) {
-                if (y+dy < 5 || 45 < y+dy) {
+                if (start.y+dy < 5 || 45 < start.y+dy) {
                     continue
                 }
                 if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
@@ -176,29 +194,7 @@ looseSpiral = function (start, numNeeded, avoid) {
         }
     }
 }
-/*
-looseSpiralFromAvoid = function (pos, numNeeded, avoid, avoidRange) {
-    const terrain = Game.rooms[pos.roomName].getTerrain(pos.RoomName);
-    const start = closestNonWall(pos, terrain);
-    let range = 0;
-    let spiral = [start];
-    while (spiral.length < numNeeded) {
-        range++;
-        for (let dx = -1*range; dx <= range ; dx+=2 ) {
-            for (let dy = -1*range; dy <= range ; dy+=2 ) {
-                if (dx !== range && dy !== range)
-                    continue;
-                if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
-                    spiral.push(new RoomPosition(start.x+dx, start.y+dy, pos.roomName))
-                    if (spiral.length >= numNeeded) {
-                        return spiral
-                    }
-                }
-            }
-        }
-    }
-}
-*/
+
 pointOK = function(x, y, avoid, terrain, avoidRange) {
     if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
         return false;

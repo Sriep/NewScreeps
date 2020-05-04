@@ -49,7 +49,7 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchToFullIdle();
+            return
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.

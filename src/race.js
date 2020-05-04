@@ -5,6 +5,7 @@
  */
 
 const gc = require("gc");
+const gf = require("gf");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,
@@ -44,7 +45,7 @@ const race = {
         //    gf.fatalError("creep must have carry part")
         //}
         for (let i = 0; i < bodyCounts[CARRY]; i++) {
-            console.log(i,"pushing carry")
+            //console.log(i,"pushing carry")
             body.push(CARRY);
         }
         //console.log("body", JSON.stringify(body), "race", race, "ec",ec)
@@ -68,7 +69,8 @@ const race = {
 
     spawnCreep: function (spawn, policyId, race) {
         //console.log("spawnCreep race",race, "ec", spawn.room.energyCapacityAvailable)
-        const body = this.body(race, spawn.room.energyCapacityAvailable);
+        //console.log("spawnCreep race",race, "ec energyAvailablenumber", spawn.room.energyAvailable)
+        const body = this.body(race, spawn.room.energyAvailable);
         if (!body)
             return undefined;
         if (!race)
@@ -87,6 +89,7 @@ const race = {
     spawn: function(spawn, body, race, memory) {
         const name = race + "_" + this.nextCreepId();
         const result = spawn.spawnCreep(body, name, {memory: memory });
+        //console.log("spawn creep result", result, "body", JSON.stringify(body));
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.
                 Memory.nextCreepId = Memory.nextCreepId +1;

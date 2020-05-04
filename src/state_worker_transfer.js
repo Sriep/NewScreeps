@@ -14,12 +14,17 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    //console.log(this.creep.name, "in STATE_WORKER_TRANSFER")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    if (!target || !target.store.getFreeCapacity(RESOURCE_ENERGY)) {
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        } else {
+            return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
+        }
     }
 
     const result = this.creep.transfer(target, RESOURCE_ENERGY);
@@ -37,13 +42,14 @@ State.prototype.enact = function () {
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
             return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
-            return gf.fatalError("transfer ERR_NOT_IN_RANGE");
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE); // todo why is this happening
+            //return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("transfer ERR_INVALID_ARGS");
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+    if (target.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
 }

@@ -22,6 +22,14 @@ State.prototype.enact = function () {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
 
+    if (!drop) {
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
+            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+        } else {
+            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+        }
+    }
+
     const result = this.creep.pickup(drop);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
@@ -43,7 +51,7 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(creep, gc.STATE_PORTER_IDLE);
     }
     state.switchTo(creep, gc.STATE_PORTER_FULL_IDLE);

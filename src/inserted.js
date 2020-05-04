@@ -4,59 +4,67 @@
  * @autohor Piers Shepperson
  */
 // const economy = require("economy")
-    //const race_harvester = require("race_harvester");
+    const budget = require("budget");
 
 const inserted = {
     top: function () {
-/*
-        let bc = race_harvester.bodyCounts(300)
-        console.log("bodycounts harvester 300", JSON.stringify(bc));
-        bc = race_harvester.bodyCounts(250)
-        console.log("bodycounts harvester 250", JSON.stringify(bc));
-        bc = race_harvester.bodyCounts(200)
-        console.log("bodycounts harvester 200", JSON.stringify(bc));
-        bc = race_harvester.bodyCounts(150)
-        console.log("bodycounts harvester 150", JSON.stringify(bc));
-*/
 
+        //if (Game.time === 30800) {
 
-
-
-
-        //room = Game.rooms["W7N7"]
-        //console.log("room",JSON.stringify(room))
-        //console.log("controller",JSON.stringify(room.controller));
-        //hws = budget.harvesterWsRoom(room, room)
-        //pcs = budget.portersCsRoom(room, room)
-        //console.log("budget harvester Ws", hws, "porter Cs", pcs);
-
-        //cPos = new RoomPosition(17, 10, 'W7N7');
-        //sPos = new RoomPosition(16, 11, 'W7N7')
-        //joins = gf.joinPointsBetween(cPos, sPos, false);
-        //console.log("joins", JSON.stringify(joins));
-        //let spots, pos;
-        //pos = new RoomPosition(16, 11, 'W7N7');
-        //spots = economy.findMostFreeNeighbours(
-        //    room, pos, 1
-        //)
-        //console.log("find neighbours pos", JSON.stringify(pos), 1, "spots",JSON.stringify(spots) )
-        //pos = new RoomPosition(22, 13, 'W7N7');
-        //spots = economy.findMostFreeNeighbours(
-        //    room, pos, 2
-        //)
-        //console.log("find neighbours pos", JSON.stringify(pos), 2, "spots",JSON.stringify(spots) )
-        //pos = new RoomPosition(3, 6, 'W7N7');
-        //spots = economy.findMostFreeNeighbours(
-        //    room, pos, 1
-        //)
-        //console.log("find neighbours pos", JSON.stringify(pos), 1, "spots",JSON.stringify(spots) )
-
+        //}
     },
 
-
     bottom: function () {
+/*
+        console.log("---------------------------------------------------------");
+        let nsew = "W7NW".split(/[0123456789]/);
+        let xy = "W7N7".split(/[NSEW]/);
+        console.log("xy",JSON.stringify(xy), "nsew", JSON.stringify(nsew));
+        const start = {x:xy[1]*1, y:xy[2]*1}
+        console.log("start", JSON.stringify(start));
 
+        const points1 = pointsDistanceFrom(start, 1);
+        const points2 = pointsDistanceFrom(start, 2);
+
+        console.log("points1", JSON.stringify(points1))
+        console.log("---")
+        console.log("points2", JSON.stringify(points2))
+*/
     }
 }
 
+pointsDistanceFrom = function (start, distance) {
+    const points = [];
+    if (distance <1)
+        return points;
+    console.log("start", JSON.stringify(start), "distance", distance)
+    for ( let dx = 0 ; dx <= distance ; dx++ ) {
+        const dy = distance - dx;
+        points.push({x: start.x + dx, y: start.y + dy})
+        points.push({x: start.x - dx, y: start.y - dy})
+        if (dx !== 0 && dy !== 0) {
+            points.push({x: start.x + dx, y: start.y - dy})
+        }
+        if (dx !== 0 && dy !== 0) {
+            points.push({x: start.x - dx, y: start.y + dy})
+        }
+    }
+    return points;
+}
+
 module.exports = inserted;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

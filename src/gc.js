@@ -95,6 +95,8 @@ const gc = {
     STATE_WORKER_HARVEST: "worker_harvest",
     STATE_WORKER_TRANSFER: "worker_transfer",
     STATE_WORKER_WITHDRAW: "worker_withdraw",
+    STATE_WORKER_PICKUP: "porter_pickup",
+    STATE_WORKER_RECEIVE: "porter_receive",
     // states porter
     STATE_PORTER_IDLE:  "porter_idle",
     STATE_PORTER_PICKUP: "porter_pickup",
@@ -107,7 +109,6 @@ const gc = {
     STATE_HARVESTER_IDLE: "harvester_idle",
     STATE_HARVESTER_BUILD: "harvester_build",
     STATE_HARVESTER_REPAIR: "harvester_repair",
-    STATE_HARVESTER_FULL: "harvester_full",
     STATE_HARVESTER_TRANSFER: "harvester_transfer",
     STATE_HARVESTER_HARVEST: "harvester_harvest",
     // states upgrader
@@ -163,15 +164,15 @@ const gc = {
         [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [
             pgc.INITIATIVE_HARVESTER,
-            pgc.INITIATIVE_PORTER,
             pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
+            pgc.INITIATIVE_PORTER,
             pgc.INITIATIVE_UPGRADER,
-            pgc.BUILD_EXTENSIONS,
             pgc.ACTIVITY_FINISHED
         ],
         [
-            "build_tower",
+            pgc.BUILD_EXTENSIONS,
+           // "build_tower",
             pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
             pgc.BUILD_ROAD_SOURCE_SPAWN,
             pgc.BUILD_ROAD_SOURCE_SOURCE,
@@ -211,7 +212,7 @@ const gc = {
 
     // Rates
     FLAG_UPDATE_RATE: 5000000,
-    BUILD_QUEUE_CHECK_RATE: 50,
+    BUILD_QUEUE_CHECK_RATE: 1,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -222,6 +223,7 @@ const gc = {
     // ownership
     ROOM_ENEMY: "enemy",
     ROOM_NEUTRAL: "neutral",
+    ROOM_NEUTRAL_ROADS: "neutral_roads",
     ROOM_RESERVED: "reserved",
     ROOM_RESERVED_ROADS: "reserved_roads",
     ROOM_OWNED: "owned",

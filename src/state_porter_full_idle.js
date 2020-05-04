@@ -4,15 +4,22 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_PORTER_FULL_IDLE;
     this.creep = creep
+    this.policyId = creep.memory.policyId
+    this.homeId = Memory.policies[this.policyId].roomId;
 }
 
 State.prototype.enact = function () {
-    if (this.creep.store.getFreeCapacity() === 0) {
+    //console.log(this.creep.name, "in STATE_PORTER_FULL_IDLE",
+    //    "store", JSON.stringify(this.creep.store), "free", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) );
+    //console.log(this.creep.name,"this.creep.store.getUsedCapacity()", this.creep.store.getUsedCapacity(RESOURCE_ENERGY))
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        //console.log("in this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0")
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
 
@@ -21,10 +28,16 @@ State.prototype.enact = function () {
             return (s.structureType === STRUCTURE_TOWER
                 || s.structureType === STRUCTURE_EXTENSION
                 || s.structureType === STRUCTURE_SPAWN
-                && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY))
+                //&& s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY))
+                && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
         }
     });
-    if (nextDelivery) {
+    //console.log("next delivery store", JSON.stringify(nextDelivery.store));
+    //console.log("next delivery getFreeCapacity", nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY));
+    //console.log("nextDelivery", nextDelivery, "pos",JSON.stringify(nextDelivery.pos))
+    if (nextDelivery && nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+        //console.log("about to delive to targt store", JSON.stringify(nextDelivery.store));
+        //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
         return state.switchToMoveTarget(
             this.creep,
             nextDelivery,
@@ -33,9 +46,11 @@ State.prototype.enact = function () {
         );
     }
 
-    const controllerFlag = Game.flags[room.controller.id];
-    containerPos = findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
-    if (nextDelivery) {
+    controller = Game.rooms[this.homeId].controller;
+    const controllerFlag = Game.flags[controller.id];
+    //console.log("contoller flag", JSON.stringify(controllerFlag))
+    containerPos = state.findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
+    if (containerPos) {
         return state.switchToMoveTarget(
             this.creep,
             containerPos,

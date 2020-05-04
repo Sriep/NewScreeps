@@ -66,12 +66,42 @@ const state = {
         return undefined;
     },
 
+    atUpgradingPost: function(pos) {
+        const flag = Game.flags[Game.rooms[pos.roomName].controller.id];
+        const posts = flag.memory.harvesterPosts;
+        for (let j in posts) {
+            if (pos.x === posts[j].x && pos.y ===posts[j].y){
+                return true;
+            }
+        }
+        return false;
+    },
+
+    atHarvestingPostWithUndepletedSourceId: function(pos) {
+        let sources = Game.rooms[pos.roomName].find(FIND_SOURCES);
+        for (let i in sources) {
+            const flag = Game.flags[sources[i].id];
+            const posts = flag.memory.harvesterPosts;
+            for (let j in posts) {
+                if (pos.x === posts[j].x && pos.y ===posts[j].y) {
+                    if (sources[i].energy > 0) {
+                        return sources[i].id
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
     findFreeUpgraderPost: function(room) {
         const flag = Game.flags[room.controller.id];
         const posts = flag.memory.upgraderPosts;
         for (let i in posts) {
-            const post = gf.roomPosFromPos(post[i]);
+            const post = gf.roomPosFromPos(posts[i], room.name);
             if (this.isUpgraderPostFree(post)) {
+                console.log("findFreeUpgraderPost found", JSON.stringify(post))
                 return post;
             }
         }
@@ -123,19 +153,27 @@ const state = {
     getHarvestContainersPos: function (room) {
         const sources = room.find(FIND_SOURCES);
         const containersPos = [];
-        for (let s in sources) {
+        for (let i in sources) {
             const flag = Game.flags[sources[i].id];
+            //console.log(i, sources[i].id, "i getHarvestContainersPos flag", JSON.stringify(flag.memory))
             if (flag.memory.containerPos) {
                 containersPos.push(gf.roomPosFromPos(flag.memory.containerPos));
             }
         }
+        //console.log("getHarvestContainersPos", JSON.stringify(containersPos));
         return containersPos;
     },
 
-    isHarvesterContainer: function(room) {
+    isHarvesterAndUpgradeContainer: function(room) {
+        const upos = Game.flags[room.controller.id].memory.containerPos;
+        //console.log("st upgrader flag", JSON.stringify(Game.flags[room.controller.id]))
+        //console.log("upos", JSON.stringify(upos), "room", room.name);
+        if (!upos || !this.findContainerAt(gf.roomPosFromPos(upos, room.name))) {
+            return false;
+        }
         const positions =  this.getHarvestContainersPos(room);
         for (let i in positions) {
-            if (this.findContainerAt(positions[i])) {
+            if (this.findContainerAt(gf.roomPosFromPos(positions[i], room.name))) {
                 return true;
             }
         }
@@ -144,24 +182,33 @@ const state = {
 
     findCollectContainer: function(room) {
         const containerPos = this.getHarvestContainersPos(room)
+        console.log("getHarvestContainersPos", JSON.stringify(containerPos));
         let containers = [];
         for (let i in containerPos) {
-             const container = this.findContainerAt(containerPos[i]);
+             const container = this.findContainerAt(gf.roomPosFromPos(containerPos[i]), room.name);
              if (container) {
                  containers.push(container);
              }
+             //console.log(i,"container pos", JSON.stringify(containerPos))
         }
-        if (containers.length === 0)
+        if (containers.length === 0) {
             return undefined;
+        }
         let maxSoFar = -1;
         let maxIndex = -1;
+        //console.log("containers", JSON.stringify(containers))
         for (let i in containers) {
-            if (containers[0].store.getUsedCapacity(RESOURCE_ENERGY) > maxSoFar) {
-                maxSoFar = containers[0].store.getUsedCapacity(RESOURCE_ENERGY);
+            if (containers[i].store.getUsedCapacity(RESOURCE_ENERGY) > maxSoFar) {
+                maxSoFar = containers[i].store.getUsedCapacity(RESOURCE_ENERGY);
                 maxIndex = i;
             }
+            //console.log(i,"i findCollectContainer getUsedCapacity, (containers[i].store.getUsedCapacity(RESOURCE_ENERGY)")
+            //console.log(i,"i maxSoFar", maxSoFar, "maxIndex", maxIndex, "pos", containers[i].pos);
         }
-        return containers[i];
+        //console.log("containers", JSON.stringify(containers))
+        //console.log("found conainer getUsedCapacity", containers[maxIndex].store.getUsedCapacity(RESOURCE_ENERGY))
+        //console.log("findCollectContainer", JSON.stringify(containers[maxIndex]))
+        return containers[maxIndex];
     },
 
     switchToMoveTarget(creep, target, range, nextState) {
@@ -196,7 +243,7 @@ const state = {
         creep.memory.state = gc.STATE_MOVE_POS;
         creep.memory.moveRange = range;
         creep.memory.next_state = nextState;
-        creep.say("go " + nextState)
+        //creep.say("go " + nextState)
         return state.enact(creep);
     },
 
@@ -212,7 +259,7 @@ const state = {
             creep.memory.targetId = targetId;
         }
         creep.memory.state = newState;
-        creep.say(this.creepSay[newState]);
+        //creep.say(this.creepSay[newState]);
         return state.enact(creep);
     },
 
@@ -220,7 +267,6 @@ const state = {
        return  race.getRace(creep) === gc.RACE_HARVESTER
                 && (creep.memory.state === gc.STATE_HARVESTER_BUILD
                 || creep.memory.state === gc.STATE_HARVESTER_REPAIR
-                || creep.memory.state === gc.STATE_HARVESTER_FULL
                 || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
                 || creep.memory.state === gc.STATE_HARVESTER_HARVEST
                 || creep.memory.next_state === gc.STATE_HARVESTER_HARVEST)
@@ -239,17 +285,20 @@ const state = {
         }).length;
     },
 
-    wsHarvesting: function(policyId) {
-        const harvesters = _.filter(Game.creeps, function (c) {
+    getHarvestingHarvesters: function(policyId) {
+        return _.filter(Game.creeps, function (c) {
             return c.memory.policyId === policyId
                 && race.getRace(c) === gc.RACE_HARVESTER
                 && (c.memory.state === gc.STATE_HARVESTER_BUILD
                     || c.memory.state === gc.STATE_HARVESTER_REPAIR
-                    || c.memory.state === gc.STATE_HARVESTER_FULL
                     || c.memory.state === gc.STATE_HARVESTER_TRANSFER
                     || c.memory.state === gc.STATE_HARVESTER_HARVEST
                     || c.memory.next_state === gc.STATE_HARVESTER_HARVEST)
         });
+    },
+
+    wsHarvesting: function(policyId) {
+        const harvesters = this.getHarvestingHarvesters(policyId);
         //console.log("in wsHarvesting harvesters", harvesters.length)
         let ws = 0;
         for (let i in harvesters) {
@@ -302,7 +351,8 @@ const state = {
         //console.log("findContainerConstructionAt stricts", JSON.stringify(StructAt))
         //console.log("StructAt.length", StructAt.length);
         //concole.log("StructAt.structureType",StructAt.structureType,"StructAt.")
-        if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
+        if (StructAt.length > 0 && (StructAt[0].structureType === STRUCTURE_CONTAINER
+            || StructAt[0].structureType === STRUCTURE_ROAD)) {
             return StructAt[0];
         }
         return undefined;

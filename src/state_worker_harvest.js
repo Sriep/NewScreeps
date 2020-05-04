@@ -13,6 +13,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    //console.log(this.creep.name, "in STATE_WORKER_HARVEST")
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }

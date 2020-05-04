@@ -7,7 +7,7 @@ const gc = require("gc");
 
 const cache = {
 
-    path(from, toArray, name, range) {
+    path(from, toArray, name, range, useRoad, redo) {
         if (toArray.length === 0) {
             return undefined;
         }
@@ -17,82 +17,90 @@ const cache = {
         if (!range) {
             range = 1
         }
-
         flag = Game.flags[from.id];
-        if (!flag.memory[name]) {
-            flag.memory[name] ={};
+        //console.log("path stored in", toArray[0].room.name)
+        if (!flag.memory[toArray[0].room.name]) {
+            flag.memory[toArray[0].room.name] ={};
         }
-        if (flag.memory[name].path) {
-            return flag.memory[name].path.cost;
+        if (!flag.memory[toArray[0].room.name][name]) {
+            flag.memory[toArray[0].room.name][name] ={};
+        }
+        const tag = useRoad ? "road" : "noroad";
+        if (!redo && flag.memory[toArray[0].room.name][name][tag]) {
+            return flag.memory[toArray[0].room.name][name][tag];
         }
         let goals = _.map(toArray, function(to) {
             return { pos: to.pos, range: range };
         });
-        pfPath = PathFinder.search(from.pos, goals, {
-            maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH
-        })
-        if (pfPath.incomplete) {
-            delete flag.memory[to.id];
-            return undefined;
+        let pfPath;
+        if (useRoad) {
+            pfPath = PathFinder.search(from.pos, goals, {
+                maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
+                swampCost: 1,
+            })
+        } else {
+            pfPath = PathFinder.search(from.pos, goals, {
+                maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
+                swampCost: 5,
+            })
         }
-        flag.memory[name].path = {
+
+        flag.memory[toArray[0].room.name][name][tag] = {
             path: this.serialisePath(pfPath.path),
             ops: pfPath.ops,
             cost: pfPath.cost,
+            incomplete: pfPath.incomplete,
         }
-        return flag.memory[name].path;
+        return flag.memory[toArray[0].room.name][name][tag];
     },
 
-    distance(from, toArray, name, range) {
-        return this.path(from, toArray, name, range).cost
+    distance(from, toArray, name, range, useRoad) {
+        //const flag = Game.flags[from.id];
+        //const tag = useRoad ? "road" : "noroad";
+        //const room = toArray[0].room;
+        //if (!flag.memory[name] || !flag.memory[name][tag] ) {
+            const p = this.path(from, toArray, name, range, useRoad);
+            //console.log("name", name,"tag", tag,"cache distance", JSON.stringify(flag.memory))
+            //console.log(p.cost,"cache distance", JSON.stringify(p))
+            return p.cost
+        //}
+
+        //console.log("name", name,"tag", tag,"cache distance", JSON.stringify(flag.memory))
+        //console.log(flag.memory[name][tag].cost,"chache distance3", JSON.stringify(flag.memory[name][tag]))
+        //return flag.memory[name][tag].cost;
     },
 
-    distanceSourceSpawn: function (source, room) {
-        const d = this.pathSourceSpawn(source, room);
-        //console.log("pathSourceSpawn", JSON.stringify(d))
-        return d;
-    },
-    pathSourceSpawn(source, room) {
-        const roomName = room.name
-        const flag = Game.flags[source.id];
-        if (!flag.memory.roomName) {
-            flag.memory.roomName = {};
-        }
-        if (!flag.memory.roomName.path) {
-            const spawns = room.find(FIND_MY_SPAWNS);
-            const d = this.path(source, spawns, roomName, 1)
-            //console.log("path", JSON.stringify(d));
-            return d;
-        }
-        //console.log("cached path", JSON.stringify(flag.memory.roomName.path))
-        return flag.memory.roomName.path;
+    distanceSourceSpawn: function(source, spawnRoom, useRoad, redo) {
+        spawns = spawnRoom.find(FIND_MY_SPAWNS);
+        return this.distance(source, spawns, "spawn", 1, useRoad, redo);
     },
 
-    distanceSourceController: function (source, room) {
-        const flag = Game.flags[source.id];
-        if (!flag.memory[room.controller.id]) {
-            flag.memory[room.controller.id] = {};
-        }
-        if (!flag.memory[room.controller.id] || !flag.memory[room.controller.id].path) {
-            return this.distance(source, [room.controller], room.controller.id, 1);
-        }
-        return flag.memory[room.controller.id].path.cost;
+    distanceSourceController: function (source, room, useRoad, redo) {
+        return this.distance(source, [room.controller], "controller", 1, useRoad, redo);
     },
 
-    distanceUpgraderSpawn: function (fromRoom, spawnRoom) {
-        const flag = Game.flags[fromRoom.controller.id];
-        if (!flag.memory.roomName) {
-            flag.memory.roomName = {};
-        }
-        if (!flag.memory.roomName.path) {
-            const spawns = spawnRoom.find(FIND_MY_SPAWNS);
-            return this.distance(fromRoom.controller.id, spawns, spawnRoom, 1);
-        }
-        return flag.memory.roomName.path.cost;
+    distanceUpgraderSpawn: function (fromRoom, spawnRoom, useRoad, redo) {
+        spawns = spawnRoom.find(FIND_MY_SPAWNS);
+        return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
     },
+
+    sPoint: function (point) {
+        return String.fromCharCode(point.x + 50 * point.y);
+    },
+
+    dPoint: function(str) {
+        const code = str.charCodeAt(0)
+        return {"x": code % 50, "y": Math.floor(code / 50)};
+    },
+
+    dRoomPos: function(str, roomName) {
+        const code = str.charCodeAt(0);
+        console.log("dRoomPos code", code,"x",code % 50,"y",Math.floor(code / 50),"room",roomName);
+        return new RoomPosition(code % 50, Math.floor(code / 50), roomName)
+    },
+
 
     serialisePath: function (path) {
-        header = {}
         let sPath = [];
         for ( let i in path) {
             sPath.push(path[i].x + 50 * path[i].y);
@@ -104,7 +112,7 @@ const cache = {
         let path = [];
         for (let i in uString.length) {
             code = uString.charCodeAt(i)
-            path.push({"x": code % 500, "y": Math.floor(code / 50)});
+            path.push({"x": code % 50, "y": Math.floor(code / 50)});
         }
         return path;
     },

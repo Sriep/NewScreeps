@@ -1,36 +1,36 @@
 /**
  * @fileOverview screeps
- * Created by piers on 28/04/2020
+ * Created by piers on 03/05/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
-    this.type = gc.STATE_PORTER_TRANSFER;
+    //console.log("in porter pickup constructor", creep.name)
+    this.type = gc.STATE_WORKER_PICKUP;
     this.creep = creep
+    this.policyId = creep.memory.policyId
+    this.homeId = Memory.policies[this.policyId].roomId;
 }
 
+
 State.prototype.enact = function () {
-    //console.log(this.creep.name, "in STATE_PORTER_TRANSFER");
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
-    }
-    const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target || !target.store.getFreeCapacity(RESOURCE_ENERGY)) {
-        //console.log("target bad", target,"capacity",target.store.getFreeCapacity(RESOURCE_ENERGY) )
+    const home = Game.rooms[this.homeId];
+    const drop = home.findClosestByRange(FIND_STRUCTURES, {
+        filter: { structureType: FIND_DROPPED_RESOURCES }
+    });
+
+    if (!drop) {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
-            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
         } else {
-            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
         }
     }
-    if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-    }
-    const result = this.creep.transfer(target, RESOURCE_ENERGY);
+
+    const result = this.creep.pickup(drop);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -51,10 +51,10 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (target.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
+    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(creep, gc.STATE_WORKER_IDLE);
     }
-    state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    state.switchTo(creep, gc.STATE_WORKER_FULL_IDLE);
 }
 
 module.exports = State;

@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
@@ -17,12 +18,13 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
     const home = Game.rooms[this.homeId];
-    console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
+    //console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
     if (home.controller.ticksToDowngrade
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
-        console.log("swith to emergency upgrade")
-        state.switchToMoveTarget(
+        //console.log("swith to emergency upgrade")
+        return state.switchToMoveTarget(
             this.creep,
             home.controller,
             gc.RANGE_UPGRADE,
@@ -30,8 +32,8 @@ State.prototype.enact = function () {
         );
     }
 
-    if (home.controller.level <= 2) {
-        state.switchToMoveTarget(
+    if (home.controller.level < 2) {
+        return state.switchToMoveTarget(
             this.creep,
             home.controller,
             gc.RANGE_UPGRADE,
@@ -48,10 +50,15 @@ State.prototype.enact = function () {
                     || structure.structureType === STRUCTURE_EXTENSION
                     || structure.structureType === STRUCTURE_SPAWN )
                     && structure.store[RESOURCE_ENERGY]
-                        < structure.store.getCapacity(RESOURCE_ENERGY);
+                    < structure.store.getCapacity(RESOURCE_ENERGY);
             }
         });
-    if (nextSourceContainer != null) {
+    //console.log("nextSourceContainer pos", nextSourceContainer.pos)
+    //onsole.log("nextSourceContainer", nextSourceContainer, JSON.stringify(nextSourceContainer));
+    //console.log("nextSourceContainer", nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY),
+     //   "store",JSON.stringify(nextSourceContainer.store));
+    if (nextSourceContainer && nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+        //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
         return state.switchToMoveTarget(
             this.creep,
             nextSourceContainer,
@@ -59,7 +66,14 @@ State.prototype.enact = function () {
             gc.STATE_WORKER_TRANSFER
         );
     }
-
+/*
+    if (nextSourceContainer.store[RESOURCE_ENERGY]
+        < nextSourceContainer.store.getCapacity(RESOURCE_ENERGY)) {
+        console.log("nextSourceContainer.store", JSON.stringify(nextSourceContainer.store))
+        console.log("nextSourceContainer.storegetFreeCapacity", JSON.stringify(nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY)))
+        gf.fatalError("STATE_WORKER_FULL_IDLE should go to store container");
+    }
+*/
     const damagedStructure = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: function(s)  {
             return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
@@ -84,7 +98,7 @@ State.prototype.enact = function () {
         );
     }
 
-    state.switchToMoveTarget(
+    return state.switchToMoveTarget(
         this.creep,
         home.controller,
         gc.RANGE_UPGRADE,

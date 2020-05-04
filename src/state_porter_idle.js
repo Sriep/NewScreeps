@@ -13,25 +13,31 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    const target = state.findCollectContainer(this.creep.room)
-    if (target) {
-        state.switchToMoveTarget(
-            this.creep,
-            target,
-            gc.RANGE_TRANSFER,
-            gc.STATE_PORTER_WITHDRAW,
-        );
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+        //console.log("in this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0")
+        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
 
+    //console.log(this.creep.name, "in STATE_PORTER_IDLE");
     const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
     if (drop) {
-        state.switchToMovePos(
+        return state.switchToMovePos(
             this.creep,
             drop.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_PICKUP,
+        );
+    }
+
+    const target = state.findCollectContainer(this.creep.room)
+    if (target) {
+        return state.switchToMoveTarget(
+            this.creep,
+            target,
+            gc.RANGE_TRANSFER,
+            gc.STATE_PORTER_WITHDRAW,
         );
     }
 
@@ -45,7 +51,7 @@ State.prototype.enact = function () {
             return b.store.getUsedCapacity(RESOURCE_ENERGY)
                 - a.store.getUsedCapacity(RESOURCE_ENERGY);
         } );
-        state.switchToMoveTarget(
+        return state.switchToMoveTarget(
             this.creep,
             creeps[0],
             gc.RANGE_TRANSFER,

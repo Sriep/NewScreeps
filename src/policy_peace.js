@@ -35,13 +35,6 @@ Policy.prototype.initilise = function () {
 }
 
 Policy.prototype.enact = function () {
-    //console.log("activity index", Memory.policies[this.id].activityIndex);
-    //let activity = gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex];
-    //console.log("activity", activity);
-
-    //console.log("enact policy id",this.id,"room",this.roomId, "memory polices", JSON.stringify(Memory.policies));
-    //console.log("enact policy id",this.id,"room",this.roomId, "memory polices", Memory.policies[this.id]);
-    //console.log("enact policy id", this.id);
     this.build();
     const initiatives = Memory.policies[this.id].initiatives;
     //console.log("initiatives", JSON.stringify(initiatives));
@@ -49,7 +42,7 @@ Policy.prototype.enact = function () {
     const room = Game.rooms[this.roomId];
     const avaliable = room.energyAvailable;
     const maxCapacity = room.energyCapacityAvailable
-    console.log("spawn energy",avaliable, "room capacity",  maxCapacity)
+    //console.log("spawn energy",avaliable, "room capacity",  maxCapacity)
     //if (avaliable === maxCapacity) { // todo can be done better
         if (initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
             this.spawn();
@@ -65,6 +58,7 @@ Policy.prototype.spawn = function () {
     const spawns = room.find(FIND_MY_SPAWNS);
     for (let spawn in spawns) {
         if (spawns[spawn].spawning === null) {
+            //console.log("about to do donextspawn")
             if (!this.doNextSpawn(spawns[spawn])) {
                 return;
             }
@@ -96,17 +90,16 @@ Policy.prototype.spawnWorkers = function () {
 }
 
 Policy.prototype.doNextSpawn = function (spawn) {
-    //console.log("in doNextSpawn")
-    const spawnRace = this.getLocalSpawn()
+    //console.log("pp in doNextSpawn")
+    const numCreeps = Object.getOwnPropertyNames(Game.creeps).length
+    //console.log("pp numCreeps", numCreeps)
+    const spawnRace = numCreeps > 2 ? this.getLocalSpawn() : gc.RACE_WORKER;
+    //console.log("pp spawn race",spawnRace);
 
-    const room = Game.rooms[this.roomId];
-    const avaliable = room.energyAvailable;
-    const maxCapacity = room.energyCapacityAvailable
-    if (avaliable !== maxCapacity) { // todo can be done better
-        return;
-    }
+
 
     if (spawnRace) {
+        //console.log("about to spawn", spawnRace)
         race.spawnCreep(spawn, this.id, spawnRace);
         return true;
     }
@@ -123,8 +116,10 @@ Policy.prototype.getLocalSpawn = function () {
         return c.memory.policyId === policyId
     });
 
-    //console.log("num creeps", Object.getOwnPropertyNames(Game.creeps).length)
-    //console.log("creeps policy", creeps.length, "all creeps length", )
+    let build;
+
+    //console.log("pp num creeps", Object.getOwnPropertyNames(Game.creeps).length)
+    //console.log("pp creeps policy", creeps.length, "all creeps length", )
     for (let i in creeps) {
         switch (race.getRace(creeps[i])) {
             case gc.RACE_HARVESTER:
@@ -142,40 +137,54 @@ Policy.prototype.getLocalSpawn = function () {
         }
     }
 
-    //console.log("hLife", hLife, "pLife", pLife, "wLife", wLife)
-    console.log("workers", workers, "harvesters",harvesters,"poerters",porters)
+    //console.log("pp hLife", hLife, "pLife", pLife, "wLife", wLife)
+    console.log("pp workers", workers, "harvesters",harvesters,"porters",porters)
 
-    //console.log("initiatives", JSON.stringify(Memory.policies[policyId].initiatives));
-    //console.log("check workers");
-     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_WORKER)) {
-        //console.log("checking workers");
+    const avaliable = room.energyAvailable;
+    const maxCapacity = room.energyCapacityAvailable
+
+    if (Object.getOwnPropertyNames(Game.creeps).length > 2
+        && avaliable !== maxCapacity
+        && (workers > 1 || porters > 1)) { // todo can be done better
+        return;
+    }
+    let buildworkers = 0;
+    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_WORKER)) {
         const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-        //console.log("constructionLeft", economy.constructionLeft(room));
-        //console.log("wLife", wLife, "buildTicksNeeded", buildTicksNeeded, "workers", workers);
+        buildworkers = buildTicksNeeded/CREEP_LIFE_TIME;
+        console.log("buld workers", buildworkers);
         if (wLife < buildTicksNeeded || workers === 0) {
-            //console.log("workers", 1, "access pts", economy.totalSourceAccessPointsRoom(room));
             if (workers === 0 || workers <= economy.totalSourceAccessPointsRoom(room)) {
-                //console.log("spawn worker");
+                //console.log("build worker")
                 return gc.RACE_WORKER;
             }
         }
     }
+    console.log("buld workers", buildworkers);
 
     const PCs = race_porter.bodyCounts(room.energyCapacityAvailable)[CARRY] // todo hacky
 
     let maxHarvesterWs = 0;
+    let maxUpgradersWs = 0;
+    const Hws = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
-        maxHarvesterWs += budget.harvesterWsRoom(room, room);
-        //console.log("INITIATIVE_HARVESTER harvesterWsRoom", budget.harvesterWsRoom(room, room))
+        maxHarvesterWs += budget.harvesterWsRoom(room, room, false);
+        //console.log("pp INITIATIVE_HARVESTER harvesterWsRoom", budget.harvesterWsRoom(room, room, false))
+        console.log("pp harveserWs", maxHarvesterWs, "max harvesers", maxHarvesterWs/Hws);
     }
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
         //console.log("INITIATIVE_UPGRADER")
         let maxEnergy = 3000 * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
         maxEnergy -= 2 * maxHarvesterWs * 125 + PCs * 75 + 100; // todo fix quick hack
-        maxHarvesterWs += budget.upgradersWsRoom(room, maxEnergy)
+        maxUpgradersWs += budget.upgradersWsRoom(room, maxEnergy, false)
+        console.log("pp upgradersWs", maxUpgradersWs, "max upgraders", maxUpgradersWs/Hws);
+        maxHarvesterWs += maxUpgradersWs;
+        //console.log("pp upgradrs Ws", budget.upgradersWsRoom(room, maxEnergy, false));
     }
-    const Hws = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
-    //console.log("harvesters", harvesters, "Math.ceil(maxHarvesterWs/Hws)",Math.ceil(maxHarvesterWs/Hws), "maxHarvestersWs", maxHarvesterWs, "Hws", Hws,)
+    //console.log("pp max harvester and  upgarder Ws", maxHarvesterWs)
+
+    //console.log("pp Hws", Hws, "maxHarvesterWs", maxHarvesterWs);
+    console.log("pp harvesters", harvesters, "Math.ceil(maxHarvesterWs/Hws)",Math.ceil(maxHarvesterWs/Hws))
     if (harvesters < Math.ceil(maxHarvesterWs/Hws)) {
         let posts = 0;
         if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
@@ -184,33 +193,30 @@ Policy.prototype.getLocalSpawn = function () {
         if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
             posts += state.countUpgraderPosts(room)
         }
-        //console.log("harvester posts", posts)
-        if  (harvesters < posts) {
+        //console.log("pp harvesters", harvesters, "posts",posts);
+        if  (harvesters < posts && (porters > 0 || workers > 3 * harvesters )) {
             return gc.RACE_HARVESTER
         }
     }
 
-    //console.log("check porters");
-    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)) {
-        //console.log("checking porters");
-
-        //console.log("estimatePorters", budget.portersCsRoom(room, room), "Porter Cs")
-        if (porters < budget.portersCsRoom(room, room) / PCs) {
-            //console.log("spawn porter")
-
-            if (porters + 1 < harvesters) {
-                if (state.isHarvesterContainer(room)) {
-                    return gc.RACE_PORTER;
-                } else {
-                    return gc.RACE_WORKER;
-                }
-
+    //console.log("porters budget Cs", budget.portersCsRoom(room, room, false) )
+    const portersNeeded = budget.portersCsRoom(room, room, false)/PCs
+    console.log("porters", porters, "0.25*workers", 0.25*(workers),"porters needed",portersNeeded);
+    //console.log("PCs", PCs,"porters needed", budget.portersCsRoom(room, room, false)/PCs)
+    //console.log("porters", porters, "workers", workers);
+    //console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
+    if (porters + 0.25 * workers < budget.portersCsRoom(room, room, false) / PCs) {
+        //console.log("about to build porter");
+            if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)
+                && state.isHarvesterAndUpgradeContainer(room)) {
+                build = gc.RACE_PORTER;
+            } else {
+                //console.log("build worker instead")
+                build = gc.RACE_WORKER;
             }
-        }
     }
 
-    //console.log("no builds")
-    return undefined;
+    return build;
 }
 
 Policy.prototype.build = function () {
@@ -228,7 +234,7 @@ Policy.prototype.build = function () {
 
 Policy.prototype.actionActivityQueue = function (room) {
     const rcl = room.controller.level;
-    gf.assert(rcl, Memory.policies[this.id].rcl, "rcl mismatch")
+    gf.assertEq(rcl, Memory.policies[this.id].rcl, "rcl mismatch")
     //console.log("gc.BUILD_ORDER_RCL", JSON.stringify(gc.BUILD_ORDER_RCL))
     //console.log("memory rcl",Memory.policies[this.id].rcl);
 
@@ -239,22 +245,22 @@ Policy.prototype.actionActivityQueue = function (room) {
         Memory.policies[this.id].activityIndex = 0;
     }
 
-    console.log("memory rcl activity", gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex]);
-    console.log("activity index", Memory.policies[this.id].activityIndex);
-    console.log("gc.BUILD_ORDER_RCL[1][0]",gc.BUILD_ORDER_RCL[1][0] )
+    //console.log("memory rcl activity", gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex]);
+    //console.log("activity index", Memory.policies[this.id].activityIndex);
+    //console.log("gc.BUILD_ORDER_RCL[1][0]",gc.BUILD_ORDER_RCL[1][0] )
     let activity = gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex];
-    console.log("activity", activity);
+    //console.log("activity", activity);
     //const fg = this.buildFcs()
     //console.log("buildfcs", JSON.stringify(fg))
     //console.log("buildfcs worker", JSON.stringify(fg["worker"]), " fc[gc.BUILD_ROAD_SPAWN_CONTROLLER]",  fg[gc.BUILD_ROAD_SPAWN_CONTROLLER])
     if (this.buildFcs()[activity].check(room, activity, this.id)) {
-        console.log("checked", activity, "result TRUE")
+       //console.log("checked", activity, "result TRUE")
         if (activity !== gc.ACTIVITY_FINISHED) {
             Memory.policies[this.id].activityIndex++;
             this.actionActivityQueue(room);
         }
     } else {
-        console.log("checked", activity, "result FALSE")
+        //console.log("checked", activity, "result FALSE")
         this.buildFcs()[activity].build(room, activity, this.id);
     }
 }
@@ -294,7 +300,7 @@ Policy.prototype.buildFcs = function () {
 
     fc[gc.BUILD_EXTENSIONS] = {
         "build": construction.finishBuildingMissingExtensions,
-        "check": construction.finishBuildingMissingExtensions
+        "check": construction.areExtensionsBuilt
     };
 
     newInititive = {
@@ -320,7 +326,7 @@ newEconomicInititive = function (room, activity, policyId)  {
 }
 
 checkInitiative = function (room, activity, policyId)  {
-    console.log("in checkInitiative")
+    //console.log("in checkInitiative")
     //console.log("room", room.name, "activity", activity, "this.id", policyId)
     //console.log("Memory.policies[policyId]", JSON.stringify(Memory.policies[policyId]));
     //console.log("initiatives", JSON.stringify(Memory.policies[policyId].initiatives));
@@ -335,15 +341,16 @@ checkInitiative = function (room, activity, policyId)  {
 
 isControllerContainerFinished = function (room) {
     const flag = Game.flags[room.controller.id];
-    if (!flag.memory.container) {
+    const pos = flag.memory.containerPos
+    if (!pos) {
         return false;
     }
-    return undefined !== state.findContainerAt(new RoomPosition(flag.memory.container));
+    return undefined !== state.findContainerAt(gf.roomPosFromPos(pos, room.name));
 }
 
 buildControllerContainer = function (room) {
     const controllerFlag = Game.flags[room.controller.id];
-    if (controllerFlag.memory.container) {
+    if (controllerFlag.memory.containerPos) {
         return;
     }
     let spots = economy.findMostFreeNeighbours(
@@ -371,11 +378,11 @@ areSourceContainersFinished = function (room) {
     const sources = room.find(FIND_SOURCES);
     for (let i in sources) {
         const flag = Game.flags[sources[i].id];
-        if (!flag.memory.container) {
+        if (!flag.memory.containerPos) {
             return false
         }
         //console.log("areSourceContainersFinished flag", JSON.stringify(flag.memory.container))
-        const container = state.findContainerAt(gf.roomPosFromPos(flag.memory.container))
+        const container = state.findContainerAt(gf.roomPosFromPos(flag.memory.containerPos))
         //console.log("areSourceContainersFinished container", JSON.stringify(container))
         if (!container) {
             return false;

@@ -7,20 +7,41 @@ const gc = require("gc");
 
 const gf = {
     fatalError: function (msg) {
-        console.log("Fatal error: ",msg);
-        console.log(Error().stack)
+        console.log("{color-lightred}Fatal error: ",msg);
+        console.log("{color-lightred}" + Error().stack)
         if (gc.DEBUG)
             throw(msg);
     },
 
-    assert: function (a, b, msg) {
+    assertEq: function (a, b, msg) {
         if (a !== b) {
-            console.log("assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
+            console.log("{color-yellow}assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
             this.fatalError("assert failed: " + msg)
         }
     },
 
-    roomPosFromPos(pos, roomName) {
+    assertNeq: function (a, b, msg) {
+        if (a === b) {
+            console.log("{color-yellow}assert failed: ", JSON.stringify(a), " === ", JSON.stringify(b));
+            this.fatalError("assert failed: " + msg)
+        }
+    },
+
+    assertGt: function (a, b, msg) {
+        if (a < b) {
+            console.log("{color-yellow}assert failed: ", JSON.stringify(a), " < ", JSON.stringify(b));
+            this.fatalError("assert failed: " + msg)
+        }
+    },
+
+    assertLt: function (a, b, msg) {
+        if (a > b) {
+            console.log("{color-yellow}assert failed: ", JSON.stringify(a), " > ", JSON.stringify(b));
+            this.fatalError("assert failed: " + msg)
+        }
+    },
+
+    roomPosFromPos: function(pos, roomName) {
         if (roomName) {
             return new RoomPosition(pos.x, pos.y, roomName)
         } else {
