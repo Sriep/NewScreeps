@@ -4,15 +4,15 @@
  * @author Piers Shepperson
  */
 
-const gc = require("gc");
-const state = require("state");
+    const gc = require("gc");
+    const state = require("state");
 
-function State (creep) {
-    this.type = gc.STATE_PORTER_IDLE;
-    this.creep = creep
-}
+    function State (creep) {
+        this.type = gc.STATE_PORTER_IDLE;
+        this.creep = creep
+    }
 
-State.prototype.enact = function () {
+    State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         //console.log("in this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0")
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
@@ -33,9 +33,10 @@ State.prototype.enact = function () {
 
     const target = state.findCollectContainer(this.creep.room)
     if (target) {
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = target.id;
+        return state.switchToMovePos(
             this.creep,
-            target,
+            target.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_WITHDRAW,
         );
@@ -51,9 +52,10 @@ State.prototype.enact = function () {
             return b.store.getUsedCapacity(RESOURCE_ENERGY)
                 - a.store.getUsedCapacity(RESOURCE_ENERGY);
         } );
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = creeps[0].name;
+        return state.switchToMovePos(
             this.creep,
-            creeps[0],
+            creeps[0].pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_RECEIVE
         )

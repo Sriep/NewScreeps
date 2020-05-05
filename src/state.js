@@ -34,16 +34,11 @@ const state = {
     },
 
     switchToMoveTarget(creep, target, range, nextState) {
-        if (!target){
-            gf.fatalError("switchToMoveTarget " + creep.name
-                + " no target next state " + nextState)
-        }
-        if (!target.id){
-            gf.fatalError("switchToMoveTarget " + creep.name
-                + " no target id next state " + nextState + "target" + JSON.stringify(target))
-        }
+        creep.memory.state = gc.STATE_MOVE_TARGET;
         creep.memory.targetId = target.id;
-        return state.switchToMovePos(creep, target.pos, range, nextState)
+        creep.memory.moveRange = range;
+        creep.memory.next_state = nextState;
+        return state.enact(creep);
     },
 
     switchToMovePos(creep, targetPos, range, nextState) {
@@ -109,7 +104,7 @@ const state = {
             const posts = flag.memory.harvesterPosts;
             for (let i in posts) {
                 const post = posts[i];
-                console.log("findFreeHarvesterPost check post", JSON.stringify(post));
+                //console.log("findFreeHarvesterPost check post", JSON.stringify(post));
                 //const post = gf.roomPosFromPos(posts[i], room.name);
                 if (this.isHarvesterPostFree(post, room.name)) {
                     post.source = sources[s];
@@ -162,21 +157,21 @@ const state = {
     findFreeUpgraderPost: function(room) {
         const flag = Game.flags[room.controller.id];
         const posts = flag.memory.upgraderPosts;
-        console.log("findFreeUpgraderPost","posts", JSON.stringify(posts))
+        //console.log("findFreeUpgraderPost","posts", JSON.stringify(posts))
         let freePosts = 0;
         let foundPost
         for (let i in posts) {
             //const post = gf.roomPosFromPos(posts[i], room.name);
             //console.log(i,"posts", JSON.stringify(posts[i]))
             if (this.isUpgraderPostFree(posts[i], room.name)) {
-                console.log(i, "findFreeUpgraderPost found", JSON.stringify(posts[i]))
+                //console.log(i, "findFreeUpgraderPost found", JSON.stringify(posts[i]))
                 foundPost = posts[i];
                 freePosts++;
             } else {
-                console.log(i, "ocuppied post", JSON.stringify(posts[i]))
+                //console.log(i, "ocuppied post", JSON.stringify(posts[i]))
             }
         }
-        console.log("findFreeUpgraderPost freepost found at!!", freePosts, "found", foundPost.x, foundPost.y)
+        //console.log("findFreeUpgraderPost freepost found at!!", freePosts, "found", foundPost.x, foundPost.y)
         if (freePosts > 1) {
             return foundPost;
         }
@@ -186,7 +181,7 @@ const state = {
     isHarvesterPostFree: function (pos, roomName) {
         for (let j in Game.creeps) {
             if (this.isHarvestingHarvester(Game.creeps[j])) {
-                console.log("isHarvesterPostFree", pos.x, pos.y, roomName)
+                //console.log("isHarvesterPostFree", pos.x, pos.y, roomName)
                 if (Game.creeps[j].memory.targetPos.x === pos.x
                     && Game.creeps[j].memory.targetPos.y === pos.y
                     && Game.creeps[j].room.name === roomName) {
@@ -198,20 +193,20 @@ const state = {
     },
 
     isUpgraderPostFree: function (pos, roomName) {
-        console.log("isUpgraderPostFree checking pos", pos.x, pos.y, roomName);
+        //console.log("isUpgraderPostFree checking pos", pos.x, pos.y, roomName);
         for (let j in Game.creeps) {
             //console.log("isUpgraderPostFree", Game.creeps[j].name,"checking if upgrader at",JSON.stringify(Game.creeps[j].pos) )
             if (this.isUpgradingHarvester(Game.creeps[j])) {
-                console.log("isUpgradingHarvester true", Game.creeps[j].name, "found upgrading harvester at xy", Game.creeps[j].pos.x, Game.creeps[j].pos.y)
-                console.log("isUpgradingHarvester true target pos", Game.creeps[j].memory.targetPos.x,  Game.creeps[j].memory.targetPos.y)
+                //console.log("isUpgradingHarvester true", Game.creeps[j].name, "found upgrading harvester at xy", Game.creeps[j].pos.x, Game.creeps[j].pos.y)
+                //console.log("isUpgradingHarvester true target pos", Game.creeps[j].memory.targetPos.x,  Game.creeps[j].memory.targetPos.y)
                 if (Game.creeps[j].memory.targetPos.x === pos.x
                     && Game.creeps[j].memory.targetPos.y === pos.y
                     && Game.creeps[j].room.name === roomName) {
-                    console.log("isUpgraderPostFree return false found upgrader at", pos.x, pos.y, roomName)
+                    //console.log("isUpgraderPostFree return false found upgrader at", pos.x, pos.y, roomName)
                     return false;
                 }
             } else {
-                console.log("isUpgradingHarvester false not upgrading",Game.creeps[j].name, "creep pos at",  Game.creeps[j].pos.x, Game.creeps[j].pos.y )
+                //console.log("isUpgradingHarvester false not upgrading",Game.creeps[j].name, "creep pos at",  Game.creeps[j].pos.x, Game.creeps[j].pos.y )
             }
         }
         return true;
@@ -267,7 +262,7 @@ const state = {
 
     findCollectContainer: function(room) {
         const containerPos = this.getHarvestContainersPos(room)
-        console.log("getHarvestContainersPos", JSON.stringify(containerPos));
+        //console.log("getHarvestContainersPos", JSON.stringify(containerPos));
         let containers = [];
         for (let i in containerPos) {
              const container = this.findContainerAt(gf.roomPosFromPos(containerPos[i]), room.name);

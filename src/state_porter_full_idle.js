@@ -38,22 +38,24 @@ State.prototype.enact = function () {
     if (nextDelivery && nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
         //console.log("about to delive to targt store", JSON.stringify(nextDelivery.store));
         //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = nextDelivery.id;
+        return state.switchToMovePos(
             this.creep,
-            nextDelivery,
+            nextDelivery.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_TRANSFER
         );
     }
 
-    controller = Game.rooms[this.homeId].controller;
+    const controller = Game.rooms[this.homeId].controller;
     const controllerFlag = Game.flags[controller.id];
     //console.log("contoller flag", JSON.stringify(controllerFlag))
-    containerPos = state.findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
-    if (containerPos) {
-        return state.switchToMoveTarget(
+    const container = state.findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
+    if (container) {
+        this.creep.memory.targetId = container.id;
+        return state.switchToMovePos(
             this.creep,
-            containerPos,
+            container.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_TRANSFER
         );

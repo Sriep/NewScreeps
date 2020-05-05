@@ -3,7 +3,7 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
-/*
+
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
@@ -11,11 +11,6 @@ const race = require("race");
 
 //depreciated, use STATE_MOVE_POSITION instead
 function State (creep) {
-    //console.log("in state_move_path constructor", creep.name)
-    if (!creep)
-        console.log("Creat creep state with no creep object")
-    if (creep.memory.state !== gc.STATE_EMPTY_IDLE)
-       // console.log("In empty idele state with creep wrong state: " + JSON.stringify(creep))
     this.type = gc.STATE_MOVE_TARGET;
     this.creep = creep
 }
@@ -28,7 +23,7 @@ State.prototype.enact = function () {
     if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
         return state.switchTo(this.creep, this.creep.memory.next_state)
     }
-    const result = this.creep.moveTo(target.pos, {reusePath: 5})
+    const result = this.creep.moveTo(target, {reusePath: 5})
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -51,4 +46,3 @@ State.prototype.enact = function () {
 }
 
 module.exports = State;
-*/

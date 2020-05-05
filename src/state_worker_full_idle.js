@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const gf = require("gf");
+//const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
@@ -24,18 +24,20 @@ State.prototype.enact = function () {
     if (home.controller.ticksToDowngrade
         < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
         //console.log("swith to emergency upgrade")
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = home.controller.id;
+        return state.switchToMovePos(
             this.creep,
-            home.controller,
+            home.controller.pos,
             gc.RANGE_UPGRADE,
             gc.STATE_WORKER_UPGRADE
         );
     }
 
     if (home.controller.level < 2) {
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = home.controller.id;
+        return state.switchToMovePos(
             this.creep,
-            home.controller,
+            home.controller.pos,
             gc.RANGE_UPGRADE,
             gc.STATE_WORKER_UPGRADE
         );
@@ -59,9 +61,10 @@ State.prototype.enact = function () {
      //   "store",JSON.stringify(nextSourceContainer.store));
     if (nextSourceContainer && nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
         //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = nextSourceContainer.id;
+        return state.switchToMovePos(
             this.creep,
-            nextSourceContainer,
+            nextSourceContainer.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_WORKER_TRANSFER
         );
@@ -80,9 +83,10 @@ State.prototype.enact = function () {
         }
     });
     if (damagedStructure != null) {
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = damagedStructure.id;
+        return state.switchToMovePos(
             this.creep,
-            damagedStructure,
+            damagedStructure.pos,
             gc.RANGE_REPAIR,
             gc.STATE_WORKER_REPAIR
         );
@@ -90,17 +94,18 @@ State.prototype.enact = function () {
 
     let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite != null) {
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = nextConstructionSite.id;
+        return state.switchToMovePos(
             this.creep,
-            nextConstructionSite,
+            nextConstructionSite.pos,
             gc.RANGE_BUILD,
             gc.STATE_WORKER_BUILD
         );
     }
-
-    return state.switchToMoveTarget(
+    this.creep.memory.targetId = home.controller.id;
+    return state.switchToMovePos(
         this.creep,
-        home.controller,
+        home.controller.pos,
         gc.RANGE_UPGRADE,
         gc.STATE_WORKER_UPGRADE
     );

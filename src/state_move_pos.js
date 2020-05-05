@@ -16,32 +16,32 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_MOVE_POS");
+    //console.log(this.creep.name, "in STATE_MOVE_POS");
     const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos)
-    console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
+    //console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
     //console.log("check creep pos", JSON.stringify(this.creep.pos),
     //    "is in rage",  this.creep.memory.moveRange, "of target", JSON.stringify(targetPos))
     //console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
-            JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+        //console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
+         //   JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
             return state.switchTo(this.creep, this.creep.memory.next_state)
     }
     if (this.creep.memory.lastpositon) {
         const lastPos =  cache.dPoint(this.creep.memory.lastpositon);
-        console.log(this.creep.name,"pos", JSON.stringify(lastPos), "cached",this.creep.memory.lastpositon)
+       // console.log(this.creep.name,"pos", JSON.stringify(lastPos), "cached",this.creep.memory.lastpositon)
         if (this.creep.pos.x === lastPos.x && this.creep.pos.y === lastPos.y) {
             delete this.creep.memory.lastpositon;
-            console.log("STATE_MOVE_POS stuck");
+            //console.log("STATE_MOVE_POS stuck");
             return this.pathLost();
         }
     }
 
-    console.log(this.creep.name, "about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
+    //console.log(this.creep.name, "about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
     const result = this.creep.moveTo(targetPos, {reusePath: 5})
     //if (result != OK) {
-        console.log("STATE_MOVE_POS result of move by",this.creep.name , "is", result);
+        //console.log("STATE_MOVE_POS result of move by",this.creep.name , "is", result);
     //}
     //console.log("result of move bySTATE_MOVE_POS",this.creep.name , "is", result);
     switch (result) {
@@ -77,7 +77,7 @@ State.prototype.enact = function () {
 
 State.prototype.pathLost = function () {
     const creepRace = race.getRace(this.creep)
-    console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos))
+    //console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos))
     switch(creepRace) {
         case gc.RACE_HARVESTER:
             return state.switchTo(this.creep, creepRace + "_idle")

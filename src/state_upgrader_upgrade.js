@@ -15,7 +15,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
+    //console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
      if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
      }

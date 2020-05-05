@@ -46,13 +46,10 @@ const policy = {
         }
         let latestId = Memory.nextPolicyId;
         Memory.nextPolicyId = Memory.nextPolicyId +1;
-        //console.log("next policy id", latestId);
         return latestId;
     },
 
     activatePolicy: function(policyType, data) {
-        //console.log("activating policy", policyType, "with data", JSON.stringify(data))
-
         const policyConstructor = require("policy_" + policyType);
         data.id = this.getNextPolicyId();
         const policy = new policyConstructor(data);

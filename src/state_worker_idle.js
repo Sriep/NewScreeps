@@ -3,7 +3,7 @@
  * Created by piers on 30/04/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
+//const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
@@ -32,9 +32,10 @@ State.prototype.enact = function () {
     //console.log("STATE_WORKER_IDLE container cap",  container.store.getUsedCapacity(RESOURCE_ENERGY) )
     if (container  && container.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         console.log("move to container", JSON.stringify(container.pos))
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = container.id;
+        return state.switchToMovePos(
             this.creep,
-            container,
+            container.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_WORKER_WITHDRAW,
         );
@@ -47,14 +48,15 @@ State.prototype.enact = function () {
     });
     //console.log("isHarvestingHarvester coumt", creeps.length);
     if (creeps.length > 0) {
-        cosole.log("movoing to harvester");
+        console.log("movoing to harvester");
         creeps = creeps.sort( function (a,b)  {
             return b.store.getUsedCapacity(RESOURCE_ENERGY)
                 - a.store.getUsedCapacity(RESOURCE_ENERGY);
         } );
-        return state.switchToMoveTarget(
+        this.creep.memory.targetId = creeps[0].name;
+        return state.switchToMovePos(
             this.creep,
-            creeps[0],
+            creeps[0].pos,
             gc.RANGE_TRANSFER,
             gc.STATE_WORKER_RECEIVE
         )

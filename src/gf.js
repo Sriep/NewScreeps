@@ -53,6 +53,42 @@ const gf = {
         return p1.x === p2.x && p1.y === p2.y;
     },
 
+    splitRoomName: function(roomName) {
+        nsew = roomName.split(/[0123456789]/).filter(n=>n);
+        xy = roomName.split(/[NSEW]/).filter(n=>n)
+        return { EW: nsew[0], NS: nsew[1], x: xy[0], y: xy[1]};
+    },
+
+    roomNameFromSplit: function(room) {
+        return room.EW + room.x.toString() + room.NS + room.y.toString();
+    },
+
+    roomDirectionToDelta: function(direction, EW, NS) {
+        const delta = this.directionToDelta(direction);
+        if (EW === "E") {
+            delta.x = delta.x*-1;
+        }
+        if (NS === "S") {
+            delta.y = delta.y*-1;
+        }
+        return delta;
+    },
+
+    directionToDelta : function (direction) {
+        switch(direction) {
+            case TOP: return {x:0,y:-1};
+            case TOP_RIGHT: return {x:1,y:-1}
+            case RIGHT: return {x:1,y:0};
+            case BOTTOM_RIGHT: return {x:1, y:1};
+            case BOTTOM: return {x:0,y:1};
+            case BOTTOM_LEFT: return {x:-1,y:1};
+            case LEFT: return {x:-1,y:0}
+            case TOP_LEFT: return{x:-1,y:-1};
+            default:
+                this.gf.fatalError("unknown direction" + direction.toString());
+        }
+    },
+
     needsRepair : function (s) {
         return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD
     },

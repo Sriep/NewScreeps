@@ -20,7 +20,7 @@ function State (creep) {
 
 State.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_PORTER_RECEIVE");
-    const harvester = Game.getObjectById(this.creep.memory.targetId);
+    const harvester = Game.creeps[this.creep.memory.targetId];
     if (!harvester || harvester.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
             return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);

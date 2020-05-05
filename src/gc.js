@@ -25,6 +25,9 @@ const pgc = {
     BUILD_ROAD_SOURCE_TOWERS: "build_road_source_towers",
     // Msc
     ACTIVITY_FINISHED: "finished",
+    // policies
+    POLICY_PEACE: "peace",
+    POLICY_EXPLORE: "explore",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -59,14 +62,7 @@ const gc = {
     RACE_WORKER: "worker",
     RACE_HARVESTER: "harvester",
     RACE_PORTER: "porter",
-
-    // Room policies
-    POLICY_PEACE: "peace",
-    POLICY_DEFENCE: "defence",
-    POLICY_RESCUE: "rescue",
-    POLICY_BUILD: "build",
-    POLICY_NEUTRAL_ROOM: "neutral_room",
-    POLICY_BUILD_SPAWN: "build_spawn",
+    RACE_SCOUT: "scout",
 
     // flags
     FLAG_SOURCE: "source",
@@ -83,6 +79,7 @@ const gc = {
     // states
     // states common
     STATE_MOVE_POS: "move_pos",
+    STATE_MOVE_TARGET: "move_target",
     // states worker
     STATE_WORKER_IDLE: "worker_idle",
     STATE_WORKER_UPGRADE: "worker_upgrade",
@@ -101,7 +98,6 @@ const gc = {
     STATE_PORTER_TRANSFER: "porter_transfer",
     STATE_PORTER_WITHDRAW: "porter_withdraw",
     STATE_PORTER_RECEIVE: "porter_receive",
-
     // states harvester
     STATE_HARVESTER_IDLE: "harvester_idle",
     STATE_HARVESTER_BUILD: "harvester_build",
@@ -111,6 +107,8 @@ const gc = {
     // states upgrader
     STATE_UPGRADER_UPGRADE: "upgrader_upgrade",
     STATE_UPGRADER_WITHDRAW: "upgrader_withdraw",
+    // scout
+    STATE_SCOUT_IDLE: "scout_idle",
 
     MAX_STATE_STACK: 5,
 
@@ -155,11 +153,12 @@ const gc = {
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
 
     // Economy
-    // Building by RCL
+    // Building by RCL for room
     BUILD_ORDER_RCL: [
         [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [
+            pgc.POLICY_EXPLORE,
             pgc.INITIATIVE_HARVESTER,
             pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
@@ -204,6 +203,15 @@ const gc = {
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
     ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
+    // policies
+    POLICY_PEACE: pgc.POLICY_PEACE,
+    POLICY_EXPLORE: pgc.POLICY_EXPLORE,
+    //POLICY_DEFENCE: "defence",
+    //POLICY_RESCUE: "rescue",
+    //POLICY_BUILD: "build",
+    //POLICY_NEUTRAL_ROOM: "neutral_room",
+    //POLICY_BUILD_SPAWN: "build_spawn",
+
 
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 

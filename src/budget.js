@@ -5,6 +5,7 @@
  */
 
 const cache = require("cache");
+const gc = require("gc");
 
 const budget = {
 
@@ -15,7 +16,7 @@ const budget = {
         for (let i in sources) {
             const distance = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad)
             //console.log("bu harvesterWsRoom distance",distance)
-            wsRoom += this.harvesterWsSource(sources[i].energyCapacity, distance);
+            wsRoom += this.harvesterWsSource(5*sources[i].energyCapacity, distance);
         }
         //console.log("bu harvesterWsRoom result", wsRoom)
         return wsRoom;
@@ -23,12 +24,14 @@ const budget = {
 
     // Ws needed for Energy =  Energy/(Lifetime * HarvestPower)
     harvesterWsSource: function (ec, distance) {
-        //console.log("harvesterWsSource travel", travel)
+        //console.log("harvesterWsSource travel", distance)
         const workLifetime = CREEP_LIFE_TIME - distance;
         //console.log("harvesterWsSource workLifetime", workLifetime, "harvest power", HARVEST_POWER)
         const energyCollectedPerWorkPart = workLifetime * HARVEST_POWER;
         const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
-        //console.log("source.energyCapacity",source.energyCapacity, "energyCollectedPerWorkPart", energyCollectedPerWorkPart)
+        //console.log("maxEnergy",maxEnergy,"ec",ec,"CREEP_LIFE_TIME",CREEP_LIFE_TIME,"ENERGY_REGEN_TIME",ENERGY_REGEN_TIME)
+        //console.log("source.energyCapacity",ec, "energyCollectedPerWorkPart", energyCollectedPerWorkPart, "maxEnergy", maxEnergy)
+        //console.log("harvesterWsSource", maxEnergy / energyCollectedPerWorkPart)
         return maxEnergy / energyCollectedPerWorkPart;
     },
 
@@ -40,7 +43,7 @@ const budget = {
             //console.log("portersCsRoom distanceSourceSpawn", initial)
             const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad)
             //console.log("portersCsRoom distanceSourceController", repeat)
-            csRoom += this.porterCsSource(sources[i].energyCapacity, initial, repeat);
+            csRoom += this.porterCsSource(5*sources[i].energyCapacity, initial, repeat);
         }
         //console.log("bu portersCsRoom result", csRoom)
         return csRoom;
@@ -48,18 +51,20 @@ const budget = {
 
     // Cs need for Energh = Energy * Trips per life / (Lifetime + carry amount)
     porterCsSource: function (ec, initial, repeat) {
-        //console.log("porterCsSource initial", initial, "repeat",repeat)
+        console.log("porterCsSource initial", initial, "repeat",repeat)
         const workLifetime = CREEP_LIFE_TIME - initial;
         const tripsPerLife = workLifetime / repeat;
         const energyPortedPerCarryPart = tripsPerLife * CARRY_CAPACITY;
+        console.log("tripsPerLife",tripsPerLife);
         const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
+        console.log("maxEnergy", maxEnergy,"energyPortedPerCarryPart",energyPortedPerCarryPart)
         return maxEnergy / energyPortedPerCarryPart;
     },
 
     // Ws needed = Energy / ( Liftime - distance)
     upgradersWsRoom: function (room, energy, useRoad) {
         const travel = cache.distanceUpgraderSpawn(room, room, useRoad);
-        const upgradersWsRoom = this.upgraderWsFromDistance(travel, energy);
+        //const upgradersWsRoom = this.upgraderWsFromDistance(travel, energy);
         //console.log("bu upgradersWsRoom", upgradersWsRoom);
         return this.upgraderWsFromDistance(travel, energy);
     },
@@ -100,31 +105,32 @@ const budget = {
         let sourcePathsRoad = [];
         let sourcePathNoRoad = [];
         for (let i in sources) {
-            sourcePathsRoad.push(cache.path(sourcePaths, spawns, "spawn", 1, true, force))
-            sourcePathNoRoad.push(cache.path(sourcePaths, spawns, "spawn", 1, false, force))
+            sourcePathsRoad.push(cache.path(sources[i], spawns, "spawn", 1, true, force))
+            sourcePathNoRoad.push(cache.path(sources[i], spawns, "spawn", 1, false, force))
         }
         const pathToControllerRoad = cache.path(home.controller, spawns, "controller", 1, true, force)
         const pathToControllerNoRoad = cache.path(home.controller, spawns, "controller", 1, false, force)
         for (let i in sources) {
-            const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, SOURCE_ENERGY_NEUTRAL_CAPACITY);
+            //console.log("nnr")
+            const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, 5*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL][sources[i].id] = nnr;
             values[gc.ROOM_NEUTRAL]["setup"] += nnr.startUpCost;
             values[gc.ROOM_NEUTRAL]["profit"] += nnr.netEnergy;
-
-            const nr = his.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, SOURCE_ENERGY_NEUTRAL_CAPACITY);
+            //console.log("nr")
+            const nr = this.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, 5*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL_ROADS][sources[i].id] = nr;
             values[gc.ROOM_NEUTRAL_ROADS]["setup"] += nr.startUpCost;
             values[gc.ROOM_NEUTRAL_ROADS]["profit"] += nr.netEnergy;
-
-            const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, SOURCE_ENERGY_CAPACITY);
+            //console.log("rnr")
+            const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, 5*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED][sources[i].id] = rnr;
             values[gc.ROOM_RESERVED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_RESERVED]["profit"] += rnr.netEnergy;
             values[gc.ROOM_OWNED][sources[i].id] = rnr;
             values[gc.ROOM_OWNED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_OWNED]["profit"] += rnr.netEnergy;
-
-            const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, SOURCE_ENERGY_CAPACITY);
+            //console.log("rr")
+            const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, 5*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED_ROADS][sources[i].id] = rr;
             values[gc.ROOM_RESERVED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_RESERVED_ROADS]["profit"] += rr.netEnergy;
@@ -132,10 +138,13 @@ const budget = {
             values[gc.ROOM_OWNED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_OWNED_ROADS]["profit"] += rr.netEnergy;
         }
+        //console.log("reserver cost no road", this.reserverCost(room, spawns, false, force),
+        //    "reserver cost road", this.reserverCost(room, spawns, true, force))
         values[gc.ROOM_RESERVED]["profit"] -= this.reserverCost(room, spawns, false, force);
         values[gc.ROOM_RESERVED_ROADS]["profit"] -= this.reserverCost(room, spawns, true, force);
         values[gc.ROOM_OWNED]["profit"] += 600; // reduction in container repair
         values[gc.ROOM_OWNED_ROADS]["profit"] += 600; // reduction in container repair
+        return values;
     },
 
     swamps: function(path) { // only works for non road paths.
@@ -147,50 +156,61 @@ const budget = {
                         :   valueSourceNoRoad(pathSpawn, pathController, swamps, energy)
     },
 
-    sourcePathRoad: function (pathSpawn, pathController, swamps, energy) {
+    valueSourceRoad: function (pathSpawn, pathController, energy, swamps) {
+        if (!swamps) swamps = 0;
+
         const startUpCost = (pathController.cost - swamps)*CONSTRUCTION_COST[STRUCTURE_ROAD]
             + swamps *CONSTRUCTION_COST[STRUCTURE_ROAD]* CONSTRUCTION_COST_ROAD_SWAMP_RATIO
             + CONSTRUCTION_COST[STRUCTURE_CONTAINER];
 
+        //console.log("pathSpawn",pathSpawn.cost,"pathController",pathController.cost,"energy",energy)
         const runningCostRepair = (pathController.cost - swamps)*1.5 + swamps*7.5 + 750;
-
-        const hWs = this.upgraderWsFromDistance(pathSpawn, energy);
-        const pCs = this.porterCsSource(energy, pathSpawn, pathContoller);
-        const energy1 = energy - convertPartsToEnergy(hWs, pCs, hWs) - runningCostRepair;
+        const hWs = this.harvesterWsSource(energy, pathSpawn.cost);
+        //console.log("hWs = this.harvesterWsSource", hWs)
+        const pCs = this.porterCsSource(energy, pathSpawn.cost, pathController.cost);
+        const energy1 = energy - this.convertPartsToEnergy(hWs, pCs, hWs) - runningCostRepair;
         const uWs1 = this.upgraderWsFromDistance(20, energy1); // guess 20
-        const energy2 = energy -convertPartsToEnergy(hWs, pCs, uWs1) - runningCostRepair;
+        const energy2 = energy -this.convertPartsToEnergy(hWs, pCs, uWs1) - runningCostRepair;
         const uWs2 = this.upgraderWsFromDistance(20, energy2);
-        const creepCosts = convertPartsToEnergy(hWs, pCs, uWs2);
+        //console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2)
+        const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs2);
 
+        //console.log("valueSourceRoad startUpCost",startUpCost)
+
+        //console.log("valueSourceRoad", JSON.stringify(rtv))
         return {
-            "startUpCost" : startUpCost,
-            "runningCostRepair" : runningCostRepair,
-            "runningCostCreeps" : creepCosts,
-            "netEnergy" : energy - runningCostRepair - creepCosts,
-        }
+            "startUpCost": startUpCost,
+            "runningCostRepair": runningCostRepair,
+            "runningCostCreeps": creepCosts,
+            "netEnergy": energy - runningCostRepair - creepCosts,
+        };
     },
 
-    sourcePathNoRoad: function (pathSpawn, pathController, energy) {
+    valueSourceNoRoad: function (pathSpawn, pathController, energy) {
+        //console.log("pathSpawn",pathSpawn.cost,"pathController",pathController.cost,"energy",energy)
+
         const startUpCost = CONSTRUCTION_COST[STRUCTURE_CONTAINER];
         //const runningCostRepair = 750;
         const runningCostRepair = CREEP_LIFE_TIME*CONTAINER_DECAY/
                                       (CONTAINER_DECAY_TIME*REPAIR_POWER)
-        console.log("valueSourceNoRoad runningCostRepair", runningCostRepair,"shoud be 750");
+        //console.log("valueSourceNoRoad runningCostRepair", runningCostRepair,"shoud be 750");
 
-        const hWs = this.upgraderWsFromDistance(pathSpawn, energy);
-        const pCs = this.porterCsSource(energy, pathSpawn, pathContoller);
+        const hWs = this.harvesterWsSource(energy, pathSpawn.cost);
+        const pCs = this.porterCsSource(energy, pathSpawn.cost, pathController.cost);
         const energy1 = energy - 2*hWs*125 + pCs*75;
         const uWs1 = this.upgraderWsFromDistance(20, energy1); // guess 20
         const energy2 = energy - hWs*125 +  pCs*75 + uWs1*125;
         const uWs2 = this.upgraderWsFromDistance(20, energy2);
-        const creepCosts = hWs*125 +  pCs*75 + uWs2*125;
+        const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs2);
+        //console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2)
 
+        //console.log("valueSourceNoRoad", JSON.stringify(rtv))
         return {
-            "startUpCost" : startUpCost,
-            "runningCostRepair" : runningCostRepair,
-            "runningCostCreeps" : creepCosts,
-            "netEnergy" : energy - runningCostRepair - creepCosts,
-        }
+            "startUpCost": startUpCost,
+            "runningCostRepair": runningCostRepair,
+            "runningCostCreeps": creepCosts,
+            "netEnergy": energy - runningCostRepair - creepCosts,
+        };
     },
 
     convertPartsToEnergy(hWs, pCs, uWs) {

@@ -22,33 +22,23 @@ const race = {
     body: function (race, ec) {
         const raceModule = require("race_" + race);
         const bodyCounts = raceModule.bodyCounts(ec)
-        //console.log("bodyCounts sjon", JSON.stringify(bodyCounts));
         if (!bodyCounts)
             return undefined;
         let body = [];
 
         for (let i = 0; i < bodyCounts[WORK]; i++) {
-            //console.log(i,"pushing work")
             body.push(WORK);
         }
         if (bodyCounts[MOVE] < 1) {
-            //console.log("bodyCounts", JSON.stringify(bodyCounts), "race", race,"ec", ec);
+            console.log("body race", race, "ec",ec)
             gf.fatalError("creep must have move part")
         }
         for (let i = 0; i < bodyCounts[MOVE]; i++) {
-            //console.log(i,"pushing move")
             body.push(MOVE);
         }
-
-        //if (bodyCounts[CARRY] < 1) {
-        //    console.log("bodyCounts", JSON.stringify(bodyCounts), "race", race,"ec", ec);
-        //    gf.fatalError("creep must have carry part")
-        //}
         for (let i = 0; i < bodyCounts[CARRY]; i++) {
-            //console.log(i,"pushing carry")
             body.push(CARRY);
         }
-        //console.log("body", JSON.stringify(body), "race", race, "ec",ec)
         return body;
     },
 

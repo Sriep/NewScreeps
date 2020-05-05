@@ -13,8 +13,6 @@ const race_harvester = require("race_harvester");
 const budget = require("budget");
 const race_porter = require("race_porter");
 
-
-
 function Policy  (data) {
     this.type = gc.POLICY_PEACE;
     if (!data) {
@@ -39,9 +37,9 @@ Policy.prototype.enact = function () {
     const initiatives = Memory.policies[this.id].initiatives;
     //console.log("initiatives", JSON.stringify(initiatives));
 
-    const room = Game.rooms[this.roomId];
-    const avaliable = room.energyAvailable;
-    const maxCapacity = room.energyCapacityAvailable
+    //const room = Game.rooms[this.roomId];
+    //const avaliable = room.energyAvailable;
+    //const maxCapacity = room.energyCapacityAvailable
     //console.log("spawn energy",avaliable, "room capacity",  maxCapacity)
     //if (avaliable === maxCapacity) { // todo can be done better
         if (initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
@@ -90,22 +88,37 @@ Policy.prototype.spawnWorkers = function () {
 }
 
 Policy.prototype.doNextSpawn = function (spawn) {
-    //console.log("pp in doNextSpawn")
     const numCreeps = Object.getOwnPropertyNames(Game.creeps).length
-    //console.log("pp numCreeps", numCreeps)
     const spawnRace = numCreeps > 2 ? this.getLocalSpawn() : gc.RACE_WORKER;
-    //console.log("pp spawn race",spawnRace);
-
-
-
     if (spawnRace) {
         //console.log("about to spawn", spawnRace)
         race.spawnCreep(spawn, this.id, spawnRace);
         return true;
     }
-    // todo foreign spawns
+
+    let buildList = Memory.policies[this.id].builds;
+    if (!buildList || buildList.length < 1)
+        return true;
+
+    let i = -1;
+    do {
+        i++;
+        result = spawn.spawnCreep(buildList[i].body, Memory.nextCreepId.toString(), { dryRun: true });
+    } while( i < buildList.length && result !== OK)
+    if (result === OK) {
+        if (OK === race.spawn(
+            spawn,
+            buildList[i].body,
+            buildList[i].race,
+            buildList[i].memory
+        )) {
+            Memory.policies[this.id].ForeignBuilds = buildList.splice(i,1)
+        }
+    }
     return false;
 }
+
+
 
 Policy.prototype.getLocalSpawn = function () {
     //console.log("in getLocalSpawn")
@@ -155,7 +168,7 @@ Policy.prototype.getLocalSpawn = function () {
         console.log("buld workers", buildworkers);
         if (wLife < buildTicksNeeded || workers === 0) {
             if (workers === 0 || workers <= economy.totalSourceAccessPointsRoom(room)) {
-                //console.log("build worker")
+                console.log("build worker")
                 return gc.RACE_WORKER;
             }
         }
@@ -169,7 +182,7 @@ Policy.prototype.getLocalSpawn = function () {
     const Hws = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
         maxHarvesterWs += budget.harvesterWsRoom(room, room, false);
-        //console.log("pp INITIATIVE_HARVESTER harvesterWsRoom", budget.harvesterWsRoom(room, room, false))
+        console.log("pp INITIATIVE_HARVESTER harvesterWsRoom", budget.harvesterWsRoom(room, room, false))
         console.log("pp harveserWs", maxHarvesterWs, "max harvesers", maxHarvesterWs/Hws);
     }
     if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
@@ -181,7 +194,7 @@ Policy.prototype.getLocalSpawn = function () {
         maxHarvesterWs += maxUpgradersWs;
         //console.log("pp upgradrs Ws", budget.upgradersWsRoom(room, maxEnergy, false));
     }
-    //console.log("pp max harvester and  upgarder Ws", maxHarvesterWs)
+    console.log("pp max harvester and  upgarder Ws", maxHarvesterWs)
 
     //console.log("pp Hws", Hws, "maxHarvesterWs", maxHarvesterWs);
     console.log("pp harvesters", harvesters, "Math.ceil(maxHarvesterWs/Hws)",Math.ceil(maxHarvesterWs/Hws))
@@ -199,12 +212,12 @@ Policy.prototype.getLocalSpawn = function () {
         }
     }
 
-    //console.log("porters budget Cs", budget.portersCsRoom(room, room, false) )
+    console.log("porters budget Cs", budget.portersCsRoom(room, room, false) )
     const portersNeeded = budget.portersCsRoom(room, room, false)/PCs
     console.log("porters", porters, "0.25*workers", 0.25*(workers),"porters needed",portersNeeded);
     //console.log("PCs", PCs,"porters needed", budget.portersCsRoom(room, room, false)/PCs)
     //console.log("porters", porters, "workers", workers);
-    //console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
+   console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
     if (porters + 0.25 * workers < budget.portersCsRoom(room, room, false) / PCs) {
         //console.log("about to build porter");
             if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)
@@ -312,11 +325,33 @@ Policy.prototype.buildFcs = function () {
     fc[gc.INITIATIVE_PORTER] = newInititive;
     fc[gc.INITIATIVE_UPGRADER] = newInititive;
 
+    newPolicy = {
+        "build": activateNewPolicy,
+        "check": checkPolicy,
+    }
+    fc[gc.POLICY_EXPLORE] = newPolicy;
+
     fc[gc.ACTIVITY_FINISHED]  = {
         "build": function(){},
         "check": function(){ return true; },
     }
     return fc;
+}
+
+activateNewPolicy = function (room, activity, policyId)  {
+    policy.activatePolicy(activity, {
+        parentId: policyId
+    })
+}
+
+checkPolicy = function (room, activity, policyId)  {
+    for ( let i in Memory.policies) {
+        if (Memory.policies[i].type === activity &&
+            Memory.policies[i].parentId === policyId) {
+            return ture;
+        }
+    }
+    return false;
 }
 
 newEconomicInititive = function (room, activity, policyId)  {
@@ -326,16 +361,10 @@ newEconomicInititive = function (room, activity, policyId)  {
 }
 
 checkInitiative = function (room, activity, policyId)  {
-    //console.log("in checkInitiative")
-    //console.log("room", room.name, "activity", activity, "this.id", policyId)
-    //console.log("Memory.policies[policyId]", JSON.stringify(Memory.policies[policyId]));
-    //console.log("initiatives", JSON.stringify(Memory.policies[policyId].initiatives));
-
     if (!Memory.policies[policyId].initiatives) {
         Memory.policies[policyId].initiatives = []
         return false;
     }
-    //console.log("checkInitiative rtv", Memory.policies[policyId].initiatives.includes(activity));
     return Memory.policies[policyId].initiatives.includes(activity);
 }
 
