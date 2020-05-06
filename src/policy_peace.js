@@ -12,12 +12,17 @@ const state = require("state");
 const race_harvester = require("race_harvester");
 const budget = require("budget");
 const race_porter = require("race_porter");
+const policy = require("policy");
+const flag = require("flag");
 
 function Policy  (data) {
     this.type = gc.POLICY_PEACE;
     if (!data) {
         return gf.fatalError("create Policy peace with no data");
     }
+    this.rcl = data.rcl;
+    this.initiatives = data.initiatives;
+    this.activityIndex = data.activityIndex;
     this.id = data.id;
     this.roomId = data.roomId;
 }
@@ -30,25 +35,27 @@ Policy.prototype.initilise = function () {
     if (!Memory.policies[this.id].rcl) {
         Memory.policies[this.id].rcl = Game.rooms[this.roomId].controller.level;
     }
-}
+    return true;
+};
 
 Policy.prototype.enact = function () {
     this.build();
-    const initiatives = Memory.policies[this.id].initiatives;
-    //console.log("initiatives", JSON.stringify(initiatives));
+    //const initiatives = Memory.policies[this.id].initiatives;
+    //console.log("initiatives", JSON.stringify(initiatives), "id", this.id,
+    //            "policy", JSON.stringify(Memory.policies[this.id]));
 
     //const room = Game.rooms[this.roomId];
     //const avaliable = room.energyAvailable;
     //const maxCapacity = room.energyCapacityAvailable
     //console.log("spawn energy",avaliable, "room capacity",  maxCapacity)
     //if (avaliable === maxCapacity) { // todo can be done better
-        if (initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
+        if (this.initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
             this.spawn();
         } else {
             this.spawnWorkers();
         }
     //}
-}
+};
 
 Policy.prototype.spawn = function () {
     //console.log("in spawn policypeace", this.id)
@@ -62,7 +69,7 @@ Policy.prototype.spawn = function () {
             }
         }
     }
-}
+};
 
 Policy.prototype.spawnWorkers = function () {
     //console.log("in spawnWorkers policy", this.id)
@@ -85,38 +92,20 @@ Policy.prototype.spawnWorkers = function () {
             }
         }
     }
-}
+};
 
 Policy.prototype.doNextSpawn = function (spawn) {
-    const numCreeps = Object.getOwnPropertyNames(Game.creeps).length
+    const numCreeps = Object.getOwnPropertyNames(Game.creeps).length;
     const spawnRace = numCreeps > 2 ? this.getLocalSpawn() : gc.RACE_WORKER;
     if (spawnRace) {
         //console.log("about to spawn", spawnRace)
         race.spawnCreep(spawn, this.id, spawnRace);
         return true;
     }
-
-    let buildList = Memory.policies[this.id].builds;
-    if (!buildList || buildList.length < 1)
-        return true;
-
-    let i = -1;
-    do {
-        i++;
-        result = spawn.spawnCreep(buildList[i].body, Memory.nextCreepId.toString(), { dryRun: true });
-    } while( i < buildList.length && result !== OK)
-    if (result === OK) {
-        if (OK === race.spawn(
-            spawn,
-            buildList[i].body,
-            buildList[i].race,
-            buildList[i].memory
-        )) {
-            Memory.policies[this.id].ForeignBuilds = buildList.splice(i,1)
-        }
-    }
-    return false;
-}
+    console.log("pp this.roomid", this.roomId, "all", JSON.stringify(this));
+    const queue = flag.getSpawnQueue(this.roomId);
+    return queue.spawnNext(spawn);
+};
 
 
 
@@ -217,7 +206,7 @@ Policy.prototype.getLocalSpawn = function () {
     console.log("porters", porters, "0.25*workers", 0.25*(workers),"porters needed",portersNeeded);
     //console.log("PCs", PCs,"porters needed", budget.portersCsRoom(room, room, false)/PCs)
     //console.log("porters", porters, "workers", workers);
-   console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
+    console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
     if (porters + 0.25 * workers < budget.portersCsRoom(room, room, false) / PCs) {
         //console.log("about to build porter");
             if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)
@@ -230,7 +219,7 @@ Policy.prototype.getLocalSpawn = function () {
     }
 
     return build;
-}
+};
 
 Policy.prototype.build = function () {
     const room = Game.rooms[this.roomId];
@@ -243,7 +232,7 @@ Policy.prototype.build = function () {
         return;
     }
     this.actionActivityQueue(room);
-}
+};
 
 Policy.prototype.actionActivityQueue = function (room) {
     const rcl = room.controller.level;
@@ -273,10 +262,10 @@ Policy.prototype.actionActivityQueue = function (room) {
             this.actionActivityQueue(room);
         }
     } else {
-        //console.log("checked", activity, "result FALSE")
+        //console.log("checked", activity, "result FALSE about to activate", activity)
         this.buildFcs()[activity].build(room, activity, this.id);
     }
-}
+};
 
 Policy.prototype.buildFcs = function () {
     fc = {};
@@ -328,37 +317,43 @@ Policy.prototype.buildFcs = function () {
     newPolicy = {
         "build": activateNewPolicy,
         "check": checkPolicy,
-    }
+    };
     fc[gc.POLICY_EXPLORE] = newPolicy;
 
     fc[gc.ACTIVITY_FINISHED]  = {
         "build": function(){},
         "check": function(){ return true; },
-    }
+    };
     return fc;
-}
+};
 
 activateNewPolicy = function (room, activity, policyId)  {
+    console.log("pp activateNewPolicy room", room.name, "activity", activity, "policyId", policyId)
+    if ("activity" === "peace") {
+        console.log("room", room, "activity", activity, "policyid", policyId);
+        gf.fatalError("spamming peace policies")
+    }
     policy.activatePolicy(activity, {
         parentId: policyId
     })
-}
+};
 
 checkPolicy = function (room, activity, policyId)  {
+    console.log("pp in checkPolciy room", room.name, "activity", activity, "policyId", policyId)
     for ( let i in Memory.policies) {
         if (Memory.policies[i].type === activity &&
             Memory.policies[i].parentId === policyId) {
-            return ture;
+            return true;
         }
     }
     return false;
-}
+};
 
 newEconomicInititive = function (room, activity, policyId)  {
     if (!Memory.policies[policyId].initiatives.includes(activity)) {
         Memory.policies[policyId].initiatives.push(activity);
     }
-}
+};
 
 checkInitiative = function (room, activity, policyId)  {
     if (!Memory.policies[policyId].initiatives) {
@@ -366,7 +361,7 @@ checkInitiative = function (room, activity, policyId)  {
         return false;
     }
     return Memory.policies[policyId].initiatives.includes(activity);
-}
+};
 
 isControllerContainerFinished = function (room) {
     const flag = Game.flags[room.controller.id];
@@ -375,7 +370,7 @@ isControllerContainerFinished = function (room) {
         return false;
     }
     return undefined !== state.findContainerAt(gf.roomPosFromPos(pos, room.name));
-}
+};
 
 buildControllerContainer = function (room) {
     const controllerFlag = Game.flags[room.controller.id];
@@ -384,7 +379,7 @@ buildControllerContainer = function (room) {
     }
     let spots = economy.findMostFreeNeighbours(
         room, room.controller.pos, 2
-    )
+    );
     if (spots.length === 0) {
         return gf.fatalError("findMostFreeNeighbours cant get to controller");
     }
@@ -400,7 +395,7 @@ buildControllerContainer = function (room) {
         console.log("spot", JSON.stringify(spots[0]));
         gf.fatalError("controller container construction failed " + result.toString());
     }
-}
+};
 
 areSourceContainersFinished = function (room) {
     //console.log("in areSourceContainersFinished")
@@ -418,7 +413,7 @@ areSourceContainersFinished = function (room) {
         }
     }
     return true;
-}
+};
 
 buildSourceContainers = function (room) {
     //console.log("in buildSourceContainers")
@@ -430,14 +425,14 @@ buildSourceContainers = function (room) {
             buildSourceContainer(sources[i], flag);
         }
     }
-}
+};
 
 buildSourceContainer = function (source, flag) {
     //console.log("in buildSourceContainer no es")
 
     let spots = economy.findMostFreeNeighbours(
         source.room, source.pos, 1
-    )
+    );
     //console.log("buildSourceContainer spots", JSON.stringify(spots))
     if (spots.length === 0) {
         return gf.fatalError("findMostFreeNeighbours cant get to source");
@@ -453,7 +448,11 @@ buildSourceContainer = function (source, flag) {
         console.log("spot", JSON.stringify(spots[0]));
         gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
     }
-}
+};
+
+Policy.prototype.draftReplacment = function() {
+    return this
+};
 
 module.exports = Policy;
 

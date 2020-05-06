@@ -16,7 +16,7 @@ const budget = {
         for (let i in sources) {
             const distance = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad)
             //console.log("bu harvesterWsRoom distance",distance)
-            wsRoom += this.harvesterWsSource(5*sources[i].energyCapacity, distance);
+            wsRoom += this.harvesterWsSource(gc.SORCE_REGEN_LT*sources[i].energyCapacity, distance);
         }
         //console.log("bu harvesterWsRoom result", wsRoom)
         return wsRoom;
@@ -43,7 +43,7 @@ const budget = {
             //console.log("portersCsRoom distanceSourceSpawn", initial)
             const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad)
             //console.log("portersCsRoom distanceSourceController", repeat)
-            csRoom += this.porterCsSource(5*sources[i].energyCapacity, initial, repeat);
+            csRoom += this.porterCsSource(gc.SORCE_REGEN_LT*sources[i].energyCapacity, initial, repeat);
         }
         //console.log("bu portersCsRoom result", csRoom)
         return csRoom;
@@ -112,17 +112,17 @@ const budget = {
         const pathToControllerNoRoad = cache.path(home.controller, spawns, "controller", 1, false, force)
         for (let i in sources) {
             //console.log("nnr")
-            const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, 5*SOURCE_ENERGY_NEUTRAL_CAPACITY);
+            const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL][sources[i].id] = nnr;
             values[gc.ROOM_NEUTRAL]["setup"] += nnr.startUpCost;
             values[gc.ROOM_NEUTRAL]["profit"] += nnr.netEnergy;
             //console.log("nr")
-            const nr = this.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, 5*SOURCE_ENERGY_NEUTRAL_CAPACITY);
+            const nr = this.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL_ROADS][sources[i].id] = nr;
             values[gc.ROOM_NEUTRAL_ROADS]["setup"] += nr.startUpCost;
             values[gc.ROOM_NEUTRAL_ROADS]["profit"] += nr.netEnergy;
             //console.log("rnr")
-            const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, 5*SOURCE_ENERGY_CAPACITY);
+            const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED][sources[i].id] = rnr;
             values[gc.ROOM_RESERVED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_RESERVED]["profit"] += rnr.netEnergy;
@@ -130,7 +130,7 @@ const budget = {
             values[gc.ROOM_OWNED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_OWNED]["profit"] += rnr.netEnergy;
             //console.log("rr")
-            const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, 5*SOURCE_ENERGY_CAPACITY);
+            const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED_ROADS][sources[i].id] = rr;
             values[gc.ROOM_RESERVED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_RESERVED_ROADS]["profit"] += rr.netEnergy;

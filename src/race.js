@@ -22,8 +22,9 @@ const race = {
     body: function (race, ec) {
         const raceModule = require("race_" + race);
         const bodyCounts = raceModule.bodyCounts(ec)
-        if (!bodyCounts)
+        if (!bodyCounts){
             return undefined;
+        }
         let body = [];
 
         for (let i = 0; i < bodyCounts[WORK]; i++) {
@@ -31,7 +32,7 @@ const race = {
         }
         if (bodyCounts[MOVE] < 1) {
             console.log("body race", race, "ec",ec)
-            gf.fatalError("creep must have move part")
+            return undefined;
         }
         for (let i = 0; i < bodyCounts[MOVE]; i++) {
             body.push(MOVE);
@@ -40,6 +41,29 @@ const race = {
             body.push(CARRY);
         }
         return body;
+    },
+
+    partsFromBody: function(body, part) {
+        let count=0;
+        for (let i in body) {
+            if (body[i] === part) {
+                count++
+            }
+        }
+        return count;
+    },
+
+    ticksLeftByPart(policyId, race, part) {
+        const creeps = _.filter(Game.creeps, function (c) {
+            return c.memory.policyId === policyId
+                && race.getRace(c) === race
+        });
+        let lifeLeft = 0;
+        for (let i in creeps) {
+            const parts = this.partsFromBody(creep.body, part);
+            lifeLeft += creeps[i].ticksToLive * parts;
+        }
+        return lifeLeft;
     },
 
     workParts: function(creep) {
@@ -61,14 +85,16 @@ const race = {
         //console.log("spawnCreep race",race, "ec", spawn.room.energyCapacityAvailable)
         //console.log("spawnCreep race",race, "ec energyAvailablenumber", spawn.room.energyAvailable)
         const body = this.body(race, spawn.room.energyAvailable);
-        if (!body)
+        if (!body) {
             return undefined;
-        if (!race)
+        }
+        if (!race) {
             return gf.fatalError("trying to spawn creep with no race, spawn", spawn.name, "policy", policyId);
+        }
         const memory =  {
             policyId: policyId,
             state: race + "_idle"
-        }
+        };
         return this.spawn(spawn, body, race, memory);
     },
 

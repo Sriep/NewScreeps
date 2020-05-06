@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-//const flag = require("flag");
+const flag = require("flag");
 const state = require("state");
 
 function State (creep) {
@@ -44,14 +44,11 @@ State.prototype.enact = function () {
         }
     }
     // next room should now be an adjacent room
-    let flag = Game.flags[nextRoom];
-    if (!flag) {
-        flag = flag.flagRoom(nextRoom)
-    }
+    const flag = flag.getRoomFlag(nextRoom)
     state.switchToMoveTarget(
         this.creep,
         flag,
-        3,
+        4,
         gc.STATE_SCOUT_IDLE,
     );
 }

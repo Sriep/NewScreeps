@@ -31,7 +31,7 @@ State.prototype.enact = function () {
     const container = state.findCollectContainer(this.creep.room)
     //console.log("STATE_WORKER_IDLE container cap",  container.store.getUsedCapacity(RESOURCE_ENERGY) )
     if (container  && container.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        console.log("move to container", JSON.stringify(container.pos))
+        //console.log("move to container", JSON.stringify(container.pos))
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
             this.creep,

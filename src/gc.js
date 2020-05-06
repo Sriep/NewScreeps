@@ -28,6 +28,10 @@ const pgc = {
     // policies
     POLICY_PEACE: "peace",
     POLICY_EXPLORE: "explore",
+    POLICY_RCL1: "rcl1",
+    POLICY_WORKERS: "workers",
+    POLICY_HARVESTERS: "harvesters",
+    POLICY_PORTERS: "porters",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -159,6 +163,7 @@ const gc = {
         [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
         [
             pgc.POLICY_EXPLORE,
+            pgc.BUILD_EXTENSIONS,
             pgc.INITIATIVE_HARVESTER,
             pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
@@ -206,12 +211,27 @@ const gc = {
     // policies
     POLICY_PEACE: pgc.POLICY_PEACE,
     POLICY_EXPLORE: pgc.POLICY_EXPLORE,
+    POLICY_RCL1: pgc.POLICY_RCL1,
+    POLICY_WORKERS: pgc.POLICY_WORKERS,
+    POLICY_HARVESTERS: pgc.POLICY_HARVESTERS,
+    POLICY_PORTERS: pgc.POLICY_PORTERS,
     //POLICY_DEFENCE: "defence",
     //POLICY_RESCUE: "rescue",
     //POLICY_BUILD: "build",
     //POLICY_NEUTRAL_ROOM: "neutral_room",
     //POLICY_BUILD_SPAWN: "build_spawn",
 
+    // spawn priories
+    SPAWN_PRIORITY_CRITICAL: 0,
+    SPAWN_PRIORITY_LOCAL: 1,
+    SPAWN_PRIORITY_FOREIGN: 2,
+    SPAWN_PRIORITY_MISC: 3,
+    SPAWN_PRIORITY_NONE: 4,
+    // spawnResults
+    QUEUE_EMPTY: -100,
+    QUEUE_HALTED: -101,
+    QUEUE_INVALID_ARGS: -102,
+    QUEUE_NOT_FOUND: -103,
 
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 
@@ -308,6 +328,15 @@ const gc = {
             "-2" : [ { dx : -1, dy : -1 } ]
         }
     },
+
+    //creep body bases
+    WMC_COST: BODYPART_COST[WORK] + BODYPART_COST[MOVE] + BODYPART_COST[CARRY],
+    PORTER_WORKER_CARRY_RATIO: 8/3,
+    HARVESTER_WORKER_RATIO: 8/5,
+
+
+    //screeps costants
+    SORCE_REGEN_LT: CREEP_LIFE_TIME/ENERGY_REGEN_TIME,
 
     END : "end"
 };

@@ -14,7 +14,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_PORTER_WITHDRAW");
+    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW");
     let target;
     if (this.creep.memory.targetId) {
         target = Game.getObjectById(this.creep.memory.targetId);
@@ -51,7 +51,7 @@ State.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
-    state.switchTo(creep, gc.STATE_PORTER_FULL_IDLE);
+    state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
 }
 
 module.exports = State;
