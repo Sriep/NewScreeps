@@ -6,10 +6,10 @@
 
 const pgc = {
     // Economy
-    INITIATIVE_WORKER: "worker",
-    INITIATIVE_HARVESTER: "harvester",
-    INITIATIVE_PORTER: "porter",
-    INITIATIVE_UPGRADER: "upgrader",
+    //INITIATIVE_WORKER: "worker",
+    //INITIATIVE_HARVESTER: "harvester",
+    //INITIATIVE_PORTER: "porter",
+    //INITIATIVE_UPGRADER: "upgrader",
     // builds
     // storage structures
     BUILD_EXTENSIONS: "build_extensions",
@@ -58,7 +58,7 @@ const pgc = {
     ],
 
     ZERO_MOVES: [{x:0, y:0}],
-}
+};
 
 const gc = {
 
@@ -116,10 +116,6 @@ const gc = {
 
     MAX_STATE_STACK: 5,
 
-    // Economy settings
-    RPC_HARVESTERS: [0, 7, 7, 5, 3, 3, 3, 2, 2],
-    RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
-
     //flag colours
     FLAG_PERMANENT_COLOUR: COLORS_ALL[COLOR_BLUE],
     FLAG_SOURCE_COLOUR: COLORS_ALL[COLOR_YELLOW],
@@ -159,27 +155,27 @@ const gc = {
     // Economy
     // Building by RCL for room
     BUILD_ORDER_RCL: [
-        [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
-        [ pgc.INITIATIVE_WORKER, pgc.ACTIVITY_FINISHED ],
+        [ pgc.ACTIVITY_FINISHED ],
+        [ pgc.POLICY_RCL1, pgc.ACTIVITY_FINISHED ],
         [
+            pgc.POLICY_WORKERS,
             pgc.POLICY_EXPLORE,
             pgc.BUILD_EXTENSIONS,
-            pgc.INITIATIVE_HARVESTER,
+            pgc.POLICY_HARVESTERS,
             pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
-            pgc.INITIATIVE_PORTER,
-            pgc.INITIATIVE_UPGRADER,
+            pgc.POLICY_PORTERS,
             pgc.ACTIVITY_FINISHED
         ],
         [
             pgc.BUILD_EXTENSIONS,
-           // "build_tower",
+            // pgc.BUILD_TOWER, //todo
             pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
             pgc.BUILD_ROAD_SOURCE_SPAWN,
             pgc.BUILD_ROAD_SOURCE_SOURCE,
             pgc.BUILD_ROAD_SOURCE_CONTROLLER,
             pgc.BUILD_ROAD_SPAWN_CONTROLLER,
-            // "build_road_source_towers", todo
+            // pgc.BUILD_ROAD_SOURCE_TOWERS, //todo
             pgc.ACTIVITY_FINISHED
         ],
         [  pgc.ACTIVITY_FINISHED ],
@@ -188,11 +184,18 @@ const gc = {
         [  pgc.ACTIVITY_FINISHED ],
         [  pgc.ACTIVITY_FINISHED ],
     ],
+    ECONOMIES: [
+        pgc.POLICY_PEACE,
+        pgc.POLICY_RCL1,
+        pgc.POLICY_WORKERS,
+        pgc.POLICY_HARVESTERS,
+        pgc.POLICY_PORTERS,
+    ],
     // Economy
-    INITIATIVE_WORKER: pgc.INITIATIVE_WORKER,
-    INITIATIVE_HARVESTER: pgc.INITIATIVE_HARVESTER,
-    INITIATIVE_PORTER: pgc.INITIATIVE_PORTER,
-    INITIATIVE_UPGRADER: pgc.INITIATIVE_UPGRADER,
+    //INITIATIVE_WORKER: pgc.INITIATIVE_WORKER,
+    //INITIATIVE_HARVESTER: pgc.INITIATIVE_HARVESTER,
+    //INITIATIVE_PORTER: pgc.INITIATIVE_PORTER,
+    //INITIATIVE_UPGRADER: pgc.INITIATIVE_UPGRADER,
     // builds
     // storage structures
     BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
@@ -333,6 +336,7 @@ const gc = {
     WMC_COST: BODYPART_COST[WORK] + BODYPART_COST[MOVE] + BODYPART_COST[CARRY],
     PORTER_WORKER_CARRY_RATIO: 8/3,
     HARVESTER_WORKER_RATIO: 8/5,
+    RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
 
 
     //screeps costants

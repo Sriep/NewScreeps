@@ -4,11 +4,9 @@
  * @author Piers Shepperson
  */
 
-const gf = require("gf");
 const gc = require("gc");
 const flag = require("flag");
-const race = require("race");
-const race_worker = require("race_worker")
+const race_worker = require("race_worker");
 
 function Policy  (data) {
     this.type = gc.POLICY_RCL1;
@@ -38,11 +36,7 @@ Policy.prototype.enact = function () {
         );
         return;
     }
-
-    const creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
-            && race.getRace(c) === gc.RACE_WORKER
-    });
+    const creeps = policy.getCreeps(policyId, gc.RACE_WORKER);
     let lifeLeft = 0;
     for (let i in creeps) {
         lifeLeft += creeps[i].ticksToLive;
@@ -63,13 +57,40 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.draftReplacment = function() {
-    const rcl = Game.rooms[this.home].controller.level;
-    if (rcl > 1) {
-        flag.getSpawnQueue(this.home).halt(gc.SPAWN_PRIORITY_COUNT);
-        const policyWorkers = require("policy_worker");
-        return new policyWorkers({parentId: this.parentId})
-    }
     return this
 };
 
 module.exports = Policy;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -137,10 +137,6 @@ const economy = {
         return Math.ceil(this.totalSourceCapacity(room) / energyPerPorter);
     },
 
-    estimateHomeHarvesters : function(room) {
-        return gc.RPC_HARVESTERS[room.controller.level]
-    },
-
     porterShortfall: function (policy) {
         const existingPorterParts = this.existingPorterParts(policy);
         const portersNoCommitmentsEnergyLT = this.energyLifeTime(Game.rooms[policy.roomId], 1, "upgrader"); //todo what should this be?

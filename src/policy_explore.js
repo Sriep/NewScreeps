@@ -4,16 +4,12 @@
  * @author Piers Shepperson
  */
 const budget = require("budget");
-const gf = require("gf");
 const race = require("race");
 const gc = require("gc");
 const flag = require("flag");
 
 function Policy  (data) {
     this.type = gc.POLICY_EXPLORE;
-    if (!data) {
-        return gf.fatalError("create Policy peace with no data");
-    }
     this.id = data.id;
     this.parentId = data.parentId;
     this.home = Memory.policies[this.parentId].roomId;
@@ -23,7 +19,7 @@ Policy.prototype.initilise = function () {
     console.log("initilise explore policy");
 
     const data = {
-        body:   race.body(gc.RACE_SCOUT, 50),
+        body:   race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
         memory: {home : this.roomName},
         name: gc.RACE_SCOUT,
     };
@@ -42,9 +38,7 @@ Policy.prototype.initilise = function () {
 Policy.prototype.enact = function () {
     console.log("enact explore policy");
     const policyId = this.id;
-    let creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
-    });
+    const creeps = policy.getCreeps(policyId, gc.RACE_SCOUT);
     for (let i in creeps) {
         const flag = Game.flags[creeps[i].room.name];
         if (fag.explored) {

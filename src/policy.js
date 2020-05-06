@@ -15,11 +15,15 @@ const policy = {
         this.checkRoomPolicies();
         for (let id in Memory.policies) {
             const policyData = Memory.policies[id];
-            const policyConstructor = require("policy_" + policyData.type);
-            const policy = new policyConstructor(policyData);
-            policy.enact();
+            const Policy = require("policy_" + policyData.type);
+            const policy = new Policy(policyData);
+
             const replacement = policy.draftReplacment();
             if (replacement) {
+                if (replacement.type !== policy.type) {
+                    replacement.policy.initilise();
+                }
+                replacement.enact();
                 Memory.policies[id] = replacement;
             } else {
                 delete Memory.policies[id];
@@ -40,6 +44,25 @@ const policy = {
         }
     },
 
+    isPolicy: function(parentId, type) {
+        for ( let i in Memory.policies) {
+            if (Memory.policies[i].type === type &&
+                Memory.policies[i].parentId === parentId) {
+                return true;
+            }
+        }
+    },
+
+    getPolicy: function(id) {
+        const data = Memory.policies[id];
+        const Policy = require("policy_" + data.type);
+        return new Policy(data);
+    },
+
+    savePolicy: function(policy) {
+        Memory[policy.id] = policy;
+    },
+
     getNextPolicyId: function() {
         if (Memory.nextPolicyId === undefined) {
             Memory.nextPolicyId = 1;
@@ -49,12 +72,12 @@ const policy = {
     },
 
     activatePolicy: function(policyType, data) {
-        console.log("policy activatePolicy type", policyType, "data", JSON.stringify(data))
+        console.log("policy activatePolicy type", policyType, "data", JSON.stringify(data));
         data.id = this.getNextPolicyId();
         const policyConstructor = require("policy_" + policyType);
         const policy = new policyConstructor(data);
         if (data.id > 3) {
-            console.log("policytype", policyType, "data", JSON.stringify(data))
+            console.log("policytype", policyType, "data", JSON.stringify(data));
             gf.fatalError("activatePolicy tempory stop policy spamming data id", data.id)
         }
         Memory.policies[policy.id] = policy;
@@ -64,10 +87,49 @@ const policy = {
             }
         } catch (e) {
             console.log(e);
-            delete Memory.policies[policy.id]
+            delete Memory.policies[policy.id];
             return undefined;
         }
         return policy.id;
+    },
+
+    replacePolices: function(policyType, data, parentId, relaceList) {
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].parentId === parentId) {
+                if (parentId.type in relaceList) {
+                    delete Memory.policies[id];
+                }
+            }
+        }
+        this.activatePolicy(policyType, data);
+    },
+
+    hasChild(parentId, typeArray) {
+        if (!parentId || !typeArray) {
+            return false;
+        }
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].parentId === parentId) {
+                if (parentId.type in typeArray) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+    getCreeps(policyId, race) {
+        if (race) {
+            return _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId === policyId
+            });
+        } else {
+            return _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId === policyId
+                    && race.getRace(creep) === race
+            });
+        }
+
     },
 
     reassignCreeps: function (oldPolicy, newPolicy) {

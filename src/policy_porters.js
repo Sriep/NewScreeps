@@ -3,7 +3,6 @@
  * Created by piers on 05/05/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
@@ -48,10 +47,7 @@ Policy.prototype.enact = function () {
     const cWorkerLife = race.ticksLeftByPart(policyId, gc.RACE_WORKER, CARRY);
     const cPorterLife = race.ticksLeftByPart(policyId, gc.RACE_PORTER, CARRY);
     const budgetHarvesterWsLt = budget.harvesterWsRoom(room, room, false)*CREEP_LIFE_TIME;
-    const budgetCsLt = budget.portersCsRoom(room, room, false)*CREEP_LIFE_TIME;
 
-    const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
-    //const cToSupportExistingWLt = budgetCsLt * wHProportionOfBudget;
     const cLife = cWorkerLife + cPorterLife;
     const harvestingWs = Math.min(wHarvesterLife, budgetHarvesterWsLt);
 
@@ -81,10 +77,7 @@ Policy.prototype.enact = function () {
     }
 
     if (wHarvesterLife<budgetHarvesterWsLt) {
-        const harvesters = _.filter(Game.creeps, function (c) {
-            return c.memory.policyId === policyId
-                && race.getRace(c) === gc.RACE_HARVESTER
-        });
+        const harvesters = policy.getCreeps(policyId, gc.RACE_HARVESTER);
         if (harvesters < state.countHarvesterPosts(room).length) {
             policy.sendOrderToQueue(
                 room,

@@ -3,10 +3,8 @@
  * Created by piers on 05/05/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
-const economy = require("economy");
 
 function Policy  (data) {
     this.type = gc.POLICY_HARVESTERS;
@@ -63,10 +61,7 @@ Policy.prototype.enact = function () {
     }
 
     if (wHarvesterLife<budgetHarvesterWsLt) {
-        const harvesters = _.filter(Game.creeps, function (c) {
-            return c.memory.policyId === policyId
-                && race.getRace(c) === gc.RACE_HARVESTER
-        });
+        const harvesters = policy.getCreeps(policyId, gc.RACE_HARVESTER);
         if (harvesters < state.countHarvesterPosts(room).length) {
             policy.sendOrderToQueue(
                 room,

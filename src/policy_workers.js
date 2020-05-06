@@ -3,7 +3,6 @@
  * Created by piers on 05/05/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
@@ -33,10 +32,7 @@ Policy.prototype.enact = function () {
     }
 
     const energy = room.energyAvailable;
-    const creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
-            && race.getRace(c) === gc.RACE_WORKER
-    });
+    const creeps = policy.getCreeps(policyId, gc.RACE_WORKER);
 
     const workers = creeps.length;
     if (workers > economy.totalSourceAccessPointsRoom(room)+2) { // +2 guess
@@ -72,3 +68,36 @@ Policy.prototype.draftReplacment = function() {
 };
 
 module.exports = Policy;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
