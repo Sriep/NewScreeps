@@ -6,6 +6,7 @@
 
 const gc = require("gc");
 const gf = require("gf");
+const flag = require("flag");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,
@@ -53,16 +54,41 @@ const race = {
         return count;
     },
 
+    partsFromBody2: function(body, part) {
+        let count=0;
+        for (let i in body) {
+            if (body[i].type === part) {
+                count++
+            }
+        }
+        return count;
+    },
+
     ticksLeftByPart(policyId, race, part) {
+        console.log("ticksLeftByPart policyId", policyId, "race", race, "part", part);
+
         const creeps = _.filter(Game.creeps, function (c) {
             return c.memory.policyId === policyId
-                && race.getRace(c) === race
+                && race === c.name.split("_")[0]
         });
+        //console.log("ticksLeftByPart creeps lenght", creeps.length);
         let lifeLeft = 0;
-        for (let i in creeps) {
-            const parts = this.partsFromBody(creep.body, part);
-            lifeLeft += creeps[i].ticksToLive * parts;
+        for (let creep of creeps) {
+            const parts = this.partsFromBody2(creep.body, part);
+            //console.log("1parts", creep, parts,creep.ticksToLive, JSON.stringify(creep.body),"part",part)
+            lifeLeft += creep.ticksToLive * parts;
         }
+        //console.log("ticksLeftByPart lifeLeft", lifeLeft);
+
+        //let lifeLeft2 = 0;
+        //for (let creep in creeps) {
+        //    const parts = this.partsFromBody2(creeps[creep].body, part);
+        //    console.log("2parts", creep, parts,creeps[creep].ticksToLive,"body",
+        //        JSON.stringify(creeps[creep].body),"part",part );
+        //    lifeLeft2 += creeps[creep].ticksToLive * parts;
+        //}
+        //console.log("ticksLeftByPart lifeLeft2", lifeLeft2);
+
         return lifeLeft;
     },
 
@@ -98,12 +124,22 @@ const race = {
         return this.spawn(spawn, body, race, memory);
     },
 
+    sendOrderToQueue : function(room, cRace, energy, policyId, priority) {
+        const data = {
+            body: this.body(cRace, energy),
+            name: cRace,// + "_" + energy.toString(),
+        };
+        const queue = flag.getSpawnQueue(room.name);
+        return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
+    },
+
     spawnWorker: function (spawn, policyId) {
         this.spawnCreep(spawn, policyId, gc.RACE_WORKER, gc.STATE_EMPTY_IDLE)
     },
 
     spawn: function(spawn, body, race, memory) {
         const name = race + "_" + this.nextCreepId();
+        console.log("race spawn body|", JSON.stringify(body), "|name|",name, "|opts|", JSON.stringify({memory: memory }));
         const result = spawn.spawnCreep(body, name, {memory: memory });
         //console.log("spawn creep result", result, "body", JSON.stringify(body));
         switch (result) {

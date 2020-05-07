@@ -8,132 +8,171 @@ const flag = require("flag");
 
 function SpawnQueue  (roomName) {
     this.home = roomName;
-    const flagHome = flag.getRoomFlag(roomName);
-    this.queue = flagHome.memory.spawnQueue;
-    if (!this.queue) {
+    const data = flag.getRoomFlag(roomName).memory.spawnQueue;
+    //console.log("data", JSON.stringify(data));
+    if (data) {
+        this.halted = data.halted ? data.halted : gc.SPAWN_PRIORITY_NONE;
+        this.spawns = data.spawns;
+        this.nextOrderId = data.nextOrderId ? data.nextOrderId : 0;
+        this.nextCreepId = data.nextCreepId ? data.nextCreepId : 0;
+    } else {
         this.clear();
+        this.nextOrderId = 0;
+        this.nextCreepId = 0;
     }
+    //console.log("SpawnQueue, constructor after", JSON.stringify(this));
 }
 
-SpawnQueue.prototype.spawnNext = function (spawn) {
-    for (let i of this.queue.spawns ) {
-        if (i <= this.queue.halted) {
+SpawnQueue.prototype.clear = function () {
+    this.halted = gc.SPAWN_PRIORITY_NONE;
+    this.spawns = [];
+    for (let i = 0 ; i < gc.SPAWN_PRIORITY_NONE; i++ ) {
+        this.spawns.push({});
+    }
+    this.save();
+};
+
+SpawnQueue.prototype.spawnNext = function (spawnObj) {
+    for ( let i = gc.SPAWN_PRIORITY_CRITICAL ; i < gc.SPAWN_PRIORITY_NONE ; i++ ) {
+        if (i >= this.halted) {
+            console.log("halted at", JSON.stringify(i))
             return gc.QUEUE_HALTED;
         }
-        while (this.queue.spawns[i].length > 0) {
-            const data = this.queue.spawns[i][0].data;
-            const name = data.name + "_" + this.nextCreepId();
-            switch (this.spawnDryRun(spawn, data.body, name, data.opts)) {
-                case OK: {
-                    result = spawn.spawnCreep(data.body, name, data.opts);
-                    if (result !== OK) {
-                        console.log("body",data.body, "name", name, "opts", optsDryRun);
-                        return gf.fatalError("spawn gives different result to dry run", result)
-                    }
-                    Memory.nextCreepId = Memory.nextCreepId +1;
-                    this.queue.spawns[i].splice();
-                    this.save();
-                    return OK;
-                } // The operation has been scheduled successfully.
-                case  ERR_NOT_OWNER:            // You are not the owner of this spawn.
-                    console.log("body",data.body, "name", name, "opts", optsDryRun);
-                    return gf.fatalError("ERR_NOT_OWNER");
-                case ERR_NAME_EXISTS:           // There is a creep with the same name already.
-                    console.log("body",data.body, "name", name, "opts", optsDryRun);
-                    return gf.fatalError("ERR_NAME_EXISTS");
-                case ERR_BUSY:                  // The spawn is already in process of spawning another creep.
-                    return ERR_BUSY;
-                case ERR_NOT_ENOUGH_ENERGY:     // The spawn and its extensions contain not enough energy to create a creep with the given body.
-                    return ERR_NOT_ENOUGH_ENERGY;
-                case ERR_INVALID_ARGS:          // Body is not properly described or name was not provided.
-                    console.log("build returned error ERR_INVALID_ARGS deleting", result, "data", JSON.stringify(data));
-                    break;
-                case ERR_RCL_NOT_ENOUGH:        // Your Room Controller level is insufficient to use this spawn.
-                    console.log("build returned error ERR_RCL_NOT_ENOUGH deleting", result, "data", JSON.stringify(data));
-                    break;
-                default:
-                    console.log("body",data.body, "name", name, "opts", optsDryRun)
-                    return gf.fatalError("spawnCreep unrecognised return value", result);
+        for ( let id in this.spawns[i]) {
+            console.log("spawnNext id", id, "data", JSON.stringify(this.spawns[i][id]))
+            const data = this.spawns[i][id];
+            if  (!data) { // probably should not happen.
+                console.log("spawnNext if  (!data) had data", data,"deleting",i,id);
+                delete this.spawns[i][id];
+                continue;
             }
-            this.queue.spawns[i].splice();
-            this.save();
+            const name = data.name + "_" + this.nextCreepId.toString();
+            console.log("spawnNext dry run spawn",spawnObj.name, "body",JSON.stringify(data.body,),
+                "name",name, "opts",JSON.stringify(data["opts"]));
+            //const result = this.spawnDryRun(spawnObj, data.body, name, data.opts );
+            const result = spawnObj.spawnCreep(data.body, name, data.opts);
+            //result = this.spawnDryRun(spawnObj, data.body, name, {memory: data.opts.memory} );
+            //result = this.spawnDryRun(spawnObj, data.body, "my_test-name", {memory: {"policyId":1, "state":"worker_idle"} });
+            //result = this.spawnDryRun(spawnObj, data.body, "my_test-name2");
+            if (result === OK) {
+                this.nextCreepId = this.nextCreepId +1;
+                console.log("spawnNext result", result, "OK",OK,"nextCreepId", this.nextCreepId)
+            }
+            console.log("spawnNext result", result);
+            if (result === ERR_BUSY || result === ERR_NOT_ENOUGH_ENERGY) {
+                console.log("spawnNext result", result, "Try again later");
+                return result;
+            }
+            console.log("spawnNext result", result,"OK", OK);
+            delete this.spawns[i][id];
+            if (result === OK) {
+                //const realResult = spawnObj.spawnCreep(data.body, name, data.opts);
+                //console.log("spawnNext realResult", realResult);
+                if (result !== OK) {
+                    console.log("body",data.body, "name", name, "opts", optsDryRun);
+                    return gf.fatalError("spawn gives different result to dry run", result)
+                }
+                console.log("spawnNext spawnCreep returned", result);
+                this.nextCreepId = this.nextCreepId +1;
+                console.log("spawnNext nextCreepId", this.nextCreepId)
+                this.save();
+                return OK;
+            }
+            if (result === ERR_NOT_OWNER && result !== ERR_NAME_EXISTS) {
+                // should not happen
+                console.log("body",data.body, "name", name, "opts", optsDryRun);
+                return gf.fatalError("spawnCreep failed result");
+            }
+            // result === ERR_INVALID_ARGS || result === ERR_RCL_NOT_ENOUGH
+            console.log("spawnNext Removed bad spawn order", JSON.stringify(this.spawns[i][id], "spawnCrep result ", result))
+            console.log("spawnNext loop", data,"deleting",i,id);
+            delete this.spawns[i][id];
         }
     }
+    this.save();
+    console.log("spawnNext empty queue", JSON.stringify(this));
     return gc.QUEUE_EMPTY;
 };
 
+SpawnQueue.prototype.spawnDryRun = function (spawnObj, body, name, opts) {
+    console.log("spawnDryRun opts", JSON.stringify(opts));
+    let optsDryRun = opts;
+    optsDryRun.dryRun = true;
+    console.log("spawnDryRun data", JSON.stringify(body),"naem",name,"optsDryRun",JSON.stringify(optsDryRun));
+    const result = spawnObj.spawnCreep(body, name, optsDryRun);
+    console.log("spawnDryRun result", result);
+    return result;
+};
+
 SpawnQueue.prototype.addSpawn = function (data, priority, policyId, startState) {
+    //console.log("addSpawn now", JSON.stringify(this))
+    //console.log("order data", JSON.stringify(data), "priority", priority, "policyid", policyId, "startstate", startState);
     if (0 < priority || priority >= gc.SPAWN_PRIORITY_COUNT) {
         return gc.QUEUE_INVALID_ARGS;
     }
-    if (!data || !data.body || data.name === undefied || !policyId || !startState)  {
+    if (!data || !data.body || !data.name || !policyId || !startState)  {
         return gc.QUEUE_INVALID_ARGS;
     }
     if (!data.opts) {
         data.opts = {};
+        data.opts["memory"] = {}
     }
-    if (!data.opts.memory) {
-        data.opts.memory = {};
+    if (!data.opts["memory"]) {
+        data.opts["memory"] = {};
     }
-    data[opts][memory][policyId] = policyId;
-    data[opts][memory][state] = startState;
-    const id = this.queue.NextId;
-    this.queue.spawns[priority].push({data: data, id: id});
-    this.queue.NextId += 1;
+    data.opts.memory["policyId"] =  policyId;
+    data.opts.memory["state"] = startState;
+    console.log("addSpawn memory", JSON.stringify(data.opts.memory));
+    const id = this.nextOrderId;
+    this.spawns[priority][id] = data;
+    this.nextOrderId += 1;
     this.save();
+    console.log("addSpawn after adding data", JSON.stringify(data));
+    console.log("addSpawn now queue is", JSON.stringify(this));
     return id;
 };
 
 SpawnQueue.prototype.halt = function (priority) {
-    if (0 < priority || priority >= gc.SPAWN_PRIORITY_COUNT) {
+    //console.log("SpawnQueue halt", priority);
+    if (0 < priority || priority >= gc.SPAWN_PRIORITY_NONE) {
         return gc.QUEUE_INVALID_ARGS;
     }
-    this.queue.halted = priority;
+    this.halted = priority;
+    console.log("SpawnQueue halted",priority);
     this.save();
     return OK;
 };
-SpawnQueue.prototype.clear = function () {
-    this.queue = {
-        halted: gc.SPAWN_PRIORITY_NONE,
-        nextId: 0,
-        spawns: [],
-    };
-    for (let i = 0 ; i<gc.SPAWN_PRIORITY_NONE; i++ ) {
-        this.queue.spawns.push([]);
-    }
-    this.save;
-};
 
 SpawnQueue.prototype.removeSpawn = function (id) {
-    for (let i of this.queue.spawns ) {
-        for (let j of this.queue.spawns[i]) {
-            if (this.queue.spawns[i][j][id] === id) {
-                this.queue.spawns[i].splice(j, 1);
-                this.save()
-                return OK;
-            }
+    for (let i in this.spawns ) {
+        if (this.spawns[i][id]) {
+            console.log("spawnNext removeSpawn", data,"deleting",i,id);
+            delete this.spawns[i][id];
+            this.save();
+            return OK;
         }
     }
-    this.save();
     return gc.QUEUE_NOT_FOUND
 };
 
 SpawnQueue.prototype.clearMy = function (policyId, priority) {
     let removed =0;
     if (priority) {
-        for (let j of this.queue.spawns[priority]) {
-            if (this.queue.spawns[i][j][data][opts][memory][policyId] === policyId) {
-                this.queue.spawns[i].splice(j, 1);
+        for (let j in this.spawns[priority]) {
+            if (this.spawns[i][j]["opts"]["memory"]["policyId"] === policyId) {
+                console.log("spawnNext clearMy 1", data,"deleting",i,id);
+                delete this.spawns[i][j];
                 removed++;
             }
         }
         this.save();
         return removed;
     }
-    for (let i of this.queue.spawns) {
-        for (let j of this.queue.spawns[i]) {
-            if (this.queue.spawns[i][j][data][opts][memory][policyId] === policyId) {
-                this.queue.spawns[i].splice(j, 1);
+    for (let i in this.spawns) {
+        for (let j in this.spawns[i]) {
+            if (this.spawns[i][j]["opts"]["memory"]["policyId"] === policyId) {
+                console.log("spawnNext clearMy 2 deleting",i,j);
+                delete this.spawns[i][j];
                 removed++;
             }
         }
@@ -142,15 +181,9 @@ SpawnQueue.prototype.clearMy = function (policyId, priority) {
     return removed;
 };
 
-SpawnQueue.prototype.spawnDryRun = function (spawn, data, name, opts) {
-    let optsDryRun = opts;
-    optsDryRun.dryRun = true;
-    return spawn.spawnCreep(data.body, name, optsDryRun);
-};
-
 SpawnQueue.prototype.save = function () {
-    const flag = flag.getRoomFlag(this.home);
-    flag.memory.spawnQueue = this.queue;
+    const homeFlag = flag.getRoomFlag(this.home);
+    homeFlag.memory.spawnQueue = this;
 };
 
 SpawnQueue.prototype.orders = function (policyId, priority) {
@@ -159,9 +192,9 @@ SpawnQueue.prototype.orders = function (policyId, priority) {
     }
     const orders = [];
     for (let i = 0; i < priority ; i++) {
-        for (let j of this.queue.spawns[i]) {
-            if (this.queue.spawns[i][j][id] === policyId) {
-                orders.push(this.queue.spawns[i][j])
+        for (let j in this.spawns[i]) {
+            if (this.spawns[i][j]["opts"]["memory"]["policyId"] === policyId) {
+                orders.push(this.spawns[i][j])
             }
         }
     }

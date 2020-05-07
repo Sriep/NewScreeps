@@ -10,16 +10,16 @@ const state = require("state");
 const budget = require("budget");
 
 function State (creep) {
-    this.creep = creep
-    this.state = gc.STATE_HARVESTER_IDLE
-    this.policyId = creep.memory.policyId
+    this.creep = creep;
+    this.state = gc.STATE_HARVESTER_IDLE;
+    this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomId;
 }
 
 State.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_HARVESTER_IDLE")
     const home = Game.rooms[this.homeId];
-    const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId)
+    const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId);
     const wBudget = budget.harvesterWsRoom(home, home);
     //console.log("wsHarvesting",wsHarvesting,">= wBudget", wBudget);
 
@@ -35,9 +35,10 @@ State.prototype.enact = function () {
             }
         }
     }
+
     sourceId = state.atHarvestingPostWithUndepletedSourceId(this.creep.pos);
     if (sourceId) {
-        harvesters = state.getHarvestingHarvesters(this.creep.policyId)
+        harvesters = state.getHarvestingHarvesters(this.creep.policyId);
         for (let i in harvesters) {
             if (harvester.memory.targetPos.x === this.creep.x
                 && harvester.memory.targetPos.y === this.creep.y) {

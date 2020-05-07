@@ -15,215 +15,34 @@ function Policy  (data) {
     this.type = gc.POLICY_PEACE;
     this.id = data.id;
     this.roomId = data.roomId;
-    this.children = data.children;
-    this.rcl = data.rcl;
-    this.activityIndex = data.activityIndex;
-    //this.initiatives = data.initiatives;
+    this.childTypes = data.childTypes ? data.childTypes : [];
+    this.rcl = data.rcl ? data.rcl : Game.rooms[this.roomId].controller.level;
+    this.activityIndex = data.activityIndex ? data.activityIndex : 0;
 }
 
 Policy.prototype.initilise = function () {
-    console.log("in policy initilise", this.id);
-    //if (!this.initiatives) {
-    //    this.initiatives = []
-    //}
-    if (!this.children) {
-        this.children = [];
-    }
-    if (!this.rcl) {
-        this.rcl = Game.rooms[this.roomId].controller.level;
-    }
-    if (!this.activityIndex) {
-        this.activityIndex = 0;
-    }
     return true;
 };
 
 Policy.prototype.enact = function () {
     this.build();
     this.spawnQueue();
-    /*
-    if (this.initiatives.includes(gc.INITIATIVE_HARVESTER)) { // todo smarten up logic
-        this.spawn();
-    } else {
-        this.spawnWorkers();
-    }
-    */
 };
 
 Policy.prototype.spawnQueue = function () {
+    //console.log("in policy peace spawnQueue");
     const room = Game.rooms[this.roomId];
     const spawns = room.find(FIND_MY_SPAWNS);
-    for (let spawn in spawns) {
-        if (spawns[spawn].spawning === null) {
+    for (let spawn of spawns) {
+        if (spawn.spawning === null) {
+            console.log("in policy peace about to call spawnNext");
+            //const race = require("race");
+            //race.spawnWorker(spawn, this.id);
             flag.getSpawnQueue(this.roomId).spawnNext(spawn);
         }
     }
 };
-/*
-Policy.prototype.spawn = function () {
-    //console.log("in spawn policypeace", this.id)
-    const room = Game.rooms[this.roomId];
-    const spawns = room.find(FIND_MY_SPAWNS);
-    for (let spawn in spawns) {
-        if (spawns[spawn].spawning === null) {
-            //console.log("about to do donextspawn")
-            if (!this.doNextSpawn(spawns[spawn])) {
-                return;
-            }
-        }
-    }
-};
 
-Policy.prototype.spawnWorkers = function () {
-    //console.log("in spawnWorkers policy", this.id)
-    const room = Game.rooms[this.roomId];
-    const spawns = room.find(FIND_MY_SPAWNS);
-    for (let spawn in spawns) {
-        if (spawns[spawn].spawning === null) {
-            //console.log("porterShortfall",economy.porterShortfall(this))
-            if (0 < economy.porterShortfall(this)) {
-                let creepCount = 0;
-                //const policyId = this.id;
-                for (let creep in Game.creeps) {
-                    if (Game.creeps[creep].memory.policyId === this.id)
-                        creepCount++;
-                }
-                //console.log("creep count", creepCount, "accesspoints", economy.totalSourceAccessPointsRoom(room))
-                if (creepCount < economy.totalSourceAccessPointsRoom(room)) {
-                    race.spawnWorker(spawns[spawn], this.id);
-                }
-            }
-        }
-    }
-};
-
-Policy.prototype.doNextSpawn = function (spawn) {
-    const numCreeps = Object.getOwnPropertyNames(Game.creeps).length;
-    const spawnRace = numCreeps > 2 ? this.getLocalSpawn() : gc.RACE_WORKER;
-    if (spawnRace) {
-        //console.log("about to spawn", spawnRace)
-        race.spawnCreep(spawn, this.id, spawnRace);
-        return true;
-    }
-    console.log("pp this.roomid", this.roomId, "all", JSON.stringify(this));
-    const queue = flag.getSpawnQueue(this.roomId);
-    return queue.spawnNext(spawn);
-};
-
-
-
-Policy.prototype.getLocalSpawn = function () {
-    //console.log("in getLocalSpawn")
-    const room = Game.rooms[this.roomId];
-    const policyId = this.id;
-    let hLife = 0, pLife = 0, wLife = 0, workers = 0, harvesters = 0, porters=0;
-    const creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
-    });
-
-    let build;
-
-    //console.log("pp num creeps", Object.getOwnPropertyNames(Game.creeps).length)
-    //console.log("pp creeps policy", creeps.length, "all creeps length", )
-    for (let i in creeps) {
-        switch (race.getRace(creeps[i])) {
-            case gc.RACE_HARVESTER:
-                hLife += creeps[i].ticksToLive;
-                harvesters++;
-                break;
-            case gc.RACE_PORTER:
-                pLife += creeps[i].ticksToLive;
-                porters++;
-                break;
-            case gc.RACE_WORKER:
-                wLife += creeps[i].ticksToLive;
-                workers++;
-                break;
-        }
-    }
-
-    //console.log("pp hLife", hLife, "pLife", pLife, "wLife", wLife)
-    //console.log("pp workers", workers, "harvesters",harvesters,"porters",porters)
-
-    const avaliable = room.energyAvailable;
-    const maxCapacity = room.energyCapacityAvailable
-
-    if (Object.getOwnPropertyNames(Game.creeps).length > 2
-        && avaliable !== maxCapacity
-        && (workers > 1 || porters > 1)) { // todo can be done better
-        return;
-    }
-    let buildworkers = 0;
-    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_WORKER)) {
-        const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-        buildworkers = buildTicksNeeded/CREEP_LIFE_TIME;
-        console.log("buld workers", buildworkers);
-        if (wLife < buildTicksNeeded || workers === 0) {
-            if (workers === 0 || workers <= economy.totalSourceAccessPointsRoom(room)) {
-                console.log("build worker")
-                return gc.RACE_WORKER;
-            }
-        }
-    }
-    //console.log("buld workers", buildworkers);
-
-    const PCs = race_porter.bodyCounts(room.energyCapacityAvailable)[CARRY] // todo hacky
-
-    let maxHarvesterWs = 0;
-    let maxUpgradersWs = 0;
-    const Hws = race_harvester.bodyCounts(room.energyCapacityAvailable)[WORK]
-    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
-        maxHarvesterWs += budget.harvesterWsRoom(room, room, false);
-        //console.log("pp INITIATIVE_HARVESTER harvesterWsRoom", budget.harvesterWsRoom(room, room, false))
-        //console.log("pp harveserWs", maxHarvesterWs, "max harvesers", maxHarvesterWs/Hws);
-    }
-    if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
-        //console.log("INITIATIVE_UPGRADER")
-        let maxEnergy = 3000 * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
-        maxEnergy -= 2 * maxHarvesterWs * 125 + PCs * 75 + 100; // todo fix quick hack
-        maxUpgradersWs += budget.upgradersWsRoom(room, maxEnergy, false)
-        //console.log("pp upgradersWs", maxUpgradersWs, "max upgraders", maxUpgradersWs/Hws);
-        maxHarvesterWs += maxUpgradersWs;
-        //console.log("pp upgradrs Ws", budget.upgradersWsRoom(room, maxEnergy, false));
-    }
-    //console.log("pp max harvester and  upgarder Ws", maxHarvesterWs)
-
-    //console.log("pp Hws", Hws, "maxHarvesterWs", maxHarvesterWs);
-    //console.log("pp harvesters", harvesters, "Math.ceil(maxHarvesterWs/Hws)",Math.ceil(maxHarvesterWs/Hws))
-    if (harvesters < Math.ceil(maxHarvesterWs/Hws)) {
-        let posts = 0;
-        if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_HARVESTER)) {
-            posts += state.countHarvesterPosts(room)
-        }
-        if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_UPGRADER)) {
-            posts += state.countUpgraderPosts(room)
-        }
-        //console.log("pp harvesters", harvesters, "posts",posts);
-        if  (harvesters < posts && (porters > 0 || workers > 3 * harvesters )) {
-            return gc.RACE_HARVESTER
-        }
-    }
-
-    //console.log("porters budget Cs", budget.portersCsRoom(room, room, false) )
-    const portersNeeded = budget.portersCsRoom(room, room, false)/PCs
-    //console.log("porters", porters, "0.25*workers", 0.25*(workers),"porters needed",portersNeeded);
-    //console.log("PCs", PCs,"porters needed", budget.portersCsRoom(room, room, false)/PCs)
-    //console.log("porters", porters, "workers", workers);
-    //console.log("state.isHarvesterAndUpgradeContainer(room)",state.isHarvesterAndUpgradeContainer(room))
-    if (porters + 0.25 * workers < budget.portersCsRoom(room, room, false) / PCs) {
-        //console.log("about to build porter");
-            if (Memory.policies[policyId].initiatives.includes(gc.INITIATIVE_PORTER)
-                && state.isHarvesterAndUpgradeContainer(room)) {
-                build = gc.RACE_PORTER;
-            } else {
-                //console.log("build worker instead")
-                build = gc.RACE_WORKER;
-            }
-    }
-
-    return build;
-};
-*/
 Policy.prototype.build = function () {
     const room = Game.rooms[this.roomId];
 
@@ -238,25 +57,26 @@ Policy.prototype.build = function () {
 
 Policy.prototype.actionActivityQueue = function (room) {
     const rcl = room.controller.level;
-    gf.assertEq(rcl, Memory.policies[this.id].rcl, "rcl mismatch");
+    gf.assertEq(rcl, this.rcl, "rcl mismatch");
     //console.log("gc.BUILD_ORDER_RCL", JSON.stringify(gc.BUILD_ORDER_RCL))
     //console.log("memory rcl",Memory.policies[this.id].rcl);
     //console.log("memory rcl activity", gc.BUILD_ORDER_RCL[Memory.policies[this.id].rcl][Memory.policies[this.id].activityIndex]);
     //console.log("activity index", Memory.policies[this.id].activityIndex);
     //console.log("gc.BUILD_ORDER_RCL[1][0]",gc.BUILD_ORDER_RCL[1][0] )
     let activity = gc.BUILD_ORDER_RCL[this.rcl][this.activityIndex];
-    //console.log("activity", activity);
+    //console.log("BORCL[1][0]", gc.BUILD_ORDER_RCL[1][0]);
+    //console.log("activity", activity, "rcl", this.rcl,"aIndex",this.activityIndex);
     //const fg = this.buildFcs()
     //console.log("buildfcs", JSON.stringify(fg))
     //console.log("buildfcs worker", JSON.stringify(fg["worker"]), " fc[gc.BUILD_ROAD_SPAWN_CONTROLLER]",  fg[gc.BUILD_ROAD_SPAWN_CONTROLLER])
     if (this.buildFcs()[activity].check(room, activity, this.id)) {
-       //console.log("checked", activity, "result TRUE")
+       console.log("pp checked", activity, "result TRUE");
         if (activity !== gc.ACTIVITY_FINISHED) {
             this.activityIndex++;
             this.actionActivityQueue(room);
         }
     } else {
-        //console.log("checked", activity, "result FALSE about to activate", activity)
+        console.log("pp checked", activity, "result FALSE about to activate", activity)
         this.buildFcs()[activity].build(room, activity, this.id);
     }
 };
@@ -299,19 +119,11 @@ Policy.prototype.buildFcs = function () {
         "check": construction.areExtensionsBuilt
     };
 
-    //newInititive = {
-    //    "build": newEconomicInititive,
-    //    "check": checkInitiative,
-    //};
-    //fc[gc.INITIATIVE_WORKER] = newInititive;
-    //fc[gc.INITIATIVE_HARVESTER] = newInititive;
-    //fc[gc.INITIATIVE_PORTER] = newInititive;
-    //fc[gc.INITIATIVE_UPGRADER] = newInititive;
-
     newPolicy = {
         "build": activateNewPolicy,
         "check": checkPolicy,
     };
+    fc[gc.POLICY_RCL1] = newPolicy;
     fc[gc.POLICY_EXPLORE] = newPolicy;
     fc[gc.POLICY_WORKERS] = newPolicy;
     fc[gc.POLICY_HARVESTERS] = newPolicy;
@@ -325,40 +137,25 @@ Policy.prototype.buildFcs = function () {
 };
 
 activateNewPolicy = function (room, activity, policyId)  {
-    policy.replacePolices(
-        activity,
-        { parentId: policyId },
-        policyId,
-        gc.ECONOMIES,
-    )
-};
-
-checkPolicy = function (room, activity, policyId)  {
-    return policy.isPolicy(policyId, activity);
-    //console.log("pp in checkPolciy room", room.name, "activity", activity, "policyId", policyId)
-    //for ( let i in Memory.policies) {
-    //    if (Memory.policies[i].type === activity &&
-    //        Memory.policies[i].parentId === policyId) {
-    //        return true;
-    //    }
-    //}
-    //return false;
-};
-/*
-newEconomicInititive = function (room, activity, policyId)  {
-    if (!Memory.policies[policyId].initiatives.includes(activity)) {
-        Memory.policies[policyId].initiatives.push(activity);
+    //console.log("pp activateNewPolicy")
+    if (gc.ECONOMIES.includes(activity)) {
+        policy.replacePolices(
+            activity,
+            { parentId: policyId },
+            policyId,
+            gc.ECONOMIES,
+        );
+    } else {
+        policy.activatePolicy(activity, {}, policyId);
     }
 };
 
-checkInitiative = function (room, activity, policyId)  {
-    if (!Memory.policies[policyId].initiatives) {
-        Memory.policies[policyId].initiatives = []
-        return false;
-    }
-    return Memory.policies[policyId].initiatives.includes(activity);
+checkPolicy = function (room, policyType, policyId)  {
+    //console.log("pp checkPolcy room", room, "policytype", policyType, "polciyId", policyId,
+    //    "result", policy.hasChildType(policyId, policyType));
+    return policy.hasChildType(policyId, policyType);
 };
-*/
+
 isControllerContainerFinished = function (room) {
     const flag = Game.flags[room.controller.id];
     const pos = flag.memory.containerPos;

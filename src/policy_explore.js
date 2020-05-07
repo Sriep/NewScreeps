@@ -7,6 +7,8 @@ const budget = require("budget");
 const race = require("race");
 const gc = require("gc");
 const flag = require("flag");
+const policy = require("policy");
+
 
 function Policy  (data) {
     this.type = gc.POLICY_EXPLORE;
@@ -23,7 +25,7 @@ Policy.prototype.initilise = function () {
         memory: {home : this.roomName},
         name: gc.RACE_SCOUT,
     };
-    const queue = flag.getSpawnQueue(this.roomName);
+    const queue = flag.getSpawnQueue(this.home);
     data.memory.direction = TOP;
     queue.addSpawn(data, gc.SPAWN_PRIORITY_MISC, this.id);
     data.memory.direction = RIGHT;

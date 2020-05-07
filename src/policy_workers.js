@@ -6,6 +6,7 @@
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
+const flag = require("flag");
 
 function Policy  (data) {
     this.type = gc.POLICY_WORKERS;
@@ -21,7 +22,7 @@ Policy.prototype.initilise = function () {
 
 Policy.prototype.enact = function () {
     const room = Game.rooms[this.home];
-    if (policy.existingOrders()) {
+    if (policy.existingOrders(this.home, this.parentId)) {
         return;
     }
 

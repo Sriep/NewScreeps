@@ -10,17 +10,19 @@ const flag = {
     },
 
     getRoomFlag(roomName) {
-        //console.log("getRoomFlag roomName", roomName)
+        console.log("flag getRoomFlag roomName", roomName)
         let flag = Game.flags[roomName];
         if (!flag) {
+            console.log("flag", roomName, "does not exist creatig");
             this.flagRoom(roomName);
-            flag = Game.rooms[roomName].controller.pos.createFlag(roomName);
+            Game.rooms[roomName].controller.pos.createFlag(roomName);
+            flag = Game.flags[roomName];
         }
         return flag;
     },
 
     getSpawnQueue(roomName) {
-        //console.log("getSpawnQueue roomName", roomName)
+        //console.log("flag getSpawnQueue roomName", roomName)
         const QueueSpawn = require("queue_spawn");
         return new QueueSpawn(roomName);
     },
