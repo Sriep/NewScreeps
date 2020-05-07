@@ -10,10 +10,10 @@ const flag = {
     },
 
     getRoomFlag(roomName) {
-        console.log("flag getRoomFlag roomName", roomName)
+       // console.log("flag getRoomFlag roomName", roomName)
         let flag = Game.flags[roomName];
         if (!flag) {
-            console.log("flag", roomName, "does not exist creatig");
+            //console.log("flag", roomName, "does not exist creatig");
             this.flagRoom(roomName);
             Game.rooms[roomName].controller.pos.createFlag(roomName);
             flag = Game.flags[roomName];

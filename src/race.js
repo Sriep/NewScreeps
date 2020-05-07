@@ -22,7 +22,7 @@ const race = {
 
     body: function (race, ec) {
         const raceModule = require("race_" + race);
-        const bodyCounts = raceModule.bodyCounts(ec)
+        const bodyCounts = raceModule.bodyCounts(ec);
         if (!bodyCounts){
             return undefined;
         }
@@ -32,7 +32,7 @@ const race = {
             body.push(WORK);
         }
         if (bodyCounts[MOVE] < 1) {
-            console.log("body race", race, "ec",ec)
+            console.log("body race", race, "ec",ec);
             return undefined;
         }
         for (let i = 0; i < bodyCounts[MOVE]; i++) {
@@ -153,7 +153,7 @@ const race = {
             case ERR_BUSY:                  // The spawn is already in process of spawning another creep.
                 return gf.fatalError("ERR_BUSY");
             case ERR_NOT_ENOUGH_ENERGY:     // The spawn and its extensions contain not enough energy to create a creep with the given body.
-                return ERR_NOT_ENOUGH_ENERGY
+                return ERR_NOT_ENOUGH_ENERGY;
             case ERR_INVALID_ARGS:          // Body is not properly described or name was not provided.
                 return gf.fatalError("ERR_INVALID_ARGS");
             case ERR_RCL_NOT_ENOUGH:        // Your Room Controller level is insufficient to use this spawn.
@@ -170,6 +170,6 @@ const race = {
         return Memory.nextCreepId.toString();
     },
 
-}
+};
 
 module.exports = race;

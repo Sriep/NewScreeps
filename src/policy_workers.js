@@ -7,6 +7,7 @@ const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
 const flag = require("flag");
+const race = require("race");
 
 function Policy  (data) {
     this.type = gc.POLICY_WORKERS;
@@ -21,18 +22,19 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
+    console.log("POLICY_WORKERS enact");
     const room = Game.rooms[this.home];
     if (policy.existingOrders(this.home, this.parentId)) {
         return;
     }
 
     const policyId = this.parentId;
-    const orders = queue.orders(policyId, gc.SPAWN_PRIORITY_LOCAL);
-    if (orders > 1) {
+    const orders = flag.getSpawnQueue(this.home).orders(policyId, gc.SPAWN_PRIORITY_LOCAL);
+    console.log("pw orders length", orders.length);
+    if (orders.length > 1) {
         return;
     }
 
-    const energy = room.energyAvailable;
     const creeps = policy.getCreeps(policyId, gc.RACE_WORKER);
 
     const workers = creeps.length;
@@ -41,26 +43,32 @@ Policy.prototype.enact = function () {
     }
 
     const wLife = race.ticksLeftByPart(policyId, gc.RACE_WORKER, WORK);
-    if (wLife < CREEP_LIFE_TIME/2 && energy >= gc.WMC_COST) { //guess
+    console.log("pw workers", workers, "wLife", wLife, "energy", room.energyAvailable);
+    if (wLife < CREEP_LIFE_TIME/4 && room.energyAvailable >= gc.WMC_COST) { //guess
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
-            energy,
+            room.energyAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_CRITICAL
         );
         return;
     }
 
-    if (Maths.floor(energy/gc.WMC_COST)
-            === Maths.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_WORKER,
-            energy,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
+    console.log("ps rhs", Math.floor(room.energyAvailable/gc.WMC_COST),
+        "=== ", Math.floor(room.energyCapacityAvailable/gc.WMC_COST));
+    if (Math.floor(room.energyAvailable/gc.WMC_COST)
+            === Math.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
+        console.log("pw workers",workers, "<= acces poitns", economy.totalSourceAccessPointsRoom(room));
+        if (workers <= economy.totalSourceAccessPointsRoom(room)) {
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_WORKER,
+                room.energyAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+        }
     }
 };
 

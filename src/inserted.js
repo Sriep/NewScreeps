@@ -18,7 +18,7 @@ const inserted = {
 
     bottom: function () {
         //const room = Game.rooms["W7N7"];
-        console.log("inserted hasChildType 1 gc.POLICY_RCL1", policy.hasChildType(1,gc.POLICY_RCL1))
+        //console.log("inserted hasChildType 1 gc.POLICY_RCL1", policy.hasChildType(1,gc.POLICY_RCL1))
         //console.log("hasChildType 1 gc.POLICY_RCL1", policy.hasChildType(1,[gc.POLICY_RCL1]))
 
     }

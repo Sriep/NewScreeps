@@ -19,6 +19,7 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
+    console.log("POLICY_HARVESTERS enact");
     const room = Game.rooms[this.home];
     if (policy.existingOrders()) {
         return;

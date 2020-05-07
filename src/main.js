@@ -9,7 +9,7 @@ const gc = require("gc");
 const state = require("state");
 const rooms = require("rooms");
 const policy = require("policy");
-
+const flag = require("flag");
 
 module.exports.loop = function () {
     console.log("************************ Start ", Game.time," *********************************");
@@ -17,20 +17,16 @@ module.exports.loop = function () {
 
     freeCreeps();
     flagRooms();
-
-    //console.log("************************ Move creeps start *********************************");
     moveCreeps();
-    //console.log("************************ Move creeps finish *********************************");
-    //console.log("cpu used before policies act", Game.cpu.getUsed());
+    enactPolicies();
+    spawnCreeps();
 
-    policy.enactPolicies();
     inserted.bottom();
-
     console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
     console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
     console.log("************************ End ",  Game.time, " *********************************");
 
-}
+};
 
 function freeCreeps() {
     for(let c in Memory.creeps) {
@@ -48,17 +44,30 @@ function moveCreeps() {
     }
 }
 
-function flagRooms() {
-    let force;
-    if (Game.time % gc.FLAG_UPDATE_RATE === 0 ) {
+function enactPolicies() {
+    policy.enactPolicies();
+}
 
+function spawnCreeps() {
+    for (let i in Game.spawns) {
+        if (!Game.spawns[i].spawning) {
+            if (Game.spawns[i].room.energyAvailable >= BODYPART_COST[MOVE]) {
+                const r = flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
+                console.log("spawn at", Game.spawns[i].room.name,"result", r)
+            }
+        }
     }
-    force = true;
+}
+
+function flagRooms() {
+    let force = false;
+    if (Game.time % gc.FLAG_UPDATE_RATE === 0 ) {
+        force = true;
+    }
     for ( let room in Game.rooms ) {
-        //console.log("flagRooms about to flag ", Game.rooms[room])
-        //console.log("flagRooms room.memory", Game.rooms[room].memory)
-        if ( (Game.rooms[room].memory && !Game.rooms[room].memory.flagged) || force ) {
+        if ( (Game.rooms[room].memory && (!Game.rooms[room].memory.flagged) || force) ) {
             rooms.flag(Game.rooms[room]);
         }
     }
+
 }

@@ -32,6 +32,7 @@ const pgc = {
     POLICY_WORKERS: "workers",
     POLICY_HARVESTERS: "harvesters",
     POLICY_PORTERS: "porters",
+    POLICY_BUILD_EXTENSIONS: "build_extensions",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -218,11 +219,15 @@ const gc = {
     POLICY_WORKERS: pgc.POLICY_WORKERS,
     POLICY_HARVESTERS: pgc.POLICY_HARVESTERS,
     POLICY_PORTERS: pgc.POLICY_PORTERS,
+    POLICY_BUILD_EXTENSIONS: pgc.POLICY_BUILD_EXTENSIONS,
     //POLICY_DEFENCE: "defence",
     //POLICY_RESCUE: "rescue",
     //POLICY_BUILD: "build",
     //POLICY_NEUTRAL_ROOM: "neutral_room",
     //POLICY_BUILD_SPAWN: "build_spawn",
+
+    //policy
+    EXPLORE_CREEPS: 4,
 
     // spawn priories
     SPAWN_PRIORITY_CRITICAL: 0,
@@ -240,7 +245,7 @@ const gc = {
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 
     // Rates
-    FLAG_UPDATE_RATE: 5000000,
+    FLAG_UPDATE_RATE: 1000,
     BUILD_QUEUE_CHECK_RATE: 1,
 
     // Thresholds

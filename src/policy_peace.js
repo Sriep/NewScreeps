@@ -9,7 +9,6 @@ const economy = require("economy");
 const construction = require("construction");
 const state = require("state");
 const policy = require("policy");
-const flag = require("flag");
 
 function Policy  (data) {
     this.type = gc.POLICY_PEACE;
@@ -25,25 +24,6 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    this.build();
-    this.spawnQueue();
-};
-
-Policy.prototype.spawnQueue = function () {
-    //console.log("in policy peace spawnQueue");
-    const room = Game.rooms[this.roomId];
-    const spawns = room.find(FIND_MY_SPAWNS);
-    for (let spawn of spawns) {
-        if (spawn.spawning === null) {
-            console.log("in policy peace about to call spawnNext");
-            //const race = require("race");
-            //race.spawnWorker(spawn, this.id);
-            flag.getSpawnQueue(this.roomId).spawnNext(spawn);
-        }
-    }
-};
-
-Policy.prototype.build = function () {
     const room = Game.rooms[this.roomId];
 
     if (!this.rcl || this.rcl !== room.controller.level || !this.activityIndex) {
@@ -76,7 +56,7 @@ Policy.prototype.actionActivityQueue = function (room) {
             this.actionActivityQueue(room);
         }
     } else {
-        console.log("pp checked", activity, "result FALSE about to activate", activity)
+        console.log("pp checked", activity, "result FALSE about to activate", activity);
         this.buildFcs()[activity].build(room, activity, this.id);
     }
 };
