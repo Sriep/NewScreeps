@@ -22,9 +22,11 @@ const flag = {
     },
 
     getSpawnQueue(roomName) {
-        //console.log("flag getSpawnQueue roomName", roomName)
         const QueueSpawn = require("queue_spawn");
-        return new QueueSpawn(roomName);
+        //console.log("flag getSpawnQueue roomName", roomName);
+        const queue = new QueueSpawn(roomName);
+        //console.log("flag getSpawnQueue" ,roomName,"queue", JSON.stringify(queue));
+        return queue;
     },
 };
 

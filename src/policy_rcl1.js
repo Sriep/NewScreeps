@@ -9,20 +9,26 @@ const policy = require("policy");
 const flag = require("flag");
 const race_worker = require("race_worker");
 
-function Policy  (data) {
+function Policy  (id, data) {
+    this.id = id;
     this.type = gc.POLICY_RCL1;
-    this.id = data.id;
     this.parentId = data.parentId;
-    this.home = Memory.policies[this.parentId].roomId;
-    //console.log("POLICY_RCL1 construtor end", JSON.stringify(this))
+    this.home = data.home;
+    this.m = data.m;
+    //console.log("POLICY_RCL1 constructor end", JSON.stringify(this));
 }
 
 Policy.prototype.initilise = function () {
-    //console.log("POLICY_RCL1 initilise start")
+    if (!this.m) {
+        this.m = {}
+    }
+    //console.log("POLICY_RCL1 initiliseparentId",this.parentId);
+    //console.log('POLICY_RCL1 initilise memroy policies', JSON.stringify(Memory.policies[this.parentId]));
+    this.home = Memory.policies[this.parentId].roomName;
     const queue = flag.getSpawnQueue(this.home);
     queue.clear();
     queue.halt(gc.SPAWN_PRIORITY_LOCAL);
-    //console.log("initilise end")
+    //console.log("policy govern this.m",JSON.stringify(this));
     return true;
 };
 
@@ -32,7 +38,9 @@ Policy.prototype.enact = function () {
 
     const energy = room.energyAvailable;
     if (energy >= race_worker.WMC_COST) {
-        console.log("send order roomenergy >= race_worker.WMC_COST energy", energy);
+        console.log("POLICY_RCL1 send order roomenergy >= race_worker.WMC_COST energy", energy);
+        console.log("POLICY_RCL1 room", room.name, "energy", energy,"parentid",
+            this.parentId, "state", gc.SPAWN_PRIORITY_CRITICAL);
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
@@ -40,35 +48,16 @@ Policy.prototype.enact = function () {
             this.parentId,
             gc.SPAWN_PRIORITY_CRITICAL
         );
-        return;
     }
+};
 
-    //const creeps = policy.getCreeps(policyId, gc.RACE_WORKER);
-    //let lifeLeft = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, WORK);
-
-    //const ticksToUpgrade = room.controller.progressTotal - room.controller.progress;
-    //const trips = Math.ceil(ticksToUpgrade/CARRY_CAPACITY);
-    // 175 and 50 just guesses.
-    //if (lifeLeft < 50 * trips + 50*creeps.length) {
-        const orders = flag.getSpawnQueue(this.home).orders(this.parentId, gc.SPAWN_PRIORITY_CRITICAL);
-        console.log("spwan queues orders", JSON.stringify(orders));
-        if (orders.length === 0 ){
-            //console.log("rc1 send order orders.length === 0 lifeLeft", lifeLeft);
-            policy.sendOrderToQueue(
-                room,
-                gc.RACE_WORKER,
-                gc.WMC_COST,
-                this.parentId,
-                gc.SPAWN_PRIORITY_CRITICAL
-            );
-        }
-    //}
+Policy.prototype.budget = function() {
+    return { RESOURCE_ENERGY : 0 };
 };
 
 Policy.prototype.draftReplacment = function() {
-    if (Game.rooms[this.home].controller.level !== 1) {
-        return undefined;
-    }
+    console.log("POLICY_RCL1 draftReplacment contorller level", Game.rooms[this.home].controller.level);
+    return Game.rooms[this.home].controller.level === 1 ? this : false;
 };
 
 module.exports = Policy;

@@ -14,7 +14,7 @@ function State (creep) {
     this.type = gc.STATE_WORKER_FULL_IDLE;
     this.creep = creep
     this.policyId = creep.memory.policyId
-    this.homeId = Memory.policies[this.policyId].roomId;
+    this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 State.prototype.enact = function () {

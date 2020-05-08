@@ -9,42 +9,37 @@ const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
 
-function Policy  (data) {
+function Policy  (id, data) {
+    this.id = id;
     this.type = gc.POLICY_EXPLORE;
-    this.id = data.id;
     this.parentId = data.parentId;
-    this.home = Memory.policies[this.parentId].roomId;
-    this.direction = data.direction;
+    this.home = data.home;
+    this.m = data.m;
 }
 
 Policy.prototype.initilise = function () {
-    const data = {
-        body:   race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
-        memory: {home : this.roomName},
-        name: gc.RACE_SCOUT,
-    };
-    const queue = flag.getSpawnQueue(this.home);
-    data.memory.direction = TOP;
-    queue.addSpawn(data, gc.SPAWN_PRIORITY_MISC, this.id);
-    data.memory.direction = RIGHT;
-    queue.addSpawn(data, gc.SPAWN_PRIORITY_MISC, this.id);
-    data.memory.direction = BOTTOM;
-    queue.addSpawn(data, gc.SPAWN_PRIORITY_MISC, this.id);
-    data.memory.direction = LEFT;
-    queue.addSpawn(data, gc.SPAWN_PRIORITY_MISC, this.id);
+    if (!this.m) {
+        this.m = {}
+    }
+    this.home = Memory.policies[this.parentId].roomName;
+    this.m.direction = TOP;
+
     return true;
 };
 
-Policy.prototype.enact = function () {
+Policy.prototype.enact = function (shortfall) {
     const policyId = this.id;
     const creeps = policy.getCreeps(policyId, gc.RACE_SCOUT);
     if (creeps.length < gc.EXPLORE_CREEPS) {
-
+        const orders = queue.orders(this.id);
+        if (creeps.length +  orders.length < gc.EXPLORE_CREEPS) {
+            this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
+        }
     }
-    console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
+    //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
         const flag = Game.flags[creeps[i].room.name];
-        if (fag.explored) {
+        if (flag.explored) {
             continue
         }
         console.log("creep", creep[i].name, "in unexplored room", creeps[i].room.name);
@@ -56,21 +51,24 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.sendExplorer = function() {
-    queue = flag.getSpawnQueue(this.home);
-    const orders = queue.orders(this.id);
-    if (creeps.length + orders.length < gc.EXPLORE_CREEPS) {
+Policy.prototype.sendExplorer = function(shortfall) {
+    console.log("POLICY_EXPLORE", shortfall);
+    for (let i = 0; i < shortfall; i++) {
         const data = {
             "body": race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
-            "opts": {"memory": {"home" : this.roomName}},
+            "opts": {"memory": {
+                "home" : this.roomName,
+                "direction" : this.direction,
+            }},
             "name": gc.RACE_SCOUT + "_50",
         };
-        data.opts.memory.direction = LEFT;
         queue.addSpawn(
             data,
             gc.SPAWN_PRIORITY_MISC,
-            this.id
-        )
+            this.id,
+            gc.STATE_SCOUT_IDLE,
+        );
+        this.m.direction = (this.m.direction+2) % 8;
     }
 };
 

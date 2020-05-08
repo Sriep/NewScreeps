@@ -10,6 +10,8 @@ const state = require("state");
 const rooms = require("rooms");
 const policy = require("policy");
 const flag = require("flag");
+const government = require("government");
+
 
 module.exports.loop = function () {
     console.log("************************ Start ", Game.time," *********************************");
@@ -17,6 +19,8 @@ module.exports.loop = function () {
 
     freeCreeps();
     flagRooms();
+
+    govern();
     moveCreeps();
     enactPolicies();
     spawnCreeps();
@@ -37,9 +41,7 @@ function freeCreeps() {
 }
 
 function moveCreeps() {
-    //console.log("main in moveCreeps")
     for (let name in Game.creeps) {
-        //console.log("creep", name)
         state.enactCreep(Game.creeps[name]);
     }
 }
@@ -48,12 +50,19 @@ function enactPolicies() {
     policy.enactPolicies();
 }
 
+function govern() {
+   // government.govern();
+}
+
 function spawnCreeps() {
     for (let i in Game.spawns) {
         if (!Game.spawns[i].spawning) {
             if (Game.spawns[i].room.energyAvailable >= BODYPART_COST[MOVE]) {
-                const r = flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
-                console.log("spawn at", Game.spawns[i].room.name,"result", r)
+                //console.log("main spawnCreeps about to get queue");
+                const q = flag.getSpawnQueue(Game.spawns[i].room.name);
+                //console.log("main spawnCreeps",Game.spawns[i].room.name,  "queue is", JSON.stringify(q));
+                const r= q.spawnNext(Game.spawns[i]);
+                //console.log("spawn at", Game.spawns[i].room.name,"result", r)
             }
         }
     }

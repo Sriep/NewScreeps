@@ -25,14 +25,18 @@ const pgc = {
     BUILD_ROAD_SOURCE_TOWERS: "build_road_source_towers",
     // Msc
     ACTIVITY_FINISHED: "finished",
+    ACTIVITY_DISALLOWED: "disallowed",
     // policies
-    POLICY_PEACE: "peace",
+    POLICY_GOVERN: "govern",
     POLICY_EXPLORE: "explore",
     POLICY_RCL1: "rcl1",
     POLICY_WORKERS: "workers",
     POLICY_HARVESTERS: "harvesters",
     POLICY_PORTERS: "porters",
     POLICY_BUILD_EXTENSIONS: "build_extensions",
+    POLICY_BUILD_ROADS: "build_roads",
+    POLICY_BUILD_SOURCE_CONTAINERS: "build_source_containers",
+    POLICY_BUILD_UPGRADE_CONTAINERS: "build_upgrade_containers",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -161,7 +165,7 @@ const gc = {
         [
             pgc.POLICY_WORKERS,
             pgc.POLICY_EXPLORE,
-            pgc.BUILD_EXTENSIONS,
+            pgc.POLICY_BUILD_EXTENSIONS,
             pgc.POLICY_HARVESTERS,
             pgc.BUILD_SOURCE_CONTAINERS,
             pgc.BUILD_CONTROLLER_CONTAINERS,
@@ -169,7 +173,6 @@ const gc = {
             pgc.ACTIVITY_FINISHED
         ],
         [
-            pgc.BUILD_EXTENSIONS,
             // pgc.BUILD_TOWER, //todo
             pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
             pgc.BUILD_ROAD_SOURCE_SPAWN,
@@ -186,7 +189,7 @@ const gc = {
         [  pgc.ACTIVITY_FINISHED ],
     ],
     ECONOMIES: [
-        pgc.POLICY_PEACE,
+        pgc.POLICY_GOVERN,
         pgc.POLICY_RCL1,
         pgc.POLICY_WORKERS,
         pgc.POLICY_HARVESTERS,
@@ -202,7 +205,7 @@ const gc = {
     BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
     BUILD_SOURCE_CONTAINERS: pgc.BUILD_SOURCE_CONTAINERS,
     BUILD_CONTROLLER_CONTAINERS: pgc.BUILD_CONTROLLER_CONTAINERS,
-    BUILD_TOWERL: "build_tower",
+    BUILD_TOWER: "build_tower",
     // roads
     BUILD_ROAD_SOURCE_SPAWN: pgc.BUILD_ROAD_SOURCE_SPAWN,
     BUILD_ROAD_SOURCE_CONTROLLER: pgc.BUILD_ROAD_SOURCE_CONTROLLER,
@@ -212,14 +215,18 @@ const gc = {
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
     ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
+    ACTIVITY_DISALLOWED: pgc.ACTIVITY_DISALLOWED,
     // policies
-    POLICY_PEACE: pgc.POLICY_PEACE,
+    POLICY_GOVERN: pgc.POLICY_GOVERN,
     POLICY_EXPLORE: pgc.POLICY_EXPLORE,
     POLICY_RCL1: pgc.POLICY_RCL1,
     POLICY_WORKERS: pgc.POLICY_WORKERS,
     POLICY_HARVESTERS: pgc.POLICY_HARVESTERS,
     POLICY_PORTERS: pgc.POLICY_PORTERS,
     POLICY_BUILD_EXTENSIONS: pgc.POLICY_BUILD_EXTENSIONS,
+    POLICY_BUILD_ROADS: pgc.POLICY_BUILD_ROADS,
+    POLICY_BUILD_SOURCE_CONTAINERS: pgc.POLICY_BUILD_SOURCE_CONTAINERS,
+    POLICY_BUILD_UPGRADE_CONTAINERS: pgc.POLICY_BUILD_UPGRADE_CONTAINERS,
     //POLICY_DEFENCE: "defence",
     //POLICY_RESCUE: "rescue",
     //POLICY_BUILD: "build",
@@ -241,12 +248,14 @@ const gc = {
     QUEUE_INVALID_ARGS: -102,
     QUEUE_NOT_FOUND: -103,
     QUEUE_INSUFFICIENT_RCL: -104,
+    QUEUE_INSUFFICIENT_PRIORITY: -105,
 
     MAX_HARVESTER_ROUTE_LENGTH: 300,
 
     // Rates
     FLAG_UPDATE_RATE: 1000,
     BUILD_QUEUE_CHECK_RATE: 1,
+    BUILD_CHECK_RATE: 1,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,

@@ -12,7 +12,7 @@ function State (creep) {
     this.type = gc.STATE_WORKER_PICKUP;
     this.creep = creep
     this.policyId = creep.memory.policyId
-    this.homeId = Memory.policies[this.policyId].roomId;
+    this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 

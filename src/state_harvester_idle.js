@@ -13,7 +13,7 @@ function State (creep) {
     this.creep = creep;
     this.state = gc.STATE_HARVESTER_IDLE;
     this.policyId = creep.memory.policyId;
-    this.homeId = Memory.policies[this.policyId].roomId;
+    this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 State.prototype.enact = function () {

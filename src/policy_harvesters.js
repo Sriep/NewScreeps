@@ -5,41 +5,47 @@
  */
 const gc = require("gc");
 const policy = require("policy");
+//const policy = require("policy");
 
-function Policy  (data) {
+function Policy  (id, data) {
+    this.id = id;
     this.type = gc.POLICY_HARVESTERS;
-    this.id = data.id;
     this.parentId = data.parentId;
-    this.home = Memory.policies[this.parentId].roomId;
+    this.home = data.home;
+    this.m = data.m;
 }
 
 Policy.prototype.initilise = function () {
-    flag.getSpawnQueue(this.home).clearMy(this.parentId, SPAWN_PRIORITY_LOCAL);
+    if (!this.m) {
+        this.m = {}
+    }
+    this.home = Memory.policies[this.parentId].roomName;
     return true;
 };
 
 Policy.prototype.enact = function () {
     console.log("POLICY_HARVESTERS enact");
     const room = Game.rooms[this.home];
-    if (policy.existingOrders()) {
-        return;
-    }
+    //if (policy.existingOrders()) {
+    //    return;
+    //}
 
-    const policyId = this.parentId;
+    const policyId = this.m.parentId;
     const wWorkerLife = race.ticksLeftByPart(plicyId, gc.RACE_WORKER, WORK);
-    if (wWorkerLife < CREEP_LIFE_TIME) {
+    if (wWorkerLife < CREEP_LIFE_TIME/10) {
+        console.log("ph spawning workers life", wWorkerLife);
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
-            gc.WMC_COST,
-            this.parentId,
+            room.energyAvailable,
+            this.m.parentId,
             gc.SPAWN_PRIORITY_CRITICAL
         );
         return;
     }
 
-    const energy = room.energyAvailable;
-    if (energy < room.energyCapacity) {
+    if (room.energyAvailable < room.energyCapacity) {
+        console.log("ph energy",room.energyAvailable, "too low cap", room.energyCapacity)
         return;
     }
 
@@ -50,25 +56,33 @@ Policy.prototype.enact = function () {
 
     const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
     const cToSupportExistingWLt = budgetCsLt * wHProportionOfBudget;
-
+    console.log("ph cWorkerLife",cWorkerLife,"cToSupportExistingWLt",cToSupportExistingWLt);
     if (cWorkerLife < cToSupportExistingWLt) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_WORKER,
-            energy,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
-    }
+        const workers = policy.getCreeps(policyId, gc.RACE_WORKER);
+        console.log("ph workers", workers, "acces points",
+            economy.totalSourceAccessPointsRoom(room), "h posts",
+            state.countHarvesterPosts(room).length);
+        if (workers <= economy.totalSourceAccessPointsRoom(room)
+                - state.countHarvesterPosts(room).length ) {
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_WORKER,
+                room.energyAvailable,
+                this.m.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+        }
 
+    }
+    console.log("ph wHarvesterLife",wHarvesterLife,"budgetHarvesterWsLt",budgetHarvesterWsLt);
     if (wHarvesterLife<budgetHarvesterWsLt) {
         const harvesters = policy.getCreeps(policyId, gc.RACE_HARVESTER);
         if (harvesters < state.countHarvesterPosts(room).length) {
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_HARVESTER,
-                energy,
-                this.parentId,
+                room.energyAvailable,
+                this.m.parentId,
                 gc.SPAWN_PRIORITY_LOCAL
             );
         }

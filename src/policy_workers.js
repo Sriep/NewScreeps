@@ -9,25 +9,26 @@ const economy = require("economy");
 const flag = require("flag");
 const race = require("race");
 
-function Policy  (data) {
+function Policy  (id, data) {
+    this.id = id;
     this.type = gc.POLICY_WORKERS;
-    this.id = data.id;
     this.parentId = data.parentId;
-    this.home = Memory.policies[this.parentId].roomId;
+    this.home = data.home;
+    this.m = data.m;
 }
 
 Policy.prototype.initilise = function () {
-    flag.getSpawnQueue(this.home).clearMy(this.parentId);
+    if (!this.m) {
+        this.m = {}
+    }
+    this.home = Memory.policies[this.parentId].roomName;
+    flag.getSpawnQueue(this.home).clear();
     return true;
 };
 
 Policy.prototype.enact = function () {
     console.log("POLICY_WORKERS enact");
     const room = Game.rooms[this.home];
-    if (policy.existingOrders(this.home, this.parentId)) {
-        return;
-    }
-
     const policyId = this.parentId;
     const orders = flag.getSpawnQueue(this.home).orders(policyId, gc.SPAWN_PRIORITY_LOCAL);
     console.log("pw orders length", orders.length);
@@ -36,9 +37,9 @@ Policy.prototype.enact = function () {
     }
 
     const creeps = policy.getCreeps(policyId, gc.RACE_WORKER);
-
     const workers = creeps.length;
-    if (workers > economy.totalSourceAccessPointsRoom(room)+2) { // +2 guess
+    if (workers > economy.totalSourceAccessPointsRoom(room)+1) { // +2 guess
+        conosle.log("pw accespoints ",economy.totalSourceAccessPointsRoom(room), "skipping")
         return;
     }
 
@@ -58,9 +59,10 @@ Policy.prototype.enact = function () {
     console.log("ps rhs", Math.floor(room.energyAvailable/gc.WMC_COST),
         "=== ", Math.floor(room.energyCapacityAvailable/gc.WMC_COST));
     if (Math.floor(room.energyAvailable/gc.WMC_COST)
-            === Math.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
+            >= Math.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
         console.log("pw workers",workers, "<= acces poitns", economy.totalSourceAccessPointsRoom(room));
         if (workers <= economy.totalSourceAccessPointsRoom(room)) {
+            console.log("send order to queue");
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_WORKER,
@@ -70,6 +72,10 @@ Policy.prototype.enact = function () {
             );
         }
     }
+};
+
+Policy.prototype.budget = function() {
+    return { RESOURCE_ENERGY : 0 };
 };
 
 Policy.prototype.draftReplacment = function() {

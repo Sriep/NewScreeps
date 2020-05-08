@@ -4,8 +4,6 @@
  * @author Piers Shepperson
  */
 
-const gc = require("gc");
-const gf = require("gf");
 const flag = require("flag");
 
 const race = {
@@ -20,9 +18,18 @@ const race = {
         return creep.name.split("_")[0];
     },
 
-    body: function (race, ec) {
+    getBodyCounts(race, ec) {
         const raceModule = require("race_" + race);
-        const bodyCounts = raceModule.bodyCounts(ec);
+        return raceModule.bodyCounts(ec);
+    },
+
+    getCost(race, ec) {
+        const raceModule = require("race_" + race);
+        return raceModule.cost(ec);
+    },
+
+    body: function (race, ec) {
+        const bodyCounts = this.getBodyCounts(race,ec);
         if (!bodyCounts){
             return undefined;
         }
@@ -78,17 +85,6 @@ const race = {
             //console.log("1parts", creep, parts,creep.ticksToLive, JSON.stringify(creep.body),"part",part)
             lifeLeft += creep.ticksToLive * parts;
         }
-        //console.log("ticksLeftByPart lifeLeft", lifeLeft);
-
-        //let lifeLeft2 = 0;
-        //for (let creep in creeps) {
-        //    const parts = this.partsFromBody2(creeps[creep].body, part);
-        //    console.log("2parts", creep, parts,creeps[creep].ticksToLive,"body",
-        //        JSON.stringify(creeps[creep].body),"part",part );
-        //    lifeLeft2 += creeps[creep].ticksToLive * parts;
-        //}
-        //console.log("ticksLeftByPart lifeLeft2", lifeLeft2);
-
         return lifeLeft;
     },
 
@@ -107,7 +103,16 @@ const race = {
         return workParts(creep) * REPAIR_POWER;
     },
 
-    spawnCreep: function (spawn, policyId, race) {
+    sendOrderToQueue : function(room, cRace, energy, policyId, priority) {
+        const data = {
+            body: this.body(cRace, energy),
+            name: cRace,// + "_" + energy.toString(),
+        };
+        const queue = flag.getSpawnQueue(room.name);
+        return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
+    },
+/*
+        spawnCreep: function (spawn, policyId, race) {
         //console.log("spawnCreep race",race, "ec", spawn.room.energyCapacityAvailable)
         //console.log("spawnCreep race",race, "ec energyAvailablenumber", spawn.room.energyAvailable)
         const body = this.body(race, spawn.room.energyAvailable);
@@ -124,14 +129,6 @@ const race = {
         return this.spawn(spawn, body, race, memory);
     },
 
-    sendOrderToQueue : function(room, cRace, energy, policyId, priority) {
-        const data = {
-            body: this.body(cRace, energy),
-            name: cRace,// + "_" + energy.toString(),
-        };
-        const queue = flag.getSpawnQueue(room.name);
-        return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
-    },
 
     spawnWorker: function (spawn, policyId) {
         this.spawnCreep(spawn, policyId, gc.RACE_WORKER, gc.STATE_EMPTY_IDLE)
@@ -169,7 +166,7 @@ const race = {
         }
         return Memory.nextCreepId.toString();
     },
-
+*/
 };
 
 module.exports = race;

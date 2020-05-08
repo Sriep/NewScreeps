@@ -37,6 +37,18 @@ const construction = {
         }
     },
 
+    buildRoadSourceTowers: function(room) {
+        const sources = room.find(FIND_SOURCES);
+        const towers = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_TOWER }
+        });
+        for (let i = 0 ; i < sources.length ; i++ ){
+            for (let j = 0 ; j < towers.length ; j++ ){
+                buildRoad(sources[i].pos, spawns[j].pos);
+            }
+        }
+    },
+
     buildRoadSources: function(room) {
         const sources = room.find(FIND_SOURCES);
         for (let i = 0 ; i < sources.length ; i++ ){
@@ -125,16 +137,87 @@ const construction = {
         }
         return extensions === wantedExtensions;
     },
-}
 
-buildRoad = function(from, to) {
-    const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
-    const room = Game.rooms[from.roomName];
-    for(let step in path) {
-        room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+    looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
+        let range = 0;
+        let spiral = [];
+        //console.log("about to start lose spiral loop")
+        while (spiral.length < numNeeded) {
+            range++;
+            for (let dx = -1*range; dx <= range ; dx+=2 ) {
+                if (start.x+dx < 5 || 45 < start.x+dx) {
+                    continue
+                }
+                for (let dy = -1*range; dy <= range ; dy+=2 ) {
+                    if (start.y+dy < 5 || 45 < start.y+dy) {
+                        continue
+                    }
+                    if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
+                        spiral.push({x: start.x+dx, y: start.y+dy})
+                        if (spiral.length >= numNeeded) {
+                            return spiral
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    pointOK: function(x, y, avoid, terrain, avoidRange) {
+        if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
+            return false;
+        }
+        for (let i in avoid) {
+            if (Math.abs(avoid[i].x - x) <= avoidRange && Math.abs(avoid[i].y - y) <= avoidRange) {
+                return false;
+            }
+        }
+        return true
+    },
+
+    centerMass: function(points) { // need points.length > 0
+        let totalX = 0;
+        let totalY = 0;
+        for (let i in points) {
+            totalX += points[i].x;
+            totalY += points[i].y
+        }
+        cx = Math.round(totalX/points.length);
+        cy = Math.round(totalY/points.length);
+        return {x: cx, y: cy };
+    },
+
+    closestNonWall: function (pos, terrain) {
+        if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
+            return pos
+        }
+        let range = 0
+        while (true) {
+            range++
+            for (let dx = -1*range; dx <= range ; range++ ) {
+                for (let dy = -1*range; dy <= range ; range++ ) {
+                    if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
+                        return pos;
+                    }
+                }
+            }
+            if (range > 50) {
+                return gf.fatalError("cant find non wall point within " + range.toString() + " of " + pos.toString());
+            }
+        }
+    },
+
+    buildRoad: function(from, to) {
+        const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
+        const room = Game.rooms[from.roomName];
+        for(let step in path) {
+            room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+        }
     }
-}
+};
 
+
+/*
 // todo refactor for when extensions are built
 buildExtensions = function (room, numNeeded) {
     //console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
@@ -168,7 +251,7 @@ buildExtensions = function (room, numNeeded) {
             }
         }
     }
-}
+};
 
 looseSpiral = function (start, numNeeded, avoid, terrain, avoidRange) {
     let range = 0;
@@ -193,7 +276,7 @@ looseSpiral = function (start, numNeeded, avoid, terrain, avoidRange) {
             }
         }
     }
-}
+};
 
 pointOK = function(x, y, avoid, terrain, avoidRange) {
     if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
@@ -205,10 +288,10 @@ pointOK = function(x, y, avoid, terrain, avoidRange) {
         }
     }
     return true
-}
+};
 
 centerMass = function(points) { // need points.length > 0
-    let totalX = 0
+    let totalX = 0;
     let totalY = 0;
     for (let i in points) {
         totalX += points[i].x;
@@ -217,7 +300,7 @@ centerMass = function(points) { // need points.length > 0
     cx = Math.round(totalX/points.length);
     cy = Math.round(totalY/points.length);
     return {x: cx, y: cy };
-}
+};
 
 closestNonWall = function (pos, terrain) {
     if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
@@ -238,5 +321,5 @@ closestNonWall = function (pos, terrain) {
         }
     }
 }
-
+*/
 module.exports = construction;

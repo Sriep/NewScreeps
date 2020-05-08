@@ -39,9 +39,9 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let csRoom = 0;
         for (let i in sources) {
-            const initial = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad)
+            const initial = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad);
             //console.log("portersCsRoom distanceSourceSpawn", initial)
-            const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad)
+            const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad);
             //console.log("portersCsRoom distanceSourceController", repeat)
             csRoom += this.porterCsSource(gc.SORCE_REGEN_LT*sources[i].energyCapacity, initial, repeat);
         }
@@ -73,6 +73,23 @@ const budget = {
         const workLifetime = CREEP_LIFE_TIME - distance;
         const energySentPerWorkPart = workLifetime * UPGRADE_CONTROLLER_POWER;
         return energy / energySentPerWorkPart;
+    },
+
+    budgetWorkerRoom: function(room, numWorkers) {
+        wsPerWorker = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
+        const dSourceSpawn = cache.distanceSourceSpawn(sources[i], room, false);
+        const sources = room.find(FIND_SOURCES);
+        let dAvSourceController = 0;
+        for (let source of sources) {
+            dAvSourceController += cache.distanceSourceController(source, room, false);
+        }
+        dAvSourceController = dAvSourceController / sources.length;
+        const energyTrip = CARRY_CAPACITY/UPGRADE_CONTROLLER_POWER + UPGRADE_CONTROLLER_POWER/HARVEST_POWER;
+        const tripsLt = (CREEP_LIFE_TIME - dSourceSpawn)/(2*dAvSourceController);
+        const energyWLt = energyTrip * tripsLt;
+
+        workerCost = numWorkers -
+        return wsPerWorker * numWorkers * energyWLt;
     },
 
     spawnPartsLT: function (room) {
