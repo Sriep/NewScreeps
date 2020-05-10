@@ -47,7 +47,7 @@ Policy.prototype.enact = function () {
 };
 
 buildSourceContainer = function (source, flag) {
-    //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
+    console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
     let spots = economy.findMostFreeNeighbours(
         source.room, source.pos, 1
     );

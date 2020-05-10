@@ -102,8 +102,8 @@ buildExtensions = function (room, numNeeded) {
 // return a valid policy to replace this policy with that
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
-    //console.log("POLICY_BUILD_EXTENSIONS draftReplacment finsihed", this.m.finished)
-    return this.m.finished ? this : this;
+    console.log("POLICY_BUILD_EXTENSIONS draftReplacment finsihed", this.m.finished)
+    return this.m.finished ? false : this;
     /*
     const room = Game.rooms[this.home];
     const rcl = room.controller.level;

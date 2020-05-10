@@ -6,6 +6,10 @@
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
+const budget = require("budget");
+const state = require("state");
+const race = require("race");
+const flag = require("flag");
 
 function Policy  (id, data) {
     this.id = id;
@@ -24,13 +28,12 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_PORTERS enact budget", JSON.stringify(this.budget()));
+    //console.log("POLICY_PORTERS enact budget", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
-    const policyId = this.parentId;
-    const wWorkerLife = race.ticksLeftByPart(plicyId, gc.RACE_WORKER, WORK);
+    const wWorkerLife = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, WORK);
     if (wWorkerLife < CREEP_LIFE_TIME/10) {
         policy.sendOrderToQueue(
             room,
@@ -45,9 +48,9 @@ Policy.prototype.enact = function () {
         return;
     }
 
-    const wHarvesterLife = race.ticksLeftByPart(policyId, gc.RACE_HARVESTER, WORK);
-    const cWorkerLife = race.ticksLeftByPart(policyId, gc.RACE_WORKER, CARRY);
-    const cPorterLife = race.ticksLeftByPart(policyId, gc.RACE_PORTER, CARRY);
+    const wHarvesterLife = race.ticksLeftByPart(this.parentId, gc.RACE_HARVESTER, WORK);
+    const cWorkerLife = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, CARRY);
+    const cPorterLife = race.ticksLeftByPart(this.parentId, gc.RACE_PORTER, CARRY);
     const budgetHarvesterWsLt = budget.harvesterWsRoom(room, room, false)*CREEP_LIFE_TIME;
     const portersCsRoomLT = budget.portersCsRoom(room,room,false)*CREEP_LIFE_TIME;
 
@@ -82,7 +85,7 @@ Policy.prototype.enact = function () {
 
     //console.log("pp wHarvesterLife", wHarvesterLife, "budgetHarvesterWsLt", budgetHarvesterWsLt)
     if (wHarvesterLife<budgetHarvesterWsLt) {
-        const harvesters = policy.getCreeps(policyId, gc.RACE_HARVESTER).length;
+        const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
         //console.log("pp harvesters", harvesters,"posts",state.countHarvesterPosts(room).length);
         if (harvesters < state.countHarvesterPosts(room).length) {
             policy.sendOrderToQueue(
@@ -106,13 +109,14 @@ Policy.prototype.enact = function () {
         );
     }
 
-    const budgetUpgradersWsLt = budget.upgradersWsRoom(room, room, false)*CREEP_LIFE_TIME
+    const budgetUpgradersWsLt = budget.upgradersWsRoom(room, room.energyCapacityAvailable, false)*CREEP_LIFE_TIME
                                 - buildTicksNeeded/HARVEST_POWER; //todo factor in repairs
     const wUpgradersLife = wHarvesterLife-budgetHarvesterWsLt;
     //console.log("pp wUpgradersLife", wUpgradersLife, "budgetUpgradersWsLt", budgetUpgradersWsLt)
     if (wUpgradersLife < budgetUpgradersWsLt) {
         //console.log("pp harvesters",harvesters, "hposts", state.countHarvesterPosts(room).length,
         //    "uposts", state.countUpgraderPosts(room).length);
+        const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
         if (harvesters < state.countHarvesterPosts(room).length
                         + state.countUpgraderPosts(room).length) {
             policy.sendOrderToQueue(

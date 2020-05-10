@@ -55,22 +55,14 @@ Policy.prototype.govern = function () {
         if (this.m.agendaIndex !== -1) {
             Memory.records["rcl " + this.m.rcl][lastAgendaItem + " checked"] = Game.time;
         }
-        //if (lastAgendaItem === gc.POLICY_BUILD_EXTENSIONS) {
-        //    console.log("pg govern POLICY_BUILD_EXTENSIONS",lastAgendaItem ,"check return TRUE changing to FALSE delaying",this.m.agenda[this.m.rcl][this.m.agendaIndex+1]);
-        //    //console.log("force running POLICY_BUILD_EXTENSIONS")
-        //    //agenda.items()[gc.POLICY_BUILD_EXTENSIONS].enact(room, gc.POLICY_BUILD_EXTENSIONS, this.id);
-        //    return
-        //}
         const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
         //console.log("pg govern now agendaIndex", this.m.agendaIndex+1," about to encat",nextAgendaItem);
         agenda.items()[nextAgendaItem].enact(room, nextAgendaItem, this.id);
 
         this.m.agendaIndex++;
         Memory.records["rcl "+this.m.rcl][nextAgendaItem + " run"] = Game.time;
-        //console.log("pg added policy, polices", JSON.stringify(Memory.policies));
-        //console.log("pg agendaIndex", agendaIndex)
+        //console.log("pg added policy, agendaIndex", agendaIndex,"polices", JSON.stringify(Memory.policies));
         return;
-        //return this.govern(room);
     }
     //console.log("pg govern check return FALSE");
 };

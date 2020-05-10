@@ -33,7 +33,7 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_RCL1 enact");
+    //console.log("POLICY_RCL1 enact");
     const room = Game.rooms[this.home];
 
     const energy = room.energyAvailable;
@@ -56,7 +56,7 @@ Policy.prototype.budget = function() {
 };
 
 Policy.prototype.draftReplacment = function() {
-    console.log("POLICY_RCL1 draftReplacment contorller level", Game.rooms[this.home].controller.level);
+    //console.log("POLICY_RCL1 draftReplacment contorller level", Game.rooms[this.home].controller.level);
     return Game.rooms[this.home].controller.level === 1 ? this : false;
 };
 

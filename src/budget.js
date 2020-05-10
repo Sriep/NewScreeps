@@ -72,7 +72,7 @@ const budget = {
     },
 
     upgraderWsFromDistance: function(distance, energy) {
-        console.log("budget upgraderWsFromDistance distance", distance, "energy", energy)
+        //console.log("budget upgraderWsFromDistance distance", distance, "energy", energy)
         const workLifetime = CREEP_LIFE_TIME - distance;
         const energySentPerWorkPart = workLifetime * UPGRADE_CONTROLLER_POWER;
         return energy / energySentPerWorkPart;
@@ -121,6 +121,7 @@ const budget = {
 
     porterRoom: function (room) {
         const budgetHarvesterWs = budget.harvesterWsRoom(room, room, false);
+        //console.log("budget poerters room", room.energyCapacityAvailable);
         const budgetUpgradersWs =  budget.upgradersWsRoom(room, room.energyCapacityAvailable, false);
         const portersCsRoom = budget.portersCsRoom(room, room, false);
 
@@ -206,27 +207,33 @@ const budget = {
             //console.log("nnr")
             const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL][sources[i].id] = nnr;
+            values[gc.ROOM_NEUTRAL]["parts"] += nnr.parts;
             values[gc.ROOM_NEUTRAL]["setup"] += nnr.startUpCost;
             values[gc.ROOM_NEUTRAL]["profit"] += nnr.netEnergy;
             //console.log("nr")
             const nr = this.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
             values[gc.ROOM_NEUTRAL_ROADS][sources[i].id] = nr;
+            values[gc.ROOM_NEUTRAL_ROADS]["parts"] += nr.parts;
             values[gc.ROOM_NEUTRAL_ROADS]["setup"] += nr.startUpCost;
             values[gc.ROOM_NEUTRAL_ROADS]["profit"] += nr.netEnergy;
             //console.log("rnr")
             const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED][sources[i].id] = rnr;
+            values[gc.ROOM_RESERVED]["parts"] += rnr.parts;
             values[gc.ROOM_RESERVED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_RESERVED]["profit"] += rnr.netEnergy;
             values[gc.ROOM_OWNED][sources[i].id] = rnr;
+            values[gc.ROOM_OWNED]["parts"] += rnr.parts;
             values[gc.ROOM_OWNED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_OWNED]["profit"] += rnr.netEnergy;
             //console.log("rr")
             const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
             values[gc.ROOM_RESERVED_ROADS][sources[i].id] = rr;
+            values[gc.ROOM_RESERVED_ROADS]["parts"] += rr.parts;
             values[gc.ROOM_RESERVED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_RESERVED_ROADS]["profit"] += rr.netEnergy;
             values[gc.ROOM_OWNED_ROADS][sources[i].id] = rr;
+            values[gc.ROOM_OWNED_ROADS]["parts"] += rr.parts;
             values[gc.ROOM_OWNED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_OWNED_ROADS]["profit"] += rr.netEnergy;
         }
@@ -234,6 +241,8 @@ const budget = {
         //    "reserver cost road", this.reserverCost(room, spawns, true, force))
         values[gc.ROOM_RESERVED]["profit"] -= this.reserverCost(room, spawns, false, force);
         values[gc.ROOM_RESERVED_ROADS]["profit"] -= this.reserverCost(room, spawns, true, force);
+        values[gc.ROOM_RESERVED]["parts"] += 2;
+        values[gc.ROOM_RESERVED_ROADS]["parts"] += 6;
         values[gc.ROOM_OWNED]["profit"] += 600; // reduction in container repair
         values[gc.ROOM_OWNED_ROADS]["profit"] += 600; // reduction in container repair
         return values;
@@ -271,6 +280,7 @@ const budget = {
 
         //console.log("valueSourceRoad", JSON.stringify(rtv))
         return {
+            "parts": 3*hWs + 3*pCs + 3*uWs1,
             "startUpCost": startUpCost,
             "runningCostRepair": runningCostRepair,
             "runningCostCreeps": creepCosts,
@@ -298,6 +308,7 @@ const budget = {
 
         //console.log("valueSourceNoRoad", JSON.stringify(rtv))
         return {
+            "parts": 3*hWs + 3*pCs + 3*uWs1,
             "startUpCost": startUpCost,
             "runningCostRepair": runningCostRepair,
             "runningCostCreeps": creepCosts,

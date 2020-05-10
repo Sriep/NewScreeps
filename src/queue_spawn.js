@@ -34,7 +34,7 @@ SpawnQueue.prototype.reset = function () {
 };
 
 SpawnQueue.prototype.spawnNext = function (spawnObj) {
-    //console.log("spawnNext spawnCreep is", JSON.stringify(this))
+    //console.log("SpawnQueue spawnNext spawnCreep is", JSON.stringify(this))
     for ( let i = gc.SPAWN_PRIORITY_CRITICAL ; i < gc.SPAWN_PRIORITY_NONE ; i++ ) {
         if (i >= this.m.halted) {
             //console.log("halted at", JSON.stringify(i))
@@ -53,7 +53,7 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
             //    "name",name, "opts",JSON.stringify(data["opts"]));
             //const result = this.m.spawnDryRun(spawnObj, data.body, name, data.opts );
             const result = spawnObj.spawnCreep(data.body, name, data.opts);
-            console.log("spawnNext spawnCreep result", result);
+            //console.log("spawnNext spawnCreep result", result);
             if (result === OK) {
                 this.m.nextCreepId = this.m.nextCreepId +1;
                 //console.log("spawnNext result", result, "OK",OK,"nextCreepId", this.m.nextCreepId)
@@ -84,7 +84,7 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
                 return gf.fatalError("spawnCreep failed result");
             }
             // result === ERR_INVALID_ARGS || result === ERR_RCL_NOT_ENOUGH
-            console.log("spawnNext Removed bad spawn order", JSON.stringify(this.m.spawns[i][id], "spawnCrep result ", result))
+            //console.log("spawnNext Removed bad spawn order", JSON.stringify(this.m.spawns[i][id], "spawnCrep result ", result))
             //console.log("spawnNext loop", data,"deleting",i,id);
             delete this.m.spawns[i][id];
         }
@@ -165,7 +165,7 @@ SpawnQueue.prototype.clearMy = function (policyId, priority) {
     for (let i in this.m.spawns) {
         for (let j in this.m.spawns[i]) {
             if (this.m.spawns[i][j]["opts"]["memory"]["policyId"] === policyId) {
-                console.log("spawnNext clearMy 2 deleting",i,j);
+                //console.log("spawnNext clearMy 2 deleting",i,j);
                 delete this.m.spawns[i][j];
                 removed++;
             }

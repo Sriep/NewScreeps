@@ -50,20 +50,33 @@ State.prototype.enact = function () {
         }
     } else {
         const roomPos = gf.splitRoomName(this.creep.room.name);
-        const delta = gf.roomDirectionToDelta(dir, roomPos.EW, roomPos.NS);
+        let delta = gf.roomDirectionToDelta(dir, roomPos.EW, roomPos.NS);
+        console.log("STATE_SCOUT_IDLE before roomPos", JSON.stringify(roomPos), "delta", JSON.stringify(delta));
+        if (roomPos.x*1 + delta.x < 0) {
+            delta.x = -1*delta.x
+        }
+        if (roomPos.y*1 + delta.y < 0) {
+            delta.y = -1*delta.y
+        }
+        console.log("STATE_SCOUT_IDLE after roomPos", JSON.stringify(roomPos), "delta", JSON.stringify(delta));
         this.m.nextRoom = gf.roomNameFromSplit({
             EW: roomPos.EW,
             x: roomPos.x*1 + delta.x,
             NS: roomPos.NS,
             y: roomPos.y*1 + delta.y,
         });
-        //console.log("STATE_SCOUT_IDLE else this.m.nextRoom", this.m.nextRoom)
+        console.log("STATE_SCOUT_IDLE else this.m.nextRoom", this.m.nextRoom)
     }
     myFlag = Game.flags[this.creep.name];
     //console.log("myFlag pos", JSON.stringify(myFlag));
     if (myFlag) {
         if (myFlag.pos.roomName === this.creep.room.name) {
             console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
+            if (!gf.validateRoomName(this.m.nextRoom)) {
+                delete this.m.nextRoom;
+                this.m.dir = this.m.direction + 2% 8;
+                return;
+            }
             const newPosition =  new RoomPosition(25, 25, this.m.nextRoom);
             myFlag.setPosition(newPosition);
             //console.log("STATE_SCOUT_IDLE move flag", JSON.stringify(myFlag.pos));

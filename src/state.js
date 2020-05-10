@@ -426,9 +426,40 @@ const state = {
         } else {
             return undefined
         }
-    }
+    },
 
-}
+    findNextSourceContainer : function (creep) {
+        console.log("findNextSourceContainer room energyAvailable",creep.room.energyAvailable,
+            "room energyCapacityAvailable", creep.room.energyCapacityAvailable);
+        if (creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
+            console.log("findNextSourceContainer room at capacity");
+            return undefined;
+        }
+
+        const nextSpawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+        if (nextSpawn && nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+            console.log("findNextSourceContainer next spawn", nextSpawn.name,"energy capacity", nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY));
+            return nextSpawn
+        }
+
+        const nextSourceContainer = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            filter: function(structure)  {
+                return ((structure.structureType === STRUCTURE_TOWER
+                    && structure.store[RESOURCE_ENERGY]
+                    < structure.store.getCapacity(RESOURCE_ENERGY)
+                    * gc.TOWER_REFILL_THRESHOLD)
+                    || structure.structureType === STRUCTURE_EXTENSION )
+                    && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            }
+        });
+        if (nextSourceContainer) {
+            console.log("findNextSourceContainer container type", nextSourceContainer.type);
+            return nextSourceContainer;
+        }
+        console.log("findNextSourceContainer dropped though closest spawn", creep.pos.findClosestByRange(FIND_MY_SPAWNS).name)
+        //return creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+    }
+};
 
 module.exports = state;
 

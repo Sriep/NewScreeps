@@ -29,19 +29,19 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
+    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
     const room = Game.rooms[this.home];
     const controllerFlag = Game.flags[room.controller.id];
-    if (!controllerFlag.memory.containerPos) {
-        //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS controllerFlag.memory.containerPos", JSON.stringify(controllerFlag.memory.containerPos));
+    if (controllerFlag.memory.containerPos) { //undefined
         return;
     }
     let spots = economy.findMostFreeNeighbours(
         room, room.controller.pos, 2
     );
+    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS found spots", JSON.stringify(spots));
     if (spots.length === 0) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
@@ -66,7 +66,7 @@ isControllerContainerFinished = function (room) {
     if (!pos) {
         return false;
     }
-    return undefined !== state.findContainerAt(gf.roomPosFromPos(pos, room.name));
+    return !!state.findContainerAt(gf.roomPosFromPos(pos, room.name));
 };
 
 
@@ -76,6 +76,9 @@ isControllerContainerFinished = function (room) {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
+    //
+    //
+    // console.log("POLICY_BUILD_CONTROLLER_CONTAINERS draftReplacment isControllerContainerFinished(room)|",isControllerContainerFinished(room))
     return isControllerContainerFinished(room) ? false : this;
 };
 

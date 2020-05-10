@@ -18,7 +18,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
+    console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
     const home = Game.rooms[this.homeId];
     //console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
     if (home.controller.ticksToDowngrade
@@ -43,24 +43,11 @@ State.prototype.enact = function () {
         );
     }
 
-    const nextSourceContainer = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: function(structure)  {
-                return ((structure.structureType === STRUCTURE_TOWER
-                            && structure.store[RESOURCE_ENERGY]
-                            < structure.store.getCapacity(RESOURCE_ENERGY)
-                            * gc.TOWER_REFILL_THRESHOLD)
-                    || structure.structureType === STRUCTURE_EXTENSION
-                    || structure.structureType === STRUCTURE_SPAWN )
-                    && structure.store[RESOURCE_ENERGY]
-                    < structure.store.getCapacity(RESOURCE_ENERGY);
-            }
-        });
-    //console.log("nextSourceContainer pos", nextSourceContainer.pos)
-    //onsole.log("nextSourceContainer", nextSourceContainer, JSON.stringify(nextSourceContainer));
-    //console.log("nextSourceContainer", nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY),
-     //   "store",JSON.stringify(nextSourceContainer.store));
-    if (nextSourceContainer && nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-        //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
+    const nextSourceContainer = state.findNextSourceContainer(this.creep);
+    console.log("STATE_WORKER_FULL_IDLE nextSourceContainer", JSON.stringify(nextSourceContainer));
+
+    if (nextSourceContainer) {
+        console.log("STATE_WORKER_FULL_IDLE nextSourceContainer getFreeCapacity" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
         this.creep.memory.targetId = nextSourceContainer.id;
         return state.switchToMovePos(
             this.creep,
@@ -69,6 +56,7 @@ State.prototype.enact = function () {
             gc.STATE_WORKER_TRANSFER
         );
     }
+    console.log("STATE_WORKER_FULL_IDLE skipped filling source containers");
 /*
     if (nextSourceContainer.store[RESOURCE_ENERGY]
         < nextSourceContainer.store.getCapacity(RESOURCE_ENERGY)) {

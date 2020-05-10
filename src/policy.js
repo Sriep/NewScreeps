@@ -4,7 +4,6 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const gf = require("gf");
 const race = require("race");
 const flag = require("flag");
 
@@ -140,7 +139,7 @@ const policy = {
         //console.log("all policies after activate replacement", JSON.stringify(Memory.policies));
     },
 
-    removePolicy(id) {
+    removePolicy: function(id) {
         //console.log("policy remove policy", id, "type",Memory.policies[id].type);
         this.removeFromParentChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
         delete Memory.policies[id];
@@ -150,7 +149,7 @@ const policy = {
         };
     },
 
-    removeFromParentChildList(parentId, childType) {
+    removeFromParentChildList: function(parentId, childType) {
         //console.log("policy removeFromParentChildList", parentId, childType,
         //    "childlist", JSON.stringify(Memory.policies[parentId].m.childTypes));
         if (Memory.policies[parentId].m.childTypes) {
@@ -162,7 +161,15 @@ const policy = {
         }
     },
 
-    hasChildType(parentId, type) {
+    iterateChildren: function(parentId, fn) {
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].parentId === parentId) {
+                 fn(this.getPolicy(id));
+            }
+        }
+    },
+
+    hasChildType: function(parentId, type) {
         //console.log("policy hasChildType, parentId", parentId, "type", type);
         //console.log("policy hasChildType find result", _.find(Memory.policies[parentId].childTypes,
         //        childType  =>
@@ -183,7 +190,7 @@ const policy = {
         return false;
     },
 
-    getCreeps(policyId, cRace) {
+    getCreeps: function(policyId, cRace) {
         if (cRace) {
             return _.filter(Game.creeps, function (creep) {
                 return creep.memory.policyId === policyId

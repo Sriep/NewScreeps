@@ -27,13 +27,16 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function (shortfall) {
-    const policyId = this.id;
-    const creeps = policy.getCreeps(policyId, gc.RACE_SCOUT);
+Policy.prototype.enact = function () {
+    const creeps = policy.getCreeps(this.parentId, gc.RACE_SCOUT);
+    //console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
-        const orders = flag.getSpawnQueue(this.home).orders(this.id);
+        const orders = flag.getSpawnQueue(this.home).orders(this.parentId).filter(
+            order => order.sender === this.id
+        );
         if (creeps.length +  orders.length < gc.EXPLORE_CREEPS) {
-            this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
+            console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" )
+           this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
         }
     }
     //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
@@ -49,7 +52,10 @@ Policy.prototype.enact = function (shortfall) {
         }
         flag.flagRoom(creeps[i].room.name);
         //console.log("creep", creeps[i].name, "in unexplored room", creeps[i].room.name);
-        flagRoom.memory.value = budget.valueNeutralRoom(
+        if (!flagRoom.memory.value) {
+            flagRoom.memory.value = {}
+        }
+        flagRoom.memory.value[creeps[i].room.name] = budget.valueNeutralRoom(
             creeps[i].room.name,
             Game.rooms[this.home],
             false,
@@ -68,11 +74,12 @@ Policy.prototype.sendExplorers = function(shortfall) {
                 "direction" : this.m.direction,
             }},
             "name": gc.RACE_SCOUT + "_50",
+            "sender" : this.id,
         };
         flag.getSpawnQueue(this.home).addSpawn(
             data,
             gc.SPAWN_PRIORITY_MISC,
-            this.id,
+            this.parentId,
             gc.STATE_SCOUT_IDLE,
         );
         this.m.direction = (this.m.direction+2) % 8;

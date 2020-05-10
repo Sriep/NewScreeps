@@ -7,7 +7,7 @@
     //const budget = require("budget");
 
 const budget = require("budget");
-//const construction = require("construction");
+const construction = require("construction");
 const policy = require("policy");
 const gc = require("gc");
 const gf = require("gf");
@@ -24,9 +24,12 @@ const inserted = {
         //    false,
         //);
 
+
     },
 
     bottom: function () {
+        //console.log("--------- piers inserted------------")
+
     }
 
 };

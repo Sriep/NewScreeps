@@ -3,7 +3,8 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
-//const cache = require("cache");
+
+const TERRAIN_MASK_WALL = 1;
 
 const construction = {
     buildRoadSourceController: function(room) {
@@ -130,7 +131,7 @@ const construction = {
             return b.adj - a.adj;
         });
         const maxAdj = valid[0].adj;
-        valid = valid.filter(v => v.adj > maxAdj/2)
+        valid = valid.filter(v => v.adj > maxAdj/2);
         let bestSoFar = 0;
         for (let i = 0 ; i < valid.length ; i++) {
             if (valid[i].adj <= valid[0].adj/2) {
@@ -178,7 +179,7 @@ const construction = {
     looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
         let range = 0;
         let spiral = [];
-        console.log("about to start lose spiral loop")
+        console.log("about to start lose spiral loop");
         while (spiral.length < numNeeded) {
             range++;
             for (let dx = -1*range; dx <= range ; dx+=2 ) {
@@ -190,7 +191,7 @@ const construction = {
                         continue
                     }
                     if (this.pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
-                        spiral.push({x: start.x+dx, y: start.y+dy})
+                        spiral.push({x: start.x+dx, y: start.y+dy});
                         if (spiral.length >= numNeeded) {
                             return spiral
                         }
@@ -232,7 +233,7 @@ const construction = {
         );
     },
 */
-    closestNonWall_I: function (pos) {
+    closestNonWall: function (pos) {
         //console.log("in closestNonWall_I pos", JSON.stringify(pos));
         const terrain = Game.rooms[pos.roomName].getTerrain();
         if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
