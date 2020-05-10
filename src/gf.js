@@ -54,12 +54,26 @@ const gf = {
     },
 
     splitRoomName: function(roomName) {
-        nsew = roomName.split(/[0123456789]/).filter(n=>n);
-        xy = roomName.split(/[NSEW]/).filter(n=>n)
-        return { EW: nsew[0], NS: nsew[1], x: xy[0], y: xy[1]};
+        console.log(roomName);
+        const nsew = roomName.split(/[0123456789]/).filter(n=>n);
+        const xy = roomName.split(/[NSEW]/).filter(n=>n)
+        return { EW: nsew[0], NS: nsew[1], x: xy[0]*1, y: xy[1]*1};
+    },
+
+    validateRoomName : function(roomName) {
+        if (typeof roomName !== "string") {
+            return false;
+        }
+        const splitName = this.splitRoomName(roomName);
+        return (splitName.EW === "E" || splitName.EW === "W")
+                && (splitName.NS === "N" || splitName.NS === "S")
+                && (0 <= splitName.x && splitName.x <= 50)
+                && (0 <= splitName.y && splitName.y <= 50)
+                && roomName.length >= 4 && roomName.length <= 8;
     },
 
     roomNameFromSplit: function(room) {
+        console.log("gf roomNameFromSplit", JSON.stringify(room));
         return room.EW + room.x.toString() + room.NS + room.y.toString();
     },
 

@@ -38,9 +38,9 @@ Policy.prototype.enact = function () {
 
     const energy = room.energyAvailable;
     if (energy >= race_worker.WMC_COST) {
-        console.log("POLICY_RCL1 send order roomenergy >= race_worker.WMC_COST energy", energy);
-        console.log("POLICY_RCL1 room", room.name, "energy", energy,"parentid",
-            this.parentId, "state", gc.SPAWN_PRIORITY_CRITICAL);
+        //console.log("POLICY_RCL1 send order roomenergy >= race_worker.WMC_COST energy", energy);
+        //console.log("POLICY_RCL1 room", room.name, "energy", energy,"parentid",
+        //    this.parentId, "state", gc.SPAWN_PRIORITY_CRITICAL);
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
@@ -52,7 +52,7 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.budget = function() {
-    return { RESOURCE_ENERGY : 0 };
+    return { "net energy" : 0, "parts" : 0 };
 };
 
 Policy.prototype.draftReplacment = function() {

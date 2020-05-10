@@ -6,6 +6,8 @@
 
 const gf = require("gf");
 const gc = require("gc");
+const economy = require("economy");
+const state = require("state");
 
 // constructor
 function Policy  (id, data) {
@@ -23,29 +25,33 @@ Policy.prototype.initilise = function () {
     }
     this.home = Memory.policies[this.parentId].roomName;
     const room = Game.rooms[this.home];
+    //console.log("POLICY_BUILD_SOURCE_CONTAINERS initilise", JSON.stringify(this));
     return !!room && !!room.controller && room.controller.my;
 };
 
 // runs once every tick
 Policy.prototype.enact = function () {
+    //console.log("POLICY_BUILD_SOURCE_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
-        return;
+        //return;
     }
     const room = Game.rooms[this.home];
     const sources = room.find(FIND_SOURCES);
-    for (let i in sources) {
-        const flag = Game.flags[sources[i].id];
+    for (let source of sources) {
+        const flag = Game.flags[source.id];
+        //console.log("POLICY_BUILD_SOURCE_CONTAINERS source id", source.id, "flag", flag);
         if (!flag.memory.containerPos) {
-            buildSourceContainer(sources[i], flag);
+            buildSourceContainer(source, flag);
         }
     }
 };
 
 buildSourceContainer = function (source, flag) {
+    //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
     let spots = economy.findMostFreeNeighbours(
         source.room, source.pos, 1
     );
-     if (spots.length === 0) {
+    if (spots.length === 0) {
         return gf.fatalError("findMostFreeNeighbours cant get to source");
     }
     flag.memory.harvesterPosts = spots[0].neighbours;
@@ -56,7 +62,7 @@ buildSourceContainer = function (source, flag) {
     }
     const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
     if (result !== OK) {
-        console.log("spot", JSON.stringify(spots[0]));
+        //console.log("spot", JSON.stringify(spots[0]));
         gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
     }
 };
@@ -82,8 +88,8 @@ areSourceContainersFinished = function (room) {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    console.log("draftReplacment buld source containers ascf",
-        areSourceContainersFinished(room));
+    //console.log("draftReplacment buld source containers ascf",
+    //    areSourceContainersFinished(room));
     return areSourceContainersFinished(room) ? false : this;
 };
 

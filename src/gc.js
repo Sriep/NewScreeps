@@ -36,7 +36,8 @@ const pgc = {
     POLICY_BUILD_EXTENSIONS: "build_extensions",
     POLICY_BUILD_ROADS: "build_roads",
     POLICY_BUILD_SOURCE_CONTAINERS: "build_source_containers",
-    POLICY_BUILD_UPGRADE_CONTAINERS: "build_upgrade_containers",
+    POLICY_BUILD_CONTROLLER_CONTAINERS: "build_controller_containers",
+    POLICY_BUILD_TOWER: "buil_tower",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -157,39 +158,7 @@ const gc = {
     PORTER_FAST_MAX_SIZE: 25,
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
 
-    // Economy
-    // Building by RCL for room
-    BUILD_ORDER_RCL: [
-        [ pgc.ACTIVITY_FINISHED ],
-        [ pgc.POLICY_RCL1, pgc.ACTIVITY_FINISHED ],
-        [
-            pgc.POLICY_WORKERS,
-            pgc.POLICY_EXPLORE,
-            pgc.POLICY_BUILD_EXTENSIONS,
-            pgc.POLICY_HARVESTERS,
-            pgc.BUILD_SOURCE_CONTAINERS,
-            pgc.BUILD_CONTROLLER_CONTAINERS,
-            pgc.POLICY_PORTERS,
-            pgc.ACTIVITY_FINISHED
-        ],
-        [
-            // pgc.BUILD_TOWER, //todo
-            pgc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            pgc.BUILD_ROAD_SOURCE_SPAWN,
-            pgc.BUILD_ROAD_SOURCE_SOURCE,
-            pgc.BUILD_ROAD_SOURCE_CONTROLLER,
-            pgc.BUILD_ROAD_SPAWN_CONTROLLER,
-            // pgc.BUILD_ROAD_SOURCE_TOWERS, //todo
-            pgc.ACTIVITY_FINISHED
-        ],
-        [  pgc.ACTIVITY_FINISHED ],
-        [  pgc.ACTIVITY_FINISHED ],
-        [  pgc.ACTIVITY_FINISHED ],
-        [  pgc.ACTIVITY_FINISHED ],
-        [  pgc.ACTIVITY_FINISHED ],
-    ],
     ECONOMIES: [
-        pgc.POLICY_GOVERN,
         pgc.POLICY_RCL1,
         pgc.POLICY_WORKERS,
         pgc.POLICY_HARVESTERS,
@@ -202,10 +171,10 @@ const gc = {
     //INITIATIVE_UPGRADER: pgc.INITIATIVE_UPGRADER,
     // builds
     // storage structures
-    BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
-    BUILD_SOURCE_CONTAINERS: pgc.BUILD_SOURCE_CONTAINERS,
-    BUILD_CONTROLLER_CONTAINERS: pgc.BUILD_CONTROLLER_CONTAINERS,
-    BUILD_TOWER: "build_tower",
+    //BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
+    //BUILD_SOURCE_CONTAINERS: pgc.BUILD_SOURCE_CONTAINERS,
+    //BUILD_CONTROLLER_CONTAINERS: pgc.BUILD_CONTROLLER_CONTAINERS,
+    //BUILD_TOWER: "build_tower",
     // roads
     BUILD_ROAD_SOURCE_SPAWN: pgc.BUILD_ROAD_SOURCE_SPAWN,
     BUILD_ROAD_SOURCE_CONTROLLER: pgc.BUILD_ROAD_SOURCE_CONTROLLER,
@@ -226,7 +195,8 @@ const gc = {
     POLICY_BUILD_EXTENSIONS: pgc.POLICY_BUILD_EXTENSIONS,
     POLICY_BUILD_ROADS: pgc.POLICY_BUILD_ROADS,
     POLICY_BUILD_SOURCE_CONTAINERS: pgc.POLICY_BUILD_SOURCE_CONTAINERS,
-    POLICY_BUILD_UPGRADE_CONTAINERS: pgc.POLICY_BUILD_UPGRADE_CONTAINERS,
+    POLICY_BUILD_CONTROLLER_CONTAINERS: pgc.POLICY_BUILD_CONTROLLER_CONTAINERS,
+    POLICY_BUILD_TOWER: pgc.POLICY_BUILD_TOWER,
     //POLICY_DEFENCE: "defence",
     //POLICY_RESCUE: "rescue",
     //POLICY_BUILD: "build",
@@ -349,6 +319,8 @@ const gc = {
 
     //creep body bases
     WMC_COST: BODYPART_COST[WORK] + BODYPART_COST[MOVE] + BODYPART_COST[CARRY],
+    WWM_COST: 2*BODYPART_COST[WORK] + BODYPART_COST[MOVE],
+    CCM_COST: BODYPART_COST[MOVE] + 2*BODYPART_COST[CARRY],
     PORTER_WORKER_CARRY_RATIO: 8/3,
     HARVESTER_WORKER_RATIO: 8/5,
     RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],

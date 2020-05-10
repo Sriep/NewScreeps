@@ -3,6 +3,7 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
+const cache = require("cache");
 
 const construction = {
     buildRoadSourceController: function(room) {
@@ -72,7 +73,7 @@ const construction = {
         }
         const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_EXTENSION }
-        })
+        });
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < beingBuilt.length ; j++ ){
                 buildRoad(sources[i].pos, beingBuilt[j].pos);
@@ -108,40 +109,34 @@ const construction = {
         }) === 0;
     },
 
-    areExtensionsBuilt: function(room) {
-        const rcl = room.controller.level;
-        const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
-        const extensions = room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_EXTENSION }
-        });
-        //beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
-        //    filter: { structureType: STRUCTURE_EXTENSION }
-        //})
-        return allowedExtensions === extensions.length;
+    coverArea: function (pos, range) {
+        const terrain = Game.rooms[pos.roomName].getTerrain();
+        const length = 2*range+1
+        const deltas = this.nxmDeltaArray(length, length);
+        const valid = [];
+        for ( let dxy of deltas) {
+            if (terrain.get(pos.x + dxy.x, pos.y+dxy.y) !== TERRAIN_MASK_WALL) {
+                valid.push({x: pos.x+dxy.x, y: pos.y+dxy.y});
+            }
+        }
+
+        return valid;
     },
 
-    finishBuildingMissingExtensions: function(room) {
-        //console.log("finishBuildingMissingExtensions room", JSON.stringify(room))
-        const rcl = room.controller.level;
-        const allowedExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][rcl]
-        const extensions = room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_EXTENSION }
-        });
-        beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
-            filter: { structureType: STRUCTURE_EXTENSION }
-        })
-        const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
-        if (wantedExtensions > 0) {
-            buildExtensions(room, wantedExtensions);
-            //buildExtensions(room, 1);
+    nxmDeltaArray: function(n,m) {
+        const nmDelta = [];
+        for (let i = 0 ; i < n ; i++) {
+            for (let j = 0 ; j < m ; j++) {
+                nnDelta.push({x : i, y: j})
+            }
         }
-        return extensions === wantedExtensions;
+        return nmDelta;
     },
 
     looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
         let range = 0;
         let spiral = [];
-        //console.log("about to start lose spiral loop")
+        console.log("about to start lose spiral loop")
         while (spiral.length < numNeeded) {
             range++;
             for (let dx = -1*range; dx <= range ; dx+=2 ) {
@@ -152,7 +147,7 @@ const construction = {
                     if (start.y+dy < 5 || 45 < start.y+dy) {
                         continue
                     }
-                    if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
+                    if (this.pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
                         spiral.push({x: start.x+dx, y: start.y+dy})
                         if (spiral.length >= numNeeded) {
                             return spiral
@@ -187,24 +182,45 @@ const construction = {
         return {x: cx, y: cy };
     },
 
-    closestNonWall: function (pos, terrain) {
+    closestNonWall: function (pos) {
+        //return this.closestNonWall_I(pos);
+        //const name = "closestNonWall_" + cache.sPos(pos);
+        //console.log("closestNonWall pos", JSON.stringify(pos), "name",name, "result", result, "global", global["name"])
+        return cache.global(
+            this.closestNonWall_I,
+            "closestNonWall_" + cache.sPos(pos),
+            [pos],
+        );
+    },
+
+    closestNonWall_I: function (pos) {
+        //console.log("in closestNonWall_I pos", JSON.stringify(pos));
+        const terrain = Game.rooms[pos.roomName].getTerrain();
         if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
+            //console.log("closestNonWall_I not entered loop", terrain.get(pos.x, pos.y), "wall",TERRAIN_MASK_WALL)
             return pos
         }
-        let range = 0
-        while (true) {
-            range++
-            for (let dx = -1*range; dx <= range ; range++ ) {
-                for (let dy = -1*range; dy <= range ; range++ ) {
+        //let range = 0;
+        //console.log("closestNonWall_I range");
+        //return (pos);
+        //while (range < 50) {
+        for (let range = 0; range < 50; range++) {
+            //range++;
+            //console.log("In closest non wall range", range, "cpu", Game.cpu.getUsed());
+            //if (Game.cpu.Used > 50) {
+            //    console.log("large cpu", Game.cpu.getUsed());
+            //    return pos;
+            //}
+            for (let dx = -1*range; dx <= range ; dx++ ) {
+                for (let dy = -1*range; dy <= range ; dy++ ) {
                     if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
-                        return pos;
+                        return {x: pos.x + dx, y: pos.y + dy};
                     }
                 }
             }
-            if (range > 50) {
-                return gf.fatalError("cant find non wall point within " + range.toString() + " of " + pos.toString());
-            }
         }
+        //console.log("closestNonWall_I fell though loop");
+        return pos;
     },
 
     buildRoad: function(from, to) {
@@ -216,110 +232,4 @@ const construction = {
     }
 };
 
-
-/*
-// todo refactor for when extensions are built
-buildExtensions = function (room, numNeeded) {
-    //console.log("buildExtensions room", room.id, "numNeeded", numNeeded)
-    const sources = room.find(FIND_SOURCES);
-    const spawns  = room.find(FIND_MY_SPAWNS);
-    let keyPts = []
-    for (let i in sources) {
-        keyPts.push(sources[i].pos)
-    }
-    let avoid = keyPts;
-    for (let i in spawns) {
-        keyPts.push(spawns[i].pos)
-    }
-    let start = centerMass(keyPts);
-    const terrain = room.getTerrain();
-    start = closestNonWall(start, terrain);
-   // console.log("centerMass at", JSON.stringify(start));
-
-    const structs = room.find(FIND_MY_STRUCTURES)
-    for (let i in structs) {
-        avoid.push(structs[i].pos)
-    }
-
-    const extensionPos = looseSpiral(start, numNeeded, avoid, terrain,1)
-    if (extensionPos) {
-        for (let i in extensionPos) {
-            result = room.createConstructionSite(extensionPos[i].x, extensionPos[i].y, STRUCTURE_EXTENSION);
-            if (result !== OK) {
-                //console.log("build extension",i,"result",result,"at",JSON.stringify(extensionPos[i]));
-                //console.log("buildExtensions build extensino failed result", result.toString());
-            }
-        }
-    }
-};
-
-looseSpiral = function (start, numNeeded, avoid, terrain, avoidRange) {
-    let range = 0;
-    let spiral = [];
-    //console.log("about to start lose spiral loop")
-    while (spiral.length < numNeeded) {
-        range++;
-        for (let dx = -1*range; dx <= range ; dx+=2 ) {
-            if (start.x+dx < 5 || 45 < start.x+dx) {
-                continue
-            }
-            for (let dy = -1*range; dy <= range ; dy+=2 ) {
-                if (start.y+dy < 5 || 45 < start.y+dy) {
-                    continue
-                }
-                if (pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
-                    spiral.push({x: start.x+dx, y: start.y+dy})
-                    if (spiral.length >= numNeeded) {
-                        return spiral
-                    }
-                }
-            }
-        }
-    }
-};
-
-pointOK = function(x, y, avoid, terrain, avoidRange) {
-    if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
-        return false;
-    }
-    for (let i in avoid) {
-        if (Math.abs(avoid[i].x - x) <= avoidRange && Math.abs(avoid[i].y - y) <= avoidRange) {
-            return false;
-        }
-    }
-    return true
-};
-
-centerMass = function(points) { // need points.length > 0
-    let totalX = 0;
-    let totalY = 0;
-    for (let i in points) {
-        totalX += points[i].x;
-        totalY += points[i].y
-    }
-    cx = Math.round(totalX/points.length);
-    cy = Math.round(totalY/points.length);
-    return {x: cx, y: cy };
-};
-
-closestNonWall = function (pos, terrain) {
-    if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
-        return pos
-    }
-    let range = 0
-    while (true) {
-        range++
-        for (let dx = -1*range; dx <= range ; range++ ) {
-            for (let dy = -1*range; dy <= range ; range++ ) {
-                if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
-                    return pos;
-                }
-            }
-        }
-        if (range > 50) {
-            return gf.fatalError("cant find non wall point within " + range.toString() + " of " + pos.toString());
-        }
-    }
-}
-*/
 module.exports = construction;

@@ -33,9 +33,9 @@ const state = {
         creepState.enact()
     },
 
-    switchToMoveTarget(creep, target, range, nextState) {
+    switchToMoveFlag(creep, flag, range, nextState) {
         creep.memory.state = gc.STATE_MOVE_TARGET;
-        creep.memory.targetId = target.id;
+        creep.memory.targetName = flag.name;
         creep.memory.moveRange = range;
         creep.memory.next_state = nextState;
         return state.enact(creep);
@@ -85,7 +85,9 @@ const state = {
         let posts = 0;
         for (let i in sources) {
             //console.log("sources[i].id",sources[i].id,"memory", JSON.stringify(Game.flags[sources[i].id].memory))
-            posts += Game.flags[sources[i].id].memory.harvesterPosts.length;
+            if (Game.flags[sources[i].id].memory.harvesterPosts) {
+                posts += Game.flags[sources[i].id].memory.harvesterPosts.length;
+            }
         }
         //console.log("countHarvesterPosts posts",posts )
         return posts;
@@ -356,14 +358,11 @@ const state = {
     },
 
     spaceForHarvest: function (creep) {
-        //console.log("spaceForHarvest freeCapacity", creep.store.getFreeCapacity(RESOURCE_ENERGY));
-        const freeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
+         const freeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
         if (freeCapacity === 0) {
             //console.log("spaceForHarvest is false");
             return false;
         }
-        //const workparts = race.workParts(creep)*HARVEST_POWER;
-        //console.log("spaceForHarvest freeCapacity", freeCapacity, "> workparts", workparts)
         return creep.store.getFreeCapacity(RESOURCE_ENERGY)
             > race.workParts(creep)*HARVEST_POWER;
     },
@@ -372,9 +371,7 @@ const state = {
         if (!pos)
             return undefined;
         const StructAt = pos.lookFor(LOOK_STRUCTURES)
-        //console.log("findContainerAt", JSON.stringify(pos),"StructAt", JSON.stringify(StructAt))
-        //console.log("findContainerAt StructAT.type", StructAt.structureType, "SC", STRUCTURE_CONTAINER);
-        if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
+         if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
             return StructAt[0];
         }
         return undefined;
@@ -382,9 +379,6 @@ const state = {
 
     findContainerConstructionAt : function (pos) {
         const StructAt = pos.lookFor(LOOK_CONSTRUCTION_SITES)
-        //console.log("findContainerConstructionAt stricts", JSON.stringify(StructAt))
-        //console.log("StructAt.length", StructAt.length);
-        //concole.log("StructAt.structureType",StructAt.structureType,"StructAt.")
         if (StructAt.length > 0 && (StructAt[0].structureType === STRUCTURE_CONTAINER
             || StructAt[0].structureType === STRUCTURE_ROAD)) {
             return StructAt[0];
@@ -402,7 +396,6 @@ const state = {
     findContainerConstructionNear : function (creep, range) {
         if (!range) range = 0;
         const pos = creep.pos;
-        //console.log("lookForAtArea points",pos.y+range, pos.x-range, pos.y-range,pos.x+range)
         const sites = creep.room.lookForAtArea(
             LOOK_CONSTRUCTION_SITES,
             pos.y-range,
@@ -418,7 +411,6 @@ const state = {
                 return sites[i].constructionSite
             }
         }
-        //console.log("findContainerConstructionNear not found any");
         return undefined;
     },
 

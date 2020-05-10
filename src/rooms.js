@@ -7,6 +7,7 @@ const gc = require("gc");
 const rooms = {
 
     flag: function (room) {
+        //console.log("room flag roomname", room.name);
         let myRoom = room.controller && room.controller.my;
         this.flagPermanents(room, myRoom);
         if (myRoom) {
@@ -15,6 +16,7 @@ const rooms = {
     },
 
     flagPermanents: function (room, myRoom) {
+        //console.log("room flag permanents room",room.name)
         let flagName;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
@@ -90,6 +92,7 @@ const rooms = {
     },
 
     flagMyRoomStructures: function (room) {
+        console.log("room flagMyRoomStructures room",room.name)
         const links = room.find(FIND_STRUCTURES, {
             filter: function(struc) {
                 return struc.structureType === STRUCTURE_LINK;

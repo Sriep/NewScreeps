@@ -4,56 +4,85 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const gf = require("gf");
 const flag = require("flag");
 const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_SCOUT_IDLE;
     this.creep = creep;
+    //console.log("constructor STATE_SCOUT_IDLE memory", JSON.stringify(this.creep.memory));
+    this.m = this.creep.memory;
+    //console.log("constructor STATE_SCOUT_IDLE m", JSON.stringify(this.m));
 }
 
 State.prototype.enact = function () {
-    let nextRoom = this.creep.memory.nextRoom;
-    let dir = this.creep.memory.direction;
+    //const nextRoom = this.m.nextRoom;
+    //console.log("STATE_SCOUT_IDLE enact this.m.nextRoom", this.m.nextRoom)
+    let dir = this.m.direction;
     if (!dir) {
         dir = TOP;
     }
-    if (nextRoom) {
-        if (nextRoom === this.creep.room.name) {
-            const exits = Game.map.describeExits(nextRoom);
+    //console.log("STATE_SCOUT_IDLE nextroom1", nextRoom, "creep room",this.creep.room.name );
+    if (this.m.nextRoom) {
+        if (this.m.nextRoom === this.creep.room.name) {
+            const exits = Game.map.describeExits( this.m.nextRoom);
             const returnDir = (dir + 4) % 8;
+            let nextNextRoom;
             for (let i = (returnDir + 2) % 8; i % 8 !== returnDir; i += 2) {
-                const flagI = Game.flags[exit[i]];
+                const flagI = Game.flags[exits[i]];
                 if (flagI && flagI.memory.explored) {
                     continue;
                 }
-                nextRoom = exits[i];
+                nextNextRoom = exits[i];
                 break;
             }
-            if (nextRoom === this.creep.room.name) {
-                nextRoom = (returnDir + 2) % 8;
+            if (!nextNextRoom) {
+                nextNextRoom = (returnDir + 2) % 8;
+            }
+            this.m.nextRoom = nextNextRoom
+            //console.log("STATE_SCOUT_IDLE nrnextroom",this.m.nextRoom)
+        } else {
+            if (!gf.validateRoomName(this.m.nextRoom)) {
+                delete this.m.nextRoom
+                return;
             }
         }
     } else {
-        currentRoom = this.creep.room.name;
-        roomPos = gf.splitRoomName(currentRoom);
-        delta = gf.roomDirectionToDelta(dir, roomPos.EW, roomPos.NS);
-        nextRoom = gf.roomNameFromSplit({
+        const roomPos = gf.splitRoomName(this.creep.room.name);
+        const delta = gf.roomDirectionToDelta(dir, roomPos.EW, roomPos.NS);
+        this.m.nextRoom = gf.roomNameFromSplit({
             EW: roomPos.EW,
-            x: room.Pos.x + delta.x,
+            x: roomPos.x*1 + delta.x,
             NS: roomPos.NS,
-            y: room.Pos.y + delta.y,
+            y: roomPos.y*1 + delta.y,
         });
-        this.creep.memory.nextRoom = nextRoom;
+        //console.log("STATE_SCOUT_IDLE else this.m.nextRoom", this.m.nextRoom)
     }
-    // next room should now be an adjacent room
-    const flag = flag.getRoomFlag(nextRoom);
-    state.switchToMoveTarget(
-        this.creep,
-        flag,
-        4,
-        gc.STATE_SCOUT_IDLE,
-    );
+    myFlag = Game.flags[this.creep.name];
+    //console.log("myFlag pos", JSON.stringify(myFlag));
+    if (myFlag) {
+        if (myFlag.pos.roomName === this.creep.room.name) {
+            console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
+            const newPosition =  new RoomPosition(25, 25, this.m.nextRoom);
+            myFlag.setPosition(newPosition);
+            //console.log("STATE_SCOUT_IDLE move flag", JSON.stringify(myFlag.pos));
+        } else {
+            const myFlag = Game.flags[this.creep.name];
+            //console.log("STATE_SCOUT_IDLE about to move this.m.nextRoom", this.m.nextRoom)
+            const newPosition =  new RoomPosition(25, 25, this.m.nextRoom);
+            //console.log("STATE_SCOUT_IDLE about to move to flag flag", JSON.stringify(myFlag.pos), "id", myFlag.id);
+            state.switchToMoveFlag(
+                this.creep,
+                myFlag,
+                4,
+                gc.STATE_SCOUT_IDLE,
+            );
+        }
+    } else {
+        const newPosition =  new RoomPosition(25, 25, this.creep.room.name);
+        result = newPosition.createFlag(this.creep.name);
+    }
 };
 
 module.exports = State;

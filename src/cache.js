@@ -8,7 +8,9 @@ const gc = require("gc");
 const cache = {
 
     path(from, toArray, name, range, useRoad, redo) {
+        //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         if (toArray.length === 0) {
+            console.log("path toArray.length === 0 toArray", JSON.stringify(toArray));
             return undefined;
         }
         if (!name) {
@@ -27,6 +29,7 @@ const cache = {
         }
         const tag = useRoad ? "road" : "noroad";
         if (!redo && flag.memory[toArray[0].room.name][name][tag]) {
+            //console.log("pathflag.memory ", JSON.stringify(flag.memory[toArray[0].room.name]))
             return flag.memory[toArray[0].room.name][name][tag];
         }
         let goals = _.map(toArray, function(to) {
@@ -50,7 +53,7 @@ const cache = {
             ops: pfPath.ops,
             cost: pfPath.cost,
             incomplete: pfPath.incomplete,
-        }
+        };
         return flag.memory[toArray[0].room.name][name][tag];
     },
 
@@ -82,6 +85,22 @@ const cache = {
     distanceUpgraderSpawn: function (fromRoom, spawnRoom, useRoad, redo) {
         spawns = spawnRoom.find(FIND_MY_SPAWNS);
         return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
+    },
+
+    global: function(fn, name, args) {
+        if (!global[name]) {
+            global[name] = fn(...args);
+        }
+        return global[name];
+    },
+
+    sPos: function (pos) {
+        return this.sPoint(pos) + pos.roomName;
+    },
+
+    dPos: function (dPos) {
+        const point = dPoint(dPos);
+        return new RoomPosition(point.x, point.y, dPos.substring(1))
     },
 
     sPoint: function (point) {

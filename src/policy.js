@@ -16,21 +16,37 @@ const policy = {
         }
         this.checkRoomPolicies();
         for (let id in Memory.policies) {
-            console.log("enact policies id", id, "type", Memory.policies[id].type);
+            //console.log("enact policies id", id, "type", Memory.policies[id].type);
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
 
             const replacement = policy.draftReplacment();
-            if (replacement) {
+            if (replacement && replacement.type) {
                 if (replacement.type !== policy.type) {
-                    this.removeFromParnetChildList(policy.parentId, policy.type);
-                    console.log("enactPolicies replace policy with", JSON.stringify(replacement));
-                    replacement.policy.initilise();
+                    this.removeFromParentChildList(policy.parentId, policy.type);
+                    //console.log("enactPolicies replace policy with", JSON.stringify(replacement));
+                    if (!replacement.policy.initilise()) {
+                        console.log("replacement for policy", id, "does not initilise");
+                        Memory.records.policies.replaced[Game.time.toString()] = {
+                            "time" : Game.time,
+                            "old" : policy.type,
+                        };
+                        continue;
+                    }
+                    Memory.records.policies.replaced[Game.time.toString()] = {
+                        "time" : Game.time,
+                        "old" : policy.type,
+                        "new" : replacement.type,
+                    };
+                    Memory.policies[id] = replacement;
                 }
                 replacement.enact();
-                Memory.policies[id] = replacement;
             } else {
-                console.log("enactPolicies delete policy", id);
+                //console.log("enactPolicies delete policy", id);
+                Memory.records.policies.replaced[Game.time.toString()] = {
+                    "time" : Game.time,
+                    "old" : policy.type,
+                };
                 delete Memory.policies[id];
             }
         }
@@ -90,6 +106,7 @@ const policy = {
         if (!policy.initilise()) {
             console.log("Policy initilise failed no policy added policyType", policyType,
                 "data", JSON.stringify(data), "parentId", parentId);
+            Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
         }
         //console.log("activatePolicy newPolicyId",newPolicyId ,"policy", JSON.stringify(policy));
@@ -101,62 +118,80 @@ const policy = {
         Memory.policies[newPolicyId] = policy;
         //console.log("activatePolicy after new policy added", JSON.stringify(Memory.policies));
         Memory.nextPolicyId = Memory.nextPolicyId + 1;
+        Memory.records.policies.created[Game.time.toString()] = policy.type;
         return policy.id;
     },
 
-    replacePolices: function(policyType, data, parentId, replaceList) {
-        console.log("replace policy type", policyType,"data",JSON.stringify(data),"parentId",parentId, "replacelist",replaceList);
+    activateReplacePolicy: function(policyType, data, parentId, replaceList) {
+        //console.log("replace policy type", policyType,"data",JSON.stringify(data),"parentId",parentId, "replacelist",JSON.stringify(replaceList));
         //console.log("all policies", JSON.stringify(Memory.policies));
         for (let id in Memory.policies) {
             //console.log("replacePolices for loop id", id, "parnetId", Memory.policies[id]);
-            if (Memory.policies[id].parentId === parentId && replaceList.includes(Memory.policies[id].type)) {
-                console.log("replacePolices deleting id",id);
+            if (Memory.policies[id].parentId === parentId
+                && replaceList.includes(Memory.policies[id].type)) {
+                //console.log("replacePolices deleting id",id,"type",Memory.policies[id].type,"list",JSON.stringify(replaceList));
                 this.removePolicy(id);
             }
         }
-        console.log("all policies after filter", JSON.stringify(Memory.policies));
-        console.log("parentId", parentId);
+        //console.log("all policies after filter", JSON.stringify(Memory.policies));
+        //console.log("parentId", parentId);
+
         this.activatePolicy(policyType, data, parentId);
-        console.log("all policies after activate replacement", JSON.stringify(Memory.policies));
+        //console.log("all policies after activate replacement", JSON.stringify(Memory.policies));
     },
 
     removePolicy(id) {
-        console.log("policy remove policy", id, "type",id.type);
-        this.removeFromParnetChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
+        //console.log("policy remove policy", id, "type",Memory.policies[id].type);
+        this.removeFromParentChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
         delete Memory.policies[id];
+        Memory.records.policies.replaced[Game.time.toString()] = {
+            "time" : Game.time,
+            "old" : policy.type,
+        };
     },
 
-    removeFromParnetChildList(parentId, childType) {
-        console.log("policy removeFromParnetChildList", parentId, childType);
+    removeFromParentChildList(parentId, childType) {
+        //console.log("policy removeFromParentChildList", parentId, childType,
+        //    "childlist", JSON.stringify(Memory.policies[parentId].m.childTypes));
         if (Memory.policies[parentId].m.childTypes) {
+            //console.log("childtype",childType,"childlist before filter",JSON.stringify(Memory.policies[parentId].m.childTypes));
             Memory.policies[parentId].childType = Memory.policies[parentId].m.childTypes.filter(
                 child => child !== childType
             );
+            //console.log("childtype",childType,"childlist after filter",JSON.stringify(Memory.policies[parentId].m.childTypes));
         }
     },
 
     hasChildType(parentId, type) {
-        console.log("policy hasChildType, parentId", parentId, "type", type);
-        console.log("policy hasChildType find result", _.find(Memory.policies[parentId].childTypes,
-                childType  =>
-            type === childType
-        ));
+        //console.log("policy hasChildType, parentId", parentId, "type", type);
+        //console.log("policy hasChildType find result", _.find(Memory.policies[parentId].childTypes,
+        //        childType  =>
+        //    type === childType
+        //));
         // return undefined means can't find anythig that matchs
         // parnet has policy that matches type
-        return !!(_.find(Memory.policies[parentId].childTypes, childType  =>
-            type === childType
-        ));
+        //const parent  = Memory.policies[parentId];
+        //console.log("hasChildType before all policies", JSON.stringify(Memory.policies));
+        for (let id in Memory.policies) {
+            //console.log("hasChildType testing id", id, "type ",Memory.policies[id].type,"parentId, ",Memory.policies[id].parentId,"obj", JSON.stringify(Memory.policies[id]))
+            if (Memory.policies[id].type === type && Memory.policies[id].parentId === parentId) {
+                //console.log("hasChildType id",id," returns true");
+                return true;
+            }
+        }
+        //console.log("hasChildType returns false");
+        return false;
     },
 
-    getCreeps(policyId, race) {
-        if (race) {
+    getCreeps(policyId, cRace) {
+        if (cRace) {
             return _.filter(Game.creeps, function (creep) {
                 return creep.memory.policyId === policyId
+                    && race.getRace(creep) === cRace
             });
         } else {
             return _.filter(Game.creeps, function (creep) {
                 return creep.memory.policyId === policyId
-                    && race.getRace(creep) === race
             });
         }
 

@@ -22,10 +22,34 @@ const race = {
         const raceModule = require("race_" + race);
         return raceModule.bodyCounts(ec);
     },
-
+// {"work": 0, "carry": 0, "move" : 1}
     getCost(race, ec) {
-        const raceModule = require("race_" + race);
-        return raceModule.cost(ec);
+        const bodyCounts = this.getBodyCounts(race, ec);
+        let cost = 0;
+        if (bodyCounts[WORK]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[WORK];
+        }
+        if (bodyCounts[MOVE]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[MOVE];
+        }
+        if (bodyCounts[CARRY]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[CARRY];
+        }
+        if (bodyCounts[ATTACK]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[ATTACK];
+        }
+        if (bodyCounts[RANGED_ATTACK]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[RANGED_ATTACK];
+        }
+        if (bodyCounts[TOUGH]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[TOUGH];
+        }
+        if (bodyCounts[HEAL]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[HEAL];
+        }
+        if (bodyCounts[CLAIM]) {
+            cost += bodyCounts[WORK]*BODYPART_COST[CLAIM];
+        }
     },
 
     body: function (race, ec) {
@@ -72,7 +96,7 @@ const race = {
     },
 
     ticksLeftByPart(policyId, race, part) {
-        console.log("ticksLeftByPart policyId", policyId, "race", race, "part", part);
+        //console.log("ticksLeftByPart policyId", policyId, "race", race, "part", part);
 
         const creeps = _.filter(Game.creeps, function (c) {
             return c.memory.policyId === policyId

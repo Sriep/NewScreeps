@@ -12,7 +12,8 @@ function State (creep) {
     this.creep = creep;
     this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
-    console.log("STATE_WORKER_IDLE this", JSON.stringify(this));
+    this.m = creep.memory;
+    //console.log("STATE_WORKER_IDLE this", JSON.stringify(this));
 }
 
 State.prototype.enact = function () {
@@ -42,14 +43,14 @@ State.prototype.enact = function () {
         );
     }
 
-    const policyId = this.creep.policyId;
+    //const policyId = this.creep.policyId;
     let creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === policyId
+        return c.memory.policyId === this.policyId
             && state.isHarvestingHarvester(c)
     });
-    //console.log("isHarvestingHarvester coumt", creeps.length);
+    //console.log("STATE_WORKER_IDLE isHarvestingHarvester count", creeps.length);
     if (creeps.length > 0) {
-        //console.log("movoing to harvester");
+        //console.log("STATE_WORKER_IDLE moving to harvester");
         creeps = creeps.sort( function (a,b)  {
             return b.store.getUsedCapacity(RESOURCE_ENERGY)
                 - a.store.getUsedCapacity(RESOURCE_ENERGY);
@@ -63,7 +64,7 @@ State.prototype.enact = function () {
         )
     }
 
-    //console.log("not found harvester going to source");
+    //console.log("STATE_WORKER_IDLE not found harvester going to source");
     //console.log("source homeid", this.homeId, Game.rooms[this.homeId], )
     const source = state.findTargetSource(Game.rooms[this.homeId]);
     if (source) {

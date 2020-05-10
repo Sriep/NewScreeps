@@ -27,36 +27,56 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_GOVERN enact")
+    //console.log("POLICY_GOVERN enact")
     //console.log("policy govern this.m",JSON.stringify(this.m), "room", Game.rooms[this.roomName]);
     //console.log("policy govern, this.roomName", this.roomName);
+    if (!Memory.records["rcl "+this.m.rcl] ) {
+        Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
+    }
     if (Game.rooms[this.roomName].controller.level !== this.m.rcl) {
         this.m.rcl = Game.rooms[this.roomName].controller.level;
         this.m.agendaIndex = -1;
+        //Memory.records["rcl "+this.m.rcl] = {};
+        Memory.records["rcl "+Game.rooms[this.roomName].controller.level.toString()]["entered"] = Game.time;
     }
+
     this.govern();
 };
 
 Policy.prototype.govern = function () {
-
     const room = Game.rooms[this.roomName];
     if (this.m.agendaIndex >= this.m.agenda[this.m.rcl].length) {
         return;
     }
-    let agendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
-    console.log("pg govern agendaItme",agendaItem, "this.m.agendaIndex",this.m.agendaIndex,"this.id", this.id );
-    if (this.m.agendaIndex === -1 || agenda.items()[agendaItem].check(room, agendaItem, this.id)) {
+    const lastAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
+    //console.log("pg govern agendaItem",lastAgendaItem, "this.m.agendaIndex",this.m.agendaIndex,"this.id", this.id,"rcl", this.m.rcl );
+    if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem].check(room, lastAgendaItem, this.id)) {
+        //console.log("pg govern check return TRUE for agendaIndex", this.m.agendaIndex, "agendaItem",lastAgendaItem );
+        if (this.m.agendaIndex !== -1) {
+            Memory.records["rcl " + this.m.rcl][lastAgendaItem + " checked"] = Game.time;
+        }
+        //if (lastAgendaItem === gc.POLICY_BUILD_EXTENSIONS) {
+        //    console.log("pg govern POLICY_BUILD_EXTENSIONS",lastAgendaItem ,"check return TRUE changing to FALSE delaying",this.m.agenda[this.m.rcl][this.m.agendaIndex+1]);
+        //    //console.log("force running POLICY_BUILD_EXTENSIONS")
+        //    //agenda.items()[gc.POLICY_BUILD_EXTENSIONS].enact(room, gc.POLICY_BUILD_EXTENSIONS, this.id);
+        //    return
+        //}
+        const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
+        //console.log("pg govern now agendaIndex", this.m.agendaIndex+1," about to encat",nextAgendaItem);
+        agenda.items()[nextAgendaItem].enact(room, nextAgendaItem, this.id);
+
         this.m.agendaIndex++;
-        console.log("pg govern check succeeded about to enact agendaIndex", this.m.agendaIndex);
-        agenda.items()[agendaItem].enact(room, agendaItem, this.id);
-        console.log("pg added policy, polices", JSON.stringify(Memory.policies));
-        return this.govern(room);
+        Memory.records["rcl "+this.m.rcl][nextAgendaItem + " run"] = Game.time;
+        //console.log("pg added policy, polices", JSON.stringify(Memory.policies));
+        //console.log("pg agendaIndex", agendaIndex)
+        return;
+        //return this.govern(room);
     }
-    console.log("pg govern check failed");
+    //console.log("pg govern check return FALSE");
 };
 
 Policy.prototype.draftReplacment = function() {
-    console.log("pg calling draftReplacment");
+    //console.log("pg calling draftReplacment");
     return this
 };
 

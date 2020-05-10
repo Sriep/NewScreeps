@@ -7,20 +7,19 @@
 const inserted = require("inserted");
 const gc = require("gc");
 const state = require("state");
-const rooms = require("rooms");
+//const rooms = require("rooms");
 const policy = require("policy");
 const flag = require("flag");
-const government = require("government");
-
 
 module.exports.loop = function () {
     console.log("************************ Start ", Game.time," *********************************");
     inserted.top();
-
+    if (!Memory.started) {
+        startup();
+    }
     freeCreeps();
     flagRooms();
 
-    govern();
     moveCreeps();
     enactPolicies();
     spawnCreeps();
@@ -31,6 +30,16 @@ module.exports.loop = function () {
     console.log("************************ End ",  Game.time, " *********************************");
 
 };
+
+function startup() {
+    Memory.started = true
+    Memory.records = {};
+    Memory.records["started"] = Game.time;
+    Memory.records.policies = {};
+    Memory.records.policies.created = {};
+    Memory.records.policies.replaced = {};
+    Memory.records.policies.initilise_failed = {};
+}
 
 function freeCreeps() {
     for(let c in Memory.creeps) {
@@ -48,10 +57,6 @@ function moveCreeps() {
 
 function enactPolicies() {
     policy.enactPolicies();
-}
-
-function govern() {
-   // government.govern();
 }
 
 function spawnCreeps() {
@@ -73,9 +78,10 @@ function flagRooms() {
     if (Game.time % gc.FLAG_UPDATE_RATE === 0 ) {
         force = true;
     }
-    for ( let room in Game.rooms ) {
-        if ( (Game.rooms[room].memory && (!Game.rooms[room].memory.flagged) || force) ) {
-            rooms.flag(Game.rooms[room]);
+    for ( let roomName in Game.rooms ) {
+        if ( (Game.rooms[roomName].memory && (!Game.rooms[roomName].memory.flagged) || force) ) {
+            flag.flagRoom(roomName);
+            //rooms.flag(Game.rooms[room]);
         }
     }
 

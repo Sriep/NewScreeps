@@ -16,11 +16,11 @@ const economy = {
         , "energy.porter" : 40 , "worker" : 40},
 
     findMostFreeNeighbours: function (room, pos, range) {
-        const terrain = room.getTerrain()
+        const terrain = room.getTerrain();
         let bestSpots = [];
-        let maxSoFar = -1
+        let maxSoFar = -1;
         //let delta = gc.DELTA_MOVES[range];
-        let delta
+        let delta;
         switch (range) {
             case 0: delta = [{x:0, y:0}]; break;
             case 1: delta = gc.ONE_MOVE; break;

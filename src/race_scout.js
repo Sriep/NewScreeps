@@ -10,11 +10,7 @@ const race_scout = {
 
     bodyCounts: function (ec) {
         return {"work": 0, "carry": 0, "move" : 1}
-    }
-
-    cost: function (ec) {
-        return 50;
-    }
+    },
 
 };
 

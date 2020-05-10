@@ -17,15 +17,15 @@ function State (creep) {
 
 State.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_MOVE_POS");
-    const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos)
+    const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos);
     //console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
     //console.log("check creep pos", JSON.stringify(this.creep.pos),
     //    "is in rage",  this.creep.memory.moveRange, "of target", JSON.stringify(targetPos))
     //console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        //console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
-         //   JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+    //   console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
+    //        JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
             return state.switchTo(this.creep, this.creep.memory.next_state)
     }
     if (this.creep.memory.lastpositon) {
@@ -51,7 +51,7 @@ State.prototype.enact = function () {
             return gf.fatalError("ERR_NOT_OWNER");
         case ERR_NO_PATH:
             this.pathLost();
-            console.log(this.creep.name, "move ERR_NO_PATH to", JSON.stringify(this.creep.memory.targetPos))
+            //console.log(this.creep.name, "move ERR_NO_PATH to", JSON.stringify(this.creep.memory.targetPos))
             return this.creep.moveTo(targetPos, {reusePath: 0});
         case ERR_BUSY:                  // The creep is still being spawned.
             //console.log("moveTo returns  ERR_BUSY error) // thinks means spawning

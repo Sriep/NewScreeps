@@ -90,19 +90,19 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
         }
     }
     //this.m.save();
-    console.log("spawnNext empty queue", JSON.stringify(this));
+    //console.log("spawnNext empty queue", JSON.stringify(this));
     return gc.QUEUE_EMPTY;
 };
 
 SpawnQueue.prototype.addSpawn = function (data, priority, policyId, startState) {
     //console.log("addSpawn now", JSON.stringify(this));
-    console.log("SpawnQueue addSpawn order data", JSON.stringify(data), "priority", priority, "policyid", policyId, "start state", startState);
+    //console.log("SpawnQueue addSpawn order data", JSON.stringify(data), "priority", priority, "policyid", policyId, "start state", startState);
     if ( priority<0 || priority >= gc.SPAWN_PRIORITY_COUNT) {
-        console.log("SpawnQueue QUEUE_INSUFFICIENT_PRIORITY", priority );
+        //console.log("SpawnQueue QUEUE_INSUFFICIENT_PRIORITY", priority );
         return gc.QUEUE_INSUFFICIENT_PRIORITY;
     }
     if (!data || !data.body || !data.name || !policyId || !startState)  {
-        console.log("SpawnQueue QUEUE_INVALID_ARGS", data, "body",data.body,"policyId", policyId, "start state", startState);
+        //console.log("SpawnQueue QUEUE_INVALID_ARGS", data, "body",data.body,"policyId", policyId, "start state", startState);
         return gc.QUEUE_INVALID_ARGS;
     }
     if (!data.opts) {
@@ -122,7 +122,7 @@ SpawnQueue.prototype.addSpawn = function (data, priority, policyId, startState) 
     //console.log("SpawnQueue addSpawn after adding data", JSON.stringify(data));
     //console.log("SpawnQueue addSpawn SpawnQueue is", JSON.stringify(this));
     const q = flag.getRoomFlag(this.home).memory.spawnQueue;
-    console.log("SpawnQueue addSpawn memory after adding spawn", JSON.stringify(q));
+    //console.log("SpawnQueue addSpawn memory after adding spawn", JSON.stringify(q));
     return id;
 };
 
@@ -132,7 +132,7 @@ SpawnQueue.prototype.halt = function (priority) {
         return gc.QUEUE_INVALID_ARGS;
     }
     this.m.halted = priority;
-    console.log("SpawnQueue halted",priority);
+    //console.log("SpawnQueue halted",priority);
     //this.m.save();
     return OK;
 };
@@ -140,7 +140,7 @@ SpawnQueue.prototype.halt = function (priority) {
 SpawnQueue.prototype.removeSpawn = function (id) {
     for (let i in this.m.spawns ) {
         if (this.m.spawns[i][id]) {
-            console.log("spawnNext removeSpawn", data,"deleting",i,id);
+            //console.log("spawnNext removeSpawn", data,"deleting",i,id);
             delete this.m.spawns[i][id];
             //this.m.save();
             return OK;

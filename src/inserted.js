@@ -6,21 +6,27 @@
 // const economy = require("economy")
     //const budget = require("budget");
 
-//const budget = require("budget");
+const budget = require("budget");
 //const construction = require("construction");
 const policy = require("policy");
 const gc = require("gc");
+const gf = require("gf");
 
 const inserted = {
     top: function () {
+        //const home = Game.rooms["W7N7"];
+        //const w7n6 = Game.rooms["W7N6"];
+        //let flagRoom = Game.flags["W7N6"];
+
+        //flagRoom.memory.value_test = budget.valueNeutralRoom(
+        //    "W7N6",
+        //    home,
+        //    false,
+        //);
 
     },
 
     bottom: function () {
-        //const room = Game.rooms["W7N7"];
-        //console.log("inserted hasChildType 1 gc.POLICY_RCL1", policy.hasChildType(1,gc.POLICY_RCL1))
-        //console.log("hasChildType 1 gc.POLICY_RCL1", policy.hasChildType(1,[gc.POLICY_RCL1]))
-
     }
 
 };
