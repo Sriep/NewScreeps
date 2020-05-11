@@ -29,10 +29,10 @@ Policy.prototype.initilise = function () {
 
 Policy.prototype.enact = function () {
     const creeps = policy.getCreeps(this.parentId, gc.RACE_SCOUT);
-    //console.log("POLICY_EXPLORE creeps", creeps.length);
+    console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
         const orders = flag.getSpawnQueue(this.home).orders(this.parentId).filter(
-            order => order.memory.sender === this.id
+            order => {  order.memory && order.memory.sender === this.id }
         );
         if (creeps.length +  orders.length < gc.EXPLORE_CREEPS) {
            console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" );
@@ -52,10 +52,10 @@ Policy.prototype.enact = function () {
         }
         flag.flagRoom(creeps[i].room.name);
         //console.log("creep", creeps[i].name, "in unexplored room", creeps[i].room.name);
-        if (!flagRoom.memory.value) {
-            flagRoom.memory.value = {}
+        if (!flagRoom.memory.values) {
+            flagRoom.memory.values = {}
         }
-        flagRoom.memory.value[creeps[i].room.name] = budget.valueNeutralRoom(
+        flagRoom.memory.values[creeps[i].room.name] = budget.valueNeutralRoom(
             creeps[i].room.name,
             Game.rooms[this.home],
             false,

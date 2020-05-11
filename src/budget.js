@@ -15,7 +15,7 @@ const budget = {
         const sources = homeRoom.find(FIND_SOURCES);
         let wsRoom = 0;
         for (let i in sources) {
-            const distance = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad)
+            const distance = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad);
             //console.log("bu harvesterWsRoom distance",distance)
             wsRoom += this.harvesterWsSource(sources[i].energyCapacity, distance);
         }
@@ -30,7 +30,7 @@ const budget = {
         //console.log("harvesterWsSource workLifetime", workLifetime, "harvest power", HARVEST_POWER)
         const energyCollectedPerWorkPart = workLifetime * HARVEST_POWER;
         //console.log("bu energyCollectedPerWorkPart",energyCollectedPerWorkPart,"workLifetime",workLifetime)
-        const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
+        const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME);
         //console.log("bu maxEnergy",maxEnergy,"ec",ec,"CREEP_LIFE_TIME",CREEP_LIFE_TIME,"ENERGY_REGEN_TIME",ENERGY_REGEN_TIME)
         //console.log("bu source.energyCapacity",ec, "energyCollectedPerWorkPart", energyCollectedPerWorkPart, "maxEnergy", maxEnergy)
         //console.log("bu harvesterWsSource", maxEnergy / energyCollectedPerWorkPart);
@@ -58,7 +58,7 @@ const budget = {
         const tripsPerLife = workLifetime / repeat;
         const energyPortedPerCarryPart = tripsPerLife * CARRY_CAPACITY;
         //console.log("tripsPerLife",tripsPerLife);
-        const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME)
+        const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME);
         //console.log("maxEnergy", maxEnergy,"energyPortedPerCarryPart",energyPortedPerCarryPart)
         return maxEnergy / energyPortedPerCarryPart;
     },
@@ -80,7 +80,6 @@ const budget = {
 
     workersRoomRationHtoW: function (room, useRoad) {
         const sources = room.find(FIND_SOURCES);
-        let csRoom = 0;
         let avDistance = 0;
         for (let source of sources) {
             // todo more accurate calculation. spawns*accespoints to construction sites.
@@ -93,9 +92,8 @@ const budget = {
         const energyPerWLt = tripsLt * CARRY_CAPACITY;
         //console.log("budget workerWsRoom energyPerWLt",energyPerWLt,"avDistance",avDistance);
         const energyPerHlt = workLt * 2;
-        const ratioHtoW = energyPerHlt / energyPerWLt;
         //console.log("ratioHtoW",ratioHtoW,"energyPerHlt",energyPerHlt,"energyPerWLt",energyPerWLt);
-        return ratioHtoW;
+        return energyPerHlt / energyPerWLt;
     },
 
     workerRoom: function(room, numWorkers) {
@@ -126,7 +124,7 @@ const budget = {
         const portersCsRoom = budget.portersCsRoom(room, room, false);
 
         const harvesterCount = Math.ceil(budgetHarvesterWs*gc.WWM_COST/room.energyCapacityAvailable);
-        const porterCount = Math.ceil(portersCsRoom*gc.CCM_COST/room.energyCapacityAvailable);
+        //const porterCount = Math.ceil(portersCsRoom*gc.CCM_COST/room.energyCapacityAvailable);
         const upgradersCount = Math.ceil(budgetUpgradersWs*gc.WWM_COST/room.energyCapacityAvailable);
         //console.log("budgetUpgradersWsLT",budgetUpgradersWsLT,"portersCsRoom",portersCsRoom,"budgetHarvesterWsLt",budgetHarvesterWsLt)
 
@@ -144,7 +142,7 @@ const budget = {
         //    "portersCsRoom",portersCsRoom,"harvesterCoun",harvesterCount,"upgradersCount",upgradersCount)
 
         //console.log("budget porterRoom", JSON.stringify({ "net energy" : netEnergy, "parts" :  parts }))
-        return { "net energy" : netEnergy, "parts" :  parts };
+        return { "net_energy" : netEnergy, "parts" :  parts };
     },
 
     spawnPartsLT: function (room) {
@@ -198,9 +196,9 @@ const budget = {
             sourcePathsRoad.push(cache.path(source, spawns, "spawn", 1, true, force));
         }
         console.log("roomName pathToControllerRoad ...");
-        console.log("valueNeutralRoom room", room.name, "controller",room.controller,"id",room.controller.id )
+        console.log("valueNeutralRoom room", room.name, "controller",room.controller,"id",room.controller.id );
         const pathToControllerRoad = cache.path(room.controller, spawns, "controller", 1, true, force);
-        console.log("pathToControllerNoRoad ... pathToControllerRoad", JSON.stringify(pathToControllerRoad))
+        console.log("pathToControllerNoRoad ... pathToControllerRoad", JSON.stringify(pathToControllerRoad));
         const pathToControllerNoRoad = cache.path(room.controller, spawns, "controller", 1, false, force);
         //console.log("paths done pathToControllerNoRoad", JSON.stringify(pathToControllerNoRoad))
         for (let i in sources) {
@@ -258,7 +256,9 @@ const budget = {
     },
 
     valueSourceRoad: function (pathSpawn, pathController, energy, swamps) {
-        if (!swamps) swamps = 0;
+        if (!swamps) {
+            swamps = 0;
+        }
 
         const startUpCost = (pathController.cost - swamps)*CONSTRUCTION_COST[STRUCTURE_ROAD]
             + swamps *CONSTRUCTION_COST[STRUCTURE_ROAD]* CONSTRUCTION_COST_ROAD_SWAMP_RATIO
@@ -294,7 +294,7 @@ const budget = {
         const startUpCost = CONSTRUCTION_COST[STRUCTURE_CONTAINER];
         //const runningCostRepair = 750;
         const runningCostRepair = CREEP_LIFE_TIME*CONTAINER_DECAY/
-                                      (CONTAINER_DECAY_TIME*REPAIR_POWER)
+                                      (CONTAINER_DECAY_TIME*REPAIR_POWER);
         //console.log("valueSourceNoRoad runningCostRepair", runningCostRepair,"shoud be 750");
 
         const hWs = this.harvesterWsSource(energy, pathSpawn.cost);
@@ -320,7 +320,7 @@ const budget = {
         return hWs*125+50 + pCs*75 + uWs*125+50;
     },
 
-}
+};
 
 module.exports = budget;
 

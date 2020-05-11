@@ -160,12 +160,11 @@ const construction = {
         });
         if (valid[0].bestCompanion) {
             return [ {
-                x: valid[0].x,
-                y: valid[0].y,
-                "numPosts": valid[0].adj ,
-                "posts": valid[0].hit
-
-            },
+                    x: valid[0].x,
+                    y: valid[0].y,
+                    "numPosts": valid[0].adj ,
+                    "posts": valid[0].hit
+                },
                 {
                     x: valid[0].bestCompanion.x,
                     y: valid[0].bestCompanion.y,
@@ -247,7 +246,7 @@ const construction = {
         );
     },
 */
-    closestNonWall_I: function (pos) {
+    closestNonWall: function (pos) {
         //console.log("in closestNonWall_I pos", JSON.stringify(pos));
         const terrain = Game.rooms[pos.roomName].getTerrain();
         if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {

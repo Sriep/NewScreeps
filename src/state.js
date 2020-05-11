@@ -279,8 +279,8 @@ const state = {
     atUpgradingPost: function(pos) { // done
         const flag = Game.flags[Game.rooms[pos.roomName].controller.id];
         const posts = flag.memory.upgraderPosts;
-        for (let post of posts) {
-            if (pos.x === post.x && pos.y === post.y){
+        for (let i in posts) {
+            if (pos.x === posts[i].x && pos.y === posts[i].y){
                 return true;
             }
         }
@@ -292,8 +292,8 @@ const state = {
         if (!containers) {
             return undefined;
         }
-        for ( let container of containers) {
-            for (let post of container.posts) {
+        for ( let i in containers) {
+            for (let post of containers[i].posts) {
                 if (this.isUpgraderPostFree(post, room.name)) {
                     return post;
                 }

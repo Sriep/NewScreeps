@@ -49,10 +49,24 @@ Policy.prototype.enact = function () {
     });
     console.log("roomValues", JSON.stringify(roomValues));
     if (roomValues[0].profit > gc.MIN_ENERGY_TO_MINE) {
-        policy.activatePolicy(gc.POLICY_MINE_ROOM, {
-            "home" : roomValues[0].flagName,
-        }, undefined);
+        policy.activatePolicy(
+            gc.POLICY_MINE_ROOM,
+            { "home" : roomValues[0].flagName, },
+            this.parentId
+        );
     }
+};
+
+Policy.prototype.freeSpawnTimeLt = function () {
+    let reservedPartsLt = 0;
+    policy.iterateChildren(this.parentId, function(policy) {
+        if (policy.budget) {
+            reservedPartsLt += policy.budget().parts;
+        }
+    });
+    const room = Game.rooms[this.home];
+    const partsLt = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
+    return partsLt - reservedPartsLt;
 };
 
 minedRooms = function() {
@@ -64,19 +78,6 @@ minedRooms = function() {
     }
     return mindedRooms;
 };
-
-freeSpawnTimeLt = function (parentId, home) {
-    let reservedPartsLt;
-    policy.iterateChildren(this.parentId, function(policy) {
-        if (policy.budget) {
-            reservedPartsLt += policy.budget().parts;
-        }
-    });
-    const partsLt = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
-    return partsLt - reservedPartsLt;
-};
-
-
 
 Policy.prototype.draftReplacment = function() {
     return this

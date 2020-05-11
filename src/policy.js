@@ -92,6 +92,16 @@ const policy = {
         return Memory.nextPolicyId;
     },
 
+    getRoomEconomyPolicy : function(roomName) {
+        for (let id in Memory.policies) {
+            if ((Memory.policies[id].home === roomName &&
+                gc.ECONOMIES.includes(Memory.policies[id].type))) {
+                return getPolicy(id);
+            }
+        }
+        return undefined;
+    },
+
     activatePolicy: function(policyType, data, parentId) {
         console.log("activatePolicy type", policyType, "data", JSON.stringify(data), "parentid", parentId);
         if (parentId) {
@@ -108,35 +118,24 @@ const policy = {
             Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
         }
-        //console.log("activatePolicy newPolicyId",newPolicyId ,"policy", JSON.stringify(policy));
-        //console.log("Memory", newPolicyId, JSON.stringify(Memory.policies[newPolicyId]));
-        if (parentId) {
+         if (parentId) {
             Memory.policies[parentId].m.childTypes.push(policyType);
         }
         //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
         Memory.policies[newPolicyId] = policy;
-        //console.log("activatePolicy after new policy added", JSON.stringify(Memory.policies));
         Memory.nextPolicyId = Memory.nextPolicyId + 1;
         Memory.records.policies.created[Game.time.toString()] = policy.type;
         return policy.id;
     },
 
     activateReplacePolicy: function(policyType, data, parentId, replaceList) {
-        //console.log("replace policy type", policyType,"data",JSON.stringify(data),"parentId",parentId, "replacelist",JSON.stringify(replaceList));
-        //console.log("all policies", JSON.stringify(Memory.policies));
-        for (let id in Memory.policies) {
-            //console.log("replacePolices for loop id", id, "parnetId", Memory.policies[id]);
+          for (let id in Memory.policies) {
             if (Memory.policies[id].parentId === parentId
                 && replaceList.includes(Memory.policies[id].type)) {
-                //console.log("replacePolices deleting id",id,"type",Memory.policies[id].type,"list",JSON.stringify(replaceList));
                 this.removePolicy(id);
             }
         }
-        //console.log("all policies after filter", JSON.stringify(Memory.policies));
-        //console.log("parentId", parentId);
-
-        this.activatePolicy(policyType, data, parentId);
-        //console.log("all policies after activate replacement", JSON.stringify(Memory.policies));
+         this.activatePolicy(policyType, data, parentId);
     },
 
     removePolicy: function(id) {
@@ -150,14 +149,10 @@ const policy = {
     },
 
     removeFromParentChildList: function(parentId, childType) {
-        //console.log("policy removeFromParentChildList", parentId, childType,
-        //    "childlist", JSON.stringify(Memory.policies[parentId].m.childTypes));
         if (Memory.policies[parentId].m.childTypes) {
-            //console.log("childtype",childType,"childlist before filter",JSON.stringify(Memory.policies[parentId].m.childTypes));
-            Memory.policies[parentId].childType = Memory.policies[parentId].m.childTypes.filter(
+             Memory.policies[parentId].childType = Memory.policies[parentId].m.childTypes.filter(
                 child => child !== childType
             );
-            //console.log("childtype",childType,"childlist after filter",JSON.stringify(Memory.policies[parentId].m.childTypes));
         }
     },
 
@@ -170,24 +165,12 @@ const policy = {
     },
 
     hasChildType: function(parentId, type) {
-        //console.log("policy hasChildType, parentId", parentId, "type", type);
-        //console.log("policy hasChildType find result", _.find(Memory.policies[parentId].childTypes,
-        //        childType  =>
-        //    type === childType
-        //));
-        // return undefined means can't find anythig that matchs
-        // parnet has policy that matches type
-        //const parent  = Memory.policies[parentId];
-        //console.log("hasChildType before all policies", JSON.stringify(Memory.policies));
         for (let id in Memory.policies) {
-            //console.log("hasChildType testing id", id, "type ",Memory.policies[id].type,"parentId, ",Memory.policies[id].parentId,"obj", JSON.stringify(Memory.policies[id]))
-            if (Memory.policies[id].type === type && Memory.policies[id].parentId === parentId) {
-                //console.log("hasChildType id",id," returns true");
+             if (Memory.policies[id].type === type && Memory.policies[id].parentId === parentId) {
                 return true;
             }
         }
-        //console.log("hasChildType returns false");
-        return false;
+         return false;
     },
 
     getCreeps: function(policyId, cRace) {
