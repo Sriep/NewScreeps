@@ -160,11 +160,11 @@ const construction = {
         });
         if (valid[0].bestCompanion) {
             return [ {
-                    x: valid[0].x,
-                    y: valid[0].y,
-                    "numPosts": valid[0].adj ,
-                    "posts": valid[0].hit
-                },
+                x: valid[0].x,
+                y: valid[0].y,
+                "numPosts": valid[0].adj ,
+                "posts": valid[0].hit
+            },
                 {
                     x: valid[0].bestCompanion.x,
                     y: valid[0].bestCompanion.y,
@@ -174,7 +174,6 @@ const construction = {
         }
         return [ { x: valid[0].x, y: valid[0].y, "posts" : valid[0].adj} ];
     },
-
     withinRange(pos1, pos2, range) {
         return Math.abs(pos1.x - pos2.x) <= range && Math.abs(pos1.y - pos2.y) <= range
     },

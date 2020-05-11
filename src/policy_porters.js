@@ -3,6 +3,7 @@
  * Created by piers on 05/05/2020
  * @author Piers Shepperson
  */
+const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
@@ -28,7 +29,7 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    //console.log("POLICY_PORTERS enact budget", JSON.stringify(this.budget()));
+    console.log("POLICY_PORTERS enact budget", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
@@ -44,7 +45,7 @@ Policy.prototype.enact = function () {
         );
         return;
     }
-    if (room.energyAvailable < room.energyCapacityAvailable) {
+    if (room.energyAvailable < gf.roomEc(room)) {
         return;
     }
 
@@ -52,64 +53,70 @@ Policy.prototype.enact = function () {
     const cWorkerLife = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, CARRY);
     const cPorterLife = race.ticksLeftByPart(this.parentId, gc.RACE_PORTER, CARRY);
     const budgetHarvesterWsLt = budget.harvesterWsRoom(room, room, false)*CREEP_LIFE_TIME;
-    const portersCsRoomLT = budget.portersCsRoom(room,room,false)*CREEP_LIFE_TIME;
+    //const budgetPortersCsRoomLT = budget.portersCsRoom(room,room,false)*CREEP_LIFE_TIME;
 
-    const cLife = cWorkerLife + cPorterLife;
+   // const cPWLife = cWorkerLife + cPorterLife;
     const harvestingWs = Math.min(wHarvesterLife, budgetHarvesterWsLt);
 
     const buildTicksNeeded = economy.constructionLeft(room) / BUILD_POWER;
-    //console.log("pp clife",cLife,"harvestingWs", harvestingWs);
-    if (cLife < harvestingWs) {
-        // todo 1.5 guess, need to average time from constructions to source,
-        // and estimate repairs.
-        const guessBuldTicksToWorkerTicks = 1.5;
-        //console.log("pp cWorkerLife",cWorkerLife,"buildTicksNeeded",buildTicksNeeded);
-        if (cWorkerLife < guessBuldTicksToWorkerTicks*buildTicksNeeded+CREEP_LIFE_TIME/2) {
-            policy.sendOrderToQueue(
-                room,
-                gc.RACE_WORKER,
-                room.energyCapacityAvailable,
-                this.parentId,
-                gc.SPAWN_PRIORITY_LOCAL
-            );
-        } else {
-            policy.sendOrderToQueue(
-                room,
-                gc.RACE_PORTER,
-                room.energyCapacityAvailable,
-                this.parentId,
-                gc.SPAWN_PRIORITY_LOCAL
-            );
-        }
-    }
+    console.log("pp cPWLife",cPWLife,"harvestingWs", harvestingWs);
 
-    //console.log("pp wHarvesterLife", wHarvesterLife, "budgetHarvesterWsLt", budgetHarvesterWsLt)
-    if (wHarvesterLife<budgetHarvesterWsLt) {
-        const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
-        //console.log("pp harvesters", harvesters,"posts",state.countHarvesterPosts(room).length);
-        if (harvesters < state.countHarvesterPosts(room).length) {
-            policy.sendOrderToQueue(
-                room,
-                gc.RACE_HARVESTER,
-                room.energyCapacityAvailable,
-                this.parentId,
-                gc.SPAWN_PRIORITY_LOCAL
-            );
-        }
-    }
+    const harvestLifeNeededForBuilding = buildTicksNeeded/2;
+    const harvesterLifeRemaining = wHarvesterLife - harvestLifeNeededForBuilding;
+    const ratioHtoW = budget.workersRoomRationHtoW(room, false);
+    const ratioHtoP = budgetHarvesterWsLt/portersCsRoomLT;
+    const ratioWtoP = ratioHtoP/ratioHtoW;
+    const wsProportionBuild = budgetHarvesterWsLt/harvestLifeNeededForBuilding;
 
-    //console.log("cLife",clife, "< portersCsRoomLT", portersCsRoomLT);
-    if (cLife < portersCsRoomLT) {
+    console.log("pp cWorkerLife", cWorkerLife, "ratioHtoW", ratioHtoW,
+        "wHarvesterLife",wHarvesterLife,"harvestLifeNeededForBuilding",harvestLifeNeededForBuilding);
+    if (cWorkerLife < ratioHtoW*Math.min(wHarvesterLife, harvestLifeNeededForBuilding)) {
+        policy.sendOrderToQueue(
+            room,
+            gc.RACE_WORKER,
+            gf.roomEc(room),
+            this.parentId,
+            gc.SPAWN_PRIORITY_LOCAL
+        );
+    }
+    console.log("ph cPorterLife",cPorterLife,"ratioHtoP",ratioHtoP,
+        "harvesterLifeRemaiming",harvesterLifeRemaining);
+    if (cPorterLife < ratioHtoP*harvesterLifeRemaining) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_PORTER,
-            room.energyCapacityAvailable,
+            gf.roomEc(room),
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
     }
 
-    const budgetUpgradersWsLt = budget.upgradersWsRoom(room, room.energyCapacityAvailable, false)*CREEP_LIFE_TIME
+    console.log("pp wHarvesterLife", wHarvesterLife, "budgetHarvesterWsLt", budgetHarvesterWsLt);
+    if (wHarvesterLife<budgetHarvesterWsLt) {
+        const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
+        if (harvesters < state.countHarvesterPosts(room).length) {
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_HARVESTER,
+                gf.roomEc(room),
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+        }
+    }
+
+    console.log("cPWLife",cPWLife, "ratioWtoP",ratioWtoP, "< portersCsRoomLT", portersCsRoomLT);
+    if (cPorterLife < wsProportionBuild*portersCsRoomLT) {
+        policy.sendOrderToQueue(
+            room,
+            gc.RACE_PORTER,
+            gf.roomEc(room),
+            this.parentId,
+            gc.SPAWN_PRIORITY_LOCAL
+        );
+    }
+
+    const budgetUpgradersWsLt = budget.upgradersWsRoom(room, gf.roomEc(room), false)*CREEP_LIFE_TIME
                                 - buildTicksNeeded/HARVEST_POWER; //todo factor in repairs
     const wUpgradersLife = wHarvesterLife-budgetHarvesterWsLt;
     //console.log("pp wUpgradersLife", wUpgradersLife, "budgetUpgradersWsLt", budgetUpgradersWsLt)
@@ -122,7 +129,7 @@ Policy.prototype.enact = function () {
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_HARVESTER,
-                room.energyCapacityAvailable,
+                gf.roomEc(room),
                 this.parentId,
                 gc.SPAWN_PRIORITY_LOCAL
             );

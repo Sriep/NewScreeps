@@ -49,6 +49,6 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("STATE_MOVE_TARGET unrecognised return", result);
     }
-}
+};
 
 module.exports = State;

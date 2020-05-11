@@ -4,13 +4,16 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+//const cache = require("cache");
 
 const gf = {
     fatalError: function (msg) {
         console.log("{color-lightred}Fatal error: ",msg);
-        console.log("{color-lightred}" + Error().stack)
+        console.log("{color-lightred}" + Error().stack);
         if (gc.DEBUG)
-            throw(msg);
+            {
+                throw(msg);
+            }
     },
 
     assertEq: function (a, b, msg) {
@@ -54,9 +57,9 @@ const gf = {
     },
 
     splitRoomName: function(roomName) {
-        console.log(roomName);
+        //console.log(roomName);
         const nsew = roomName.split(/[0123456789]/).filter(n=>n);
-        const xy = roomName.split(/[NSEW]/).filter(n=>n)
+        const xy = roomName.split(/[NSEW]/).filter(n=>n);
         return { EW: nsew[0], NS: nsew[1], x: xy[0]*1, y: xy[1]*1};
     },
 
@@ -73,7 +76,7 @@ const gf = {
     },
 
     roomNameFromSplit: function(room) {
-        console.log("gf roomNameFromSplit", JSON.stringify(room));
+        //console.log("gf roomNameFromSplit", JSON.stringify(room));
         return room.EW + room.x.toString() + room.NS + room.y.toString();
     },
 
@@ -91,12 +94,12 @@ const gf = {
     directionToDelta : function (direction) {
         switch(direction) {
             case TOP: return {x:0,y:-1};
-            case TOP_RIGHT: return {x:1,y:-1}
+            case TOP_RIGHT: return {x:1,y:-1};
             case RIGHT: return {x:1,y:0};
             case BOTTOM_RIGHT: return {x:1, y:1};
             case BOTTOM: return {x:0,y:1};
             case BOTTOM_LEFT: return {x:-1,y:1};
-            case LEFT: return {x:-1,y:0}
+            case LEFT: return {x:-1,y:0};
             case TOP_LEFT: return{x:-1,y:-1};
             default:
                 this.gf.fatalError("unknown direction" + direction.toString());
@@ -105,6 +108,24 @@ const gf = {
 
     needsRepair : function (s) {
         return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD
+    },
+
+    // replacment for room.energyCapacity which seems broken
+    //roomEc: function (room) {
+    //    return cache.global(
+    //        this.roomEc_I,
+    //        "roomEc_I" + cache.sPos(room.name),
+    //        [room],
+    //    );
+    //},
+
+    roomEc : function(room) { //
+        let ec =  room.find(FIND_MY_SPAWNS).length * SPAWN_ENERGY_CAPACITY;
+        ec += room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_EXTENSION }
+        }).length * EXTENSION_ENERGY_CAPACITY[room.controller.level];
+        console.log("roomEc_I", ec);
+        return ec;
     },
 
     joinPointsBetween: function (pos1, pos2, creepsAreObsticals) {
@@ -116,7 +137,9 @@ const gf = {
             const pos = new RoomPosition( pos2.x + offsets[i].dx,
                 pos2.y + offsets[i].dy,
                 pos2.roomName );
-            if (gf.isEnterable(pos, creepsAreObsticals)) joinPos.push(pos);
+            if (gf.isEnterable(pos, creepsAreObsticals)) {
+                joinPos.push(pos);
+            }
         }
         return joinPos;
     },
@@ -130,11 +153,15 @@ const gf = {
             switch (atPos[i].type) {
                 case LOOK_TERRAIN:
                     if (atPos[i].terrain !== PLAIN && atPos[i].terrain !== SWAMP)
-                        return false;
+                        {
+                            return false;
+                        }
                     break;
                 case LOOK_STRUCTURES:
                     if (OBSTACLE_OBJECT_TYPES.includes(atPos[i].structure.structureType))
-                        return false;
+                        {
+                            return false;
+                        }
                     break;
                 case LOOK_CREEPS:
                 case LOOK_POWER_CREEPS:
@@ -142,7 +169,7 @@ const gf = {
                 case LOOK_SOURCES:
                 case LOOK_MINERALS:
                 case LOOK_NUKES:
-                    return false
+                    return false;
                 case LOOK_RUINS:
                 case LOOK_DEPOSITS:
                 case LOOK_ENERGY:
@@ -157,6 +184,6 @@ const gf = {
         return true;
     },
 
-}
+};
 
 module.exports = gf;

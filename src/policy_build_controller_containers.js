@@ -7,6 +7,7 @@
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
+const construction = require("construction");
 
 // constructor
 function Policy  (id, data) {
@@ -34,22 +35,25 @@ Policy.prototype.enact = function () {
     }
     const room = Game.rooms[this.home];
     const controllerFlag = Game.flags[room.controller.id];
-    if (controllerFlag.memory.upgarderPosts) { //undefined
+    if (controllerFlag.memory.upgraderPosts) { //undefined
         return;
     }
-    setContainerSites(room);
+    setContainerSites(room, controllerFlag);
 };
 
 setContainerSites = function(room, cflag) {
     const terrain = room.getTerrain();
-    let spots = construction.coverArea(room.controller.id, 3, terrain);
+    let spots = construction.coverArea(room.controller.pos, 3, terrain);
+    //console.log("setContainerSites spots", JSON.stringify(spots));
     if (spots.length === 0) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
     cflag.memory.upgraderPosts = spots;
 
     for (let spot of spots) {
-        pos = gf.roomPosFromPos(spot.x, spot.y, room.name);
+        //console.log("spot x", spot.x, "spoty", spot.y, "roomname", room.name, JSON.stringify(spot));
+        pos = gf.roomPosFromPos(spot, room.name);
+        //const pos = new RoomPosition(spot.x, spot.y, room.name);
         const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
             gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS controller container construction failed " + result.toString());

@@ -7,6 +7,7 @@
 const cache = require("cache");
 const gc = require("gc");
 const race = require("race");
+const gf = require("gf");
 
 const budget = {
 
@@ -97,9 +98,9 @@ const budget = {
     },
 
     workerRoom: function(room, numWorkers) {
-        const workerCost = numWorkers * race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable);
+        const workerCost = numWorkers * race.getCost(gc.RACE_WORKER, gf.roomEc(room));
         //console.log("budgetWorkerRoom", workerCost);
-        const wsPerWorker = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
+        const wsPerWorker = race.getBodyCounts(gc.RACE_WORKER, gf.roomEc(room));
         //const dSourceSpawn = cache.distanceSourceSpawn(sources[i], room, false);
         const sources = room.find(FIND_SOURCES);
         let dAvSourceController = 0;
@@ -119,13 +120,13 @@ const budget = {
 
     porterRoom: function (room) {
         const budgetHarvesterWs = budget.harvesterWsRoom(room, room, false);
-        //console.log("budget poerters room", room.energyCapacityAvailable);
-        const budgetUpgradersWs =  budget.upgradersWsRoom(room, room.energyCapacityAvailable, false);
+        //console.log("budget poerters room", gf.roomEc(room));
+        const budgetUpgradersWs =  budget.upgradersWsRoom(room, gf.roomEc(room), false);
         const portersCsRoom = budget.portersCsRoom(room, room, false);
 
-        const harvesterCount = Math.ceil(budgetHarvesterWs*gc.WWM_COST/room.energyCapacityAvailable);
-        //const porterCount = Math.ceil(portersCsRoom*gc.CCM_COST/room.energyCapacityAvailable);
-        const upgradersCount = Math.ceil(budgetUpgradersWs*gc.WWM_COST/room.energyCapacityAvailable);
+        const harvesterCount = Math.ceil(budgetHarvesterWs*gc.WWM_COST/gf.roomEc(room));
+        //const porterCount = Math.ceil(portersCsRoom*gc.CCM_COST/gf.roomEc(room));
+        const upgradersCount = Math.ceil(budgetUpgradersWs*gc.WWM_COST/gf.roomEc(room));
         //console.log("budgetUpgradersWsLT",budgetUpgradersWsLT,"portersCsRoom",portersCsRoom,"budgetHarvesterWsLt",budgetHarvesterWsLt)
 
         const harvestersCost = budgetHarvesterWs*gc.WWM_COST + harvesterCount*BODYPART_COST[CARRY];
@@ -173,12 +174,12 @@ const budget = {
         const sources = room.find(FIND_SOURCES);
         const spawns = home.find(FIND_MY_SPAWNS);
         const values = {};
-        values[gc.ROOM_NEUTRAL] = {'setup': 0, 'profit': 0};
-        values[gc.ROOM_NEUTRAL_ROADS] = {'setup': 0, 'profit': 0};
-        values[gc.ROOM_RESERVED] = {'setup': 0, 'profit': 0};
-        values[gc.ROOM_RESERVED_ROADS] = {'setup': 0, 'profit': 0};
-        values[gc.ROOM_OWNED] = {'setup': 0, 'profit': 0};
-        values[gc.ROOM_OWNED_ROADS] = {'setup': 0, 'profit': 0};
+        values[gc.ROOM_NEUTRAL] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_NEUTRAL_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_RESERVED] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_RESERVED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_OWNED] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_OWNED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
 
         let sourcePathsRoad = [];
         let sourcePathNoRoad = [];

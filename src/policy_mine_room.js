@@ -22,19 +22,35 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
+    if (this.m.spawnRoom) {
+        return;
+    }
+    if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
+        return;
+    }
+    this.m.spawnRoom = this.getSpawnRoom();
+    if (!this.m.spawnRoom) {
+        return;
+    }
+
+    gouvoner = policy.getGouvernerPolicy(this.m.spawnRoom.name);
+    gouvoner.addColoney(this.home);
 };
 
-Policy.prototype.getSupplyRoom = function() {
+Policy.prototype.getSpawnRoom = function() {
     const values  = Game.flags[this.home][values];
     let bestProfit = 0;
     let bestRoom;
+    let useroad = false;
     for(let roomName in values) {
-        const profit = getProfitRoom(room, values[roomName]);
+        const roomBest = getProfitRoom(room, values[roomName]).profit;
+        const profit = roomBest.profit;
+        useroad = roomBest.road;
         if (profit > bestProfit) {
             bestRoom = roomName;
         }
     }
-    return bestRoom;
+    return { "name" : bestRoom, "road": useroad } ;
 };
 
 getProfitRoom = function(room, valueObj) {
@@ -42,15 +58,15 @@ getProfitRoom = function(room, valueObj) {
     valueNoRoad = getProfitRoomRoad(room, valueObj, budget, false);
     valueRoad = getProfitRoomRoad(room, valueObj, budget, true);
     if (!valueNoRoad) {
-        return valueRoad ? valueRoad.value.profit : 0;
+        return valueRoad ? { "profit": valueRoad.value.profit, "road": true} : 0;
     }
     if (!valueRoad) {
-        return valueNoRoad.value.profit;
+        return { "profit": valueNoRoad.value.profit, "road": false } ;
     }
     if (valueNoRoad.value.profit > valueRoad.value.profit) {
-        return valueNoRoad.value.profit
+        return { "profit": valueNoRoad.value.profit, "road": false }
     }
-    return valueRoad.value.profit;
+    return { "profit" : valueRoad.value.profit, "road" : true }  ;
 };
 
 getProfitRoomRoad = function(room, valueObj, budget, useRoad) {

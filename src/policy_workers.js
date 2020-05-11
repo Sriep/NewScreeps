@@ -27,7 +27,7 @@ Policy.prototype.initilise = function () {
     flag.getSpawnQueue(this.home).clear();
     for (let id in Memory.policies) {
         if (id !== this.id && Memory.policies[id].type === gc.POLICY_WORKERS) {
-            console.log("Worker policy", JSON.stringify(this));
+            //console.log("Worker policy", JSON.stringify(this));
             gf.fatalError("two worker policies");
         }
     }
@@ -47,7 +47,7 @@ Policy.prototype.enact = function () {
     const creeps = policy.getCreeps(policyId, gc.RACE_WORKER).length;
     const workers = creeps.length;
     if (workers > this.equilibriumWorkers()) { // +2 guess
-        console.log("pw accespoints ",economy.totalSourceAccessPointsRoom(room), "skipping");
+        //console.log("pw accespoints ",economy.totalSourceAccessPointsRoom(room), "skipping");
         return;
     }
 
@@ -65,12 +65,12 @@ Policy.prototype.enact = function () {
     }
 
     //console.log("ps rhs", Math.floor(room.energyAvailable/gc.WMC_COST),
-    //    "=== ", Math.floor(room.energyCapacityAvailable/gc.WMC_COST));
+    //    "=== ", Math.floor(gf.roomEc(room)/gc.WMC_COST));
     if (Math.floor(room.energyAvailable/gc.WMC_COST)
-            >= Math.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
-        console.log("pw workers",workers, "<= acces poitns", economy.totalSourceAccessPointsRoom(room));
+            >= Math.floor(gf.roomEc(room)/gc.WMC_COST)) {
+        //console.log("pw workers",workers, "<= acces poitns", economy.totalSourceAccessPointsRoom(room));
         if (workers <= this.equilibriumWorkers()) {
-            console.log("send order to queue");
+            //console.log("send order to queue");
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_WORKER,

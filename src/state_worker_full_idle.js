@@ -12,13 +12,13 @@ function State (creep) {
         //console.log(creep.name,"In STATE_WORKER_FULL_IDLE with empty creep");
     }
     this.type = gc.STATE_WORKER_FULL_IDLE;
-    this.creep = creep
-    this.policyId = creep.memory.policyId
+    this.creep = creep;
+    this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
+   // console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
     const home = Game.rooms[this.homeId];
     //console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
     if (home.controller.ticksToDowngrade
@@ -44,10 +44,10 @@ State.prototype.enact = function () {
     }
 
     const nextSourceContainer = state.findNextSourceContainer(this.creep);
-    console.log("STATE_WORKER_FULL_IDLE nextSourceContainer", JSON.stringify(nextSourceContainer));
+    //console.log("STATE_WORKER_FULL_IDLE nextSourceContainer", JSON.stringify(nextSourceContainer));
 
     if (nextSourceContainer) {
-        console.log("STATE_WORKER_FULL_IDLE nextSourceContainer getFreeCapacity" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
+        //console.log("STATE_WORKER_FULL_IDLE nextSourceContainer getFreeCapacity" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
         this.creep.memory.targetId = nextSourceContainer.id;
         return state.switchToMovePos(
             this.creep,
@@ -97,6 +97,6 @@ State.prototype.enact = function () {
         gc.RANGE_UPGRADE,
         gc.STATE_WORKER_UPGRADE
     );
-}
+};
 
 module.exports = State;

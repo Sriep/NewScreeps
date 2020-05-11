@@ -9,6 +9,7 @@ const economy = require("economy");
 const race = require("race");
 
 const state = {
+
     stackDepth: 0,
 
     enactCreep : function(creep) {
@@ -17,9 +18,7 @@ const state = {
     },
 
     enact : function(creep) {
-        //console.log("state stack depth", this.stackDepth)
         if (this.stackDepth > gc.MAX_STATE_STACK) {
-            //console.log("state stack too big");
             return;
         }
         this.stackDepth++;
@@ -111,8 +110,6 @@ const state = {
             const posts = flag.memory.harvesterPosts;
             for (let i in posts) {
                 const post = posts[i];
-                //console.log("findFreeHarvesterPost check post", JSON.stringify(post));
-                //const post = gf.roomPosFromPos(posts[i], room.name);
                 if (this.isHarvesterPostFree(post, room.name)) {
                     post.source = sources[s];
                     return post;
@@ -429,16 +426,17 @@ const state = {
     },
 
     findNextSourceContainer : function (creep) {
-        console.log("findNextSourceContainer room energyAvailable",creep.room.energyAvailable,
-            "room energyCapacityAvailable", creep.room.energyCapacityAvailable);
-        if (creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
+        //console.log("findNextSourceContainer room energyAvailable",creep.room.energyAvailable,
+       //     "room energyCapacityAvailable", gf.roomEc(creep.room));
+        //if (creep.room.energyAvailable === creep.gf.roomEc(room)) {
+        if (creep.room.energyAvailable === gf.roomEc(creep.room)) {
             console.log("findNextSourceContainer room at capacity");
             return undefined;
         }
 
         const nextSpawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
         if (nextSpawn && nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-            console.log("findNextSourceContainer next spawn", nextSpawn.name,"energy capacity", nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY));
+            //console.log("findNextSourceContainer next spawn", nextSpawn.name,"energy capacity", nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY));
             return nextSpawn
         }
 
@@ -448,15 +446,17 @@ const state = {
                     && structure.store[RESOURCE_ENERGY]
                     < structure.store.getCapacity(RESOURCE_ENERGY)
                     * gc.TOWER_REFILL_THRESHOLD)
-                    || structure.structureType === STRUCTURE_EXTENSION )
-                    && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                    || structure.structureType === STRUCTURE_EXTENSION
+                    || structure.structureType === STRUCTURE_SPAWN)
+                    && (!structure.store.energy
+                        || structure.store.energy < structure.store.getCapacity(RESOURCE_ENERGY));
             }
         });
         if (nextSourceContainer) {
-            console.log("findNextSourceContainer container type", nextSourceContainer.type);
+            //console.log("findNextSourceContainer container type", nextSourceContainer.type);
             return nextSourceContainer;
         }
-        console.log("findNextSourceContainer dropped though closest spawn", creep.pos.findClosestByRange(FIND_MY_SPAWNS).name)
+        //console.log("findNextSourceContainer dropped though closest spawn", creep.pos.findClosestByRange(FIND_MY_SPAWNS).name)
         //return creep.pos.findClosestByRange(FIND_MY_SPAWNS);
     }
 };

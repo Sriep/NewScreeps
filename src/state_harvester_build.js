@@ -61,8 +61,8 @@ State.prototype.enact = function () {
             // assume target is invalid because its built.
             //console.log(this.creep.name,"details",JSON.stringify(this.creep.store))
             //console.log("site", JSON.stringify(site));
-            console.log("site", JSON.stringify(site));
-            console.log("pos", JSON.stringify(site.pos));
+            //console.log("site", JSON.stringify(site));
+            //console.log("pos", JSON.stringify(site.pos));
             //console.log("store", JSON.stringify(this.creep.store))
             //console.log("space for harvest", state.spaceForHarvest(this.creep))
             //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
@@ -78,6 +78,6 @@ State.prototype.enact = function () {
             return gf.fatalError("no valid result");
     }
     //console.log(this.creep.name,"sucessful build");
-}
+};
 
 module.exports = State;

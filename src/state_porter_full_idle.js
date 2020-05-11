@@ -22,19 +22,20 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
 
-    const nextDelivery = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-        filter: function(s)  {
-            return (s.structureType === STRUCTURE_TOWER
-                || s.structureType === STRUCTURE_EXTENSION
-                || s.structureType === STRUCTURE_SPAWN
-                //&& s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY))
-                && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
-        }
-    });
+    const nextDelivery = state.findNextSourceContainer(this.creep);
+    //const nextDelivery = this.creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+    //    filter: function(s)  {
+    //        return (s.structureType === STRUCTURE_TOWER
+    //            || s.structureType === STRUCTURE_EXTENSION
+    //            || s.structureType === STRUCTURE_SPAWN
+    //            //&& s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY))
+    //            && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
+    //    }
+    //});
     //console.log("next delivery store", JSON.stringify(nextDelivery.store));
     //console.log("next delivery getFreeCapacity", nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY));
     //console.log("nextDelivery", nextDelivery, "pos",JSON.stringify(nextDelivery.pos))
-    if (nextDelivery && nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+    if (nextDelivery) {//} && nextDelivery.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
         //console.log("about to delive to targt store", JSON.stringify(nextDelivery.store));
         //console.log("nextSourceContainer" , nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY))
         this.creep.memory.targetId = nextDelivery.id;

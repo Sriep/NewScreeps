@@ -25,7 +25,7 @@ const policy = {
                     this.removeFromParentChildList(policy.parentId, policy.type);
                     //console.log("enactPolicies replace policy with", JSON.stringify(replacement));
                     if (!replacement.policy.initilise()) {
-                        console.log("replacement for policy", id, "does not initilise");
+                        //console.log("replacement for policy", id, "does not initilise");
                         Memory.records.policies.replaced[Game.time.toString()] = {
                             "time" : Game.time,
                             "old" : policy.type,
@@ -56,7 +56,7 @@ const policy = {
             const room = Game.rooms[roomName];
             if (!room.memory.policy || !Memory.policies[room.memory.policy] ) {
                 if (room.controller && room.controller.my) {
-                    console.log("call activate policy checkRoomPolicies room", roomName);
+                    //console.log("call activate policy checkRoomPolicies room", roomName);
                     room.memory.policy = this.activatePolicy(gc.POLICY_GOVERN, {roomName: roomName})
                 } else {
                     //room.memory.policy = this.activatePolicy(gc.POLICY_NEUTRAL_ROOM, {roomId: roomId})
@@ -96,10 +96,19 @@ const policy = {
         for (let id in Memory.policies) {
             if ((Memory.policies[id].home === roomName &&
                 gc.ECONOMIES.includes(Memory.policies[id].type))) {
-                return getPolicy(id);
+                return this.getPolicy(id);
             }
         }
         return undefined;
+    },
+
+    getGouvernerPolicy : function(roomName) {
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].home === roomName &&
+                Memory.policies[id].type === gc.POLICY_GOVERN) {
+                return this.getPolicy(id);
+            }
+        }
     },
 
     activatePolicy: function(policyType, data, parentId) {

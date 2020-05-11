@@ -58,20 +58,9 @@ const cache = {
     },
 
     distance(from, toArray, name, range, useRoad) {
-        //const flag = Game.flags[from.id];
-        //const tag = useRoad ? "road" : "noroad";
-        //const room = toArray[0].room;
-        //if (!flag.memory[name] || !flag.memory[name][tag] ) {
-            const p = this.path(from, toArray, name, range, useRoad);
-            //console.log("name", name,"tag", tag,"cache distance", JSON.stringify(flag.memory))
-            //console.log(p.cost,"cache distance", JSON.stringify(p))
-            return p.cost
-        //}
-
-        //console.log("name", name,"tag", tag,"cache distance", JSON.stringify(flag.memory))
-        //console.log(flag.memory[name][tag].cost,"chache distance3", JSON.stringify(flag.memory[name][tag]))
-        //return flag.memory[name][tag].cost;
-    },
+        const p = this.path(from, toArray, name, range, useRoad);
+        return p.cost
+     },
 
     distanceSourceSpawn: function(source, spawnRoom, useRoad, redo) {
         spawns = spawnRoom.find(FIND_MY_SPAWNS);
@@ -108,7 +97,7 @@ const cache = {
     },
 
     dPoint: function(str) {
-        const code = str.charCodeAt(0)
+        const code = str.charCodeAt(0);
         return {"x": code % 50, "y": Math.floor(code / 50)};
     },
 
@@ -127,14 +116,14 @@ const cache = {
         return String.fromCharCode(...sPath);
     },
 
-    deserialisePath: function (uString, headerOnly) {
+    deserialisePath: function (uString) {
         let path = [];
         for (let i in uString.length) {
-            code = uString.charCodeAt(i)
+            code = uString.charCodeAt(i);
             path.push({"x": code % 50, "y": Math.floor(code / 50)});
         }
         return path;
     },
-}
+};
 
 module.exports = cache;

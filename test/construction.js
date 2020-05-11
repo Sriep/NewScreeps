@@ -165,7 +165,6 @@ const construction = {
                 y: valid[0].y,
                 "numPosts": valid[0].adj ,
                 "posts": valid[0].hit
-
             },
                 {
                     x: valid[0].bestCompanion.x,

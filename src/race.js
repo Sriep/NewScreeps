@@ -5,6 +5,7 @@
  */
 
 const flag = require("flag");
+//const gf = require("gf");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,
@@ -63,7 +64,7 @@ const race = {
             body.push(WORK);
         }
         if (bodyCounts[MOVE] < 1) {
-            console.log("body race", race, "ec",ec);
+            //console.log("body race", race, "ec",ec);
             return undefined;
         }
         for (let i = 0; i < bodyCounts[MOVE]; i++) {
@@ -137,7 +138,7 @@ const race = {
     },
 /*
         spawnCreep: function (spawn, policyId, race) {
-        //console.log("spawnCreep race",race, "ec", spawn.room.energyCapacityAvailable)
+        //console.log("spawnCreep race",race, "ec", spawn.gf.roomEc(room))
         //console.log("spawnCreep race",race, "ec energyAvailablenumber", spawn.room.energyAvailable)
         const body = this.body(race, spawn.room.energyAvailable);
         if (!body) {

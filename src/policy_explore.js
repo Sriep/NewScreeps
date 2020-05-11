@@ -29,7 +29,7 @@ Policy.prototype.initilise = function () {
 
 Policy.prototype.enact = function () {
     const creeps = policy.getCreeps(this.parentId, gc.RACE_SCOUT);
-    console.log("POLICY_EXPLORE creeps", creeps.length);
+    //console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
         const orders = flag.getSpawnQueue(this.home).orders(this.parentId).filter(
             order => {  order.memory && order.memory.sender === this.id }
