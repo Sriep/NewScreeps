@@ -6,7 +6,6 @@
 
 const gf = require("gf");
 const gc = require("gc");
-const economy = require("economy");
 const state = require("state");
 
 // constructor
@@ -35,28 +34,26 @@ Policy.prototype.enact = function () {
     }
     const room = Game.rooms[this.home];
     const controllerFlag = Game.flags[room.controller.id];
-    if (controllerFlag.memory.containerPos) { //undefined
+    if (controllerFlag.memory.upgarderPosts) { //undefined
         return;
     }
-    let spots = economy.findMostFreeNeighbours(
-        room, room.controller.pos, 2
-    );
-    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS found spots", JSON.stringify(spots));
+    setContainerSites(room);
+};
+
+setContainerSites = function(room, cflag) {
+    const terrain = room.getTerrain();
+    let spots = construction.coverArea(room.controller.id, 3, terrain);
     if (spots.length === 0) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
+    cflag.memory.upgraderPosts = spots;
 
-    controllerFlag.memory.upgraderPosts = spots[0].neighbours;
-    spots[0].pos.roomName = room.name;
-    controllerFlag.memory.containerPos = spots[0].pos;
-    if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
-        //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS findContainerOrConstructionAt");
-        return;
-    }
-    const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
-    if (result !== OK) {
-        //console.log("spot", JSON.stringify(spots[0]));
-        gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS controller container construction failed " + result.toString());
+    for (let spot of spots) {
+        pos = gf.roomPosFromPos(spot.x, spot.y, room.name);
+        const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
+        if (result !== OK) {
+            gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS controller container construction failed " + result.toString());
+        }
     }
 };
 

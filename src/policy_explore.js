@@ -32,10 +32,10 @@ Policy.prototype.enact = function () {
     //console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
         const orders = flag.getSpawnQueue(this.home).orders(this.parentId).filter(
-            order => order.sender === this.id
+            order => order.memory.sender === this.id
         );
         if (creeps.length +  orders.length < gc.EXPLORE_CREEPS) {
-            console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" )
+           console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" );
            this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
         }
     }
@@ -72,9 +72,9 @@ Policy.prototype.sendExplorers = function(shortfall) {
             "opts": {"memory": {
                 "home" : this.roomName,
                 "direction" : this.m.direction,
+                "sender" : this.id,
             }},
             "name": gc.RACE_SCOUT + "_50",
-            "sender" : this.id,
         };
         flag.getSpawnQueue(this.home).addSpawn(
             data,

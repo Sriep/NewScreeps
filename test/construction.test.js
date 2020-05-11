@@ -8,15 +8,15 @@ const assert = require('assert');
 const construction = require("./construction");
 const Terrain = require("./terrain");
 
-const pt = { x : 22, y : 13 }
-const range = 3;
+const pt = { x : 22, y : 13 };
 
 describe("construction", function() {
     describe("cover  area", function() {
         it("should show best two points to put contaienr", function() {
            const terrainW7N7 = new Terrain("W7N7");
            const pts = construction.coverArea(pt, 3, terrainW7N7);
-           assert.strictEqual(pts[0].posts + pts[1].posts, 2*3*3);
+           console.log(JSON.stringify(pts));
+           assert.strictEqual(pts[0].numPosts + pts[1].numPosts, 2*3*3);
         });
 
         it("should return true if points within range", function() {

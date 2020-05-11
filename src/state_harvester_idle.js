@@ -24,15 +24,9 @@ State.prototype.enact = function () {
     //console.log("wsHarvesting",wsHarvesting,">= wBudget", wBudget);
 
     if (wsHarvesting >= wBudget) {
-        const UpgradecontainerPos = Game.flags[home.controller.id].memory.containerPos;
-        if (UpgradecontainerPos) {
-            const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradecontainerPos, this.homeId))
-            if (upgradeContainer) {
-                //console.log()
-                return this.goUpgrade();
-            } else {
-                return
-            }
+        const UpgradePost = state.findFreeUpgraderPost(home);
+        if (UpgradePost) {
+            return this.goUpgrade(UpgradePost);
         }
     }
 
@@ -54,10 +48,10 @@ State.prototype.enact = function () {
     if (state.atUpgradingPost(this.creep.pos)) {
         //console.log("at UpgradingPost", JSON.stringify(this.creep.pos))
         const UpgradecontainerPos = Game.flags[home.controller.id].memory.containerPos;
-        const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradecontainerPos, this.homeId))
+        const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradecontainerPos, this.homeId));
         //console.log("at upgrading post with energy", upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0)
         if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
-            harvesters = state.getHarvestingHarvesters(this.creep.policyId)
+            harvesters = state.getHarvestingHarvesters(this.creep.policyId);
             for (let i in harvesters) {
                 if (harvester.memory.targetPos.x === this.creep.x
                     && harvester.memory.targetPos.y === this.creep.y) {
@@ -74,31 +68,11 @@ State.prototype.enact = function () {
     const post = state.findFreeHarvesterPost(home);
     //console.log(this.creep.name,"STATE_HARVESTER_IDLE freeharves post", JSON.stringify(post))
     if (!post) {
-        const UpgradeContainerPos = Game.flags[home.controller.id].memory.containerPos;
-        if (UpgradeContainerPos) {
-            const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradeContainerPos, this.homeId));
-            if (upgradeContainer) {
-                return this.goUpgrade();
-            } else {
-                return
-            }
-        }
-        return;
+        return this.goUpgrade();
     }
 
     if (post.source && post.source.energy === 0 && this.creep.lifetime < post.source.ticksToRegeneration) {
-        const UpgradecontainerPos = Game.flags[home.controller.id].memory.containerPos;
-        if (UpgradecontainerPos) {
-            const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradecontainerPos, this.homeId));
-            if (upgradeContainer) {
-                return this.goUpgrade();
-            } else {
-                //console.log(this.creep.name,"suicide ------------------to many creeps?");
-                //this.creep.suicide()
-                return;
-            }
-        }
-
+        return this.goUpgrade();
     }
     // todo check creep lifetime, check lives long enough to reach target.
     this.creep.memory.targetId = post.source.id;
@@ -113,12 +87,13 @@ State.prototype.enact = function () {
         0,
         gc.STATE_HARVESTER_HARVEST,
     );
-}
+};
 
-State.prototype.goUpgrade = function () {
+State.prototype.goUpgrade = function (post) {
     const home = Game.rooms[this.homeId];
-    const post =  state.findFreeUpgraderPost(home);
-    //console.log(this.creep.name,"STATE_HARVESTER_IDLE post found", post.x, post.y);
+    if (!post) {
+        post =  state.findFreeUpgraderPost(home);
+    }
     if (!post) {
         //console.log(this.creep.name,"stuck in goUpgrade")
         //creep.say("help do?")
@@ -127,15 +102,14 @@ State.prototype.goUpgrade = function () {
         return;
     }
     this.creep.targetId = home.controller.id;
-    const newPos = gf.roomPosFromPos({x: post.x, y:post.y, roomName: home.name})
-    //console.log(this.creep.name, "STATE_HARVESTER_IDLE new post", JSON.stringify(newPos))
+    const newPos = gf.roomPosFromPos({x: post.x, y:post.y, roomName: home.name});
     return state.switchToMovePos(
         this.creep,
         newPos,
         0,
         gc.STATE_UPGRADER_UPGRADE
     );
-}
+};
 
 module.exports = State;
 

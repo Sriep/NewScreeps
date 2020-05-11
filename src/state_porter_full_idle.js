@@ -4,13 +4,12 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const gf = require("gf");
 const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_PORTER_FULL_IDLE;
-    this.creep = creep
-    this.policyId = creep.memory.policyId
+    this.creep = creep;
+    this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
@@ -47,10 +46,11 @@ State.prototype.enact = function () {
         );
     }
 
-    const controller = Game.rooms[this.homeId].controller;
-    const controllerFlag = Game.flags[controller.id];
+    //const controller = Game.rooms[this.homeId].controller;
+    //const controllerFlag = Game.flags[controller.id];
     //console.log("contoller flag", JSON.stringify(controllerFlag))
-    const container = state.findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
+    //const container = state.findContainerAt(gf.roomPosFromPos(controllerFlag.memory.containerPos))
+    const container = state.findUpgradeContainerToFill(Game.rooms[this.homeId]);
     if (container) {
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
@@ -61,6 +61,6 @@ State.prototype.enact = function () {
         );
     }
 
-}
+};
 
 module.exports = State;

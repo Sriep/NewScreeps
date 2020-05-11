@@ -114,13 +114,14 @@ const construction = {
         let valid = [];
         for ( let dxy of deltas) {
             if (terrain.get(pos.x + dxy.x, pos.y+dxy.y) !== TERRAIN_MASK_WALL) {
-                valid.push({x: pos.x+dxy.x, y: pos.y+dxy.y, adj: 0, missed : [] });
+                valid.push({x: pos.x+dxy.x, y: pos.y+dxy.y, adj: 0, missed : [], hit : [] });
             }
         }
         for (let pt1 of valid) {
             for (let pt2 of valid) {
                 if (this.withinRange(pt1, pt2, 1)) {
                     pt1.adj++;
+                    pt1.hit.push({x: pt2.x, y: pt2.y});
                 } else {
                     pt1.missed.push({x: pt2.x, y: pt2.y});
                 }
@@ -130,7 +131,7 @@ const construction = {
             return b.adj - a.adj;
         });
         const maxAdj = valid[0].adj;
-        valid = valid.filter(v => v.adj > maxAdj/2)
+        valid = valid.filter(v => v.adj > maxAdj/2);
         let bestSoFar = 0;
         for (let i = 0 ; i < valid.length ; i++) {
             if (valid[i].adj <= valid[0].adj/2) {
@@ -138,15 +139,18 @@ const construction = {
             }
             for (let pt1 of valid[i].missed) {
                 let adj = 0;
+                const hits = [];
                 for (let pt2 of valid[i].missed) {
                     if (this.withinRange(pt1, pt2, 1)) {
-                        adj++
+                        adj++;
+                        hits.push({x: pt2.x, y:pt2.y})
                     }
                 }
                 if (adj > bestSoFar) {
                     bestSoFar = adj;
                     valid[i].bestCompaiongAdj = bestSoFar;
                     valid[i].bestCompanion = pt1;
+                    valid[i].bestCompanionPosts = hits;
                     valid[i].bestTotalAdj = valid[i].adj + bestSoFar;
                 }
             }
@@ -155,8 +159,19 @@ const construction = {
             return b.bestTotalAdj - (a.bestTotalAdj);
         });
         if (valid[0].bestCompanion) {
-            return [ { x: valid[0].x, y: valid[0].y, "posts": valid[0].adj },
-                { x: valid[0].bestCompanion.x, y: valid[0].bestCompanion.y, "posts" : valid[0].bestCompaiongAdj } ]
+            return [ {
+                x: valid[0].x,
+                y: valid[0].y,
+                "numPosts": valid[0].adj ,
+                "posts": valid[0].hit
+
+            },
+                {
+                    x: valid[0].bestCompanion.x,
+                    y: valid[0].bestCompanion.y,
+                    "numPosts" : valid[0].bestCompaiongAdj,
+                    "posts": valid[0].bestCompanionPosts
+                } ]
         }
         return [ { x: valid[0].x, y: valid[0].y, "posts" : valid[0].adj} ];
     },
@@ -178,7 +193,7 @@ const construction = {
     looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
         let range = 0;
         let spiral = [];
-        console.log("about to start lose spiral loop")
+        console.log("about to start lose spiral loop");
         while (spiral.length < numNeeded) {
             range++;
             for (let dx = -1*range; dx <= range ; dx+=2 ) {
@@ -190,7 +205,7 @@ const construction = {
                         continue
                     }
                     if (this.pointOK(start.x +dx, start.y+dy, avoid, terrain, avoidRange)) {
-                        spiral.push({x: start.x+dx, y: start.y+dy})
+                        spiral.push({x: start.x+dx, y: start.y+dy});
                         if (spiral.length >= numNeeded) {
                             return spiral
                         }

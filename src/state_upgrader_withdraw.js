@@ -8,7 +8,8 @@ const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_UPGRADER_WITHDRAW;
-    this.creep = creep
+    this.creep = creep;
+    this.m = this.creep.memroy
 }
 
 State.prototype.enact = function () {
@@ -17,7 +18,7 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
     }
 
-    const container = state.findUpgradeContainer(this.creep.room);
+    const container = state.findUpgradeContainerNear(this.creep);
     if (!container) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE)
     }
@@ -47,6 +48,6 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-}
+};
 
 module.exports = State;
