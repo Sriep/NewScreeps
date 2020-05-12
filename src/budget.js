@@ -174,12 +174,12 @@ const budget = {
         const sources = room.find(FIND_SOURCES);
         const spawns = home.find(FIND_MY_SPAWNS);
         const values = {};
-        values[gc.ROOM_NEUTRAL] = {"setup": 0, "profit": 0, "parts" : 0};
-        values[gc.ROOM_NEUTRAL_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
-        values[gc.ROOM_RESERVED] = {"setup": 0, "profit": 0, "parts" : 0};
-        values[gc.ROOM_RESERVED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
-        values[gc.ROOM_OWNED] = {"setup": 0, "profit": 0, "parts" : 0};
-        values[gc.ROOM_OWNED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0};
+        values[gc.ROOM_NEUTRAL] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
+        values[gc.ROOM_NEUTRAL_ROADS] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
+        values[gc.ROOM_RESERVED] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
+        values[gc.ROOM_RESERVED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
+        values[gc.ROOM_OWNED] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
+        values[gc.ROOM_OWNED_ROADS] = {"setup": 0, "profit": 0, "parts" : 0, "sources" : {}};
 
         let sourcePathsRoad = [];
         let sourcePathNoRoad = [];
@@ -205,34 +205,34 @@ const budget = {
         for (let i in sources) {
             //console.log("nnr")
             const nnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
-            values[gc.ROOM_NEUTRAL][sources[i].id] = nnr;
-            values[gc.ROOM_NEUTRAL]["parts"] += nnr.parts;
+            values[gc.ROOM_NEUTRAL][sources][sources[i].id] = nnr;
+            values[gc.ROOM_NEUTRAL]["parts"] += nnr.parts.hW + nnr.parts.pC +nnr.parts.uW;
             values[gc.ROOM_NEUTRAL]["setup"] += nnr.startUpCost;
             values[gc.ROOM_NEUTRAL]["profit"] += nnr.netEnergy;
             //console.log("nr")
             const nr = this.valueSourceRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_NEUTRAL_CAPACITY);
-            values[gc.ROOM_NEUTRAL_ROADS][sources[i].id] = nr;
-            values[gc.ROOM_NEUTRAL_ROADS]["parts"] += nr.parts;
+            values[gc.ROOM_NEUTRAL_ROADS][sources][sources[i].id] = nr;
+            values[gc.ROOM_NEUTRAL_ROADS]["parts"] += nr.parts.hW + nr.parts.pC +nr.parts.uW;
             values[gc.ROOM_NEUTRAL_ROADS]["setup"] += nr.startUpCost;
             values[gc.ROOM_NEUTRAL_ROADS]["profit"] += nr.netEnergy;
             //console.log("rnr")
             const rnr = this.valueSourceNoRoad(sourcePathNoRoad[i], pathToControllerNoRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
-            values[gc.ROOM_RESERVED][sources[i].id] = rnr;
-            values[gc.ROOM_RESERVED]["parts"] += rnr.parts;
+            values[gc.ROOM_RESERVED][sources][sources[i].id] = rnr;
+            values[gc.ROOM_RESERVED]["parts"] += rnr.parts.hW + rnr.parts.pC +rnr.parts.uW;
             values[gc.ROOM_RESERVED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_RESERVED]["profit"] += rnr.netEnergy;
-            values[gc.ROOM_OWNED][sources[i].id] = rnr;
-            values[gc.ROOM_OWNED]["parts"] += rnr.parts;
+            values[gc.ROOM_OWNED][sources][sources[i].id] = rnr;
+            values[gc.ROOM_OWNED]["parts"] += rnr.parts.hW + rnr.parts.pC +rnr.parts.uW;
             values[gc.ROOM_OWNED]["setup"] += rnr.startUpCost;
             values[gc.ROOM_OWNED]["profit"] += rnr.netEnergy;
             //console.log("rr")
             const rr = this.valueSourceNoRoad(sourcePathsRoad[i], pathToControllerRoad, gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY);
-            values[gc.ROOM_RESERVED_ROADS][sources[i].id] = rr;
-            values[gc.ROOM_RESERVED_ROADS]["parts"] += rr.parts;
+            values[gc.ROOM_RESERVED_ROADS][sources][sources[i].id] = rr;
+            values[gc.ROOM_RESERVED_ROADS]["parts"] += rr.parts.hW + rr.parts.pC +rr.parts.uW;
             values[gc.ROOM_RESERVED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_RESERVED_ROADS]["profit"] += rr.netEnergy;
-            values[gc.ROOM_OWNED_ROADS][sources[i].id] = rr;
-            values[gc.ROOM_OWNED_ROADS]["parts"] += rr.parts;
+            values[gc.ROOM_OWNED_ROADS][sources][sources[i].id] = rr;
+            values[gc.ROOM_OWNED_ROADS]["parts"] += rr.parts.hW + rr.parts.pC +rr.parts.uW;
             values[gc.ROOM_OWNED_ROADS]["setup"] += rr.startUpCost;
             values[gc.ROOM_OWNED_ROADS]["profit"] += rr.netEnergy;
         }
@@ -281,7 +281,7 @@ const budget = {
 
         //console.log("valueSourceRoad", JSON.stringify(rtv))
         return {
-            "parts": 3*hWs + 3*pCs + 3*uWs1,
+            "parts": { "hW": 3*hWs, "pC": 3*pCs, "uW": 3*uWs1 },
             "startUpCost": startUpCost,
             "runningCostRepair": runningCostRepair,
             "runningCostCreeps": creepCosts,
@@ -309,7 +309,7 @@ const budget = {
 
         //console.log("valueSourceNoRoad", JSON.stringify(rtv))
         return {
-            "parts": 3*hWs + 3*pCs + 3*uWs1,
+            "parts": { "hW": 3*hWs, "pC": 3*pCs, "uW": 3*uWs1 },
             "startUpCost": startUpCost,
             "runningCostRepair": runningCostRepair,
             "runningCostCreeps": creepCosts,

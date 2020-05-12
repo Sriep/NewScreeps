@@ -231,6 +231,7 @@ const gc = {
     BUILD_QUEUE_CHECK_RATE: 1,
     BUILD_CHECK_RATE: 1,
     NEUTRAL_ROOM_CHECK_RATE: 10,
+    CALC_ROOM_RESOURCES_RATE: 10,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -241,7 +242,7 @@ const gc = {
     // Econimic factors
     SPAWN_TIME_RESERVE: 50, // 50 complete guess.
     MIN_ENERGY_TO_MINE: 1000, // guess
-
+    COLONY_PROFIT_MARGIN: 500,
 
     // ownership
     ROOM_ENEMY: "enemy",

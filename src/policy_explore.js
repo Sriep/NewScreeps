@@ -55,7 +55,7 @@ Policy.prototype.enact = function () {
         if (!flagRoom.memory.values) {
             flagRoom.memory.values = {}
         }
-        flagRoom.memory.values[creeps[i].room.name] = budget.valueNeutralRoom(
+        flagRoom.memory.values[this.home] = budget.valueNeutralRoom(
             creeps[i].room.name,
             Game.rooms[this.home],
             false,

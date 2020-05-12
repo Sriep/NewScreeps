@@ -28,29 +28,32 @@ Policy.prototype.enact = function () {
     if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
         return;
     }
-    this.m.spawnRoom = this.getSpawnRoom();
+    const miningInfo = this.getSpawnRoom();
+    this.m.spawnRoom= miningInfo.name;
     if (!this.m.spawnRoom) {
         return;
     }
-
-    gouvoner = policy.getGouvernerPolicy(this.m.spawnRoom.name);
-    gouvoner.addColoney(this.home);
+    const governor = policy.getGouvernerPolicy(this.m.spawnRoom.name);
+    governor.addColoney(this.home);
+    if (miningInfo.road) {
+        buildRoads(this.home, this.m.spawnRoom);
+    }
 };
 
 Policy.prototype.getSpawnRoom = function() {
     const values  = Game.flags[this.home][values];
     let bestProfit = 0;
     let bestRoom;
-    let useroad = false;
+    let useRoad = false;
     for(let roomName in values) {
         const roomBest = getProfitRoom(room, values[roomName]).profit;
         const profit = roomBest.profit;
-        useroad = roomBest.road;
+        useRoad = roomBest.road;
         if (profit > bestProfit) {
             bestRoom = roomName;
         }
     }
-    return { "name" : bestRoom, "road": useroad } ;
+    return { "name" : bestRoom, "road": useRoad } ;
 };
 
 getProfitRoom = function(room, valueObj) {
@@ -88,8 +91,8 @@ getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
     return {"value": value, "useRoad" : useRoad, };
 };
 
-
-
+buildRoads = function(colony, spawnRoom) {
+};
 
 Policy.prototype.draftReplacment = function() {
     return this
@@ -97,10 +100,6 @@ Policy.prototype.draftReplacment = function() {
 
 module.exports = Policy;
 
-// values[gc.ROOM_NEUTRAL][sources[i].id] = nnr;
-// values[gc.ROOM_NEUTRAL]["parts"] += nnr.parts;
-// values[gc.ROOM_NEUTRAL]["setup"] += nnr.startUpCost;
-// values[gc.ROOM_NEUTRAL]["profit"] += nnr.netEnergy;
 
 
 

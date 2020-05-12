@@ -119,13 +119,16 @@ const gf = {
     //    );
     //},
 
-    roomEc : function(room) { //
+    roomEc : function(room) {
+        return room.energyCapacityAvailable;
+        /*
         let ec =  room.find(FIND_MY_SPAWNS).length * SPAWN_ENERGY_CAPACITY;
         ec += room.find(FIND_MY_STRUCTURES, {
             filter: { structureType: STRUCTURE_EXTENSION }
         }).length * EXTENSION_ENERGY_CAPACITY[room.controller.level];
         console.log("roomEc_I", ec);
         return ec;
+        */
     },
 
     joinPointsBetween: function (pos1, pos2, creepsAreObsticals) {

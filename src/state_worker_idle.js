@@ -30,9 +30,9 @@ State.prototype.enact = function () {
         );
     }
 
-    const container = state.findCollectContainer(this.creep.room)
-    //console.log("STATE_WORKER_IDLE container cap",  container.store.getUsedCapacity(RESOURCE_ENERGY) )
-    if (container  && container.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+    const container = state.findCollectContainer(this.creep.room);
+    if (container) {
+        //console.log("STATE_WORKER_IDLE container cap",  container.store.getUsedCapacity(RESOURCE_ENERGY) )
         //console.log("move to container", JSON.stringify(container.pos))
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
@@ -43,9 +43,9 @@ State.prototype.enact = function () {
         );
     }
 
-    //const policyId = this.creep.policyId;
+    const policyId = this.policyId;
     let creeps = _.filter(Game.creeps, function (c) {
-        return c.memory.policyId === this.policyId
+        return c.memory.policyId === policyId
             && state.isHarvestingHarvester(c)
     });
     //console.log("STATE_WORKER_IDLE isHarvestingHarvester count", creeps.length);
