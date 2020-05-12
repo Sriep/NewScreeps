@@ -14,7 +14,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_WORKER_TRANSFER");
+    //console.log(this.creep.name, "in STATE_WORKER_TRANSFER");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         console.log(this.creep.name, "in STATE_WORKER_TRANSFER this.creep.store.getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY)  );
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
@@ -45,6 +45,8 @@ State.prototype.enact = function () {
             console.log("STATE_WORKER_TRANSFER result", result);
             return gf.fatalError("transfer ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
+            console.log(this.creep.name,"STATE_WORKER_TRANSFER");
+            console.log("ERR_INVALID_TARGET target", target.structureType,"target",JSON.stringify(target));
             console.log("STATE_WORKER_TRANSFER result", result);
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.

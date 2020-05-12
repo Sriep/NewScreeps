@@ -109,6 +109,17 @@ const policy = {
                 return this.getPolicy(id);
             }
         }
+        return undefined;
+    },
+
+    getMiningPolicy :  function(roomName) {
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].home === roomName &&
+                Memory.policies[id].type === gc.POLICY_MINE_ROOM) {
+                return this.getPolicy(id);
+            }
+        }
+        return undefined;
     },
 
     activatePolicy: function(policyType, data, parentId) {

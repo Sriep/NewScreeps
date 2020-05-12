@@ -81,18 +81,20 @@ State.prototype.enact = function () {
 
 State.prototype.pathLost = function () {
     const creepRace = race.getRace(this.creep);
+    //console.log(this.creep.name, "STATE_MOVE_POS creep race", creepRace);
     //console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos))
     switch(creepRace) {
         case gc.RACE_HARVESTER:
             return state.switchTo(this.creep, creepRace + "_idle");
         case gc.RACE_WORKER:
+            break;
         case gc.RACE_PORTER:
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 return state.switchTo(this.creep, creepRace + "_idle")
             } else {
-                // porter hack approaching crowed upgarde container
+                // porter hack approaching crowed upgrade container
                 const UpgradeContainerPos = Game.flags[this.creep.room.controller.id].memory.containerPos;
-                if (this.creep.targetPos
+                if (this.creep.targetPos && race.getRace(this.creep) === gc.RACE_PORTER
                     && (this.creep.targetPos.x === UpgradeContainerPos.x
                         && this.creep.targetPos.y === UpgradeContainerPos.y)) {
                     if (this.creep.pos.inRangeTo(targetPos,1)) {
@@ -107,6 +109,10 @@ State.prototype.pathLost = function () {
                             0,
                             race.getRace(inTheWay) + "_idle"
                         );
+                        if (race.getRace(this.creep) !== gc.RACE_PORTER) {
+                            console.log(this.creep.name,"STATE_MOVE_POS pathLost");
+                            gf.fatalError("STATE_MOVE_POS In pathLost should be porter");
+                        }
                         return state.switchToMovePos(
                             this.creep,
                             inTheWay.pos,

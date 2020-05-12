@@ -46,6 +46,6 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
-}
+};
 
 module.exports = State;

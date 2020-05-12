@@ -76,8 +76,8 @@ const cache = {
         return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
     },
 
-    global: function(fn, name, args) {
-        if (!global[name]) {
+    global: function(fn, name, args, force) {
+        if (!global[name] || force) {
             global[name] = fn(...args);
         }
         return global[name];

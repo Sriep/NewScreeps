@@ -18,7 +18,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-   // console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
+    //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
     const home = Game.rooms[this.homeId];
     //console.log("homeId", this.homeId, "downgrade", home.controller.ticksToDowngrade)
     if (home.controller.ticksToDowngrade
@@ -57,14 +57,7 @@ State.prototype.enact = function () {
         );
     }
     console.log("STATE_WORKER_FULL_IDLE skipped filling source containers");
-/*
-    if (nextSourceContainer.store[RESOURCE_ENERGY]
-        < nextSourceContainer.store.getCapacity(RESOURCE_ENERGY)) {
-        console.log("nextSourceContainer.store", JSON.stringify(nextSourceContainer.store))
-        console.log("nextSourceContainer.storegetFreeCapacity", JSON.stringify(nextSourceContainer.store.getFreeCapacity(RESOURCE_ENERGY)))
-        gf.fatalError("STATE_WORKER_FULL_IDLE should go to store container");
-    }
-*/
+
     const damagedStructure = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: function(s)  {
             return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;

@@ -9,7 +9,6 @@ const gc = require("gc");
 const economy = require("economy");
 const state = require("state");
 
-// constructor
 function Policy  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_SOURCE_CONTAINERS;
@@ -18,28 +17,23 @@ function Policy  (id, data) {
     this.m = data.m;
 }
 
-// runs first time policy is created only
 Policy.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
     this.home = Memory.policies[this.parentId].roomName;
     const room = Game.rooms[this.home];
-    //console.log("POLICY_BUILD_SOURCE_CONTAINERS initilise", JSON.stringify(this));
     return !!room && !!room.controller && room.controller.my;
 };
 
-// runs once every tick
 Policy.prototype.enact = function () {
-    //console.log("POLICY_BUILD_SOURCE_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
-        //return;
+        return;
     }
     const room = Game.rooms[this.home];
     const sources = room.find(FIND_SOURCES);
     for (let source of sources) {
         const flag = Game.flags[source.id];
-        //console.log("POLICY_BUILD_SOURCE_CONTAINERS source id", source.id, "flag", flag);
         if (!flag.memory.containerPos) {
             buildSourceContainer(source, flag);
         }
@@ -62,7 +56,6 @@ buildSourceContainer = function (source, flag) {
     }
     const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
     if (result !== OK) {
-        //console.log("spot", JSON.stringify(spots[0]));
         gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
     }
 };
@@ -82,14 +75,8 @@ areSourceContainersFinished = function (room) {
     return true;
 };
 
-// runs once every tick before enact
-// return anything without a type field to delete the policy
-// return a valid policy to replace this policy with that
-// return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    //console.log("draftReplacment buld source containers ascf",
-    //    areSourceContainersFinished(room));
     return areSourceContainersFinished(room) ? false : this;
 };
 

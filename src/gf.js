@@ -110,6 +110,10 @@ const gf = {
         return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD
     },
 
+    myControlledRoom : function (room) {
+        return !!room.controller && room.controller.my && room.controller.level > 1;
+    },
+
     // replacment for room.energyCapacity which seems broken
     //roomEc: function (room) {
     //    return cache.global(

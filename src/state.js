@@ -30,7 +30,7 @@ const state = {
             {
                 return gf.fatalError("error! creep" + creep.name + "with no state " + JSON.stringify(creep.memory));
             }
-        requireString = "state_" + creep.memory.state;
+        const requireString = "state_" + creep.memory.state;
         const stateConstructor = require(requireString);
         const creepState = new stateConstructor(creep);
         creepState.enact()
@@ -102,6 +102,99 @@ const state = {
         return countPosts;
     },
 
+    //------------ nextFreeHarvesterPost----------------------------------------
+
+    freeHarvesterPost(source, spawnRoom, ec) {
+        const sourceFlag = Game.flags[source.id];
+        const posts = sourceFlag.memory.harvesterPosts;
+        creeps = _.filter(Game.creeps, c =>
+            race.getRace(c) === gc.RACE_HARVESTER
+            && c.memory.targetId === source.id
+        );
+        if (creeps.length === 0) {
+            return posts[0];
+        }
+        if (ec <= gc.MAX_EC_3WORK_HARVESTER && posts.length > 1) {
+            if (creeps.length > 2) {
+                return false;
+            }
+            if (creeps.length === 1) {
+                return this.findFreePostIfPossable(creeps, posts);
+            }
+            if (ec <= gc.MAX_EC_2WORK_HARVESTER && posts.length > 2) {
+                return this.findFreePostIfPossable(creeps, posts);
+            } else {
+                return false;
+            }
+        } else {
+            if (creeps.length > 1) {
+                return false;
+            }
+            const distance = cache.distanceSourceSpawn(source, spawnRoom);
+            if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
+                return this.findFreePostIfPossable(creeps, posts);
+            } else {
+                return false;
+            }
+        }
+    },
+
+    findFreePostIfPossable(creeps, posts) {
+        for (let post of posts) {
+            let taken = false;
+            for (let creep of creeps) {
+                if (creep.x === post.x && creep.y === post.y) {
+                    taken = true;
+                    break;
+                }
+            }
+            if (!taken) {
+                return post;
+            }
+        }
+        return post[0];
+    },
+
+    listFreeHarvesterPosts_I(home, colonies, ec) {
+        const freePosts = [];
+        const spawnRoom = Game.rooms[home];
+        const rooms = [home].concat(colonies);
+        for (let colonyName of rooms) {
+            const colony = Game.rooms[colonyName];
+            let sources = Game.rooms[colony].find(FIND_SOURCES);
+            sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
+            for (let source of sources) {
+                const post = this.freeHarvesterPost(source, spawnRoom, ec);
+                if (post) {
+                    freePosts.push({ "sourceId": source.id,  "post": post });
+                }
+            }
+        }
+        return { "freePosts" : freePosts, "cached" : Game.time };
+    },
+
+    nextFreeHarvesterPost: function(home, colonies, ec) {
+        let list =  cache.global(
+            this.listFreeHarvesterPosts_I,
+            "listFreeHarvesterPosts_" + home,
+            [home, colonies, ec],
+            false
+        );
+        if (list.cached + gc.FREE_HARVESTER_POST_CACHE_RATE < Game.time) {
+            list =  cache.global(
+                this.listFreeHarvesterPosts_I,
+                "listFreeHarvesterPosts_" + home,
+                [home, colonies, ec],
+                true
+            );
+        }
+        if (list.freePosts.length > 0) {
+            return list.freePosts.shift();
+        }
+    },
+
+    //------------ nextFreeHarvesterPost----------------------------------------
+
     findFreeHarvesterPost: function(room) {
         let sources = room.find(FIND_SOURCES);
         sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
@@ -163,10 +256,9 @@ const state = {
 
     findTargetSource: function(room) {
         let sources = room.find(FIND_SOURCES);
-        if (sources.length === 0)
-            {
-                return undefined;
-            }
+        if (sources.length === 0)  {
+            return undefined;
+        }
         // todo also sort by tick to regenerate if both empty.
         sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
         for (let i = 0; i < sources.length; i++)  {

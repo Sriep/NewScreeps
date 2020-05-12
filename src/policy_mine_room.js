@@ -28,38 +28,40 @@ Policy.prototype.enact = function () {
     if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
         return;
     }
-    const miningInfo = this.getSpawnRoom();
-    this.m.spawnRoom= miningInfo.name;
-    if (!this.m.spawnRoom) {
+    const spawnInfo = this.getSpawnRoom();
+    if (!spawnInfo.name) {
         return;
     }
+
+    this.m.spawnRoom = spawnInfo.name;
     const governor = policy.getGouvernerPolicy(this.m.spawnRoom.name);
-    governor.addColoney(this.home);
-    if (miningInfo.road) {
-        buildRoads(this.home, this.m.spawnRoom);
-    }
+    governor.addColoney(this.home, spawnInfo.profit);
+    build(this.home, this.m.spawnRoom, spawnInfo.road);
 };
 
 Policy.prototype.getSpawnRoom = function() {
     const values  = Game.flags[this.home][values];
     let bestProfit = 0;
     let bestRoom;
-    let useRoad = false;
+    let useRoad;
     for(let roomName in values) {
-        const roomBest = getProfitRoom(room, values[roomName]).profit;
-        const profit = roomBest.profit;
-        useRoad = roomBest.road;
-        if (profit > bestProfit) {
+        const roomInfo = getProfitRoom(room, values[roomName]);
+        if (roomInfo && roomInfo.profit > bestProfit) {
+            bestProfit = roomInfo.profit;
+            useRoad = roomInfo.road;
             bestRoom = roomName;
         }
     }
-    return { "name" : bestRoom, "road": useRoad } ;
+    return { "name" : bestRoom, "road": useRoad, "profit": bestProfit } ;
 };
 
 getProfitRoom = function(room, valueObj) {
     let budget = policy.getRoomEconomyPolicy(room.name).budget();
-    valueNoRoad = getProfitRoomRoad(room, valueObj, budget, false);
-    valueRoad = getProfitRoomRoad(room, valueObj, budget, true);
+    if (!budget["support_colonies"]) {
+        return
+    }
+    const valueNoRoad = getProfitRoomRoad(room, valueObj, budget, false);
+    const valueRoad = getProfitRoomRoad(room, valueObj, budget, true);
     if (!valueNoRoad) {
         return valueRoad ? { "profit": valueRoad.value.profit, "road": true} : 0;
     }
@@ -91,7 +93,8 @@ getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
     return {"value": value, "useRoad" : useRoad, };
 };
 
-buildRoads = function(colony, spawnRoom) {
+build = function(colony, spawnRoom, useRoad) {
+    // todo
 };
 
 Policy.prototype.draftReplacment = function() {

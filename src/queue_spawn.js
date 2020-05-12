@@ -12,7 +12,7 @@ function SpawnQueue  (roomName) {
     //console.log("SpawnQueue constructor room", roomName, "memroy", JSON.stringify(this.m));
     //console.log("data", JSON.stringify(data));
     if (!this.m) {
-        flag.getRoomFlag(roomName).memory.spawnQueue = {}
+        flag.getRoomFlag(roomName).memory.spawnQueue = {};
         this.m = flag.getRoomFlag(roomName).memory.spawnQueue;
         this.reset();
     }
@@ -34,14 +34,11 @@ SpawnQueue.prototype.reset = function () {
 };
 
 SpawnQueue.prototype.spawnNext = function (spawnObj) {
-    //console.log("SpawnQueue spawnNext spawnCreep is", JSON.stringify(this))
     for ( let i = gc.SPAWN_PRIORITY_CRITICAL ; i < gc.SPAWN_PRIORITY_NONE ; i++ ) {
         if (i >= this.m.halted) {
-            //console.log("halted at", JSON.stringify(i))
             return gc.QUEUE_HALTED;
         }
         for ( let id in this.m.spawns[i]) {
-            //console.log("spawnNext id", id, "data", JSON.stringify(this.m.spawns[i][id]))
             const data = this.m.spawns[i][id];
             if  (!data) { // probably should not happen.
                 console.log("spawnNext if  (!data) had data", data,"deleting",i,id);
@@ -49,48 +46,30 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
                 continue;
             }
             const name = data.name + "_" + this.m.nextCreepId.toString();
-            //console.log("spawnNext dry run spawn",spawnObj.name, "body",JSON.stringify(data.body,),
-            //    "name",name, "opts",JSON.stringify(data["opts"]));
-            //const result = this.m.spawnDryRun(spawnObj, data.body, name, data.opts );
             const result = spawnObj.spawnCreep(data.body, name, data.opts);
-            //console.log("spawnNext spawnCreep result", result);
             if (result === OK) {
                 this.m.nextCreepId = this.m.nextCreepId +1;
-                //console.log("spawnNext result", result, "OK",OK,"nextCreepId", this.m.nextCreepId)
             }
-            //console.log("spawnNext result", result);
             if (result === ERR_BUSY || result === ERR_NOT_ENOUGH_ENERGY) {
                 console.log("spawnNext result", result, "Try again later");
                 return result;
             }
-            //console.log("spawnNext result", result,"OK", OK);
             delete this.m.spawns[i][id];
             if (result === OK) {
-                //const realResult = spawnObj.spawnCreep(data.body, name, data.opts);
-                //console.log("spawnNext realResult", realResult);
                 if (result !== OK) {
                     console.log("body",data.body, "name", name, "opts", optsDryRun);
                     return gf.fatalError("spawn gives different result to dry run", result)
                 }
-                //console.log("spawnNext spawnCreep returned", result);
                 this.m.nextCreepId = this.m.nextCreepId +1;
-                //console.log("spawnNext nextCreepId", this.m.nextCreepId)
-                //this.m.save();
                 return OK;
             }
             if (result === ERR_NOT_OWNER && result !== ERR_NAME_EXISTS) {
-                // should not happen
                 console.log("body",data.body, "name", name, "opts", optsDryRun);
                 return gf.fatalError("spawnCreep failed result");
             }
-            // result === ERR_INVALID_ARGS || result === ERR_RCL_NOT_ENOUGH
-            //console.log("spawnNext Removed bad spawn order", JSON.stringify(this.m.spawns[i][id], "spawnCrep result ", result))
-            //console.log("spawnNext loop", data,"deleting",i,id);
             delete this.m.spawns[i][id];
         }
     }
-    //this.m.save();
-    //console.log("spawnNext empty queue", JSON.stringify(this));
     return gc.QUEUE_EMPTY;
 };
 
@@ -121,7 +100,7 @@ SpawnQueue.prototype.addSpawn = function (data, priority, policyId, startState) 
     //this.save();
     //console.log("SpawnQueue addSpawn after adding data", JSON.stringify(data));
     //console.log("SpawnQueue addSpawn SpawnQueue is", JSON.stringify(this));
-    const q = flag.getRoomFlag(this.home).memory.spawnQueue;
+    //const q = flag.getRoomFlag(this.home).memory.spawnQueue;
     //console.log("SpawnQueue addSpawn memory after adding spawn", JSON.stringify(q));
     return id;
 };

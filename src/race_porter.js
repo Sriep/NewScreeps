@@ -9,8 +9,9 @@ const race_porter = {
     CCM_COST: 150,
 
     bodyCounts: function (ec) {
-        if (ec < this.CCM_COST)
+        if (ec < this.CCM_COST) {
             return undefined;
+        }
 
         let Cs = 0, Ms = 0;
         const ccmBlocks = Math.floor(ec/this.CCM_COST);
@@ -21,6 +22,6 @@ const race_porter = {
         }
         return {"work": 0, "carry": Cs, "move" : Ms}
     }
-}
+};
 
 module.exports = race_porter;

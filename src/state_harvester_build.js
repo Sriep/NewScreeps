@@ -56,7 +56,8 @@ State.prototype.enact = function () {
             //console.log("pos", JSON.stringify(site.pos), "site", JSON.stringify(site));
             //console.log("store", JSON.stringify(this.creep.store))
             //console.log("space for harvest", state.spaceForHarvest(this.creep))
-            return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
+            return;
+            //return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             // assume target is invalid because its built.
             //console.log(this.creep.name,"details",JSON.stringify(this.creep.store))

@@ -11,6 +11,7 @@
 //const policy = require("policy");
 //const gc = require("gc");
 //const gf = require("gf");
+//const race = require("race");
 
 const inserted = {
     top: function () {
@@ -19,6 +20,11 @@ const inserted = {
 
     bottom: function () {
         //console.log("--------- piers inserted------------")
+
+        //for (let name in Game.creeps) {
+            //console.log(name, "has race", race.getRace(Game.creeps[name]));
+        //}
+
         //const home = Game.rooms["W7N7"];
         //const ec = gf.roomEc(home);
         //console.log("energy capacity", ec);
@@ -31,6 +37,10 @@ const inserted = {
         //    "spawn getFreeCapacity", spawn.store.getFreeCapacity(RESOURCE_ENERGY),
         //    "spawn getUsedCapacity", spawn.store.getUsedCapacity(RESOURCE_ENERGY));
 
+        //console.log("Game.spawns.Spawn1.store.getCapacity()", Game.spawns.Spawn1.store.getCapacity());
+        //console.log("Game.spawns.Spawn1.store.getCapacity(RESOURCE_ENERGY)", Game.spawns.Spawn1.store.getCapacity(RESOURCE_ENERGY));
+        //console.log("Game.spawns.Spawn1.store.getCapacity('energy')", Game.spawns.Spawn1.store.getCapacity('energy'));
+        //console.log("Game.spawns.Spawn1.energyCapacity", Game.spawns.Spawn1.energyCapacity);
     }
 
 };

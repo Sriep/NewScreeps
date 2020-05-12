@@ -5,6 +5,7 @@
  */
 const budget = require("budget");
 const race = require("race");
+//onst gf = require("gf");
 const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
@@ -28,39 +29,52 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    const creeps = policy.getCreeps(this.parentId, gc.RACE_SCOUT);
-    //console.log("POLICY_EXPLORE creeps", creeps.length);
+    const creeps = policy.getCreeps(this.id, gc.RACE_SCOUT);
+    console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
-        const orders = flag.getSpawnQueue(this.home).orders(this.parentId).filter(
-            order => {  order.memory && order.memory.sender === this.id }
-        );
-        if (creeps.length +  orders.length < gc.EXPLORE_CREEPS) {
+        const orders = flag.getSpawnQueue(this.home).orders(this.id);
+        if (creeps.length + orders.length < gc.EXPLORE_CREEPS) {
            console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" );
            this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
         }
     }
-    //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
+    console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
-        let flagRoom = Game.flags[creeps[i].room.name];
-        if (flagRoom && flagRoom.memory.explored) {
-            continue;
+        let roomFlag = Game.flags[creeps[i].room.name];
+        if (!roomFlag || !roomFlag.memory.explored) {
+            this.exploreRoom(creeps[i].room.name);
         }
-        if (!flagRoom) {
-            const center = new RoomPosition(25, 25, creeps[i].room.name);
-            center.createFlag(creeps[i].room.name);
-            flagRoom = Game.flags[creeps[i].room.name];
+    }
+};
+
+Policy.prototype.exploreRoom = function(newRoom) {
+    let newRoomFlag = Game.flags[newRoom];
+    if (!newRoomFlag) {
+        console.log("exploreRoom newRoom", newRoom);
+        const center = new RoomPosition(25, 25, newRoom);
+        center.createFlag(newRoom);
+        newRoomFlag = Game.flags[newRoom];
+    }
+
+    flag.flagRoom(newRoom);
+
+    if (!newRoomFlag.memory.values) {
+        newRoomFlag.memory.values = {}
+    }
+
+    //console.log("exploreRoom rooms", JSON.stringify(_.filter(Game.rooms, r => gf.myControlledRoom(r))))
+    for (let name in Game.rooms) {
+        const room = Game.rooms[name];
+        //console.log("exploreRoom", name, "obj",room);
+        if (!!room.controller && room.controller.my && room.controller.level > 1) {
+            newRoomFlag.memory.values[name] = budget.valueNeutralRoom(name, this.home, false);
         }
-        flag.flagRoom(creeps[i].room.name);
-        //console.log("creep", creeps[i].name, "in unexplored room", creeps[i].room.name);
-        if (!flagRoom.memory.values) {
-            flagRoom.memory.values = {}
-        }
-        flagRoom.memory.values[this.home] = budget.valueNeutralRoom(
-            creeps[i].room.name,
-            Game.rooms[this.home],
-            false,
-        );
-        flagRoom.memory.explored = true;
+    }
+
+    newRoomFlag.memory.explored = true;
+
+    if (!policy.getMiningPolicy(newRoom)) {
+        policy.activatePolicy( gc.POLICY_MINE_ROOM, { "home" : newRoom, },);
     }
 };
 
@@ -72,14 +86,13 @@ Policy.prototype.sendExplorers = function(shortfall) {
             "opts": {"memory": {
                 "home" : this.roomName,
                 "direction" : this.m.direction,
-                "sender" : this.id,
             }},
             "name": gc.RACE_SCOUT + "_50",
         };
         flag.getSpawnQueue(this.home).addSpawn(
             data,
             gc.SPAWN_PRIORITY_MISC,
-            this.parentId,
+            this.id,
             gc.STATE_SCOUT_IDLE,
         );
         this.m.direction = (this.m.direction+2) % 8;

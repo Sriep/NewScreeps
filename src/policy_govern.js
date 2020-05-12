@@ -20,6 +20,7 @@ Policy.prototype.initilise = function () {
     this.m.rcl = Game.rooms[this.roomName].controller.level;
     this.m.agendaIndex = -1;
     this.m.childTypes = [];
+    this.m.colonies = [];
     this.m.agenda = agenda.peace;
     return true;
 };
@@ -55,10 +56,10 @@ Policy.prototype.govern = function () {
  };
 
 Policy.prototype.addColony = function(roomName) {
-    if (!this.m.colonies) {
-        this.m.colonies = [];
-    }
-    this.m.colonies.push(roomName);
+    this.m.colonies.push({"name" : roomName, "profit" : profit });
+    this.m.colonies = this.m.colonies.sort( function (a,b)  {
+        return b.profit - a.profit;
+    });
 };
 
 Policy.prototype.draftReplacment = function() {

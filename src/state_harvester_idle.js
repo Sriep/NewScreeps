@@ -23,6 +23,8 @@ State.prototype.enact = function () {
     const wBudget = budget.harvesterWsRoom(home, home);
     //console.log("wsHarvesting",wsHarvesting,">= wBudget", wBudget);
 
+
+
     if (wsHarvesting >= wBudget) {
         const UpgradePost = state.findFreeUpgraderPost(home);
         if (UpgradePost) {

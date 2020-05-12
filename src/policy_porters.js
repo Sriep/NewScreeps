@@ -30,7 +30,6 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    // this.localSpawns();
     const room = Game.rooms[this.home];
     if (!this.m.resources || Game.time + this.id % gc.CALC_ROOM_RESOURCES_RATE !== 0 ) {
         if (room.controller < 3) {
@@ -46,10 +45,31 @@ Policy.prototype.spawns = function (room, resources) {
     const wHarvesterLife = race.ticksLeftByPart(this.parentId, gc.RACE_HARVESTER, WORK);
     const cWorkerLife = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, CARRY);
     const cPorterLife = race.ticksLeftByPart(this.parentId, gc.RACE_PORTER, CARRY);
-    const min = Math.min(wHarvesterLife, cWorkerLife, cPorterLife);
+    const cUpgraderLife = race.ticksLeftByPart(this.parentId, gc.RACE_UPGRADER, WORK);
 
-    if (wHarvesterLife === min
-        && wHarvesterLife/CREEP_LIFE_TIME < resources.hW + resources.uW) {
+    flag.getSpawnQueue(this.home).clearMy(this.parentId);
+
+    if (cWorkerLife < CREEP_LIFE_TIME/2) {
+        policy.sendOrderToQueue(
+            room,
+            gc.RACE_WORKER,
+            room.energyAvailable,
+            this.parentId,
+            gc.SPAWN_PRIORITY_CRITICAL
+        );
+        return;
+    }
+    console.log("pp spawns cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife,"cPorterLife",cPorterLife);
+    console.log("pp spawns resources", JSON.stringify(resources));
+
+    const canBuildHarvesters =  wHarvesterLife/CREEP_LIFE_TIME < resources.hW + resources.uW;
+    const canBuildWorkers = cWorkerLife/CREEP_LIFE_TIME < resources.wW;
+    const canBuildPorters = cPorterLife/CREEP_LIFE_TIME < resources.pC;
+    const canBuildUpgrader = cUpgraderLife/CREEP_LIFE_TIME < resources.uW;
+
+    if (canBuildHarvesters
+        && (canBuildWorkers && wHarvesterLife <= cWorkerLife
+        && (canBuildPorters && wHarvesterLife <= cPorterLife))) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_HARVESTER,
@@ -57,9 +77,10 @@ Policy.prototype.spawns = function (room, resources) {
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
+        return;
     }
 
-    if (cWorkerLife === min && cWorkerLife/CREEP_LIFE_TIME < resources.wWC) {
+    if (canBuildWorkers) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
@@ -67,9 +88,10 @@ Policy.prototype.spawns = function (room, resources) {
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
+        return;
     }
 
-    if (cPorterLife === min && cPorterLife/CREEP_LIFE_TIME < resources.pC) {
+    if (canBuildPorters) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_PORTER,
@@ -77,18 +99,32 @@ Policy.prototype.spawns = function (room, resources) {
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
+        return
     }
+
+    if (canBuildUpgrader) {
+        policy.sendOrderToQueue(
+            room,
+            gc.RACE_UPGRADER,
+            gf.roomEc(room),
+            this.parentId,
+            gc.SPAWN_PRIORITY_LOCAL
+        );
+    }
+
+
 };
 
 Policy.prototype.calcResources = function (roomType1, roomType2) {
-    let harvesterWs = budget.harvesterWsRoom(room, room, false);
-    let porterCs = budget.harvesterWsRoom(room, room, false);
-    let upgradeWs =  budget.upgradersWsRoom(room, gf.roomEc(room));
-    let buildTicks = economy.constructionLeft(room) / BUILD_POWER;
-    let ratioHtoW = budget.workersRoomRationHtoW(room, room);
-    porterCs -= (porterCs/harvesterWs) * (buildTicks / CREEP_LIFE_TIME);
-    let workerWs = ratioHtoW * buildTicks / CREEP_LIFE_TIME;
+    const resources = this.calcRoomResources(
+        this.home,
+        budget.harvesterWsRoom(room, room, false),
+        budget.harvesterWsRoom(room, room, false),
+        budget.upgradersWsRoom(room, gf.roomEc(room))
+    );
 
+    console.log("pp calcResources home", JSON.stringify(resources));
+    //return resources;
     const colonies = Memory.policies[this.parentId].colonies;
     for (let colony of colonies) {
         const flagRoom = Game.flags[colony];
@@ -107,20 +143,36 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
                 uW += values["sources"][id].parts.uW
             }
         }
-        const room = Game.rooms[colony];
-        const ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home]);
-        buildTicks += economy.constructionLeft(room) / BUILD_POWER;
-        porterCs -= (pC/hW) * (ratioHtoW*buildTicks / CREEP_LIFE_TIME);
-        workerWs += ratioHtoW*buildTicks / CREEP_LIFE_TIME;
-
-        harvesterWs += hW;
-        porterCs += pC;
-        upgradeWs += uW;
+        const colonyResources = calcRoomResources(colony, hW, pC, uW);
+        console.log("pp calcResources colony",colony,JSON.stringify(colonyResources));
+        resources.hW += colonyResources.hW;
+        resources.pC +=  colonyResources.pC;
+        resources.wW +=  colonyResources.wW;
+        resources.uW +=  colonyResources.uW
     }
-
-    return { "hW": harvesterWs, "pC": porterCs, "uW": upgradeWs, "wWC": workerWs }
+    console.log("pp calcResources", JSON.stringify(resources));
+    return resources
 };
 
+calcRoomResources = function (roomName, hW, pC, uW) {
+    const room = Game.rooms[roomName];
+    const buildTicks = economy.constructionLeft(room) / BUILD_POWER;
+    const ratioHtoW = budget.workersRoomRationHtoW(room, false);
+    let workerWs = ratioHtoW * buildTicks / CREEP_LIFE_TIME;
+    const ratioWtoP = (hW/pC)/ratioHtoW;
+    if (workerWs <  ratioWtoP * pC) {
+        pC -= workerWs/ratioWtoP;
+    } else {
+        workerWs =  ratioWtoP * pC;
+        pC = 0;
+    }
+
+    return { "hW": hW, "pC" : pC, "wW" : workerWs,  "uW": uW };
+};
+
+/**
+ * @deprecated Not using this method any more.
+ */
 Policy.prototype.localSpawns = function () {
     console.log("POLICY_PORTERS enact budget", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];

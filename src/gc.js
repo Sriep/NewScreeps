@@ -3,13 +3,9 @@
  * Created by piers on 24/04/2020
  * @author Piers Shepperson
  */
+const C = require("./Constants");
 
 const pgc = {
-    // Economy
-    //INITIATIVE_WORKER: "worker",
-    //INITIATIVE_HARVESTER: "harvester",
-    //INITIATIVE_PORTER: "porter",
-    //INITIATIVE_UPGRADER: "upgrader",
     // builds
     // storage structures
     BUILD_EXTENSIONS: "build_extensions",
@@ -73,8 +69,41 @@ const gc = {
     // Races
     RACE_WORKER: "worker",
     RACE_HARVESTER: "harvester",
+    RACE_UPGRADER: "upgrader",
     RACE_PORTER: "porter",
     RACE_SCOUT: "scout",
+
+    MIN_HARVESTER_EC: 300,
+    MAX_HARVESTER_EC: 800,
+    HARVESTER_BODY: {
+        300 : [C.WORK, C.WORK, C.CARRY, C.MOVE],
+        350 : [C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
+        400 : [C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
+        450 : [C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
+        500 : [C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE],
+        550 : [C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
+        600 : [C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE],
+        650 : [C.WORK, C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
+        700 : [C.WORK, C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE],
+        750 : [C.WORK, C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE, C.MOVE],
+        800 : [C.WORK, C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE, C.MOVE, C.MOVE],
+    },
+    HARVESTER_BODY_COUNTS: {
+        300 : {"work": 2, "carry": 1, "move" : 1},
+        350 : {"work": 2, "carry": 1, "move" : 2},
+        400 : {"work": 2, "carry": 1, "move" : 2},
+        450 : {"work": 3, "carry": 1, "move" : 2},
+        500 : {"work": 3, "carry": 1, "move" : 3},
+        550 : {"work": 4, "carry": 1, "move" : 2},
+        600 : {"work": 4, "carry": 1, "move" : 3},
+        650 : {"work": 5, "carry": 1, "move" : 2},
+        700 : {"work": 5, "carry": 1, "move" : 3},
+        750 : {"work": 5, "carry": 1, "move" : 4},
+        800 : {"work": 5, "carry": 1, "move" : 5},
+    },
+    MAX_EC_2WORK_HARVESTER: 300,
+    MAX_EC_3WORK_HARVESTER: 500,
+    ASSIGN_HARVESTER_BUFFER: 33,
 
     // flags
     FLAG_SOURCE: "source",
@@ -101,8 +130,8 @@ const gc = {
     STATE_WORKER_HARVEST: "worker_harvest",
     STATE_WORKER_TRANSFER: "worker_transfer",
     STATE_WORKER_WITHDRAW: "worker_withdraw",
-    STATE_WORKER_PICKUP: "porter_pickup",
-    STATE_WORKER_RECEIVE: "porter_receive",
+    STATE_WORKER_PICKUP: "worker_pickup",
+    STATE_WORKER_RECEIVE: "worker_receive",
     // states porter
     STATE_PORTER_IDLE:  "porter_idle",
     STATE_PORTER_PICKUP: "porter_pickup",
@@ -125,19 +154,19 @@ const gc = {
     MAX_STATE_STACK: 5,
 
     //flag colours
-    FLAG_PERMANENT_COLOUR: COLORS_ALL[COLOR_BLUE],
-    FLAG_SOURCE_COLOUR: COLORS_ALL[COLOR_YELLOW],
-    FLAG_CONTROLLER_COLOUR: COLORS_ALL[COLOR_PURPLE],
-    FLAG_MINERAL_COLOUR: COLORS_ALL[COLOR_GREY],
-    FLAG_KEEPERS_LAIR_COLOUR: COLORS_ALL[COLOR_ORANGE],
-    FLAG_STRUCTURE_COLOUR: COLORS_ALL[COLOR_BROWN],
-    FLAG_LINK_COLOUR: COLORS_ALL[COLOR_CYAN],
-    FLAG_HARVEST_KEEPER_COLOUR: COLORS_ALL[COLOR_RED],
-    FLAG_PORTAL_COLOUR: COLORS_ALL[COLOR_BLUE],
-    FLAG_TERMINAL_COLOUR: COLORS_ALL[COLOR_PURPLE],
-    FLAG_LAB_COLOUR: COLORS_ALL[COLOR_GREY],
-    FLAG_CONTAINER_COLOUR: COLORS_ALL[COLOR_BROWN],
-    FLAG_IGNORE_COLOR: COLORS_ALL[COLOR_RED],
+    FLAG_PERMANENT_COLOUR:      C.COLORS_ALL[C.COLOR_BLUE],
+    FLAG_SOURCE_COLOUR:         C.COLORS_ALL[C.COLOR_YELLOW],
+    FLAG_CONTROLLER_COLOUR:     C.COLORS_ALL[C.COLOR_PURPLE],
+    FLAG_MINERAL_COLOUR:        C.COLORS_ALL[C.COLOR_GREY],
+    FLAG_KEEPERS_LAIR_COLOUR:   C.COLORS_ALL[C.COLOR_ORANGE],
+    FLAG_STRUCTURE_COLOUR:      C.COLORS_ALL[C.COLOR_BROWN],
+    FLAG_LINK_COLOUR:           C.COLORS_ALL[C.COLOR_CYAN],
+    FLAG_HARVEST_KEEPER_COLOUR: C.COLORS_ALL[C.COLOR_RED],
+    FLAG_PORTAL_COLOUR:         C.COLORS_ALL[C.COLOR_BLUE],
+    FLAG_TERMINAL_COLOUR:       C.COLORS_ALL[C.COLOR_PURPLE],
+    FLAG_LAB_COLOUR:            C.COLORS_ALL[C.COLOR_GREY],
+    FLAG_CONTAINER_COLOUR:      C.COLORS_ALL[C.COLOR_BROWN],
+    FLAG_IGNORE_COLOUR:         C.COLORS_ALL[C.COLOR_RED],
 
     //Ranges
     RANGE_HARVEST: 1,
@@ -166,17 +195,6 @@ const gc = {
         pgc.POLICY_HARVESTERS,
         pgc.POLICY_PORTERS,
     ],
-    // Economy
-    //INITIATIVE_WORKER: pgc.INITIATIVE_WORKER,
-    //INITIATIVE_HARVESTER: pgc.INITIATIVE_HARVESTER,
-    //INITIATIVE_PORTER: pgc.INITIATIVE_PORTER,
-    //INITIATIVE_UPGRADER: pgc.INITIATIVE_UPGRADER,
-    // builds
-    // storage structures
-    //BUILD_EXTENSIONS: pgc.BUILD_EXTENSIONS,
-    //BUILD_SOURCE_CONTAINERS: pgc.BUILD_SOURCE_CONTAINERS,
-    //BUILD_CONTROLLER_CONTAINERS: pgc.BUILD_CONTROLLER_CONTAINERS,
-    //BUILD_TOWER: "build_tower",
     // roads
     BUILD_ROAD_SOURCE_SPAWN: pgc.BUILD_ROAD_SOURCE_SPAWN,
     BUILD_ROAD_SOURCE_CONTROLLER: pgc.BUILD_ROAD_SOURCE_CONTROLLER,
@@ -232,6 +250,7 @@ const gc = {
     BUILD_CHECK_RATE: 1,
     NEUTRAL_ROOM_CHECK_RATE: 10,
     CALC_ROOM_RESOURCES_RATE: 10,
+    FREE_HARVESTER_POST_CACHE_RATE: 20,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -239,7 +258,7 @@ const gc = {
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,
 
-    // Econimic factors
+    // Economic factors
     SPAWN_TIME_RESERVE: 50, // 50 complete guess.
     MIN_ENERGY_TO_MINE: 1000, // guess
     COLONY_PROFIT_MARGIN: 500,
@@ -329,16 +348,16 @@ const gc = {
     },
 
     //creep body bases
-    WMC_COST: 200, // BODYPART_COST[WORK] + BODYPART_COST[MOVE] + BODYPART_COST[CARRY],
-    WWM_COST: 250, // 2*BODYPART_COST[WORK] + BODYPART_COST[MOVE],
-    CCM_COST: 75,  // BODYPART_COST[MOVE] + 2*BODYPART_COST[CARRY],
+    WMC_COST: 200,
+    WWM_COST: 250,
+    CCM_COST: 75,
     PORTER_WORKER_CARRY_RATIO: 8/3,
     HARVESTER_WORKER_RATIO: 8/5,
     RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
 
 
-    //screeps costants
-    SORCE_REGEN_LT: 5, // CREEP_LIFE_TIME/ENERGY_REGEN_TIME,
+    //screeps constants
+    SORCE_REGEN_LT: 5,
 
     END : "end"
 };
