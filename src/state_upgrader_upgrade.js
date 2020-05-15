@@ -9,13 +9,13 @@ const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_UPGRADER_UPGRADE;
-    this.creep = creep
-    this.policyId = creep.memory.policyId
+    this.creep = creep;
+    this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
+    //console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
        return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
     }
@@ -32,8 +32,8 @@ State.prototype.enact = function () {
         case ERR_NOT_FOUND:     // Extractor not found. You must build an extractor structure to harvest minerals. Learn more.
             return gf.fatalError(ERR_NOT_FOUND);
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-            console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) )
-            console.log("creep",JSON.stringify(this.creep.name))
+            console.log("getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY) );
+            console.log("creep",JSON.stringify(this.creep.name));
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES" + JSON.stringify(this.creep.store));
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");

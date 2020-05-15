@@ -48,10 +48,12 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY === 0)) {
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    } else {
+        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
-
+/* todo code to wait until full before returning. Do we need this?
     const sources = this.creep.room.find(FIND_SOURCES);
     let mySource;
     for (let source of sources) {
@@ -62,17 +64,11 @@ State.prototype.enact = function () {
     }
     if (mySource) {
         creeps = _.filter(Game.creeps, c => c.memory.targetId === mySource.id);
-        if (creeps.length > 0 && creeps[0].isNearTo(mySource)) {
+        if (creeps.length > 0 && creeps[0].pos.isNearTo(mySource)) {
             return;
         }
     }
-
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
-    } else {
-        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-    }
-
+*/
 };
 
 module.exports = State;

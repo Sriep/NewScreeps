@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const assert = require('assert');
-const race_harvester = require("./race_harvester");
+const race_harvester = require("../src/race_harvester");
 
 describe("race_harvester", function() {
     describe("bodyCounts", function() {

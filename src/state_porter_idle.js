@@ -16,6 +16,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    //console.log(this.creep.name,"STATE_PORTER_IDLE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
@@ -23,18 +24,20 @@ State.prototype.enact = function () {
     const room = Game.rooms[this.homeId];
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
-    const containerPos = state.findPorterSourceContainer(
+    //console.log("STATE_PORTER_IDLE colonies", colonies,"ec", room.energyCapacityAvailable);
+    const container = state.findPorterSourceContainer(
         room, colonies, room.energyCapacityAvailable
     );
-    if (containerPos) {
-        this.creep.memory.targetId = state.findContainerAt(containerPos);
+    if (container) {
+        this.creep.memory.targetId = container.id;
         if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
             console.log(".getFreeCapacity(RESOURCE_ENERGY)", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) );
             gf.fatalError("STATE_PORTER_IDLE free capacity should be 0 for withdrawal")
         }
+        //console.log("STATE_PORTER_IDLE container pos", JSON.stringify(container));
         return state.switchToMovePos(
             this.creep,
-            containerPos,
+            container.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_WITHDRAW,
         );

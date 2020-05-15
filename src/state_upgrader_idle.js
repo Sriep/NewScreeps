@@ -7,7 +7,6 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
-const budget = require("budget");
 
 function State (creep) {
     this.creep = creep;
@@ -19,22 +18,21 @@ function State (creep) {
 
 State.prototype.enact = function () {
     const home = Game.rooms[this.homeId];
-    //const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId);
-    //const wBudget = budget.harvesterWsRoom(home, home);
-    //console.log("wsHarvesting",wsHarvesting,">= wBudget", wBudget);
+    //console.log(this.creep.name, "STATE_UPGRADER_IDLE");
 
     const UpgradePost = state.findFreeUpgraderPost(home);
+    //console.log("STATE_UPGRADER_IDLE found post", JSON.stringify(UpgradePost))
     if (UpgradePost) {
         return this.goUpgrade(UpgradePost);
     }
 
     if (state.atUpgradingPost(this.creep.pos)) {
-        //console.log("at UpgradingPost", JSON.stringify(this.creep.pos))
-        const UpgradecontainerPos = Game.flags[home.controller.id].memory.containerPos;
-        const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(UpgradecontainerPos, this.homeId));
-        //console.log("at upgrading post with energy", upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0)
+        //console.log("STATE_UPGRADER_IDLE at UpgradingPost", JSON.stringify(this.creep.pos))
+        const upgradeContainerPos = Game.flags[home.controller.id].memory.containerPos;
+        const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(upgradeContainerPos, this.homeId));
+        //console.log("STATE_UPGRADER_IDLE at upgrading post with energy", upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0)
         if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
-            upgraders = state.getHarvestingHarvesters(this.creep.policyId);
+            //upgraders = state.getHarvestingHarvesters(this.creep.policyId);
             for (let i in upgraders) {
                 if (upgraders.memory.targetPos.x === this.creep.x
                     && upgraders.memory.targetPos.y === this.creep.y) {

@@ -11,18 +11,24 @@ const policy = require("policy");
 function Policy  (id, data) {
     this.type = gc.POLICY_MINE_ROOM;
     this.id = id;
-    //this.home = data.home;
-    this.m = data;
+    this.home = data.home;
+    this.m = data.m;
 }
 
 // runs first time policy is created only
 Policy.prototype.initilise = function () {
+    if (!this.m) {
+        this.m = {}
+    }
+    if (this.home) {
+        delete this.home;
+    }    
     return true;
 };
 
 // runs once every tick
 Policy.prototype.enact = function () {
-    //console.log("POLICY_MINE_ROOM room", JSON.stringify(this.m.home))
+    //console.log("POLICY_MINE_ROOM room", JSON.stringify(this.home))
     if (this.m.spawnRoom) {
         return;
     }
@@ -36,12 +42,12 @@ Policy.prototype.enact = function () {
 
     this.m.spawnRoom = spawnInfo.name;
     const governor = policy.getGouvernerPolicy(this.m.spawnRoom.name);
-    governor.addColony(this.m.home, spawnInfo.profit, spawnInfo.parts);
-    build(Game.rooms[this.m.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);
+    governor.addColony(this.home, spawnInfo.profit, spawnInfo.parts);
+    build(Game.rooms[this.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);
 };
 
 Policy.prototype.getSpawnRoom = function() {
-    const values = JSON.parse(Game.flags[this.m.home].memory[values]);
+    const values = JSON.parse(Game.flags[this.home].memory[values]);
     console.log("getSpawnRoom values",JSON.stringify(values));
     let bestProfit = 0;
     let bestRoom;
@@ -137,13 +143,17 @@ buildRoads = function(colony, spawnRoom) {
 };
 
 Policy.prototype.draftReplacment = function() {
-    //return false;
+    if (!this.home) {
+        return false;
+    }
     for ( let id in Memory.policies) {
         if (Memory.policies[id].type === gc.POLICY_MINE_ROOM
-            && Memory.policies[id].m.home === this.m.home) {
+            && Memory.policies[id].m.home === this.home) {
+            console.log("draftReplacment POLICY_MINE_ROOM",this.home,"return false this", JSON.stringify(this));
             return false;
         }
     }
+    console.log("draftReplacment POLICY_MINE_ROOM",this.home,"return this", JSON.stringify(this));
     return this
 };
 

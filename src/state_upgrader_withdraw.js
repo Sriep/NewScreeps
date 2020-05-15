@@ -13,22 +13,22 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
+    //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        console.log("STATE_UPGRADER_WITHDRAW this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0"
-            ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY))
+        //console.log("STATE_UPGRADER_WITHDRAW this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0"
+        //    ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY))
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
     }
 
     const container = state.findUpgradeContainerNear(this.creep);
     if (!container) {
-        console.log("STATE_UPGRADER_WITHDRAW !container")
+        //console.log("STATE_UPGRADER_WITHDRAW !container")
         return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE)
     }
 
     if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        console.log("STATE_UPGRADER_WITHDRAW this.container.store.getUsedCapacity(RESOURCE_ENERGY) === 0"
-            ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY));
+        //console.log("STATE_UPGRADER_WITHDRAW this.container.store.getUsedCapacity(RESOURCE_ENERGY) === 0"
+        //    ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY));
         return;
         //return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
     }

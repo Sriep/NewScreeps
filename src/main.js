@@ -19,9 +19,8 @@ module.exports.loop = function () {
     }
     freeCreeps();
     flagRooms();
-
-    moveCreeps();
     enactPolicies();
+    moveCreeps();
     spawnCreeps();
 
     inserted.bottom();
@@ -65,9 +64,9 @@ function spawnCreeps() {
             //console.log("main spawn loop energy avaliable", Game.spawns[i].room.energyAvailable);
             //if (Game.spawns[i].room.energyAvailable >= BODYPART_COST[MOVE]) {
                 //console.log("main spawnCreeps about to get queue");
-                const q = flag.getSpawnQueue(Game.spawns[i].room.name);
+                //const q = flag.getSpawnQueue(Game.spawns[i].room.name);
                 //console.log("main spawnCreeps",Game.spawns[i].room.name,  "queue is", JSON.stringify(q));
-                const r= q.spawnNext(Game.spawns[i]);
+            flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
                 //console.log("spawn at", Game.spawns[i].room.name,"result", r)
             //}
         }

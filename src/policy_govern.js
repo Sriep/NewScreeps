@@ -20,7 +20,7 @@ Policy.prototype.initilise = function () {
     this.m.rcl = Game.rooms[this.roomName].controller.level;
     this.m.agendaIndex = -1;
     this.m.childTypes = [];
-    this.m.colonies = [this.roomName]
+    this.m.colonies = [this.roomName];
     console.log("this.m.colonies", JSON.stringify(this.m.colonies));
     this.m.agenda = agenda.peace;
     this.m.parts = 0;
@@ -57,7 +57,7 @@ Policy.prototype.govern = function () {
 
         this.m.agendaIndex++;
         Memory.records["rcl "+this.m.rcl][nextAgendaItem + " run"] = Game.time;
-        return;
+        //return;
     }
     ///console.log("govern check FAILED")
  };

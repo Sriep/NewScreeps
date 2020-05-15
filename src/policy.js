@@ -20,7 +20,9 @@ const policy = {
             const policy = new Policy(id, Memory.policies[id]);
 
             const replacement = policy.draftReplacment();
+            //console.log("enactPolicies replacement", replacement);
             if (replacement && replacement.type) {
+                //console.log("enactPolicies replacement", replacement, "type", replacement.type);
                 if (replacement.type !== policy.type) {
                     this.removeFromParentChildList(policy.parentId, policy.type);
                     //console.log("enactPolicies replace policy with", JSON.stringify(replacement));
@@ -41,7 +43,7 @@ const policy = {
                 }
                 replacement.enact();
             } else {
-                //console.log("enactPolicies delete policy", id);
+                console.log("enactPolicies delete policy", id);
                 Memory.records.policies.replaced[Game.time.toString()] = {
                     "time" : Game.time,
                     "old" : policy.type,

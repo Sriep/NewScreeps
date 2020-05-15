@@ -5,7 +5,7 @@
  */
 
 const assert = require('assert');
-const construction = require("./construction");
+const construction = require("../src/construction");
 const Terrain = require("./terrain");
 
 const pt = { x : 22, y : 13 };

@@ -3,7 +3,8 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
-//const cache = require("cache");
+const C = require("./Constants");
+const TERRAIN_MASK_WALL = C.TERRAIN_MASK_WALL;
 
 const construction = {
     buildRoadSourceController: function(room) {

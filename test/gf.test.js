@@ -5,7 +5,7 @@
  */
 
 const assert = require('assert');
-const gf = require("./gf");
+const gf = require("../src/gf");
 
 describe("gf", function() {
     describe("splitRoomName", function() {

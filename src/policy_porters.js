@@ -8,7 +8,6 @@ const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
 const budget = require("budget");
-const state = require("state");
 const race = require("race");
 const flag = require("flag");
 const race_harvester = require("race_harvester");
@@ -50,18 +49,17 @@ Policy.prototype.spawns = function (room, resources) {
     const workers = policy.getCreeps(this.parentId, gc.RACE_WORKER).length;
     const porters = policy.getCreeps(this.parentId, gc.RACE_PORTER).length;
     const upgraders = policy.getCreeps(this.parentId, gc.RACE_UPGRADER).length;
-    console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders);
+    //console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders);
 
     const wHarvester = race.creepPartsAlive(this.parentId, gc.RACE_HARVESTER, WORK);
     const cWorker = race.creepPartsAlive(this.parentId, gc.RACE_WORKER, CARRY);
     const cPorter = race.creepPartsAlive(this.parentId, gc.RACE_PORTER, CARRY);
     const wUpgrader = race.creepPartsAlive(this.parentId, gc.RACE_UPGRADER, WORK);
-    console.log("pp spawns wHarvester",wHarvester,"cWorker",cWorker,"cPorter",cPorter,"wUpgrader",wUpgrader);
+    console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,"cPorter",cPorter,"wUpgrader",wUpgrader);
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
     if (cWorker < 2) {
-        const cWorkerLife = race.ticksLeftByPart(this.parentId, gc.RACE_WORKER, CARRY);
         if (cWorker < CREEP_LIFE_TIME/10 || (harvesters === 0 && cPorter === 0 )) {
             policy.sendOrderToQueue(
                 room,
@@ -141,7 +139,6 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
     const sourceEnergyLT = 30000;
 
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        const home = Game.rooms[this.home];
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {
@@ -172,12 +169,11 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
 
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
-    console.log("pp colonies", colonies);
+    //console.log("pp colonies", colonies);
     for (let colony of colonies) {
         if (colony === this.home) {
             continue;
         }
-        const flagRoom = Game.flags[colony];
         const valuesObj = JSON.parse(Game.flags[this.home].memory[values]);
         let values;
         if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
@@ -210,7 +206,6 @@ calcRoomResources = function (roomName, hW, pC, uW) {
     const buildTicks = economy.constructionRepairLeft(room);
     const ratioHtoW = budget.workersRoomRationHtoW(room, false);
     let workerWs = 0;
-    const ratioWtoP = (hW/pC)/ratioHtoW;
     let porterCs = pC;
     let upgradeWs = uW;
     if (buildTicks > 0) {

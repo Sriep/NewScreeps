@@ -19,7 +19,7 @@ const inserted = {
     },
 
     bottom: function () {
-        console.log("--------- piers inserted------------")
+        //console.log("--------- piers inserted------------")
         //for (let roomName in Game.flags) {
           //  if (Game.flags[roomName].memory.values) {
                // console.log(roomName,"  ",Game.flags[roomName].memory.values)
@@ -58,7 +58,7 @@ const inserted = {
 
 
 
-        console.log("--------- piers inserted done ------------")
+        //console.log("--------- piers inserted done ------------")
     }
 
 };

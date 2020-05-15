@@ -203,7 +203,7 @@ const budget = {
         values[gc.ROOM_RESERVED_ROADS]["parts"] += 6;
         values[gc.ROOM_OWNED]["profit"] += 600; // reduction in container repair
         values[gc.ROOM_OWNED_ROADS]["profit"] += 600; // reduction in container repair
-        console.log("budget valueNeutralRoom result", JSON.stringify(values));
+        //console.log("budget valueNeutralRoom result", JSON.stringify(values));
         return values;
     },
 

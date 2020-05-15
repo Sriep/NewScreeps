@@ -47,16 +47,14 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.exploreRoom = function(newRoom) {
-    const roomFlag = flag.getRoomFlag(newRoom);
+    let roomFlag = flag.getRoomFlag(newRoom);
+    if (!roomFlag) {
+        gf.fatalError("should have room flag room " + newRoom);
+    }
     if (roomFlag.memory.explored ) {
         return;
     }
-
-    if (!Game.flags[newRoom]) {
-        const center = new RoomPosition(25, 25, newRoom);
-        center.createFlag(newRoom);
-        newRoomFlag = Game.flags[newRoom];
-    }
+    roomFlag.memory.explored = true;
     if (!Game.rooms[newRoom].controller) {
         return;
     }
@@ -67,7 +65,7 @@ Policy.prototype.exploreRoom = function(newRoom) {
         const room = Game.rooms[name];
         if (!!room.controller && room.controller.my && room.controller.level > 1) {
             values[name] = budget.valueNeutralRoom(newRoom, name, false);
-            console.log(newRoom,"values[name]", JSON.stringify(values[name]));
+            //console.log(newRoom,"values[name]", JSON.stringify(values[name]));
             if (!showsProfit) {
                 showsProfit = values[name][gc.ROOM_NEUTRAL].profit > 0
                     || values[name][gc.ROOM_NEUTRAL_ROADS].profit > 0
@@ -81,13 +79,8 @@ Policy.prototype.exploreRoom = function(newRoom) {
     }
 
     if (!policy.getMiningPolicy(newRoom) && showsProfit) {
-        if (!Game.flags[newRoom]) {
-            const center = new RoomPosition(25, 25, newRoom);
-            center.createFlag(newRoom);
-            newRoomFlag = Game.flags[newRoom];
-        }
         roomFlag.memory.values = JSON.stringify(values);
-        if (!roomFlag.memroy.keeperLairs && !roomFlag.memroy.invaderCore) {
+        if (!roomFlag.memory.keeperLairs && !roomFlag.memory.invaderCore) {
             policy.activatePolicy( gc.POLICY_MINE_ROOM, { "home" : newRoom, },);
         }
     }

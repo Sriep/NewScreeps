@@ -19,6 +19,7 @@ const flag = {
                 const center = new RoomPosition(25, 25, room.name);
                 center.createFlag(room.name);
             }
+            roomFlag = Game.flags[roomName];
         }
         return roomFlag;
     },

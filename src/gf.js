@@ -3,8 +3,7 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
-//const cache = require("cache");
+const gc = require("./gc");
 
 const gf = {
     fatalError: function (msg) {
