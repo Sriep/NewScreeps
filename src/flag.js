@@ -8,22 +8,19 @@ const rooms = require("rooms");
 
 const flag = {
     flagRoom(roomName) {
-        //console.log("flag room",roomName, "room obj", Game.rooms[roomName])
         rooms.flag(Game.rooms[roomName]);
     },
 
     getRoomFlag(roomName) {
-        //console.log("flag getRoomFlag roomName", roomName)
-        let flag = Game.flags[roomName];
-        if (!flag) {
+        let roomFlag = Game.flags[roomName];
+        if (!roomFlag) {
             this.flagRoom(roomName);
-            if (!Game.rooms[roomName] || !Game.rooms[roomName].controller) {
-                return undefined;
+            if (!Game.flags[roomName]) {
+                const center = new RoomPosition(25, 25, room.name);
+                center.createFlag(room.name);
             }
-            Game.rooms[roomName].controller.pos.createFlag(roomName);
-            flag = Game.flags[roomName];
         }
-        return flag;
+        return roomFlag;
     },
 
     getSpawnQueue(roomName) {

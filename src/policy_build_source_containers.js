@@ -76,6 +76,7 @@ areSourceContainersFinished = function (room) {
 };
 
 Policy.prototype.draftReplacment = function() {
+    // return this;
     const room = Game.rooms[this.home];
     return areSourceContainersFinished(room) ? false : this;
 };

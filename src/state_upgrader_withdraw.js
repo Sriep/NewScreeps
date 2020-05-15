@@ -13,18 +13,24 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
+    console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+        console.log("STATE_UPGRADER_WITHDRAW this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0"
+            ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY))
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
     }
 
     const container = state.findUpgradeContainerNear(this.creep);
     if (!container) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE)
+        console.log("STATE_UPGRADER_WITHDRAW !container")
+        return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE)
     }
 
     if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
+        console.log("STATE_UPGRADER_WITHDRAW this.container.store.getUsedCapacity(RESOURCE_ENERGY) === 0"
+            ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY));
+        return;
+        //return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
     }
 
     const result = this.creep.withdraw(container, RESOURCE_ENERGY);
@@ -36,7 +42,7 @@ State.prototype.enact = function () {
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("transfer ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:           // upgraders' bucket is empty
-            return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
+            return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:

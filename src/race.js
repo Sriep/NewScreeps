@@ -95,6 +95,18 @@ const race = {
         return count;
     },
 
+    creepPartsAlive(policyId, race, part) {
+        const creeps = _.filter(Game.creeps, function (c) {
+            return c.memory.policyId === policyId
+                && race === c.name.split("_")[0]
+        });
+        let partsLeft = 0;
+        for (let creep of creeps) {
+            partsLeft += this.partsFromBody2(creep.body, part);
+        }
+        return partsLeft;
+    },
+
     ticksLeftByPart(policyId, race, part) {
         const creeps = _.filter(Game.creeps, function (c) {
             return c.memory.policyId === policyId

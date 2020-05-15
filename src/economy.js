@@ -109,13 +109,21 @@ const economy = {
         return { count: count, neighbours: neighbours};
     },
 
-    constructionLeft: function (room) {
+    constructionRepairLeft: function (room) {
         const sites = room.find(FIND_CONSTRUCTION_SITES);
         let construction = 0;
         for (let i in sites) {
             construction += sites[i].progressTotal - sites[i].progress
         }
-        return construction;
+        const damaged = room.find(FIND_STRUCTURES, {
+            filter: function(s)  {
+                return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
+            }
+        });
+        for (let obj of damaged) {
+            construction += (obj.hitsMax - obj.hits) / REPAIR_POWER;
+        }
+        return construction / BUILD_POWER;
     },
 
     totalSourceCapacity: function(room) {

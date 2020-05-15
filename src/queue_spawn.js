@@ -7,13 +7,15 @@ const gc = require("gc");
 const flag = require("flag");
 
 function SpawnQueue  (roomName) {
-    this.home = roomName;
-    this.m = flag.getRoomFlag(roomName).memory.spawnQueue;
+    //this.home = roomName;
+    //this.m = flag.getRoomFlag(roomName).memory.spawnQueue;
+    this.m = Game.rooms[roomName].memory.spawnQueue;
     //console.log("SpawnQueue constructor room", roomName, "memroy", JSON.stringify(this.m));
     //console.log("data", JSON.stringify(data));
     if (!this.m) {
-        flag.getRoomFlag(roomName).memory.spawnQueue = {};
-        this.m = flag.getRoomFlag(roomName).memory.spawnQueue;
+        //flag.getRoomFlag(roomName).memory.spawnQueue = {};
+        Game.rooms[roomName].memory.spawnQueue = {};
+        this.m = Game.rooms[roomName].memory.spawnQueue;
         this.reset();
     }
     //console.log("SpawnQueue, constructor after", JSON.stringify(this));

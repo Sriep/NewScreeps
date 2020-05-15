@@ -24,9 +24,11 @@ State.prototype.enact = function () {
     //console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-    //   console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
-    //        JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
-            return state.switchTo(this.creep, this.creep.memory.next_state)
+        if (this.creep.memory.moveRange === 0) {
+            console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
+                JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+        }
+        return state.switchTo(this.creep, this.creep.memory.next_state)
     }
     if (this.creep.memory.lastpositon) {
         const lastPos =  cache.dPoint(this.creep.memory.lastpositon);
@@ -85,14 +87,36 @@ State.prototype.pathLost = function () {
     //console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos))
     switch(creepRace) {
         case gc.RACE_HARVESTER:
-            return state.switchTo(this.creep, creepRace + "_idle");
+            const sourceId = state.atHarvestingPost(this.creep.pos);
+            console.log(this.creep.name, "atHarvestingPost", sourceId);
+            if (sourceId) {
+                console.log(this.creep.name,"STATE_HARVESTER_IDLE at harvesting pos", sourceId);
+                harvesters = state.getHarvestingHarvesters(this.creep.policyId);
+                for (let i in harvesters) {
+                    if (harvester.memory.targetPos.x === this.creep.x
+                        && harvester.memory.targetPos.y === this.creep.y) {
+                        delete harvester.memory.targetPos;
+                        state.switchTo(harvester, gc.STATE_HARVESTER_IDLE);
+                        break;
+                    }
+                }
+                this.creep.memory.targetId = sourceId;
+                this.creep.memory.targetPos = this.creep.pos;
+                return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
+            }
+            return;
+            //return state.switchTo(this.creep, creepRace + "_idle");
         case gc.RACE_WORKER:
-            break;
+            return;
+            //return state.switchTo(this.creep, creepRace + "_idle");
         case gc.RACE_PORTER:
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 return state.switchTo(this.creep, creepRace + "_idle")
             } else {
                 // porter hack approaching crowed upgrade container
+                if (!Game.flags[this.creep.room.controller.id]) {
+                    return;
+                }
                 const UpgradeContainerPos = Game.flags[this.creep.room.controller.id].memory.containerPos;
                 if (this.creep.targetPos && race.getRace(this.creep) === gc.RACE_PORTER
                     && (this.creep.targetPos.x === UpgradeContainerPos.x
@@ -124,8 +148,11 @@ State.prototype.pathLost = function () {
 
                 return state.switchTo(this.creep, creepRace + "_full_idle")
             }
+        case gc.RACE_UPGRADER:
+            return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
         default:
-            return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);
+            return;
+            //return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);
     }
 };
 

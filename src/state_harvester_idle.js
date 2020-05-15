@@ -7,24 +7,44 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const policy = require("policy");
 const budget = require("budget");
 
 function State (creep) {
     this.creep = creep;
     this.state = gc.STATE_HARVESTER_IDLE;
     this.policyId = creep.memory.policyId;
+    this.m = this.creep.memory;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 State.prototype.enact = function () {
+    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    const home = Game.rooms[this.homeId];
+
+    const governor = policy.getGouvernerPolicy(this.homeId);
+    const nextPost = state.nextFreeHarvesterPost(
+        this.homeId,
+        governor.getColonies(),
+        home.energyCapacityAvailable
+    );
+    if (nextPost) {
+        this.m.targetId = nextPost.sourceId;
+        state.switchToMovePos(
+            this.creep,
+            nextPost.post,
+            0,
+            gc.STATE_HARVESTER_HARVEST,
+        );
+    }
+};
+/*
+State.prototype.enactOld = function () {
     //console.log(this.creep.name,"STATE_HARVESTER_IDLE")
     const home = Game.rooms[this.homeId];
     const wsHarvesting = state.wsHarvesting(this.creep.memory.policyId);
     const wBudget = budget.harvesterWsRoom(home, home);
     //console.log("wsHarvesting",wsHarvesting,">= wBudget", wBudget);
-
-
-
     if (wsHarvesting >= wBudget) {
         const UpgradePost = state.findFreeUpgraderPost(home);
         if (UpgradePost) {
@@ -112,7 +132,7 @@ State.prototype.goUpgrade = function (post) {
         gc.STATE_UPGRADER_UPGRADE
     );
 };
-
+*/
 module.exports = State;
 
 

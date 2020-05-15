@@ -28,7 +28,7 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_RCL1 enact");
+    //console.log("POLICY_RCL1 enact");
     const room = Game.rooms[this.home];
 
     const energy = room.energyAvailable;

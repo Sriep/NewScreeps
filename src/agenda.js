@@ -11,13 +11,12 @@ const agenda = {
         [ gc.ACTIVITY_DISALLOWED ],
         [ gc.POLICY_RCL1, gc.ACTIVITY_FINISHED ],
         [
-            //gc.POLICY_WORKERS,
+            gc.POLICY_PORTERS,
             gc.POLICY_EXPLORE,
-            gc.POLICY_HARVESTERS,
             gc.POLICY_BUILD_SOURCE_CONTAINERS,
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
-            gc.POLICY_PORTERS,
+            // gc.POLICY_PORTERS,
             gc.ACTIVITY_FINISHED
         ],
         [

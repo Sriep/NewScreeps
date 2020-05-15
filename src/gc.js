@@ -36,6 +36,7 @@ const pgc = {
     POLICY_BUILD_TOWER: "build_tower",
     POLICY_FOREIGN_MINING: "foreign_mining",
     POLICY_MINE_ROOM: "mine_room",
+    POLICY_UPGRADER_IDLE: "upgrader_idle",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -101,8 +102,9 @@ const gc = {
         750 : {"work": 5, "carry": 1, "move" : 4},
         800 : {"work": 5, "carry": 1, "move" : 5},
     },
-    MAX_EC_2WORK_HARVESTER: 300,
+    MAX_EC_2WORK_HARVESTER: 400,
     MAX_EC_3WORK_HARVESTER: 500,
+    MAX_EC_4WORK_HARVESTER: 600,
     ASSIGN_HARVESTER_BUFFER: 33,
 
     // flags
@@ -148,6 +150,7 @@ const gc = {
     // states upgrader
     STATE_UPGRADER_UPGRADE: "upgrader_upgrade",
     STATE_UPGRADER_WITHDRAW: "upgrader_withdraw",
+    STATE_UPGRADER_IDLE: "upgrader_idle",
     // scout
     STATE_SCOUT_IDLE: "scout_idle",
 
@@ -219,11 +222,6 @@ const gc = {
     POLICY_BUILD_TOWER: pgc.POLICY_BUILD_TOWER,
     POLICY_FOREIGN_MINING: pgc.POLICY_FOREIGN_MINING,
     POLICY_MINE_ROOM: pgc.POLICY_MINE_ROOM,
-    //POLICY_DEFENCE: "defence",
-    //POLICY_RESCUE: "rescue",
-    //POLICY_BUILD: "build",
-    //POLICY_NEUTRAL_ROOM: "neutral_room",
-    //POLICY_BUILD_SPAWN: "build_spawn",
 
     //policy
     EXPLORE_CREEPS: 4,
@@ -249,8 +247,8 @@ const gc = {
     BUILD_QUEUE_CHECK_RATE: 1,
     BUILD_CHECK_RATE: 1,
     NEUTRAL_ROOM_CHECK_RATE: 10,
-    CALC_ROOM_RESOURCES_RATE: 10,
-    FREE_HARVESTER_POST_CACHE_RATE: 20,
+    CALC_ROOM_RESOURCES_RATE: 20,
+    FREE_HARVESTER_POST_CACHE_RATE: 10,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -262,6 +260,7 @@ const gc = {
     SPAWN_TIME_RESERVE: 50, // 50 complete guess.
     MIN_ENERGY_TO_MINE: 1000, // guess
     COLONY_PROFIT_MARGIN: 500,
+    COLONY_PARTS_MARGIN: 30,
 
     // ownership
     ROOM_ENEMY: "enemy",

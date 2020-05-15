@@ -19,28 +19,46 @@ const inserted = {
     },
 
     bottom: function () {
-        //console.log("--------- piers inserted------------")
+        console.log("--------- piers inserted------------")
+        //for (let roomName in Game.flags) {
+          //  if (Game.flags[roomName].memory.values) {
+               // console.log(roomName,"  ",Game.flags[roomName].memory.values)
+            //}
+        //}
+        //console.log("befire",Memory.N,  Memory.W);
+       /* if (Memory.N === undefined) {
+            Memory.N = 0;
+            Memory.W = 0;
+        } else {
+            //console.log("else",Memory.N,  Memory.W);
+            if (Memory.N < 11) {
+                Memory.N = Memory.N + 1;
+                //console.log("after Memory.N = Memory.N + 1",Memory.N,  Memory.W);
+            } else {
+                Memory.N = 0;
+                Memory.W = Memory.W + 1
+               // console.log("after Memory.W = Memory.W + 1",Memory.N,  Memory.W);
+            }
+        }
+        //console.log("after",Memory.N,  Memory.W);
 
-        //for (let name in Game.creeps) {
-            //console.log(name, "has race", race.getRace(Game.creeps[name]));
+        //for (let n = 0 ; n <= 10 ; n++) {
+          //  for (let w = 0 ;  w <= 10 ; n++) {
+        if (Memory.N <11 && Memory.W < 11) {
+            let rawData = new Uint8Array(2500);
+            const roomName = "W" + Memory.W.toString() + "N" + Memory.N.toString();
+            console.log(roomName);
+            const terrain = Game.map.getRoomTerrain(roomName);
+            terrain.getRawBuffer(rawData);
+            console.log(roomName,":  ", JSON.stringify(rawData));
+        }*/
+
+            //}
         //}
 
-        //const home = Game.rooms["W7N7"];
-        //const ec = gf.roomEc(home);
-        //console.log("energy capacity", ec);
 
-        //console.log("home energyAvailable", home.energyAvailable,
-        //    "energyCapacityAvailable",home.energyCapacityAvailable);
-        //const spawn = Game.spawns["Spawn1"];
-        //console.log("spawn store", JSON.stringify(spawn.store),
-        //    "spawn getCapacity", spawn.store.getCapacity(RESOURCE_ENERGY),
-        //    "spawn getFreeCapacity", spawn.store.getFreeCapacity(RESOURCE_ENERGY),
-        //    "spawn getUsedCapacity", spawn.store.getUsedCapacity(RESOURCE_ENERGY));
 
-        //console.log("Game.spawns.Spawn1.store.getCapacity()", Game.spawns.Spawn1.store.getCapacity());
-        //console.log("Game.spawns.Spawn1.store.getCapacity(RESOURCE_ENERGY)", Game.spawns.Spawn1.store.getCapacity(RESOURCE_ENERGY));
-        //console.log("Game.spawns.Spawn1.store.getCapacity('energy')", Game.spawns.Spawn1.store.getCapacity('energy'));
-        //console.log("Game.spawns.Spawn1.energyCapacity", Game.spawns.Spawn1.energyCapacity);
+        console.log("--------- piers inserted done ------------")
     }
 
 };

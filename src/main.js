@@ -32,7 +32,7 @@ module.exports.loop = function () {
 };
 
 function startup() {
-    Memory.started = true
+    Memory.started = true;
     Memory.records = {};
     Memory.records["started"] = Game.time;
     Memory.records.policies = {};

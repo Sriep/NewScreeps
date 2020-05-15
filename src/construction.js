@@ -12,8 +12,8 @@ const construction = {
         const sources = room.find(FIND_SOURCES);
 
         for (let j = 0 ; j < sources.length ; j++ ){
-            buildRoad(sources[i].pos, room.controller.pos);
-            buildRoad(sources[i].pos, ccPos);
+            this.buildRoad(sources[i].pos, room.controller.pos);
+            this.buildRoad(sources[i].pos, ccPos);
         }
     },
 
@@ -23,8 +23,8 @@ const construction = {
         const spawns = room.find(FIND_MY_SPAWNS);
 
         for (let j = 0 ; j < spawns.length ; j++ ){
-            buildRoad(spawns[i].pos, room.controller.pos);
-            buildRoad(spawns[i].pos, ccPos);
+            this.buildRoad(spawns[i].pos, room.controller.pos);
+            this.buildRoad(spawns[i].pos, ccPos);
         }
     },
 
@@ -33,7 +33,7 @@ const construction = {
         const spawns = room.find(FIND_MY_SPAWNS);
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < spawns.length ; j++ ){
-                buildRoad(sources[i].pos, spawns[j].pos);
+                this.buildRoad(sources[i].pos, spawns[j].pos);
             }
         }
     },
@@ -45,7 +45,7 @@ const construction = {
         });
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < towers.length ; j++ ){
-                buildRoad(sources[i].pos, spawns[j].pos);
+                this.buildRoad(sources[i].pos, spawns[j].pos);
             }
         }
     },
@@ -55,7 +55,7 @@ const construction = {
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < sources.length ; j++ ){
                 if (i !== j) {
-                    buildRoad(sources[i].pos, sources[j].pos);
+                    this.buildRoad(sources[i].pos, sources[j].pos);
                 }
             }
         }
@@ -68,7 +68,7 @@ const construction = {
         });
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < extensions.length ; j++ ){
-                buildRoad(sources[i].pos, extensions[j].pos);
+                this.buildRoad(sources[i].pos, extensions[j].pos);
             }
         }
         const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
@@ -76,7 +76,7 @@ const construction = {
         });
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < beingBuilt.length ; j++ ){
-                buildRoad(sources[i].pos, beingBuilt[j].pos);
+                this.buildRoad(sources[i].pos, beingBuilt[j].pos);
             }
         }
     },
@@ -97,7 +97,7 @@ const construction = {
         for (let i = 0 ; i < sources.length ; i++ ){
             for (let j = 0 ; j < structures.length ; j++ ){
                 if ( i !== j) {
-                    buildRoad(structures[i].pos, structures[j].pos);
+                    this.buildRoad(structures[i].pos, structures[j].pos);
                 }
             }
         }

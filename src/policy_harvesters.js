@@ -28,7 +28,7 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    //console.log("POLICY_HARVESTERS enact budget", JSON.stringify(this.budget()));
+    console.log("POLICY_HARVESTERS enact budget", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);

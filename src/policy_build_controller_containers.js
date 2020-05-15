@@ -61,13 +61,18 @@ setContainerSites = function(room, cflag) {
     }
 };
 
-isControllerContainerFinished = function (room) {
+areControllerContainerFinished = function (room) {
     const flag = Game.flags[room.controller.id];
-    const pos = flag.memory.containerPos;
-    if (!pos) {
+    const posts = flag.memory.upgraderPosts;
+    if (!posts) {
         return false;
     }
-    return !!state.findContainerAt(gf.roomPosFromPos(pos, room.name));
+    for (let post of posts) {
+        if (!state.findContainerAt(gf.roomPosFromPos({x:post.x, y:post.y}, room.name))) {
+            return false;
+        }
+    }
+    return true;
 };
 
 
@@ -77,10 +82,9 @@ isControllerContainerFinished = function (room) {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    //
-    //
-    // console.log("POLICY_BUILD_CONTROLLER_CONTAINERS draftReplacment isControllerContainerFinished(room)|",isControllerContainerFinished(room))
-    return isControllerContainerFinished(room) ? false : this;
+    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS draftReplacment");
+    //console.log("areControllerContainerFinished", room.name, areControllerContainerFinished(room));
+    return areControllerContainerFinished(room) ? false : this;
 };
 
 module.exports = Policy;

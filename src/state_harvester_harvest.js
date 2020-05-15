@@ -19,10 +19,10 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
     }
     const source = Game.getObjectById(this.creep.memory.targetId);
-    if (source.energy === 0) {
+    //if (source.energy === 0) {
         //console.log("no object id:", this.creep.memory.targetId)
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
-    }
+        //return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
+    //}
     //console.log("creep body", JSON.stringify(this.creep.body))
     //console.log("about to harvestm source", source.id, "energy", source.energy);
     const result = this.creep.harvest(source);
@@ -36,6 +36,7 @@ State.prototype.enact = function () {
         case ERR_NOT_FOUND:     // Extractor not found. You must build an extractor structure to harvest minerals. Learn more.
             return gf.fatalError(ERR_NOT_FOUND);
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
+            return ERR_NOT_ENOUGH_RESOURCES;
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");

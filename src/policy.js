@@ -104,8 +104,11 @@ const policy = {
 
     getGouvernerPolicy : function(roomName) {
         for (let id in Memory.policies) {
-            if (Memory.policies[id].home === roomName &&
+            //console.log("getGouvernerPolicy roomName", roomName, "home",
+            //    Memory.policies[id].home, "type", Memory.policies[id].type);
+            if (Memory.policies[id].roomName === roomName &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {
+            //    console.log("found getGouvernerPolicy", id)
                 return this.getPolicy(id);
             }
         }
@@ -131,10 +134,10 @@ const policy = {
         const policyConstructor = require("policy_" + policyType);
         //console.log("activatePolicy data", JSON.stringify(data));
         const policy = new policyConstructor(newPolicyId, data);
-        //Memory.policies[policy.id] = policy;
+        //console.log("calling initilise policy", JSON.stringify(policy));
         if (!policy.initilise()) {
-            console.log("Policy initilise failed no policy added policyType", policyType,
-                "data", JSON.stringify(data), "parentId", parentId);
+            //console.log("Policy initilise failed no policy added policyType", policyType,
+             //   "data", JSON.stringify(data), "parentId", parentId);
             Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
         }
@@ -186,7 +189,8 @@ const policy = {
 
     hasChildType: function(parentId, type) {
         for (let id in Memory.policies) {
-             if (Memory.policies[id].type === type && Memory.policies[id].parentId === parentId) {
+             if (Memory.policies[id].type === type
+                 && Memory.policies[id].parentId === parentId) {
                 return true;
             }
         }

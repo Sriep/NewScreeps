@@ -7,31 +7,42 @@ const gc = require("gc");
 
 const cache = {
 
-    path(from, toArray, name, range, useRoad, redo) {
+    path(from, toArray, name, range, useRoad, redo, cacheResult) {
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
+        //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
             console.log("path toArray.length === 0 toArray", JSON.stringify(toArray));
             return undefined;
         }
         if (!name) {
-            name = toArrya[0].id;
+            name = toArray[0].id;
         }
         if (!range) {
             range = 1
         }
-        flag = Game.flags[from.id];
-        //console.log("path stored in", toArray[0].room.name)
-        if (!flag.memory[toArray[0].room.name]) {
-            flag.memory[toArray[0].room.name] ={};
-        }
-        if (!flag.memory[toArray[0].room.name][name]) {
-            flag.memory[toArray[0].room.name][name] ={};
+        let flag;
+
+        if (cacheResult) {
+            flag = Game.flags[from.id];
+            //console.log("path stored in", toArray[0].room.name)
+            if (!flag.memory[toArray[0].room.name]) {
+                flag.memory[toArray[0].room.name] ={};
+            }
+            if (!flag.memory[toArray[0].room.name][name]) {
+                flag.memory[toArray[0].room.name][name] ={};
+            }
         }
         const tag = useRoad ? "road" : "noroad";
-        if (!redo && flag.memory[toArray[0].room.name][name][tag]) {
-            //console.log("pathflag.memory ", JSON.stringify(flag.memory[toArray[0].room.name]))
-            return flag.memory[toArray[0].room.name][name][tag];
+        if (cacheResult && !redo && flag.memory[toArray[0].room.name][name][tag]) {
+            const cachedPath =  flag.memory[toArray[0].room.name][name][tag];
+            return {
+                path: this.deserialisePath(cachedPath.path),
+                ops: cachedPath.ops,
+                cost: cachedPath.cost,
+                incomplete: cachedPath.incomplete,
+            }
         }
+
         let goals = _.map(toArray, function(to) {
             return { pos: to.pos, range: range };
         });
@@ -47,23 +58,30 @@ const cache = {
                 swampCost: 5,
             })
         }
-
-        flag.memory[toArray[0].room.name][name][tag] = {
-            path: this.serialisePath(pfPath.path),
+        const result =  {
+            path: pfPath.path,
             ops: pfPath.ops,
             cost: pfPath.cost,
             incomplete: pfPath.incomplete,
         };
-        return flag.memory[toArray[0].room.name][name][tag];
+        if (cacheResult) {
+            flag.memory[toArray[0].room.name][name][tag] = {
+                path: this.serialisePath(pfPath.path),
+                ops: pfPath.ops,
+                cost: pfPath.cost,
+                incomplete: pfPath.incomplete,
+            }
+        }
+        return pfPath;
     },
 
-    distance(from, toArray, name, range, useRoad) {
-        const p = this.path(from, toArray, name, range, useRoad);
+    distance(from, toArray, name, range, useRoad, redo, cacheResult) {
+        const p = this.path(from, toArray, name, range, useRoad, redo, useRoad);
         return p.cost
      },
 
     distanceSourceSpawn: function(source, spawnRoom, useRoad, redo) {
-        spawns = spawnRoom.find(FIND_MY_SPAWNS);
+        const spawns = spawnRoom.find(FIND_MY_SPAWNS);
         return this.distance(source, spawns, "spawn", 1, useRoad, redo);
     },
 
@@ -72,7 +90,7 @@ const cache = {
     },
 
     distanceUpgraderSpawn: function (fromRoom, spawnRoom, useRoad, redo) {
-        spawns = spawnRoom.find(FIND_MY_SPAWNS);
+        const spawns = spawnRoom.find(FIND_MY_SPAWNS);
         return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
     },
 

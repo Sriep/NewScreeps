@@ -30,56 +30,70 @@ Policy.prototype.initilise = function () {
 
 Policy.prototype.enact = function () {
     const creeps = policy.getCreeps(this.id, gc.RACE_SCOUT);
-    console.log("POLICY_EXPLORE creeps", creeps.length);
+    //console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
         const orders = flag.getSpawnQueue(this.home).orders(this.id);
         if (creeps.length + orders.length < gc.EXPLORE_CREEPS) {
-           console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" );
+           //console.log("POLICY_EXPLORE sending new explorer currently",creeps.length,"plus",orders.length,"explorers out there" );
            this.sendExplorers(gc.EXPLORE_CREEPS - creeps.length -  orders.length)
         }
     }
-    console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
+    //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
-        let roomFlag = Game.flags[creeps[i].room.name];
-        if (!roomFlag || !roomFlag.memory.explored) {
-            this.exploreRoom(creeps[i].room.name);
-        }
+        //if (!Game.flags[creeps[i].room.name].memory || !Game.flags[creeps[i].room.name].memory.explored ) {
+           this.exploreRoom(creeps[i].room.name);
+        //}
     }
 };
 
 Policy.prototype.exploreRoom = function(newRoom) {
-    let newRoomFlag = Game.flags[newRoom];
-    if (!newRoomFlag) {
-        console.log("exploreRoom newRoom", newRoom);
+    const roomFlag = flag.getRoomFlag(newRoom);
+    if (roomFlag.memory.explored ) {
+        return;
+    }
+
+    if (!Game.flags[newRoom]) {
         const center = new RoomPosition(25, 25, newRoom);
         center.createFlag(newRoom);
         newRoomFlag = Game.flags[newRoom];
     }
-
-    flag.flagRoom(newRoom);
-
-    if (!newRoomFlag.memory.values) {
-        newRoomFlag.memory.values = {}
+    if (!Game.rooms[newRoom].controller) {
+        return;
     }
 
-    //console.log("exploreRoom rooms", JSON.stringify(_.filter(Game.rooms, r => gf.myControlledRoom(r))))
+    let showsProfit = false;
+    const values = {};
     for (let name in Game.rooms) {
         const room = Game.rooms[name];
-        //console.log("exploreRoom", name, "obj",room);
         if (!!room.controller && room.controller.my && room.controller.level > 1) {
-            newRoomFlag.memory.values[name] = budget.valueNeutralRoom(name, this.home, false);
+            values[name] = budget.valueNeutralRoom(newRoom, name, false);
+            console.log(newRoom,"values[name]", JSON.stringify(values[name]));
+            if (!showsProfit) {
+                showsProfit = values[name][gc.ROOM_NEUTRAL].profit > 0
+                    || values[name][gc.ROOM_NEUTRAL_ROADS].profit > 0
+                    || values[name][gc.ROOM_RESERVED_ROADS].profit > 0
+                    || values[name][gc.ROOM_RESERVED].profit > 0
+                    || values[name][gc.ROOM_OWNED].profit > 0
+                    || values[name][gc.ROOM_OWNED_ROADS].profit > 0
+            }
+
         }
     }
 
-    newRoomFlag.memory.explored = true;
-
-    if (!policy.getMiningPolicy(newRoom)) {
-        policy.activatePolicy( gc.POLICY_MINE_ROOM, { "home" : newRoom, },);
+    if (!policy.getMiningPolicy(newRoom) && showsProfit) {
+        if (!Game.flags[newRoom]) {
+            const center = new RoomPosition(25, 25, newRoom);
+            center.createFlag(newRoom);
+            newRoomFlag = Game.flags[newRoom];
+        }
+        roomFlag.memory.values = JSON.stringify(values);
+        if (!roomFlag.memroy.keeperLairs && !roomFlag.memroy.invaderCore) {
+            policy.activatePolicy( gc.POLICY_MINE_ROOM, { "home" : newRoom, },);
+        }
     }
 };
 
 Policy.prototype.sendExplorers = function(shortfall) {
-    //console.log("POLICY_EXPLORE", shortfall);
     for (let i = 0; i < shortfall; i++) {
         const data = {
             "body": race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),

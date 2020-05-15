@@ -48,10 +48,64 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
+    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY === 0)) {
+        state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    }
+
+    const sources = this.creep.room.find(FIND_SOURCES);
+    let mySource;
+    for (let source of sources) {
+        if (source.pos.isNearTo(this.creep.memory.targetPos.x, this.creep.memory.targetPos.y)){
+            mySource = source;
+            break;
+        }
+    }
+    if (mySource) {
+        creeps = _.filter(Game.creeps, c => c.memory.targetId === mySource.id);
+        if (creeps.length > 0 && creeps[0].isNearTo(mySource)) {
+            return;
+        }
+    }
+
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+    } else {
+        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
-    state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-}
+
+};
 
 module.exports = State;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

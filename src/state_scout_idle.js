@@ -85,7 +85,7 @@ State.prototype.enact = function () {
             //console.log("STATE_SCOUT_IDLE about to move this.m.nextRoom", this.m.nextRoom)
             //const newPosition =  new RoomPosition(25, 25, this.m.nextRoom);
             //console.log("STATE_SCOUT_IDLE about to move to flag flag", JSON.stringify(myFlag.pos), "id", myFlag.id);
-            state.switchToMoveFlag(
+            return state.switchToMoveFlag(
                 this.creep,
                 myFlag,
                 4,
