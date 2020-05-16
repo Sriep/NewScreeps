@@ -40,9 +40,7 @@ Policy.prototype.enact = function () {
     }
     //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
-        //if (!Game.flags[creeps[i].room.name].memory || !Game.flags[creeps[i].room.name].memory.explored ) {
            this.exploreRoom(creeps[i].room.name);
-        //}
     }
 };
 
@@ -56,6 +54,10 @@ Policy.prototype.exploreRoom = function(newRoom) {
     }
     roomFlag.memory.explored = true;
     if (!Game.rooms[newRoom].controller) {
+        return;
+    }
+
+    if (Game.rooms[newRoom].controller.my) {
         return;
     }
 

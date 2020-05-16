@@ -49,7 +49,8 @@ setContainerSites = function(room, cflag) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
     for (let spot of spots) {
-        spot.posts = spot.posts.sort( p1, p2 => {
+        //console.log("setContainerSites", JSON.stringify(spot));
+        spot.posts = spot.posts.sort( (p1, p2) => {
             return room.controller.pos.getRangeTo(p1.x, p1.y) - room.controller.pos.getRangeTo(p2.x, p2.y)
         });
     }

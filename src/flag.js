@@ -4,8 +4,6 @@
  * @author Piers Shepperson
  */
 const rooms = require("rooms");
-
-
 const flag = {
     flagRoom(roomName) {
         rooms.flag(Game.rooms[roomName]);

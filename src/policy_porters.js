@@ -151,7 +151,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         resources = calcRoomResources(
             this.home,
             maxWs,
-            ratio * budget.harvesterWsRoom(homeRoom, homeRoom, false),
+            ratio * budget.portersCsRoom(homeRoom, homeRoom, false),
             ratio * budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
         //console.log("pp ec<=MAX_EC_4WORK_HARVESTER calcResources home", JSON.stringify(resources));
@@ -159,7 +159,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         resources = calcRoomResources(
             this.home,
             budget.harvesterWsRoom(homeRoom, homeRoom, false),
-            budget.harvesterWsRoom(homeRoom, homeRoom, false),
+            budget.portersCsRoom(homeRoom, homeRoom, false),
             budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
         //console.log("pp ec>MAX_EC_4WORK_HARVESTER calcResources home", JSON.stringify(resources));
@@ -221,12 +221,33 @@ calcRoomResources = function (roomName, hW, pC, uW) {
 };
 
 Policy.prototype.budget = function() {
-    const budget = budget.porterRoom(Game.rooms[this.home]);
-    budget.parts = this.m.resources.hW*11/5;
-    budget.parts += this.m.resources.pC * 3;
-    budget.parts += this.m.resources.wW * 3;
-    budget.parts += this.m.resources.uW * 2;
-    return budget;
+    room = Game.rooms[this.home];
+    const prBudget = budget.porterRoom(room);
+
+    const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
+    const hPartCount = hbc[WORK] + hbc[MOVE] + hbc[CARRY];
+    let parts = Math.ceil((this.m.resources.hW*11/5)/hPartCount) * hPartCount;
+
+    const pbc = race.getBodyCounts(gc.RACE_PORTER, room.energyCapacityAvailable);
+    const pPartCount = pbc[WORK] + pbc[MOVE] + pbc[CARRY];
+    parts += Math.ceil((this.m.resources.pC*3)/pPartCount) * pPartCount;
+
+    const wbc = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
+    const wPartCount = wbc[WORK] + wbc[MOVE] + wbc[CARRY];
+    parts += Math.ceil((this.m.resources.wW*3)/wPartCount) * wPartCount;
+
+    const ubc = race.getBodyCounts(gc.RACE_UPGRADER, room.energyCapacityAvailable);
+    const uPartCount = ubc[WORK] + ubc[MOVE] + ubc[CARRY];
+    parts += Math.ceil((this.m.resources.uW*2)/uPartCount) * uPartCount;
+
+    parts += 4; // scouts.
+
+    const spawns = Game.rooms[this.RoomName].find(FIND_MY_SPAWNS).length;
+    const partsLT = spawns * CREEP_LIFE_TIME / 3;
+
+    prBudget.parts = partsLT - parts;
+    console.log("POLICY_PORTERS budget parts", parts, "budget", JSON.stringify(prBudget));
+    return prBudget;
 };
 
 Policy.prototype.draftReplacment = function() {

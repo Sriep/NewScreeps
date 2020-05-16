@@ -147,7 +147,7 @@ const state = {
     //------------ nextCollectContainer ----------------------------------------
     //
     findPorterSourceContainer: function(spawnRoom, colonies, ec) {
-        const porterCC = race.getBodyCounts(gc.RACE_PORTER, ec)["carry"]*75;
+        const porterCC = race.getBodyCounts(gc.RACE_PORTER, ec)["carry"] * 75;
         //console.log("findPorterSourceContainer spawn room", spawnRoom.name,"porterCC",porterCC, "colonies", JSON.stringify(colonies),"ec", ec)
         const porters = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_PORTER
@@ -159,49 +159,70 @@ const state = {
         //console.log("findPorterSourceContainer sourceContainers before", JSON.stringify(sourceContainers));
         for (let container of sourceContainers) {
             const tripsPerLifetimePerPorter = CREEP_LIFE_TIME / (2 * container.distance);
-            //const fPorters = porters.filter( p =>
+            const fPorters = porters.filter(p =>
+                p.memory.targetPos.x === container.pos.x
+                && p.memory.targetPos.y === container.pos.y
+            );
+            //console.log(container.sourceId, "tripsPerLifetimePerPorter", tripsPerLifetimePerPorter, "fPorters length", fPorters.length);
+            sourceContainers["tripsLT"] = fPorters.length * tripsPerLifetimePerPorter;
+            //console.log("porter length", porters.filter(p =>
             //    p.memory.targetPos.x === container.pos.x
             //    && p.memory.targetPos.y === container.pos.y
-            //);
-            //console.log(container.sourceId, "tripsPerLifetimePerPorter",tripsPerLifetimePerPorter,"fPorters length", fPorters.length);
-            //sourceContainers["tripsLT"] = fPorters.length * tripsPerLifetimePerPorter
-            container["tripsLT"] = porters.filter( p =>
+            //).length)
+            container["tripsLT"] = porters.filter(p =>
                 p.memory.targetPos.x === container.pos.x
                 && p.memory.targetPos.y === container.pos.y
             ).length * tripsPerLifetimePerPorter;
-            //console.log(container.sourceId, "sourceContainers[\"tripsLT\"] ",container["tripsLT"])
+            //console.log(container.sourceId, "sourceContainers[\"tripsLT\"] ", container["tripsLT"])
         }
         //console.log("findPorterSourceContainer sourceContainers after", JSON.stringify(sourceContainers));
         sourceContainers.sort((c1, c2) => c1.tripsLT - c2.tripsLT);
+        //console.log("findPorterSourceContainer container", JSON.stringify(sourceContainers));
+        //console.log("findPorterSourceContainer tLT*pCC", sourceContainers[0].tripsLT * porterCC, "energy", gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY);
+        if (sourceContainers[0].tripsLT * porterCC >= gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY) {
+            //console.log("findPorterSourceContainer all sources have enough porters servicing");
+            return;
+        }
+
         //console.log("findPorterSourceContainer after sorting sourceContainers", JSON.stringify(sourceContainers));
-        let fullestContainer;
-        let containerEnergy = 0;
+        let fullestContainer = undefined;
+        let maxEnergySoFar = -1;
+        let portersOnRoute = undefined;
         for (let container of sourceContainers) {
-            //console.log("findPorterSourceContainer container", JSON.stringify(container))
-            //console.log("findPorterSourceContainer tLT*pCC",container.tripsLT*porterCC, "energy",gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY )
-            if (container.tripsLT*porterCC >= gc.SORCE_REGEN_LT*SOURCE_ENERGY_CAPACITY) {
-                console.log("findPorterSourceContainer container continue");
-                continue;
-            }
             const harvesters = _.filter(Game.creeps, c => {
                 return c.memory.targetId === container.sourceId
-                && race.getRace(c) === gc.RACE_HARVESTER
+                    && race.getRace(c) === gc.RACE_HARVESTER
             });
-            //console.log(container.sourceId,"sourceId findPorterSourceContainer harvesters", JSON.stringify(harvesters));
-            if (harvesters.length > 0) {
+            //console.log(container.sourceId, "sourceId findPorterSourceContainer harvesters", JSON.stringify(harvesters));
+            if (harvesters.length === 0) {
                 //console.log("findPorterSourceContainer returning", JSON.stringify(container));
-                return container;
+                continue;
             }
-            if (container.store.getUsedCapacity(RESOURCE_ENERGY) > containerEnergy && container.tripsLT === 0) {
-                //console.log("set possible pos", JSON.stringify(container));
-                containerEnergy = container.store.getUsedCapacity(RESOURCE_ENERGY);
+
+            if (portersOnRoute === undefined) {
+                portersOnRoute = container["tripsLT"];
+                fullestContainer = container;
+                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
+            } else if (portersOnRoute > container["tripsLT"]){
+                return fullestContainer;
+            }
+            if (maxEnergySoFar < container.store.getUsedCapacity(RESOURCE_ENERGY) ) {
+                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
                 fullestContainer = container;
             }
         }
         if (fullestContainer) {
+            //console.log("fullestContainer", JSON.stringify(fullestContainer));
             return fullestContainer;
         }
-        //console.log("findPorterSourceContainer dropped though")
+        //console.log("no harvesters found!!!! go to fullest container");
+        for (let container of sourceContainers) {
+            if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
+                fullestContainer = container;
+                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
+            }
+        }
+        return fullestContainer;
     },
 
     listSourceContainers: function(spawnRoom, colonies) {
@@ -406,31 +427,34 @@ const state = {
 
     findFreeUpgraderPost: function(room) { // done
         const upgraderPosts = Game.flags[room.controller.id].memory.upgraderPosts;
-        let bestSoFar = 9999;
+        let lowestUserCount = 9999;
         let bestPost;
         //console.log("findFreeUpgraderPost: upgraderPosts length",upgraderPosts.length ,"upgraderPosts", JSON.stringify(upgraderPosts));
         for ( let i = 0; i < upgraderPosts.length ; i++ ) {
             let users = 0;
             let freePost = undefined;
-            //console.log("indFreeUpgraderPost: posts[i]", JSON.stringify(posts[i]));
+            //console.log(i,"findFreeUpgraderPost: posts[i]", JSON.stringify(upgraderPosts[i]));
             for (let post of upgraderPosts[i].posts) {
-                //console.log(i,"findFreeUpgraderPost post", JSON.stringify(post));
+                //console.log("findFreeUpgraderPost post", JSON.stringify(post));
                 if (this.isUpgraderPostFree(post, room.name)) {
-                    freePost = post;
-                    //console.log(i,"post is free", JSON.stringify(freePost));
+                    if (!freePost) {
+                        freePost = post;
+                    }
+                    //console.log("post is free", JSON.stringify(freePost));
                 } else {
                     users++;
-                    //console.log(i,"findFreeUpgraderPost post is not free", users);
+                    //console.log("findFreeUpgraderPost post is not free", users);
                 }
             }
             //console.log(i,"findFreeUpgraderPost upgraderPosts[i].posts", JSON.stringify(upgraderPosts[i].posts))
-            //console.log(i,"findFreeUpgraderPost users", users, "bestSoFar", bestSoFar,"upgraderPosts[i].length", upgraderPosts[i].posts.length)
-            if (users < bestSoFar && users < upgraderPosts[i].posts.length) {
-                bestSoFar = users;
+            //console.log(i,"findFreeUpgraderPost users", users, "bestSoFar", lowestUserCount,"upgraderPosts[i].length", upgraderPosts[i].posts.length)
+            if (users < lowestUserCount && users < upgraderPosts[i].posts.length) {
+                lowestUserCount = users;
                 bestPost = freePost;
+                //console.log("found lowestUserCount",lowestUserCount,"bestPost",JSON.stringify(freePost));
             }
         }
-        //console.log("findFreeUpgraderPost bestSoFar", bestSoFar, "returning bestPost", JSON.stringify(bestPost));
+        //console.log("findFreeUpgraderPost bestSoFar", lowestUserCount, "returning bestPost", JSON.stringify(bestPost));
         return bestPost;
     },
 
@@ -440,6 +464,7 @@ const state = {
                  if (Game.creeps[j].memory.targetPos.x === pos.x
                     && Game.creeps[j].memory.targetPos.y === pos.y
                     && Game.creeps[j].room.name === roomName) {
+                     //console.log("found",j,"at postion x",pos.x,"y",pos.y);
                      return false;
                 }
             }
@@ -701,7 +726,7 @@ listSourceContainers = function(spawnRoom, colonies) {
             sFlag = Game.flags[source.id];
             //console.log(source.id, "listSourceContainers sFlag", JSON.stringify(sFlag.memory));
             if (sFlag) {
-                const distance = cache.distanceSourceSpawn(source, spawnRoom);
+                const distance = cache.distanceSourceController(source, spawnRoom);
                 const pos = new RoomPosition(sFlag.memory.containerPos.x, sFlag.memory.containerPos.y, colonyName);
                 const container = state.findContainerAt(pos);
                 container["sourceId"] = source.id;

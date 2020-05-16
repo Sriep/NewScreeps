@@ -14,13 +14,17 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
+    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    }
+
     //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW");
     let target;
     if (this.creep.memory.targetId) {
         target = Game.getObjectById(this.creep.memory.targetId);
     }
     if (!target) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY > 0)) {
             return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
         } else {
             return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
@@ -48,8 +52,9 @@ State.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
+    delete this.creep.memory.next_state;
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     } else {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }

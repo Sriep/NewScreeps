@@ -10,12 +10,15 @@ const state = require("state");
 //const rooms = require("rooms");
 const policy = require("policy");
 const flag = require("flag");
+const records = require("records");
+
 
 module.exports.loop = function () {
     console.log("************************ Start ", Game.time," *********************************");
     inserted.top();
     if (!Memory.started) {
         startup();
+        records.startup()
     }
     freeCreeps();
     flagRooms();
@@ -34,6 +37,7 @@ function startup() {
     Memory.started = true;
     Memory.records = {};
     Memory.records["started"] = Game.time;
+    Memory.agenda = [];
     Memory.records.policies = {};
     Memory.records.policies.created = {};
     Memory.records.policies.replaced = {};

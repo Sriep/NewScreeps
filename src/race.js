@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 
-const flag = require("flag");
+//const flag = require("flag");
 //const gf = require("gf");
 
 const race = {
@@ -134,7 +134,7 @@ const race = {
     repairPower: function(creep) {
         return workParts(creep) * REPAIR_POWER;
     },
-
+/*
     sendOrderToQueue : function(room, cRace, energy, policyId, priority) {
         const data = {
             body: this.body(cRace, energy),
@@ -143,6 +143,8 @@ const race = {
         const queue = flag.getSpawnQueue(room.name);
         return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
     },
+*/
+
 };
 
 module.exports = race;

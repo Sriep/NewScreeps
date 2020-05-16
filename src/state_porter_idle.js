@@ -30,10 +30,6 @@ State.prototype.enact = function () {
     );
     if (container) {
         this.creep.memory.targetId = container.id;
-        if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-            console.log(".getFreeCapacity(RESOURCE_ENERGY)", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) );
-            gf.fatalError("STATE_PORTER_IDLE free capacity should be 0 for withdrawal")
-        }
         //console.log("STATE_PORTER_IDLE container pos", JSON.stringify(container));
         return state.switchToMovePos(
             this.creep,
@@ -43,6 +39,7 @@ State.prototype.enact = function () {
         );
     }
 
+    // todo maybe this should go first?
     const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
     });
@@ -54,22 +51,7 @@ State.prototype.enact = function () {
             gc.STATE_PORTER_PICKUP,
         );
     }
-/*
-    const target = state.findCollectContainer(this.creep.room);
-    if (target) {
-        this.creep.memory.targetId = target.id;
-        if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-            console.log(".getFreeCapacity(RESOURCE_ENERGY)", this.creep.store.getFreeCapacity(RESOURCE_ENERGY) );
-            gf.fatalError("STATE_PORTER_IDLE free capacity should be 0 for withdrawal")
-        }
-        return state.switchToMovePos(
-            this.creep,
-            target.pos,
-            gc.RANGE_TRANSFER,
-            gc.STATE_PORTER_WITHDRAW,
-        );
-    }
-*/
+
     const policyId = this.creep.policyId;
     let creeps = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId

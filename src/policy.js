@@ -43,10 +43,11 @@ const policy = {
                 }
                 replacement.enact();
             } else {
-                console.log("enactPolicies delete policy", id);
+                //console.log("enactPolicies delete policy", id);
                 Memory.records.policies.replaced[Game.time.toString()] = {
                     "time" : Game.time,
                     "old" : policy.type,
+                    "policy" : JSON.stringify(policy)
                 };
                 delete Memory.policies[id];
             }

@@ -25,7 +25,7 @@ const budget = {
         let csRoom = 0;
         for (let i in sources) {
             const initial = cache.distanceSourceSpawn(sources[i], homeRoom, useRoad);
-             const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad);
+            const repeat = cache.distanceSourceController(sources[i], homeRoom, useRoad);
             csRoom += this.porterCsSource(sources[i].energyCapacity, initial, repeat);
         }
         return csRoom;
@@ -34,7 +34,7 @@ const budget = {
     // Cs need for Energh = Energy * Trips per life / (Lifetime + carry amount)
     porterCsSource: function (ec, initial, repeat) {
         const workLifetime = CREEP_LIFE_TIME - initial;
-        const tripsPerLife = workLifetime / repeat;
+        const tripsPerLife = workLifetime / (2*repeat);
         const energyPortedPerCarryPart = tripsPerLife * CARRY_CAPACITY;
         const maxEnergy = ec * (CREEP_LIFE_TIME / ENERGY_REGEN_TIME);
         return maxEnergy / energyPortedPerCarryPart;

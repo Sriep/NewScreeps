@@ -84,10 +84,11 @@ buildExtensions = function (room, numNeeded) {
     }
     const terrain = room.getTerrain();
     //const extensionPos = []
-    const extensionPos = construction.looseSpiral(start, numNeeded, avoid, terrain,1);
+    const skip = 1;
+    const extensionPos = construction.looseSpiral(start, numNeeded + skip, avoid, terrain,1);
     //if (extensionPos) {
     //console.log("extension pos", JSON.stringify(extensionPos));
-    for (let i in extensionPos) {
+    for ( let i = skip; i < extensionPos.length ; i++ ) {
         result = room.createConstructionSite(extensionPos[i].x, extensionPos[i].y, STRUCTURE_EXTENSION);
         if (result !== OK) {
             //console.log("build extension",i,"result",result,"at",JSON.stringify(extensionPos[i]));

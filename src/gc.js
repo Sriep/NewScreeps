@@ -261,6 +261,7 @@ const gc = {
     MIN_ENERGY_TO_MINE: 1000, // guess
     COLONY_PROFIT_MARGIN: 500,
     COLONY_PARTS_MARGIN: 30,
+    PORTER_FUDGE_FACTOR: 1.5,
 
     // ownership
     ROOM_ENEMY: "enemy",

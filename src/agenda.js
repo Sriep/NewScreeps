@@ -16,7 +16,6 @@ const agenda = {
             gc.POLICY_BUILD_SOURCE_CONTAINERS,
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
-            // gc.POLICY_PORTERS,
             gc.ACTIVITY_FINISHED
         ],
         [
