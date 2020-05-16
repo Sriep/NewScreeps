@@ -1,3 +1,3 @@
 # screeps
 
-New screeps code, in development. Not for use yet.
+New screeps code, in development.
