@@ -119,12 +119,15 @@ const budget = {
     },
 
     valueNeutralRoom: function (roomName, home, force) {
+        console.log("valueNeutralRoom roomName", roomName, "home", home, "force",force);
         const room = Game.rooms[roomName];
         home = Game.rooms[home];
         if (!room) {
+            console.log("valueNeutralRoom !room");
             return {};
         }
         if (!room.controller) {
+            console.log("valueNeutralRoom no_controller\"");
             return { "no_controller" : true }
         }
 
@@ -144,6 +147,7 @@ const budget = {
         if (sources.length === 0) {
             //console.log("valueNeutralRoom no sources in room", room.name);
             values["no source"] = true;
+            console.log("valueNeutralRoom no source");
             return values;
         }
 
@@ -203,7 +207,7 @@ const budget = {
         values[gc.ROOM_RESERVED_ROADS]["parts"] += 6;
         values[gc.ROOM_OWNED]["profit"] += 600; // reduction in container repair
         values[gc.ROOM_OWNED_ROADS]["profit"] += 600; // reduction in container repair
-        //console.log("budget valueNeutralRoom result", JSON.stringify(values));
+        console.log("budget valueNeutralRoom result", JSON.stringify(values));
         return values;
     },
 
@@ -227,9 +231,9 @@ const budget = {
 
         //console.log("pathSpawn",pathSpawn.cost,"pathController",pathController.cost,"energy",energy)
         const runningCostRepair = (pathController.cost - swamps)*1.5 + swamps*7.5 + 750;
-        const hWs = harvesterWsSource(energy, pathSpawn.cost);
+        const hWs = harvesterWsSource(energy/(CREEP_LIFE_TIME / ENERGY_REGEN_TIME), pathSpawn.cost);
         //console.log("hWs = harvesterWsSource", hWs)
-        const pCs = this.porterCsSource(energy, pathSpawn.cost, pathController.cost);
+        const pCs = this.porterCsSource(energy/(CREEP_LIFE_TIME / ENERGY_REGEN_TIME), pathSpawn.cost, pathController.cost);
         const energy1 = energy - this.convertPartsToEnergy(hWs, pCs, hWs) - runningCostRepair;
         const uWs1 = this.upgraderWsFromDistance(20, energy1); // guess 20
         const energy2 = energy -this.convertPartsToEnergy(hWs, pCs, uWs1) - runningCostRepair;
@@ -250,28 +254,28 @@ const budget = {
     },
 
     valueSourceNoRoad: function (pathSpawn, pathController, energy) {
-        //console.log("pathSpawn",pathSpawn.cost,"pathController",pathController.cost,"energy",energy)
+        console.log("pathSpawn",pathSpawn.cost,"pathController",pathController.cost,"energy",energy);
         const startUpCost = CONSTRUCTION_COST[STRUCTURE_CONTAINER];
         //const runningCostRepair = 750;
         const runningCostRepair = CREEP_LIFE_TIME*CONTAINER_DECAY/
                                       (CONTAINER_DECAY_TIME*REPAIR_POWER);
-        //console.log("valueSourceNoRoad runningCostRepair", runningCostRepair,"shoud be 750");
+        console.log("valueSourceNoRoad runningCostRepair", runningCostRepair,"shoud be 750");
 
-        const hWs = harvesterWsSource(energy, pathSpawn.cost);
-        const pCs = this.porterCsSource(energy, pathSpawn.cost, pathController.cost);
-        const energy1 = energy - 2*hWs*125 + pCs*75;
+        const hWs = harvesterWsSource(energy/(CREEP_LIFE_TIME / ENERGY_REGEN_TIME), pathSpawn.cost);
+        const pCs = this.porterCsSource(energy/(CREEP_LIFE_TIME / ENERGY_REGEN_TIME), pathSpawn.cost, pathController.cost);
+        const energy1 = energy - this.convertPartsToEnergy(hWs, pCs, hWs);
         const uWs1 = this.upgraderWsFromDistance(20, energy1); // guess 20
-        const energy2 = energy - hWs*125 +  pCs*75 + uWs1*125;
+        const energy2 = energy - this.convertPartsToEnergy(hWs, pCs, uWs1);
         const uWs2 = this.upgraderWsFromDistance(20, energy2);
         const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs2);
-        //console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2)
-        /*console.log("valueSourceNoRoad", JSON.stringify({
+        console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2);
+        console.log("valueSourceNoRoad", JSON.stringify({
             "parts": { "hW": 3*hWs, "pC": 3*pCs, "uW": 3*uWs1 },
             "startUpCost": startUpCost,
             "runningCostRepair": runningCostRepair,
             "runningCostCreeps": creepCosts,
             "netEnergy": energy - runningCostRepair - creepCosts,
-        }))*/
+        }));
         return {
             "parts": { "hW": 3*hWs, "pC": 3*pCs, "uW": 3*uWs1 },
             "startUpCost": startUpCost,

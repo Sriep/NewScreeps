@@ -137,7 +137,7 @@ const state = {
             );
         }
         //let list = listFreeHarvesterPosts_I(home, colonies, ec);
-        console.log("nextFreeHarvesterPost list", JSON.stringify(list));
+        //console.log("nextFreeHarvesterPost list", JSON.stringify(list));
         if (list.freePosts.length > 0) {
             return list.freePosts.shift();
         }
@@ -626,7 +626,20 @@ const state = {
         if (nextSourceContainer) {
              return nextSourceContainer;
         }
+    },
+
+    getSourcePosts : function (sourceId) {
+        return Game.flags[sourceId].memory.harvesterPosts;
+    },
+
+    getSourceContainer : function (sourceId) {
+        return Game.flags[sourceId].memory.containerPos;
+    },
+
+    getControllerPosts : function (controllerId) {
+        return Game.flags[controllerId].memory.upgraderPosts;
     }
+
 };
 
 module.exports = state;
@@ -636,25 +649,30 @@ listFreeHarvesterPosts = function (home, colonies, ec) {
     const spawnRoom = Game.rooms[home];
     const freePosts = [];
     //let suppliedRooms = [home];
-    //console.log("listFreeHarvesterPosts suppliedRooms", JSON.stringify(suppliedRooms))
+    //console.log("listFreeHarvesterPosts colonies", JSON.stringify(colonies));
     //if (colonies && colonies.length >0) {
     //    console.log("concating with", JSON.stringify(colonies));
     //    suppliedRooms = suppliedRooms.concat(colonies);
     //}
-    //console.log("listFreeHarvesterPosts suppliedRooms", JSON.stringify(suppliedRooms))
-    for (let colonyName of colonies) {
-        const colony = Game.rooms[colonyName];
-        console.log("listFreeHarvesterPosts_I colonyNAme", colonyName, "colony", colony);
-        let sources = colony.find(FIND_SOURCES);
-        sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
-        for (let source of sources) {
-            const post = this.freeHarvesterPost(source, spawnRoom, ec);
-            const postRp =  new RoomPosition(post.x, post.y, colonyName);
+    console.log("listFreeHarvesterPosts home", home,"colonies", JSON.stringify(colonies));
+    for (let colonyObj of colonies) {
+        console.log("listFreeHarvesterPosts colonyObj", JSON.stringify(colonyObj));
+
+        //const colony = Game.rooms[colonyObj.name];
+        //console.log("listFreeHarvesterPosts_I colony", colony.name);
+        //let sources = colony.find(FIND_SOURCES);
+        //sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
+        //const sourceIds = getSourceIds(colonyObj.name);
+
+        for (let sourceId of Game.flags[colonyObj.name].memory.sources) {
+            const post = freeHarvesterPost(sourceId, spawnRoom, ec);
+            const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
             if (post) {
-                freePosts.push({ "sourceId": source.id,  "post": postRp });
+                freePosts.push({ "sourceId": sourceId,  "post": postRp });
             }
         }
     }
+    //console.log("listFreeHarvesterPosts freeposts", freePosts);
     return { "freePosts" : freePosts, "cached" : Game.time };
 };
 
@@ -667,27 +685,33 @@ maxHEc = function (ec) {
     return 1;
 };
 
-freeHarvesterPost = function (source, spawnRoom, ec) {
-    const sourceFlag = Game.flags[source.id];
+
+
+freeHarvesterPost = function (sourceId, spawnRoom, ec) {
+    const sourceFlag = Game.flags[sourceId];
     const posts = sourceFlag.memory.harvesterPosts;
     creeps = _.filter(Game.creeps, c =>
-        c.memory.targetId === source.id
+        c.memory.targetId === sourceId
         //&& race.getRace(c) === gc.RACE_HARVESTER
     );
     if (creeps.length === 0) {
         return posts[0];
     }
     const maxHEc = this.maxHEc(ec);
-    console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
+    //console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
     //console.log(source.id, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts))
     if (creeps.length > maxHEc) {
         //console.log("freeHarvesterPost return false1")
         return false;
     }
     if (maxHEc === 1) {
+        const source = Game.getObjectById(sourceId);
+        if (!source) {
+            return false;
+        }
         const distance = cache.distanceSourceSpawn(source, spawnRoom);
         if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
-            return this.findFreePostIfPossable(creeps, posts);
+            return findFreePostIfPossable(creeps, posts);
         } else {
             //console.log("freeHarvesterPost return false2")
             return false;
@@ -720,14 +744,14 @@ findFreePostIfPossable = function (creeps, posts) {
 listSourceContainers = function(spawnRoom, colonies) {
     const containerInfo = [];
     //console.log("listSourceContainers colonies", JSON.stringify(colonies), "spawn room", spawnRoom.name)
-    for (let colonyName of colonies) {
-        const room = Game.rooms[colonyName];
+    for (let colonyObj of colonies) {
+        const room = Game.rooms[colonyObj.name];
         for (let source of room.find(FIND_SOURCES)) {
             sFlag = Game.flags[source.id];
             //console.log(source.id, "listSourceContainers sFlag", JSON.stringify(sFlag.memory));
             if (sFlag) {
                 const distance = cache.distanceSourceController(source, spawnRoom);
-                const pos = new RoomPosition(sFlag.memory.containerPos.x, sFlag.memory.containerPos.y, colonyName);
+                const pos = new RoomPosition(sFlag.memory.containerPos.x, sFlag.memory.containerPos.y, colonyObj.name);
                 const container = state.findContainerAt(pos);
                 container["sourceId"] = source.id;
                 container["distance"] = distance;

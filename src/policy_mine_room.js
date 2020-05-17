@@ -29,38 +29,43 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
-    console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
+    return;
     if (this.m.spawnRoom) {
         return;
     }
     if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
-        //return;
-    }
-    const spawnInfo = this.getSpawnRoom();
-    if (!spawnInfo.name) {
-        console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
-        undefined.break;
         return;
     }
 
-    this.m.spawnRoom = spawnInfo.name;
+    if (!Game.rooms[this.home]) {
+        console.log("POLICY_MINE_ROOM enact no asset in room")
+    }
+
+    console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
+
+    const spawnInfo = this.getSpawnRoom();
     console.log("POLICY_MINE_ROOM spawnInfo", JSON.stringify(spawnInfo));
-    const governor = policy.getGouvernerPolicy(this.m.spawnRoom.name);
+    if (!spawnInfo.name) {
+        console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
+        return;
+    }
+    this.m.spawnRoom = spawnInfo.name;
+    const governor = policy.getGouvernerPolicy(spawnInfo.name);
+    console.log("POLICY_MINE_ROOM about to call addColony");
     governor.addColony(this.home, spawnInfo.profit, spawnInfo.parts);
-    undefined.break;
     build(Game.rooms[this.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);
 };
 
 Policy.prototype.getSpawnRoom = function() {
     const values = JSON.parse(Game.flags[this.home].memory["values"]);
-    console.log("POLICY_MINE_ROOM getSpawnRoom values",JSON.stringify(values));
+    console.log(this.home,"POLICY_MINE_ROOM getSpawnRoom values",Game.flags[this.home].memory["values"]);
     let bestProfit = 0;
     let bestRoom;
     let useRoad;
     let bestParts;
     for(let roomName in values) {
-        const roomInfo = getProfitRoom(Game.rooms[roomName], values[roomName]);
-        console.log("POLICY_MINE_ROOM getProfitRoom", JSON.stringify(roomInfo));
+        const roomInfo = this.getProfitRoom(Game.rooms[roomName], values[roomName]);
+        console.log(this.home,"POLICY_MINE_ROOM getProfitRoom", JSON.stringify(roomInfo));
         if (roomInfo && roomInfo.profit > bestProfit) {
             bestProfit = roomInfo.profit;
             useRoad = roomInfo.road;
@@ -71,15 +76,15 @@ Policy.prototype.getSpawnRoom = function() {
     return { "name" : bestRoom, "road": useRoad, "profit": bestProfit, "parts" : bestParts } ;
 };
 
-getProfitRoom = function(room, valueObj) {
-    console.log("POLICY_MINE_ROOM getProfitRoom");
+Policy.prototype.getProfitRoom = function(room, valueObj) {
+    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom");
     let budget = policy.getGouvernerPolicy(room.name).budget();
-    console.log("POLICY_MINE_ROOM getGouvernerPolicy budget", JSON.stringify(budget));
+    console.log(this.home,"POLICY_MINE_ROOM getGouvernerPolicy budget", JSON.stringify(budget));
     if (!budget["support_colonies"]) {
         return
     }
-    const valueNoRoad = getProfitRoomRoad(room, valueObj, budget, false);
-    const valueRoad = getProfitRoomRoad(room, valueObj, budget, true);
+    const valueNoRoad = this.getProfitRoomRoad(room, valueObj, budget, false);
+    const valueRoad = this.getProfitRoomRoad(room, valueObj, budget, true);
     if (!valueNoRoad) {
         return valueRoad ? { "profit": valueRoad.value.profit, "road": true, "parts" :  valueRoad.value.parts} : 0;
     }
@@ -92,11 +97,15 @@ getProfitRoom = function(room, valueObj) {
     return { "profit" : valueRoad.value.profit, "road" : true, "parts" :  valueRoad.value.parts }  ;
 };
 
-getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
-    console.log("POLICY_MINE_ROOM getProfitRoomRoad home","budget",budget,"useRoad", useRoad, "valueObj", valueObj);
+Policy.prototype.getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
+    console.log(this.home,"POLICY_MINE_ROOM getProfitRoomRoad home budget",budget,"useRoad", useRoad, "valueObj", valueObj);
     let value;
     if (room.controller.level <= 2) {
-        value = valueObj[useRoad ? gc.ROOM_NEUTRAL_ROADS  : gc.ROOM_NEUTRAL];
+        if (!useRoad) {
+            value = valueObj[gc.ROOM_NEUTRAL];
+        } else {
+            return undefined;
+        }
     } else if (room.controller.level > 3) {
         value = valueObj[useRoad ? gc.ROOM_RESERVED_ROADS : gc.ROOM_RESERVED];
     }
@@ -108,10 +117,11 @@ getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
     const ltToNextLevel = energyLeft / budget.net_energy;
     const ltToPayOff = value.startUpCost / value.profit;
     if ( ltToNextLevel < ltToPayOff ) {
-        console.log("getProfitRoom faile ltToNextLevel",ltToNextLevel,"ltToPayOff",ltToPayOff);
+        console.log(this.home, "POLICY_MINE_ROOM getProfitRoom faile ltToNextLevel",ltToNextLevel,"ltToPayOff",ltToPayOff);
         return undefined;
     }
-    console.log("getProfitRoom ok",JSON.stringify({"value": value, "useRoad" : useRoad, "parts" : value.parts}));
+    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok ok ok ok oko ko ko ko ko ko kok ok oko ko ko ko ko ko k");
+    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok",JSON.stringify({"useRoad" : useRoad, "parts" : value.parts,"value": value }));
     return {"value": value, "useRoad" : useRoad, "parts" : value.parts};
 };
 

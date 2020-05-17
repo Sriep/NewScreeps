@@ -21,7 +21,7 @@ Policy.prototype.initilise = function () {
     this.m.rcl = Game.rooms[this.roomName].controller.level;
     this.m.agendaIndex = -1;
     this.m.childTypes = [];
-    this.m.colonies = [this.roomName];
+    this.m.colonies = [{ "name" : this.roomName }];
     console.log("this.m.colonies", JSON.stringify(this.m.colonies));
     this.m.agenda = agenda.peace;
     this.m.parts = 0;
@@ -64,27 +64,30 @@ Policy.prototype.govern = function () {
  };
 
 Policy.prototype.getColonies = function() {
-    const colonies = [];
-    for (let i in this.m.colonies) {
-        colonies.push(this.m.colonies[i].name)
-    }
-    //return [this.roomName];
-    return colonies;
+    return [...this.m.colonies];
 };
 
 Policy.prototype.budget = function() {
     let budget = policy.getRoomEconomyPolicy(this.roomName).budget();
+    console.log("POLICY_GOVERN getRoomEconomyPolicy parts", budget.parts);
+    console.log("this.m.colonies",JSON.stringify(this.m.colonies), "this.rooName", this.roomName);
+
+    this.m.colonies[0]["parts"] = 500-budget.parts;
     for (let colony of this.m.colonies) {
-        if (colony !== this.roomName) {
-            budget.parts += colony.parts;
+        console.log("colony", JSON.stringify(colony), "this.roomName");
+        if (colony.name !== this.roomName) {
+            console.log("budget.parts",budget.parts,"colony.parts",colony.parts);
+            budget.parts -= colony.parts;
+            console.log("budget.parts",budget.parts,"colony.parts",colony.parts)
         }
     }
     this.m.parts = budget.parts;
+    console.log("POLICY_GOVERN parts", this.m.parts, "budget rtv", JSON.stringify(budget));
     return budget
 };
 
 Policy.prototype.addColony = function(roomName, profit, parts) {
-    console.log("addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
     //const localParts = policy.getRoomEconomyPolicy(this.roomName).budget().parts;
     //this.m.parts = this.m.parts - this.m.colonies[0].parts + localParts;
     //this.m.colonies[0].parts = localParts;
@@ -100,9 +103,9 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         }
     }
 
-    this.m.colonies.push({"name" : roomName, "profit" : profit, "parts": parts });
+    this.m.colonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
     this.m.colonies = this.m.colonies.sort( function (a,b)  {
-        return b.profit - a.profit;
+        return b.profit/b.parts - a.profit/a.parts;
     });
     console.log("POLICY_GOVERN addColony this.m.colonies now", JSON.stringify(this.m.colonies));
 
@@ -119,14 +122,14 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         this.m.parts = parts;
         const colonyLength = this.m.colonies.length;
         for ( ; index < colonyLength ; index++ ) {
-            this.m.colonies.pop //todo need to do sometihng with rtv?
+            this.m.colonies.pop() //todo need to do sometihng with rtv?
         }
         console.log("addColony new this.m.colonies", JSON.stringify(this.m.colonies));
         return true; // todo maybe
     }
 
     this.m.parts += parts;
-    console.log("POLICY_GOVERN addColony success", JSON.stringify(thie.m.colonies));
+    console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(thie.m.colonies));
     return true;
 };
 

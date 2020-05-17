@@ -20,7 +20,7 @@ const agenda = {
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER, //todo
+            //gc.POLICY_BUILD_TOWER, //todo
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.BUILD_ROAD_SOURCE_SPAWN,
             gc.BUILD_ROAD_SOURCE_SOURCE,

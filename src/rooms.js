@@ -14,32 +14,51 @@ const rooms = {
             center.createFlag(room.name);
         }
         let myRoom = room.controller && room.controller.my && room.controller.level > 0;
-        this.flagPermanents(room, myRoom);
+        this.flagPermanents(room);
         if (myRoom) {
             this.flagMyRoomStructures(room);
         }
     },
 
-    flagPermanents: function (room, myRoom) {
+    flagPermanents: function (room) {
         //console.log("room flag permanents room",room.name)
-        let flagName;
+        const m = Game.flags[room.name].memory;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_KEEPER_LAIR }
         });
-        Game.flags[room.name].memory.keeperLairs = keeperLairs.length > 0;
+        m.keeperLairs = keeperLairs.length > 0;
 
         const invaderCore = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_INVADER_CORE }
         });
-        Game.flags[room.name].memory.invaderCore = invaderCore.length > 0;
+        m.invaderCore = invaderCore.length > 0;
+
+        const sources = room.find(FIND_SOURCES);
+        if (sources.length > 0) {
+            m.sources = [];
+            for ( let source of sources ) {
+                m.sources.push(source.id)
+            }
+        }
+
+        if (room.controller) {
+            m.controller = room.controller.id;
+        }
+/*
+        const minerals = room.find(FIND_MINERALS);
+        if (minerals.length > 0) {
+            m.mineral = [];
+            for (let mineral of minerals ) {
+                m.mineral.push({"id" : mineral.id, "type":mineral.type})
+            }
+        }
 
         const powerBank = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_POWER_BANK }
         });
-        Game.flags[room.name].memory.powerBank = powerBank.length > 0;
+        m.powerBank = powerBank.length > 0;
 
- /*
         for ( i in keeperLairs ) {
             flagName = keeperLairs[i].id;
             if (!Game.flags[flagName])
@@ -48,54 +67,6 @@ const rooms = {
                 }
             Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR;
             Game.flags[flagName].memory.keeperLairRoom = true;
-        }
-
-        const sources = room.find(FIND_SOURCES);
-        for ( let i in sources ) {
-            flagName = sources[i].id;
-            if (!Game.flags[flagName])
-                {
-                    sources[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
-                }
-            Game.flags[flagName].memory.type = gc.FLAG_SOURCE;
-            Game.flags[flagName].memory.resourceType = RESOURCE_ENERGY;
-            Game.flags[flagName].memory.energyCapacity = sources[i].energyCapacity;
-            if (room.controller && !myRoom) {
-                Game.flags[flagName].memory.upgradeController = true;
-            }
-            if (keeperLairs.length > 0) {
-                Game.flags[flagName].memory.keeperLairRoom = true;
-            }
-            Game.flags[flagName].memory.accessPoints = economy.countAccessPoints(sources[i].pos);
-        }
-        if (room.controller) {
-            flagName = room.controller.id;
-            if (!Game.flags[flagName])
-                {
-                    room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
-                }
-            Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
-            if (!myRoom) {
-                Game.flags[flagName].memory.upgradeController = (sources.length >= gc.SOURCES_REVERSE_CONTROLLER);
-            }
-            if (keeperLairs.length > 0) {
-                Game.flags[flagName].memory.keeperLairRoom = true;
-            }
-        }
-
-        const minerals = room.find(FIND_MINERALS);
-        for ( i in minerals ) {
-            flagName =  minerals[i].id;
-            if (!Game.flags[flagName])
-                {
-                    minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
-                }
-            Game.flags[flagName].memory.type = gc.FLAG_MINERAL;
-            Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
-            //Game.flags[flagName].memory.extractor = gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR);
-            if (keeperLairs.length > 0) {
-                Game.flags[flagName].memory.keeperLairRoom = true;
-            }
         }
 
         const walls = room.find(FIND_STRUCTURES, {
@@ -125,7 +96,7 @@ const rooms = {
                 }
         }
 */
-        room.memory.flagged = true;
+        m.flagged = true;
     },
 
     flagMyRoomStructures: function (room) {

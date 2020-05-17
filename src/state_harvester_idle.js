@@ -5,10 +5,10 @@
  */
 
 const gc = require("gc");
-const gf = require("gf");
+//const gf = require("gf");
 const state = require("state");
 const policy = require("policy");
-const budget = require("budget");
+//const budget = require("budget");
 
 function State (creep) {
     this.creep = creep;
@@ -19,7 +19,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE");
     const home = Game.rooms[this.homeId];
 
     const governor = policy.getGouvernerPolicy(this.homeId);

@@ -7,6 +7,13 @@ const gc = require("gc");
 
 const cache = {
 
+    global: function(fn, name, args, force) {
+        if (!global[name] || force) {
+            global[name] = fn(...args);
+        }
+        return global[name];
+    },
+
     path(from, toArray, name, range, useRoad, redo, cacheResult) {
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         //console.log("toArray",JSON.stringify(toArray));
@@ -58,12 +65,6 @@ const cache = {
                 swampCost: 5,
             })
         }
-        const result =  {
-            path: pfPath.path,
-            ops: pfPath.ops,
-            cost: pfPath.cost,
-            incomplete: pfPath.incomplete,
-        };
         if (cacheResult) {
             flag.memory[toArray[0].room.name][name][tag] = {
                 path: this.serialisePath(pfPath.path),
@@ -76,8 +77,10 @@ const cache = {
     },
 
     distance(from, toArray, name, range, useRoad, redo, cacheResult) {
-        const p = this.path(from, toArray, name, range, useRoad, redo, useRoad);
-        return p.cost
+        const p = this.path(from, toArray, name, range, useRoad, redo, cacheResult);
+        if (!p.incomplete) {
+            return p.cost
+        }
      },
 
     distanceSourceSpawn: function(source, spawnRoom, useRoad, redo) {
@@ -92,13 +95,6 @@ const cache = {
     distanceUpgraderSpawn: function (fromRoom, spawnRoom, useRoad, redo) {
         const spawns = spawnRoom.find(FIND_MY_SPAWNS);
         return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
-    },
-
-    global: function(fn, name, args, force) {
-        if (!global[name] || force) {
-            global[name] = fn(...args);
-        }
-        return global[name];
     },
 
     sPos: function (pos) {

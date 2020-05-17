@@ -88,7 +88,7 @@ State.prototype.pathLost = function () {
     switch(creepRace) {
         case gc.RACE_HARVESTER:
             const sourceId = state.atHarvestingPost(this.creep.pos);
-            console.log(this.creep.name, "atHarvestingPost", sourceId);
+            //console.log(this.creep.name, "atHarvestingPost", sourceId);
             if (sourceId) {
                 console.log(this.creep.name,"STATE_HARVESTER_IDLE at harvesting pos", sourceId);
                 harvesters = state.getHarvestingHarvesters(this.creep.policyId);

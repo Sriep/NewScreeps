@@ -19,12 +19,28 @@ const inserted = {
     },
 
     bottom: function () {
-        //console.log("--------- piers inserted------------")
+
+
+        //console.log("--------- piers inserted------------");
+        //for (let creep in Game.creeps) {
+        //    console.log(Game.creeps[creep].name, "is in room",Game.creeps[creep].pos.roomName)
+        //}
+
+
+
+        //const away = "W8N2";
+        //const home = "W7N7";
+        //const myValue  = budget.valueNeutralRoom(away, home, false);
+        //console.log("value W7N7 W8N7", JSON.stringify(myValue[gc.ROOM_NEUTRAL]));
+        //console.log("22222--------- piers inserted------------");
+        //console.log("stored vaue", Game.flags["W8N7"]["values"])
+
+
         //for (let roomName in Game.flags) {
           //  if (Game.flags[roomName].memory.values) {
                // console.log(roomName,"  ",Game.flags[roomName].memory.values)
             //}
-        //}
+        //}W8N7
         //console.log("befire",Memory.N,  Memory.W);
        /* if (Memory.N === undefined) {
             Memory.N = 0;

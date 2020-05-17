@@ -169,18 +169,24 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
 
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
-    //console.log("pp colonies", colonies);
-    for (let colony of colonies) {
-        if (colony === this.home) {
+    //console.log("pp colonies", JSON.stringify(colonies));
+    for (let colonyObj of colonies) {
+        if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        const valuesObj = JSON.parse(Game.flags[this.home].memory[values]);
+        console.log("pp calcResources colonyObj",JSON.stringify(colonyObj));
+        //console.log("pp calcResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
+        //console.log("pp calcResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
+        const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
+        const valuesRoom = valuesObj[this.home];
+        //console.log("pp calcResources valuesRoom", JSON.stringify(valuesRoom));
         let values;
-        if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
-            values = valuesObj[roomType1];
+        if(valuesRoom[roomType1].profit > valuesRoom[roomType2].profit) {
+            values = valuesRoom[roomType1];
         } else {
-            values = valuesObj[roomType2];
+            values = valuesRoom[roomType2];
         }
+        //console.log("pp calcResources values", JSON.stringify(values));
         let hW=0, pC=0, uW=0;
         for (let id in values["sources"]) {
             //if (values["sources"][id].netEnergy > gc.COLONY_PROFIT_MARGIN) {
@@ -189,7 +195,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
                 uW += values["sources"][id].parts.uW
             //}
         }
-        const colonyResources = calcRoomResources(colony, hW, pC, uW);
+        const colonyResources = calcRoomResources(colonyObj.name, hW, pC, uW);
         //console.log("pp calcResources colony",colony,JSON.stringify(colonyResources));
         resources.hW += colonyResources.hW;
         resources.pC +=  colonyResources.pC;
@@ -203,8 +209,14 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
 calcRoomResources = function (roomName, hW, pC, uW) {
     console.log("calcRoomResources roomName", roomName, "hW", hW, "pC", pC, "uW", uW);
     const room = Game.rooms[roomName];
-    const buildTicks = economy.constructionRepairLeft(room);
-    const ratioHtoW = budget.workersRoomRationHtoW(room, false);
+    let buildTicks, ratioHtoW;
+    if (room) {
+        buildTicks = economy.constructionRepairLeft(room);
+        ratioHtoW = budget.workersRoomRationHtoW(room, false);
+    } else {
+        buildTicks = 0;
+        ratioHtoW = 1.1;
+    }
     let workerWs = 0;
     let porterCs = pC;
     let upgradeWs = uW;
@@ -242,7 +254,7 @@ Policy.prototype.budget = function() {
 
     parts += 4; // scouts.
 
-    const spawns = Game.rooms[this.RoomName].find(FIND_MY_SPAWNS).length;
+    const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS).length;
     const partsLT = spawns * CREEP_LIFE_TIME / 3;
 
     prBudget.parts = partsLT - parts;

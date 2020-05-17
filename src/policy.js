@@ -108,13 +108,14 @@ const policy = {
     getGouvernerPolicy : function(roomName) {
         for (let id in Memory.policies) {
             //console.log("getGouvernerPolicy roomName", roomName, "home",
-            //    Memory.policies[id].home, "type", Memory.policies[id].type);
+           //     Memory.policies[id].roomName, "type", Memory.policies[id].type);
             if (Memory.policies[id].roomName === roomName &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {
-            //    console.log("found getGouvernerPolicy", id)
+                //console.log("found getGouvernerPolicy", id)
                 return this.getPolicy(id);
             }
         }
+        //console.log("getGouvernerPolicy dropped though", roomName)
         return undefined;
     },
 
