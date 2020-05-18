@@ -67,7 +67,7 @@ Policy.prototype.exploreRoom = function(newRoom) {
         const room = Game.rooms[name];
         if (!!room.controller && room.controller.my && room.controller.level > 1) {
             values[name] = budget.valueNeutralRoom(newRoom, name, false);
-            //console.log(newRoom,"values[name]", JSON.stringify(values[name]));
+            console.log(newRoom,"values[name]", JSON.stringify(values[name]));
             if (!showsProfit) {
                 showsProfit = values[name][gc.ROOM_NEUTRAL].profit > 0
                     || values[name][gc.ROOM_NEUTRAL_ROADS].profit > 0

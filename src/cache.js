@@ -18,7 +18,7 @@ const cache = {
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
-            console.log("path toArray.length === 0 toArray", JSON.stringify(toArray));
+            //console.log("path toArray.length === 0 toArray", JSON.stringify(toArray));
             return undefined;
         }
         if (!name) {
@@ -78,6 +78,11 @@ const cache = {
 
     distance(from, toArray, name, range, useRoad, redo, cacheResult) {
         const p = this.path(from, toArray, name, range, useRoad, redo, cacheResult);
+        if (!p) {
+            //console.log("cache distance from", from.id, "toArraylength", toArray.length, "name", name,
+            //    "range", range, "userRoad", useRoad, "redo", redo, "cacheR", cacheResult)
+            //console.log("cache distance p", JSON.stringify(p))
+        }
         if (!p.incomplete) {
             return p.cost
         }
@@ -117,7 +122,7 @@ const cache = {
 
     dRoomPos: function(str, roomName) {
         const code = str.charCodeAt(0);
-        console.log("dRoomPos code", code,"x",code % 50,"y",Math.floor(code / 50),"room",roomName);
+        //console.log("dRoomPos code", code,"x",code % 50,"y",Math.floor(code / 50),"room",roomName);
         return new RoomPosition(code % 50, Math.floor(code / 50), roomName)
     },
 

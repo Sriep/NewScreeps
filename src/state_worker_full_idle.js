@@ -8,9 +8,6 @@ const gc = require("gc");
 const state = require("state");
 
 function State (creep) {
-    if (0  !== creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
-        //console.log(creep.name,"In STATE_WORKER_FULL_IDLE with empty creep");
-    }
     this.type = gc.STATE_WORKER_FULL_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;

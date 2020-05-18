@@ -28,21 +28,21 @@ State.prototype.enact = function () {
 
     if (state.atUpgradingPost(this.creep.pos)) {
         //console.log("STATE_UPGRADER_IDLE at UpgradingPost", JSON.stringify(this.creep.pos))
-        const upgradeContainerPos = Game.flags[home.controller.id].memory.containerPos;
-        const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(upgradeContainerPos, this.homeId));
-        //console.log("STATE_UPGRADER_IDLE at upgrading post with energy", upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0)
-        if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
-            //upgraders = state.getHarvestingHarvesters(this.creep.policyId);
-            for (let i in upgraders) {
-                if (upgraders.memory.targetPos.x === this.creep.x
-                    && upgraders.memory.targetPos.y === this.creep.y) {
-                    delete upgraders.memory.targetPos;
-                    state.switchTo(upgraders, gc.STATE_UPGRADER_IDLE);
+        const upgradeContainerPoses = state.getControllerPosts(home.controller.id);
+        for (let cPos of upgradeContainerPoses) {
+            const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(cPos, this.homeId));
+            if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
+                for (let i in upgraders) {
+                    if (upgraders.memory.targetPos.x === this.creep.x
+                        && upgraders.memory.targetPos.y === this.creep.y) {
+                        delete upgraders.memory.targetPos;
+                        state.switchTo(upgraders, gc.STATE_UPGRADER_IDLE);
+                    }
                 }
+                this.creep.memory.targetId = home.controller.id;
+                this.creep.memory.targetPos = this.creep.pos;
+                return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE);
             }
-            this.creep.memory.targetId = home.controller.id;
-            this.creep.memory.targetPos = this.creep.pos;
-            return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE);
         }
     }
 };

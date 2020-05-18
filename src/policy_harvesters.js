@@ -54,7 +54,7 @@ Policy.prototype.enact = function () {
     console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife);
     const budgetHarvesterWsLt = budget.harvesterWsRoom(room, room, false)*CREEP_LIFE_TIME;
     //const budgetCsLt = budget.portersCsRoom(room, room, false)*CREEP_LIFE_TIME;
-    const rationHtoW = budget.workersRoomRationHtoW(room, false);
+    const rationHtoW = budget.workersRoomRationHtoW(room, room,false);
 
     //const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
     //console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife,"rationHtoW",rationHtoW,"rationHtoW*wHarvesterLife",rationHtoW*wHarvesterLife)

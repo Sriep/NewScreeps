@@ -34,14 +34,13 @@ Policy.prototype.enact = function () {
         return;
     }
     const room = Game.rooms[this.home];
-    const controllerFlag = Game.flags[room.controller.id];
-    if (controllerFlag.memory.upgraderPosts) { //undefined
+    if (state.getControllerPosts(room.controller.id)) {
         return;
     }
     setContainerSites(room, controllerFlag);
 };
 
-setContainerSites = function(room, cflag) {
+setContainerSites = function(room) {
     const terrain = room.getTerrain();
     let spots = construction.coverArea(room.controller.pos, 3, terrain);
     //console.log("setContainerSites spots", JSON.stringify(spots));
@@ -54,7 +53,7 @@ setContainerSites = function(room, cflag) {
             return room.controller.pos.getRangeTo(p1.x, p1.y) - room.controller.pos.getRangeTo(p2.x, p2.y)
         });
     }
-    cflag.memory.upgraderPosts = spots;
+    Game.flags[room.controller.id].memory.upgraderPosts = spots;
 
     for (let spot of spots) {
         //console.log("spot x", spot.x, "spoty", spot.y, "roomname", room.name, JSON.stringify(spot));
@@ -68,8 +67,7 @@ setContainerSites = function(room, cflag) {
 };
 
 areControllerContainerFinished = function (room) {
-    const flag = Game.flags[room.controller.id];
-    const posts = flag.memory.upgraderPosts;
+    const posts = state.getControllerPosts(room.controller.id);
     if (!posts) {
         return false;
     }

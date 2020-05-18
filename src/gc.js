@@ -21,6 +21,7 @@ const pgc = {
     BUILD_ROAD_SOURCE_TOWERS: "build_road_source_towers",
     // Msc
     ACTIVITY_FINISHED: "finished",
+    ACTIVITY_FOREIGN_MINING: "foreign_mining",
     ACTIVITY_DISALLOWED: "disallowed",
     // policies
     POLICY_GOVERN: "govern",
@@ -153,6 +154,9 @@ const gc = {
     STATE_UPGRADER_IDLE: "upgrader_idle",
     // scout
     STATE_SCOUT_IDLE: "scout_idle",
+    //tower
+    STATE_TOWER_IDLE: "tower_idle",
+    STATE_TOWER_DEFEND: "tower_defend",
 
     MAX_STATE_STACK: 5,
 
@@ -207,6 +211,7 @@ const gc = {
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
     ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
+    ACTIVITY_FOREIGN_MINING: pgc.ACTIVITY_FOREIGN_MINING,
     ACTIVITY_DISALLOWED: pgc.ACTIVITY_DISALLOWED,
     // policies
     POLICY_GOVERN: pgc.POLICY_GOVERN,
@@ -255,12 +260,14 @@ const gc = {
     EMERGENCY_DOWNGRADING_THRESHOLD: 3000,
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,
+    TOWER_REPAIR_THRESHOLD: 0.9,
 
     // Economic factors
     SPAWN_TIME_RESERVE: 50, // 50 complete guess.
     MIN_ENERGY_TO_MINE: 1000, // guess
     COLONY_PROFIT_MARGIN: 500,
-    COLONY_PARTS_MARGIN: 30,
+    COLONY_PROFIT_PART_MARGIN: 10,
+    COLONY_PARTS_MARGIN: 50,
     PORTER_FUDGE_FACTOR: 1.5,
 
     // ownership

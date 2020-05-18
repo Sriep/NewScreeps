@@ -4,8 +4,12 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const gf = require("gf");
 const race = require("race");
 const flag = require("flag");
+const economy = require("economy");
+const state = require("state");
+const construction = require("construction");
 
 const policy = {
 
@@ -78,9 +82,8 @@ const policy = {
     },
 
     getPolicy: function(id) {
-        const data = Memory.policies[id];
-        const Policy = require("policy_" + data.type);
-        return new Policy(id, data);
+        const Policy = require("policy_" + Memory.policies[id].type);
+        return new Policy(id, Memory.policies[id]);
     },
 
     savePolicy: function(policy) {
@@ -230,6 +233,79 @@ const policy = {
         };
         const queue = flag.getSpawnQueue(room.name);
         return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
+    },
+
+    buildSourceContainer : function (source) {
+        //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
+        if (state.getSourceContainer(source.id)) {
+            return;
+        }
+
+        let spots = economy.findMostFreeNeighbours(
+            source.room, source.pos, 1
+        );
+        if (spots.length === 0) {
+            return gf.fatalError("findMostFreeNeighbours cant get to source");
+        }
+        let sourceFlag = Game.flags[source.id];
+        if (!sourceFlag) {
+            source.pos.createFlag(source.id);
+            sourceFlag = Game.flags[source.id];
+        }
+        sourceFlag.memory.harvesterPosts = spots[0].neighbours;
+        spots[0].pos.roomName = source.room.name;
+        sourceFlag.memory.containerPos = spots[0].pos;
+        if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
+            return;
+        }
+        const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
+        if (result !== OK) {
+            gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
+        }
+    },
+
+    areSourceContainersFinished : function (room) {
+        const sources = room.find(FIND_SOURCES);
+        for (let source of sources) {
+            const cPos = state.getSourceContainer(source.id);
+            if (!cPos) {
+                return false;
+            }
+            const container = state.findContainerAt(gf.roomPosFromPos(cPos));
+            if (!container) {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    buildStructuresLooseSpiral : function (room, strucType, numNeeded, skip) {
+        //console.log("buildStructuresLooseSpiral room", room.name, "strucType",strucType,"numNeeded", numNeeded);
+        const sources = room.find(FIND_SOURCES);
+        const spawns  = room.find(FIND_MY_SPAWNS);
+
+        let keyPts = [];
+        for (let i in sources) {
+            keyPts.push(sources[i].pos)
+        }
+        let avoid = keyPts;
+        for (let i in spawns) {
+            keyPts.push(spawns[i].pos)
+        }
+        keyPts.push(room.controller.pos);
+        let start = construction.centerMass(keyPts);
+        start = construction.closestNonWall(gf.roomPosFromPos(start, room.name));
+        const structs = room.find(FIND_MY_STRUCTURES);
+        for (let i in structs) {
+            avoid.push(structs[i].pos)
+        }
+        const terrain = room.getTerrain();
+        const extensionPos = construction.looseSpiral(start, numNeeded + skip, avoid, terrain,1);
+        for ( let i = skip; i < extensionPos.length ; i++ ) {
+            const result = room.createConstructionSite(extensionPos[i].x, extensionPos[i].y, strucType);
+            if (result !== OK) {
+            }
+        }
     },
 
 };

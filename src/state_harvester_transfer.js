@@ -23,7 +23,7 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
     }
 
-    const scPos = gf.roomPosFromPos(Game.flags[this.creep.memory.targetId].memory.containerPos);
+    const scPos = gf.roomPosFromPos(state.getSourceContainer(this.creep.memory.targetId));
     const container = state.findContainerAt(scPos);
     //console.log("in STATE_HARVESTER_TRANSFER container", JSON.stringify(container))
     if (!container) {
@@ -49,7 +49,7 @@ State.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return
+            return;
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -59,6 +59,6 @@ State.prototype.enact = function () {
     }
 
     state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
-}
+};
 
 module.exports = State;

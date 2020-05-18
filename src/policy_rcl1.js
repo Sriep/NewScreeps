@@ -44,7 +44,7 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.budget = function() {
-    return { "net energy" : 0, "parts" : 0, "support_colonies": false };
+    return { "net energy" : 0, "parts" : 0 };
 };
 
 Policy.prototype.draftReplacment = function() {

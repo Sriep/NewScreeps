@@ -98,27 +98,19 @@ const state = {
         return state.enact(creep);
     },
 
-    //--------------------- state switches -------------------------------------
+    //--------------------- state switches end----------------------------------
 
     countHarvesterPosts: function(room) {
         const sources = room.find(FIND_SOURCES);
         let posts = 0;
-        for (let i in sources) {
-             if (Game.flags[sources[i].id].memory.harvesterPosts) {
-                posts += Game.flags[sources[i].id].memory.harvesterPosts.length;
+        for (let source of sources) {
+             if (state.getSourcePosts(source.id)) {
+                posts += state.getSourcePosts(source.id).length;
             }
         }
         return posts;
     },
-/*
-    countUpgraderPosts: function(room) { //done
-        let countPosts = 0;
-        for (let cPosts of Game.flags[room.controller.id].memory.upgraderPosts[0].posts) {
-            countPosts += cPosts.length
-        }
-        return countPosts;
-    },
-*/
+
     //------------ nextFreeHarvesterPost----------------------------------------
 
     nextFreeHarvesterPost: function(home, colonies, ec) {
@@ -241,8 +233,9 @@ const state = {
         let sources = room.find(FIND_SOURCES);
         sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
         for (let s in sources) {
-            const flag = Game.flags[sources[s].id];
-            const posts = flag.memory.harvesterPosts;
+            //const flag = Game.flags[sources[s].id];
+            //const posts = flag.memory.harvesterPosts;
+            const posts = state.getSourcePosts(sources[s].id);
             for (let i in posts) {
                 const post = posts[i];
                 if (this.isHarvesterPostFree(post, room.name)) {
@@ -294,11 +287,12 @@ const state = {
     atHarvestingPost: function(pos) {
         let sources = Game.rooms[pos.roomName].find(FIND_SOURCES);
         for (let source of sources) {
-            const flag = Game.flags[source.id];
-            if (!flag) { // left room
-                return false;
-            }
-            const posts = flag.memory.harvesterPosts;
+            //const flag = Game.flags[source.id];
+            //if (!flag) { // left room
+            //    return false;
+            //}
+            //const posts = flag.memory.harvesterPosts;
+            const posts = state.getSourcePosts(source.id);
             for (let j in posts) {
                 if (pos.x === posts[j].x && pos.y ===posts[j].y) {
                         return source.id
@@ -365,26 +359,12 @@ const state = {
         const sources = room.find(FIND_SOURCES);
         const containersPos = [];
         for (let source of sources) {
-            const flag = Game.flags[source.id];
-            if (flag.memory.containerPos) {
-                containersPos.push(gf.roomPosFromPos(flag.memory.containerPos));
+            const cPos = state.getSourceContainer(source.id);
+            if (cPos) {
+                containersPos.push(gf.roomPosFromPos(cPos));
             }
         }
         return containersPos;
-    },
-
-    isHarvesterAndUpgradeContainer: function(room) {
-        const upos = Game.flags[room.controller.id].memory.containerPos;
-        if (!upos || !this.findContainerAt(gf.roomPosFromPos(upos, room.name))) {
-            return false;
-        }
-        const positions =  this.getHarvestContainersPos(room);
-        for (let i in positions) {
-            if (this.findContainerAt(gf.roomPosFromPos(positions[i], room.name))) {
-                return true;
-            }
-        }
-        return false;
     },
 
     numHarvestersHarvesting: function(policyId) { //done
@@ -415,8 +395,7 @@ const state = {
     },
 
     atUpgradingPost: function(pos) { // done
-        const flag = Game.flags[Game.rooms[pos.roomName].controller.id];
-        const posts = flag.memory.upgraderPosts;
+        const posts = state.getControllerPosts(Game.rooms[pos.roomName].controller.id);
         for (let i in posts) {
             if (pos.x === posts[i].x && pos.y === posts[i].y){
                 return true;
@@ -426,14 +405,12 @@ const state = {
     },
 
     findFreeUpgraderPost: function(room) { // done
-        const upgraderPosts = Game.flags[room.controller.id].memory.upgraderPosts;
+        const upgraderPosts = state.getControllerPosts(room.controller.id);
         let lowestUserCount = 9999;
         let bestPost;
-        //console.log("findFreeUpgraderPost: upgraderPosts length",upgraderPosts.length ,"upgraderPosts", JSON.stringify(upgraderPosts));
         for ( let i = 0; i < upgraderPosts.length ; i++ ) {
             let users = 0;
             let freePost = undefined;
-            //console.log(i,"findFreeUpgraderPost: posts[i]", JSON.stringify(upgraderPosts[i]));
             for (let post of upgraderPosts[i].posts) {
                 //console.log("findFreeUpgraderPost post", JSON.stringify(post));
                 if (this.isUpgraderPostFree(post, room.name)) {
@@ -446,8 +423,6 @@ const state = {
                     //console.log("findFreeUpgraderPost post is not free", users);
                 }
             }
-            //console.log(i,"findFreeUpgraderPost upgraderPosts[i].posts", JSON.stringify(upgraderPosts[i].posts))
-            //console.log(i,"findFreeUpgraderPost users", users, "bestSoFar", lowestUserCount,"upgraderPosts[i].length", upgraderPosts[i].posts.length)
             if (users < lowestUserCount && users < upgraderPosts[i].posts.length) {
                 lowestUserCount = users;
                 bestPost = freePost;
@@ -500,7 +475,7 @@ const state = {
     },
 
     findUpgradeContainerToFill : function(room) {
-        const containerPosts = Game.flags[room.controller.id].memory.upgraderPosts;
+        const containerPosts = state.getControllerPosts(room.controller.id);
         if (!containerPosts) {
             return undefined;
         }
@@ -555,7 +530,7 @@ const state = {
             return undefined;
         }
         const StructAt = pos.lookFor(LOOK_STRUCTURES);
-         if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
+        if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
             return StructAt[0];
         }
         return undefined;
@@ -629,15 +604,21 @@ const state = {
     },
 
     getSourcePosts : function (sourceId) {
-        return Game.flags[sourceId].memory.harvesterPosts;
+        if (Game.flags[sourceId]) {
+            return Game.flags[sourceId].memory.harvesterPosts;
+        }
     },
 
     getSourceContainer : function (sourceId) {
-        return Game.flags[sourceId].memory.containerPos;
+        if (Game.flags[sourceId]) {
+            return Game.flags[sourceId].memory.containerPos;
+        }
     },
 
     getControllerPosts : function (controllerId) {
-        return Game.flags[controllerId].memory.upgraderPosts;
+        if (Game.flags[controllerId]) {
+            return Game.flags[controllerId].memory.upgraderPosts;
+        }
     }
 
 };
@@ -664,7 +645,7 @@ listFreeHarvesterPosts = function (home, colonies, ec) {
         //sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
         //const sourceIds = getSourceIds(colonyObj.name);
 
-        for (let sourceId of Game.flags[colonyObj.name].memory.sources) {
+        for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
             const post = freeHarvesterPost(sourceId, spawnRoom, ec);
             const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
             if (post) {
@@ -685,11 +666,10 @@ maxHEc = function (ec) {
     return 1;
 };
 
-
-
 freeHarvesterPost = function (sourceId, spawnRoom, ec) {
-    const sourceFlag = Game.flags[sourceId];
-    const posts = sourceFlag.memory.harvesterPosts;
+    //const sourceFlag = Game.flags[sourceId];
+    //const posts = sourceFlag.memory.harvesterPosts;
+    const posts = state.getSourcePosts(sourceId);
     creeps = _.filter(Game.creeps, c =>
         c.memory.targetId === sourceId
         //&& race.getRace(c) === gc.RACE_HARVESTER
@@ -745,15 +725,18 @@ listSourceContainers = function(spawnRoom, colonies) {
     const containerInfo = [];
     //console.log("listSourceContainers colonies", JSON.stringify(colonies), "spawn room", spawnRoom.name)
     for (let colonyObj of colonies) {
-        const room = Game.rooms[colonyObj.name];
-        for (let source of room.find(FIND_SOURCES)) {
-            sFlag = Game.flags[source.id];
+        const gameFlag = Game.flag[colonyObj.name];
+        //for (let source of room.find(FIND_SOURCES)) {
+        for (let sourceId in gameFlag.memory.sources) {
+            //sFlag = Game.flags[source.id];
             //console.log(source.id, "listSourceContainers sFlag", JSON.stringify(sFlag.memory));
-            if (sFlag) {
-                const distance = cache.distanceSourceController(source, spawnRoom);
-                const pos = new RoomPosition(sFlag.memory.containerPos.x, sFlag.memory.containerPos.y, colonyObj.name);
+            const cPos = state.getSourceContainer(sourceId);
+            if (cPos) {
+                const distance = gameFlag.memory.sources[sourceId].distance;
+                console.log("listSourceContainers distance",distance);
+                const pos = new RoomPosition(cPos.x, cPos.y, colonyObj.name);
                 const container = state.findContainerAt(pos);
-                container["sourceId"] = source.id;
+                container["sourceId"] = sourceId;
                 container["distance"] = distance;
                 containerInfo.push(container);
                 //console.log(source.id, "listSourceContainers pushed", JSON.stringify(container))

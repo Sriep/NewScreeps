@@ -17,7 +17,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    console.log(this.creep.name,"STATE_WORKER_IDLE")
+    //console.log(this.creep.name,"STATE_WORKER_IDLE")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
@@ -86,11 +86,6 @@ State.prototype.enactOld = function () {
 
     const container = state.findCollectContainer(this.creep.room);
     if (container) {
-        //console.log("getUsedCapacity(RESOURCE_ENERGY)",this.creep.store.getUsedCapacity(RESOURCE_ENERGY),
-        //    "getCapacity(RESOURCE_ENERGY)",this.creep.store.getCapacity(RESOURCE_ENERGY),
-        //        "getFreeCapacity(RESOURCE_ENERGY)",this.creep.store.getFreeCapacity(RESOURCE_ENERGY),
-        //        "store", JSON.stringify(this.creep.store))
-
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
             this.creep,

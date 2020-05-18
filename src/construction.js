@@ -276,6 +276,10 @@ const construction = {
         return pos;
     },
 
+    planwall: function(terrain, center, include, minSize) {
+
+    },
+
     buildRoad: function(from, to) {
         const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
         const room = Game.rooms[from.roomName];

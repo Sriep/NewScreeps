@@ -25,12 +25,13 @@ Policy.prototype.initilise = function () {
         this.m = {}
     }
     this.home = Memory.policies[this.parentId].roomName;
+    this.m.curProduction = {};
     return true;
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_PORTERS budget", JSON.stringify( budget.porterRoom(Game.rooms[this.home])));
-    console.log("POLICY_PORTERS resources", JSON.stringify(this.m.resources));
+    //console.log("POLICY_PORTERS budget", JSON.stringify( budget.porterRoom(Game.rooms[this.home])));
+    //console.log("POLICY_PORTERS resources", JSON.stringify(this.m.resources));
     const room = Game.rooms[this.home];
     ///if (!this.m.resources || (Game.time + this.id) % gc.CALC_ROOM_RESOURCES_RATE !== 0 ) {
         if (room.controller < 3) {
@@ -40,6 +41,7 @@ Policy.prototype.enact = function () {
         }
     //}
     this.spawns(room, this.m.resources);
+    console.log("POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
 };
 
 Policy.prototype.spawns = function (room, resources) {
@@ -127,45 +129,47 @@ Policy.prototype.spawns = function (room, resources) {
     }
 };
 
+Policy.prototype.localResources = function () {
+
+};
+
 Policy.prototype.calcResources = function (roomType1, roomType2) {
     let resources;
+
+    this.m.curProduction = {};
+
     const homeRoom = Game.rooms[this.home];
     const ec = homeRoom.energyCapacityAvailable;
-
-    //let sourceEnergyLT = 0;
-    //for (let source of homeRoom.find(FIND_SOURCES)) {
-    //    sourceEnergyLT += gc.SORCE_REGEN_LT*source.energyCapacity
-    //}
     const sourceEnergyLT = 30000;
-
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {
-            let sFlag = Game.flags[source.id];
-            const ap = sFlag.memory.accessPoints;
+            const ap = flag.getRoomFlag(this.home).memory.sources[source.id].ap;
             maxWs += Math.min(5, ap*hWperBody);
         }
         const budgetWs = budget.harvesterWsRoom(homeRoom, homeRoom, false);
         const ratio = maxWs/budgetWs;
-        resources = calcRoomResources(
+        resources = this.updateRoomResources(
             this.home,
             maxWs,
             ratio * budget.portersCsRoom(homeRoom, homeRoom, false),
             ratio * budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
-        //console.log("pp ec<=MAX_EC_4WORK_HARVESTER calcResources home", JSON.stringify(resources));
+        //console.log("pp ec<=MAX_EC_4 home", this.home,"this.updateRoomResources", JSON.stringify(resources));
     } else {
-        resources = calcRoomResources(
+        resources = this.updateRoomResources(
             this.home,
             budget.harvesterWsRoom(homeRoom, homeRoom, false),
             budget.portersCsRoom(homeRoom, homeRoom, false),
             budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
-        //console.log("pp ec>MAX_EC_4WORK_HARVESTER calcResources home", JSON.stringify(resources));
+        //console.log("pp ec>MAX_EC_4 home", this.home,"this.updateRoomResources", JSON.stringify(resources));
     }
-
-    this.m.localResoures = resources;
+    //console.log("POLICY_PORTERS production vector1", JSON.stringify(this.m.curProduction))
+    this.m.curProduction[this.home] = Object.assign({}, resources);
+    //console.log("POLICY_PORTERS production vector2", JSON.stringify(this.m.curProduction))
+    this.m.localResoures = Object.assign({}, resources);
 
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
@@ -174,19 +178,19 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        console.log("pp calcResources colonyObj",JSON.stringify(colonyObj));
-        //console.log("pp calcResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
-        //console.log("pp calcResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
+        //console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
+        //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
+        //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
         const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
         const valuesRoom = valuesObj[this.home];
-        //console.log("pp calcResources valuesRoom", JSON.stringify(valuesRoom));
+        //console.log("pp this.updateRoomResources valuesRoom", JSON.stringify(valuesRoom));
         let values;
         if(valuesRoom[roomType1].profit > valuesRoom[roomType2].profit) {
             values = valuesRoom[roomType1];
         } else {
             values = valuesRoom[roomType2];
         }
-        //console.log("pp calcResources values", JSON.stringify(values));
+        //console.log("pp this.updateRoomResources values", JSON.stringify(values));
         let hW=0, pC=0, uW=0;
         for (let id in values["sources"]) {
             //if (values["sources"][id].netEnergy > gc.COLONY_PROFIT_MARGIN) {
@@ -195,24 +199,30 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
                 uW += values["sources"][id].parts.uW
             //}
         }
-        const colonyResources = calcRoomResources(colonyObj.name, hW, pC, uW);
-        //console.log("pp calcResources colony",colony,JSON.stringify(colonyResources));
+        const colonyResources = this.updateRoomResources(colonyObj.name, hW, pC, uW);
+        this.m.curProduction[colonyObj.name] = Object.assign({}, colonyResources);
+        //console.log("pp this.updateRoomResources colony",colonyObj.name,JSON.stringify(colonyResources));
         resources.hW += colonyResources.hW;
         resources.pC +=  colonyResources.pC;
         resources.wW +=  colonyResources.wW;
         resources.uW +=  colonyResources.uW
+        //console.log(colonyObj.name,"POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
     }
-    //console.log("pp calcResources", JSON.stringify(resources));
+    //console.log("pp this.updateRoomResources", JSON.stringify(resources));
     return resources
 };
 
-calcRoomResources = function (roomName, hW, pC, uW) {
-    console.log("calcRoomResources roomName", roomName, "hW", hW, "pC", pC, "uW", uW);
+Policy.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
+    //console.log("updateRoomResources roomName", roomName, "hW", hW, "pC", pC, "uW", uW);
     const room = Game.rooms[roomName];
+    if (!room) { // todo cache updateRoomResources somehow so can return that if no sight on room
+        return { "hW": hW, "pC" : pC, "wW" : 0,  "uW": uW };
+    }
+    //console.log("updateRoomResources room", room.name, roomName)
     let buildTicks, ratioHtoW;
     if (room) {
         buildTicks = economy.constructionRepairLeft(room);
-        ratioHtoW = budget.workersRoomRationHtoW(room, false);
+        ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home], false);
     } else {
         buildTicks = 0;
         ratioHtoW = 1.1;
@@ -224,42 +234,56 @@ calcRoomResources = function (roomName, hW, pC, uW) {
         porterCs = 0;
         upgradeWs = 0;
         workerWs = ratioHtoW * hW;
-        //console.log("pp calcRoomResources workerWs",workerWs,"ratioHtoW",ratioHtoW,"hW",ratioHtoW)
+        //console.log("pp updateRoomResources workerWs",workerWs,"ratioHtoW",ratioHtoW,"hW",ratioHtoW)
     }
     //upgradeWs =  uW * porterCs / pC;
-    //console.log("calcRoomResources buildTicks",buildTicks,"ratioHtoW",ratioHtoW,"workerWs",workerWs);
-    //console.log("calcRoomResources ratioWtoP",ratioWtoP, "porterCs", porterCs);
+    //console.log("updateRoomResources buildTicks",buildTicks,"ratioHtoW",ratioHtoW,"workerWs",workerWs);
+    //console.log("updateRoomResources ratioWtoP",ratioWtoP, "porterCs", porterCs);
     return { "hW": hW, "pC" : porterCs, "wW" : workerWs,  "uW": upgradeWs };
 };
 
-Policy.prototype.budget = function() {
+Policy.prototype.localBudget = function() {
     room = Game.rooms[this.home];
-    const prBudget = budget.porterRoom(room);
-
+    //console.log("pp localBudget localResources", JSON.stringify(this.m.localResoures));
     const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
     const hPartCount = hbc[WORK] + hbc[MOVE] + hbc[CARRY];
-    let parts = Math.ceil((this.m.resources.hW*11/5)/hPartCount) * hPartCount;
+    let parts = Math.ceil((this.m.localResoures.hW*11/5)/hPartCount) * hPartCount;
 
     const pbc = race.getBodyCounts(gc.RACE_PORTER, room.energyCapacityAvailable);
     const pPartCount = pbc[WORK] + pbc[MOVE] + pbc[CARRY];
-    parts += Math.ceil((this.m.resources.pC*3)/pPartCount) * pPartCount;
+    parts += Math.ceil((this.m.localResoures.pC*3)/pPartCount) * pPartCount;
 
     const wbc = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
     const wPartCount = wbc[WORK] + wbc[MOVE] + wbc[CARRY];
-    parts += Math.ceil((this.m.resources.wW*3)/wPartCount) * wPartCount;
+    parts += Math.ceil((this.m.localResoures.wW*3)/wPartCount) * wPartCount;
 
     const ubc = race.getBodyCounts(gc.RACE_UPGRADER, room.energyCapacityAvailable);
     const uPartCount = ubc[WORK] + ubc[MOVE] + ubc[CARRY];
-    parts += Math.ceil((this.m.resources.uW*2)/uPartCount) * uPartCount;
+    parts += Math.ceil((this.m.localResoures.uW*2)/uPartCount) * uPartCount;
 
     parts += 4; // scouts.
+    const spawnCapacity = Game.rooms[this.home].find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
 
-    const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS).length;
-    const partsLT = spawns * CREEP_LIFE_TIME / 3;
+    const ecSources = Game.rooms[this.home].find(FIND_SOURCES).length * SOURCE_ENERGY_CAPACITY;
+    const profit = ecSources * gc.SORCE_REGEN_LT - budget.convertPartsToEnergy(
+        this.m.localResoures.hW,
+        this.m.localResoures.pC,
+        this.m.localResoures.uW,
+        this.m.localResoures.wW
+    );
 
-    prBudget.parts = partsLT - parts;
-    console.log("POLICY_PORTERS budget parts", parts, "budget", JSON.stringify(prBudget));
-    return prBudget;
+    console.log("POLICY_PORTERS localBudget parts", parts, "rtv", JSON.stringify({
+        "profit" : profit,
+        "parts" : parts,
+        "profitpart" : profit/parts,
+        "spawnPartsLT" : spawnCapacity,
+    }));
+    return {
+        "profit" : profit,
+        "parts" : parts,
+        "profitpart" : profit/parts,
+        "spawnPartsLT" : spawnCapacity,
+    };
 };
 
 Policy.prototype.draftReplacment = function() {

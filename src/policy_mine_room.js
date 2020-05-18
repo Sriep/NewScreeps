@@ -7,6 +7,8 @@
 const gc = require("gc");
 const gf = require("gf");
 const policy = require("policy");
+const flag = require("flag");
+const cache = require("cache");
 
 // constructor
 function Policy  (id, data) {
@@ -29,43 +31,50 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
-    return;
+    //return;
+    //console.log("POLICY_MINE_ROOM", this.home);
+    //if (this.home !== "W8N7") {
+    //    return;
+    //}
     if (this.m.spawnRoom) {
+        //console.log("POLICY_MINE_ROOM enact", this.home,"spawn room exits", this.m.spawnRoom);
         return;
     }
     if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
-        return;
+       return;
     }
-
     if (!Game.rooms[this.home]) {
-        console.log("POLICY_MINE_ROOM enact no asset in room")
+        //console.log("POLICY_MINE_ROOM enact no asset in room")
+        return
     }
 
-    console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
+    //console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
 
     const spawnInfo = this.getSpawnRoom();
-    console.log("POLICY_MINE_ROOM spawnInfo", JSON.stringify(spawnInfo));
+    //console.log("POLICY_MINE_ROOM spawnInfo", JSON.stringify(spawnInfo));
     if (!spawnInfo.name) {
-        console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
+        //console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
         return;
     }
-    this.m.spawnRoom = spawnInfo.name;
+
     const governor = policy.getGouvernerPolicy(spawnInfo.name);
-    console.log("POLICY_MINE_ROOM about to call addColony");
-    governor.addColony(this.home, spawnInfo.profit, spawnInfo.parts);
-    build(Game.rooms[this.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);
+    //console.log("POLICY_MINE_ROOM about to call addColony");
+    if (governor.addColony(this.home, spawnInfo.profit, spawnInfo.parts)) {
+        this.m.spawnRoom = spawnInfo.name;
+        build(Game.rooms[this.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);
+    }
 };
 
 Policy.prototype.getSpawnRoom = function() {
     const values = JSON.parse(Game.flags[this.home].memory["values"]);
-    console.log(this.home,"POLICY_MINE_ROOM getSpawnRoom values",Game.flags[this.home].memory["values"]);
+    //console.log(this.home,"POLICY_MINE_ROOM getSpawnRoom values",Game.flags[this.home].memory["values"]);
     let bestProfit = 0;
     let bestRoom;
     let useRoad;
     let bestParts;
     for(let roomName in values) {
         const roomInfo = this.getProfitRoom(Game.rooms[roomName], values[roomName]);
-        console.log(this.home,"POLICY_MINE_ROOM getProfitRoom", JSON.stringify(roomInfo));
+        //console.log(this.home,"POLICY_MINE_ROOM getProfitRoom", JSON.stringify(roomInfo));
         if (roomInfo && roomInfo.profit > bestProfit) {
             bestProfit = roomInfo.profit;
             useRoad = roomInfo.road;
@@ -77,10 +86,10 @@ Policy.prototype.getSpawnRoom = function() {
 };
 
 Policy.prototype.getProfitRoom = function(room, valueObj) {
-    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom");
+    //console.log(this.home,"POLICY_MINE_ROOM getProfitRoom");
     let budget = policy.getGouvernerPolicy(room.name).budget();
-    console.log(this.home,"POLICY_MINE_ROOM getGouvernerPolicy budget", JSON.stringify(budget));
-    if (!budget["support_colonies"]) {
+    //console.log(this.home,"POLICY_MINE_ROOM getGouvernerPolicy budget", JSON.stringify(budget));
+    if (!budget[gc.ACTIVITY_FOREIGN_MINING]) {
         return
     }
     const valueNoRoad = this.getProfitRoomRoad(room, valueObj, budget, false);
@@ -98,7 +107,7 @@ Policy.prototype.getProfitRoom = function(room, valueObj) {
 };
 
 Policy.prototype.getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
-    console.log(this.home,"POLICY_MINE_ROOM getProfitRoomRoad home budget",budget,"useRoad", useRoad, "valueObj", valueObj);
+    //console.log(this.home,"POLICY_MINE_ROOM getProfitRoomRoad home budget",budget,"useRoad", useRoad, "valueObj", valueObj);
     let value;
     if (room.controller.level <= 2) {
         if (!useRoad) {
@@ -109,46 +118,38 @@ Policy.prototype.getProfitRoomRoad = function(room, valueObj, budget, useRoad) {
     } else if (room.controller.level > 3) {
         value = valueObj[useRoad ? gc.ROOM_RESERVED_ROADS : gc.ROOM_RESERVED];
     }
-    if (!budget.parts || value.parts >= budget.parts) {
-        console.log("getProfitRoom fail; budget.parts", budget.parts, "value.parts", value.parts);
+    if (!budget.parts || value.parts >= budget.spawnPartsLT - budget.parts) {
+        //console.log("getProfitRoom fail; budget.parts", budget.parts, "value.parts", value.parts);
         return undefined;
     }
     const energyLeft = room.controller.progressTotal - room.controller.progress;
-    const ltToNextLevel = energyLeft / budget.net_energy;
+    const ltToNextLevel = energyLeft / budget.profit;
     const ltToPayOff = value.startUpCost / value.profit;
     if ( ltToNextLevel < ltToPayOff ) {
-        console.log(this.home, "POLICY_MINE_ROOM getProfitRoom faile ltToNextLevel",ltToNextLevel,"ltToPayOff",ltToPayOff);
+        //console.log(this.home, "POLICY_MINE_ROOM getProfitRoom faile ltToNextLevel",ltToNextLevel,"ltToPayOff",ltToPayOff);
         return undefined;
     }
-    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok ok ok ok oko ko ko ko ko ko kok ok oko ko ko ko ko ko k");
-    console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok",JSON.stringify({"useRoad" : useRoad, "parts" : value.parts,"value": value }));
+    //console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok ok ok ok oko ko ko ko ko ko kok ok oko ko ko ko ko ko k");
+    //console.log(this.home,"POLICY_MINE_ROOM getProfitRoom ok",JSON.stringify({"useRoad" : useRoad, "parts" : value.parts,"value": value }));
     return {"value": value, "useRoad" : useRoad, "parts" : value.parts};
 };
 
 build = function(colony, spawnRoom, useRoad) {
-    buildSourceSupport(colony);
+    buildSourceSupport(colony, spawnRoom);
     if (useRoad) {
         buildRoads(colony, spawnRoom)
     }
 };
 
-buildSourceSupport = function(colony) {
+buildSourceSupport = function(colony, spawnRoom) {
+    //console.log("buildSourceSupport colony", colony.name, "spawn room", spawnRoom.name);
+    const roomFlag = flag.getRoomFlag(colony.name).memory;
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {
-        let sourceFlag = Game.flags[sorce.id];
-        if (!sourceFlag) {
-            source.pos.createFlag(sorce.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR)
-        }
-        let spots = economy.findMostFreeNeighbours(
-            source.room, source.pos, 1
-        );
-        sourceFlag.memory.harvesterPosts = spots[0].neighbours;
-        spots[0].pos.roomName = source.room.name;
-        sourceFlag.memory.containerPos = spots[0].pos;
-        const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
-        if (result !== OK) {
-            gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
-        }
+        policy.buildSourceContainer(source);
+        //console.log("POLICY_MINE_ROOM bss distance", distance,
+        //    "sourceid", source.id,"roomFlag.sources[source.id]", JSON.stringify(roomFlag));
+        roomFlag.sources[source.id]["distance"] = cache.distanceSourceController(source, spawnRoom);
     }
 };
 
@@ -179,6 +180,12 @@ Policy.prototype.draftReplacment = function() {
             return false;
         }
     }
+    if(Game.rooms[this.home]) {
+        if(Game.rooms[this.home].controller.my &&  Game.rooms[this.home].controller.level > 0) {
+            return false;
+        }
+    }
+
     //console.log("draftReplacment POLICY_MINE_ROOM",this.home,"return this", JSON.stringify(this));
     return this
 };

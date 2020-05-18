@@ -4,10 +4,10 @@
  * @author Piers Shepperson
  */
 
-const gf = require("gf");
+//const gf = require("gf");
 const gc = require("gc");
-const economy = require("economy");
-const state = require("state");
+const policy = require("policy");
+//const state = require("state");
 
 function Policy  (id, data) {
     this.id = id;
@@ -33,52 +33,14 @@ Policy.prototype.enact = function () {
     const room = Game.rooms[this.home];
     const sources = room.find(FIND_SOURCES);
     for (let source of sources) {
-        const flag = Game.flags[source.id];
-        if (!flag.memory.containerPos) {
-            buildSourceContainer(source, flag);
-        }
+        policy.buildSourceContainer(source);
     }
-};
-
-buildSourceContainer = function (source, flag) {
-    console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
-    let spots = economy.findMostFreeNeighbours(
-        source.room, source.pos, 1
-    );
-    if (spots.length === 0) {
-        return gf.fatalError("findMostFreeNeighbours cant get to source");
-    }
-    flag.memory.harvesterPosts = spots[0].neighbours;
-    spots[0].pos.roomName = source.room.name;
-    flag.memory.containerPos = spots[0].pos;
-    if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
-        return;
-    }
-    const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
-    if (result !== OK) {
-        gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
-    }
-};
-
-areSourceContainersFinished = function (room) {
-    const sources = room.find(FIND_SOURCES);
-    for (let i in sources) {
-        const flag = Game.flags[sources[i].id];
-        if (!flag.memory.containerPos) {
-            return false
-        }
-        const container = state.findContainerAt(gf.roomPosFromPos(flag.memory.containerPos));
-        if (!container) {
-            return false;
-        }
-    }
-    return true;
 };
 
 Policy.prototype.draftReplacment = function() {
     // return this;
     const room = Game.rooms[this.home];
-    return areSourceContainersFinished(room) ? false : this;
+    return policy.areSourceContainersFinished(room) ? false : this;
 };
 
 module.exports = Policy;

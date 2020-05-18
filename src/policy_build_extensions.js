@@ -6,6 +6,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const construction = require("construction");
+const policy = require("policy");
 
 // constructor
 function Policy  (id, data) {
@@ -18,7 +19,6 @@ function Policy  (id, data) {
 
 // runs first time policy is created only
 Policy.prototype.initilise = function () {
-
     if (!this.m) {
         this.m = {}
     }
@@ -57,7 +57,8 @@ Policy.prototype.enact = function () {
     }
     const wantedExtensions = allowedExtensions - extensions.length - beingBuilt.length;
     console.log("POLICY_BUILD_EXTENSIONS still need to set up",wantedExtensions ,"construction sites");
-    buildExtensions(room, wantedExtensions)
+    policy.buildStructuresLooseSpiral(room, STRUCTURE_EXTENSION, wantedExtensions, 3);
+    //buildExtensions(room, wantedExtensions)
 };
 
 buildExtensions = function (room, numNeeded) {

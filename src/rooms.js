@@ -8,15 +8,17 @@ const economy = require("economy");
 
 const rooms = {
 
-    flag: function (room) {
-        if (!Game.flags[room.name]) {
+    flag: function (room, force) {
+        if (!Game.flags[room.name] || force) {
+            console.log("room flag name", room.name, "force", force);
             const center = new RoomPosition(25, 25, room.name);
             center.createFlag(room.name);
-        }
-        let myRoom = room.controller && room.controller.my && room.controller.level > 0;
-        this.flagPermanents(room);
-        if (myRoom) {
-            this.flagMyRoomStructures(room);
+
+            let myRoom = room.controller && room.controller.my && room.controller.level > 0;
+            this.flagPermanents(room);
+            if (myRoom) {
+                this.flagMyRoomStructures(room);
+            }
         }
     },
 
@@ -36,23 +38,24 @@ const rooms = {
 
         const sources = room.find(FIND_SOURCES);
         if (sources.length > 0) {
-            m.sources = [];
+            m.sources = {};
             for ( let source of sources ) {
-                m.sources.push(source.id)
+                m.sources[source.id]= { "ap" : economy.countAccessPoints(source.pos) }
             }
         }
 
         if (room.controller) {
-            m.controller = room.controller.id;
+            m.controller = { "id" : room.controller.id }
         }
-/*
+
         const minerals = room.find(FIND_MINERALS);
         if (minerals.length > 0) {
-            m.mineral = [];
-            for (let mineral of minerals ) {
-                m.mineral.push({"id" : mineral.id, "type":mineral.type})
-            }
+                m.mineral = {"id" : minerals[0].id, "type":minerals[0].type}
         }
+
+        m.flagged = true;
+/*
+
 
         const powerBank = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_POWER_BANK }
@@ -96,7 +99,6 @@ const rooms = {
                 }
         }
 */
-        m.flagged = true;
     },
 
     flagMyRoomStructures: function (room) {
@@ -104,9 +106,7 @@ const rooms = {
         for ( let source of sources ) {
             if (!Game.flags[source.id]) {
                 source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
-                //Game.flags[source.id].memory.type = gc.FLAG_SOURCE;
-                //Game.flags[source.id].memory.resourceType = RESOURCE_ENERGY;
-                //Game.flags[source.id].memory.energyCapacity = sources[i].energyCapacity;
+
                 Game.flags[source.id].memory.accessPoints = economy.countAccessPoints(source.pos);
             }
             console.log("flagged souce", source.id,"ap", Game.flags[source.id].accessPoints)
@@ -116,7 +116,6 @@ const rooms = {
             if (!Game.flags[room.controller.id])
             {
                 room.controller.pos.createFlag(room.controller.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
-                //Game.flags[room.controller.id].memory.type = gc.FLAG_CONTROLLER;
             }
         }
 
@@ -125,9 +124,7 @@ const rooms = {
             if (!Game.flags[mineral.id])
             {
                 mineral.pos.createFlag(mineral.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
-                //Game.flags[mineral.id].memory.type = gc.FLAG_MINERAL;
-                //Game.flags[mineral.id].memory.resourceType = minerals[i].mineralType;
-            }
+             }
         }
 
         /*

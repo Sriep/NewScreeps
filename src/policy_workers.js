@@ -88,7 +88,7 @@ Policy.prototype.equilibriumWorkers = function()  {
 
 Policy.prototype.budget = function() {
     const netEnergy = budget.workerRoom(Game.rooms[this.home], this.equilibriumWorkers());
-    return { "net_energy" : netEnergy, "parts" :  this.equilibriumWorkers()*3 };
+    return { "profit" : netEnergy, "parts" :  this.equilibriumWorkers()*3 };
 };
 
 Policy.prototype.draftReplacment = function() {

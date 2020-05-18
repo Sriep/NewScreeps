@@ -117,35 +117,37 @@ State.prototype.pathLost = function () {
                 if (!Game.flags[this.creep.room.controller.id]) {
                     return;
                 }
-                const UpgradeContainerPos = Game.flags[this.creep.room.controller.id].memory.containerPos;
-                if (this.creep.targetPos && race.getRace(this.creep) === gc.RACE_PORTER
-                    && (this.creep.targetPos.x === UpgradeContainerPos.x
-                        && this.creep.targetPos.y === UpgradeContainerPos.y)) {
-                    if (this.creep.pos.inRangeTo(targetPos,1)) {
-                        const pos = gf.roomPosFromPos(this.creep.targetPos, this.creep.room.name);
-                        const path = pos.findPathTo(UpgradeContainerPos.x, UpgradeContainerPos.y);
-                        console.log(this.creep.name,"pos",this.creep.pos,"path",JSON.stringify(path));
-                        inTheWay = getCreepAt(path[1].x, path[2].y, this.creep.room.name);
-                        console.log(this.creep.name,"swap with", inTheWay.name);
-                        state.switchToMovePos(
-                            inTheWay,
-                            this.creep.pos,
-                            0,
-                            race.getRace(inTheWay) + "_idle"
-                        );
-                        if (race.getRace(this.creep) !== gc.RACE_PORTER) {
-                            console.log(this.creep.name,"STATE_MOVE_POS pathLost");
-                            gf.fatalError("STATE_MOVE_POS In pathLost should be porter");
+                const UpgradeContainerPoses = state.getControllerPosts(this.creep.room.controller.id);
+                if (!UpgradeContainerPoses) {
+                    return;
+                }
+                for (let cPos of UpgradeContainerPoses) {
+                    if (this.creep.targetPos.x === cPos.x && this.creep.targetPos.y === cPos.y) {
+                        if (this.creep.pos.inRangeTo(targetPos,1)) {
+                            const pos = gf.roomPosFromPos(this.creep.targetPos, this.creep.room.name);
+                            const path = pos.findPathTo(cPos.x, cPos.y);
+                            console.log(this.creep.name,"pos",this.creep.pos,"path",JSON.stringify(path));
+                            inTheWay = getCreepAt(path[1].x, path[2].y, this.creep.room.name);
+                            console.log(this.creep.name,"swap with", inTheWay.name);
+                            state.switchToMovePos(
+                                inTheWay,
+                                this.creep.pos,
+                                0,
+                                race.getRace(inTheWay) + "_idle"
+                            );
+                            if (race.getRace(this.creep) !== gc.RACE_PORTER) {
+                                console.log(this.creep.name,"STATE_MOVE_POS pathLost");
+                                gf.fatalError("STATE_MOVE_POS In pathLost should be porter");
+                            }
+                            return state.switchToMovePos(
+                                this.creep,
+                                inTheWay.pos,
+                                0,
+                                gc.STATE_PORTER_TRANSFER,
+                            );
                         }
-                        return state.switchToMovePos(
-                            this.creep,
-                            inTheWay.pos,
-                            0,
-                            gc.STATE_PORTER_TRANSFER,
-                        );
                     }
                 }
-
                 return state.switchTo(this.creep, creepRace + "_full_idle")
             }
         case gc.RACE_UPGRADER:

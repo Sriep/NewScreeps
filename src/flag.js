@@ -10,22 +10,17 @@ const flag = {
     },
 
     getRoomFlag(roomName) {
+        //console.log("getRoomFlag", roomName);
         let roomFlag = Game.flags[roomName];
         if (!roomFlag) {
             this.flagRoom(roomName);
-            if (!Game.flags[roomName]) {
-                const center = new RoomPosition(25, 25, room.name);
-                center.createFlag(room.name);
-            }
-            roomFlag = Game.flags[roomName];
+            roomFlag = Game.flags[roomName]
         }
         return roomFlag;
     },
 
     getSpawnQueue(roomName) {
         const QueueSpawn = require("queue_spawn");
-        //console.log("flag getSpawnQueue roomName", roomName);
-        //console.log("flag getSpawnQueue" ,roomName,"queue", JSON.stringify(queue));
         return new QueueSpawn(roomName);
     },
 };

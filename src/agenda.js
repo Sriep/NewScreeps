@@ -16,11 +16,12 @@ const agenda = {
             gc.POLICY_BUILD_SOURCE_CONTAINERS,
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
+            gc.ACTIVITY_FOREIGN_MINING,
             gc.ACTIVITY_FINISHED
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
-            //gc.POLICY_BUILD_TOWER, //todo
+            gc.POLICY_BUILD_TOWER, //todo
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.BUILD_ROAD_SOURCE_SPAWN,
             gc.BUILD_ROAD_SOURCE_SOURCE,
@@ -52,6 +53,7 @@ const agenda = {
         fc[gc.POLICY_BUILD_CONTROLLER_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_EXTENSIONS] = newBlockerPolicy;
+        fc[gc.ACTIVITY_FOREIGN_MINING] = newActivity;
         fc[gc.ACTIVITY_FINISHED]  = {
             "enact": function(){},
             "check": function(){ return false; },
@@ -66,27 +68,24 @@ const agenda = {
 };
 // agenda.items()[nextAgendaItem].enact(room, agendaItem, this.id);
 // activatePolicy: function(policyType, data, parentId)
-const activateNewPolicy = function (room, agendaItem, parnetId)  {
+const activateNewPolicy = function ( agendaItem, parnetId)  {
     //console.log("agenda activate new policy agendaItem", agendaItem, "parnetId", parnetId);
     policy.activatePolicy(agendaItem, {}, parnetId);
 };
 
-const activateNewRoadsPolicy = function (room, agendaItem, parnetId)  {
-    //console.log("agenda activateNewRoadsPolicy", agendaItem, parnetId, roads);
+const activateNewRoadsPolicy = function ( agendaItem, parnetId)  {
+    console.log("agenda activateNewRoadsPolicy", agendaItem, parnetId, roads);
     policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : agendaItem}, parnetId);
 };
 
 const newBuildRoadBlockerPolicy = {
-    "build": activateNewRoadsPolicy,
-    "check": function (room, agendaItem, parnetId)  {
-        //console.log("agenda check activateNewRoadsPolicy", room.name, "policyType", agendaItem, "policyId", parnetId)
-        //const phct = policy.hasChildType(policyId, policyType)
-        //console.log("agenda check result of check", phct)
-        return policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
+    "enact": activateNewRoadsPolicy,
+    "check": function ( agendaItem, parnetId)  {
+         return policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
     },
 };
 
-const activateNewReplacementPolicy = function (room, agendaItem, parnetId)  {
+const activateNewReplacementPolicy = function ( agendaItem, parnetId)  {
     //console.log("agenda activate new replacement policy agendaItem", agendaItem, "parnetId", parnetId);
     policy.activateReplacePolicy(
         agendaItem,
@@ -94,6 +93,14 @@ const activateNewReplacementPolicy = function (room, agendaItem, parnetId)  {
         parnetId,
         gc.ECONOMIES,
     );
+};
+
+const newActivity = {
+    "enact": function (agendaItem, parnetId) {
+        parent = policy.getPolicy(parnetId);
+        parent.m[agendaItem] = true;
+    },
+    "check": function(){ return true; },
 };
 
 const newPolicy = {
@@ -108,11 +115,9 @@ const newPolicyReplacment ={
 
 const newBlockerPolicy = {
     "enact": activateNewPolicy,
-    "check": function (room, agendaItem, parnetId)  {
-        //console.log("agenda check newBlockerPolicy room", room.name, "policyType", agendaItem, "policyId", parnetId);
+    "check": function (agendaItem, parnetId)  {
         const hasChildType = policy.hasChildType(parnetId, agendaItem);
-        //console.log("agenda check",agendaItem," newBlockerPolicy",hasChildType);
-        return !hasChildType;
+         return !hasChildType;
     },
 };
 
