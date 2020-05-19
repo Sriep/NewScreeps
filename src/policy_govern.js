@@ -94,22 +94,22 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
     if (!this.m[gc.ACTIVITY_FOREIGN_MINING]) {
         return false;
     }
-    //console.log("POLICY_GOVERN addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
     if (profit/parts < gc.COLONY_PROFIT_PART_MARGIN) {
-        //console.log("POLICY_GOVERN addColony failed profit",profit,"martgin",gc.COLONY_PROFIT_MARGIN);
+        console.log("POLICY_GOVERN addColony failed profit",profit,"martgin",gc.COLONY_PROFIT_MARGIN);
         return false;
     }
     for (let colony of this.m.colonies) {
         if (colony.name === roomName) {
-            //console.log("POLICY_GOVERN addColony already added");
+            console.log("POLICY_GOVERN addColony already added");
             return false;
         }
     }
 
     let tempColonies = [...this.m.colonies];
     let tempParts = this.m.parts;
-    //console.log("POLICY_GOVERN tempParts", tempParts, "parts", parts, "margin",
-     //   gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
+    console.log("POLICY_GOVERN tempParts", tempParts, "parts", parts, "margin",
+        gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
 
     const newColonyProfitParts = profit/parts;
     while (tempParts + parts + gc.COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
@@ -127,7 +127,7 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         return b.profitpart - a.profitpart;
     });
     this.m.parts = tempParts;
-    //console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
+    console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
     this.m.colonies = tempColonies;
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     //this.budget();

@@ -11,8 +11,8 @@ const rooms = {
     flag: function (room, force) {
         if (!Game.flags[room.name] || force) {
             console.log("room flag name", room.name, "force", force);
-            const center = new RoomPosition(25, 25, room.name);
-            center.createFlag(room.name);
+            const centre = new RoomPosition(25, 25, room.name);
+            centre.createFlag(room.name);
 
             let myRoom = room.controller && room.controller.my && room.controller.level > 0;
             this.flagPermanents(room);

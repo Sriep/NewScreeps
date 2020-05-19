@@ -293,7 +293,7 @@ const policy = {
             keyPts.push(spawns[i].pos)
         }
         keyPts.push(room.controller.pos);
-        let start = construction.centerMass(keyPts);
+        let start = construction.centreMass(keyPts);
         start = construction.closestNonWall(gf.roomPosFromPos(start, room.name));
         const structs = room.find(FIND_MY_STRUCTURES);
         for (let i in structs) {

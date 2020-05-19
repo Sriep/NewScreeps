@@ -12,16 +12,16 @@ const agenda = {
         [ gc.POLICY_RCL1, gc.ACTIVITY_FINISHED ],
         [
             gc.POLICY_PORTERS,
-            gc.POLICY_EXPLORE,
             gc.POLICY_BUILD_SOURCE_CONTAINERS,
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
             gc.ACTIVITY_FOREIGN_MINING,
+            gc.POLICY_EXPLORE,
             gc.ACTIVITY_FINISHED
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER, //todo
+            gc.POLICY_BUILD_TOWER,
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.BUILD_ROAD_SOURCE_SPAWN,
             gc.BUILD_ROAD_SOURCE_SOURCE,
@@ -30,11 +30,29 @@ const agenda = {
             gc.BUILD_ROAD_SOURCE_TOWERS, 
             gc.ACTIVITY_FINISHED
         ],
-        [  gc.POLICY_BUILD_EXTENSIONS, gc.ACTIVITY_FINISHED ],
-        [  gc.POLICY_BUILD_EXTENSIONS, gc.ACTIVITY_FINISHED ],
-        [  gc.POLICY_BUILD_EXTENSIONS, gc.ACTIVITY_FINISHED ],
-        [  gc.POLICY_BUILD_EXTENSIONS, gc.ACTIVITY_FINISHED ],
-        [  gc.POLICY_BUILD_EXTENSIONS, gc.ACTIVITY_FINISHED ],
+        [
+            gc.POLICY_BUILD_EXTENSIONS,
+            gc.POLICY_BUILD_STORAGE,
+            gc.ACTIVITY_FINISHED
+        ],
+        [
+            gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.ACTIVITY_FINISHED,
+        ],
+        [
+            gc.POLICY_BUILD_EXTENSIONS,
+            gc.ACTIVITY_FINISHED ],
+        [
+            gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.ACTIVITY_FINISHED
+        ],
+        [
+            gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.ACTIVITY_FINISHED
+        ],
     ],
 
     items : function () {
@@ -53,6 +71,7 @@ const agenda = {
         fc[gc.POLICY_BUILD_CONTROLLER_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_EXTENSIONS] = newBlockerPolicy;
+        fc[gc.POLICY_BUILD_TOWER] = newBlockerPolicy;
         fc[gc.ACTIVITY_FOREIGN_MINING] = newActivity;
         fc[gc.ACTIVITY_FINISHED]  = {
             "enact": function(){},

@@ -11,11 +11,22 @@ const Terrain = require("./terrain");
 const pt = { x : 22, y : 13 };
 
 describe("construction", function() {
+    describe("plan wall", function() {
+        it("show some working", function() {
+            const terrain = new Terrain("W7N7");
+            const data = construction.planwall(terrain, {x:12, y:11});
+            console.log("centre", JSON.stringify({x:12, y:11}));
+            console.log("yUp",JSON.stringify(data.yUp));
+            console.log("yDown",JSON.stringify(data.yDown));
+            console.log("xRight",JSON.stringify(data.xRight));
+            console.log("xLeft",JSON.stringify(data.xLeft))
+        });
+    });
+
     describe("cover  area", function() {
         it("should show best two points to put contaienr", function() {
            const terrainW7N7 = new Terrain("W7N7");
            const pts = construction.coverArea(pt, 3, terrainW7N7);
-           console.log(JSON.stringify(pts));
            assert.strictEqual(pts[0].numPosts + pts[1].numPosts, 2*3*3);
         });
 

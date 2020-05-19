@@ -226,7 +226,7 @@ const construction = {
         return true
     },
 
-    centerMass: function(points) { // need points.length > 0
+    centreMass: function(points) { // need points.length > 0
         let totalX = 0;
         let totalY = 0;
         for (let i in points) {
@@ -276,8 +276,29 @@ const construction = {
         return pos;
     },
 
-    planwall: function(terrain, center, include, minSize) {
+    planwall: function(terrain, centre, include, minSize) {
+        //{"up":0, "down" :0}
+        let yUp = [];
+        let yDown = [];
+        for( let x = 0 ; x < 50 ; x ++ ) {
+            yDown[x] = 0;
+            while ( yDown[x] < centre.y && terrain.get(x, centre.y-yDown[x]) !== TERRAIN_MASK_WALL) { yDown[x]++}
+            yUp[x] = 0;
+            while ( yUp[x] < 50-centre.y && terrain.get(x, centre.y+yUp[x]) !== TERRAIN_MASK_WALL) { yUp[x]++}
+        }
 
+        let xRight = [];
+        let xLeft = [];
+        for( let y = 0 ; y < 50 ; y ++ ) {
+            for( let y = 0 ; y < 50 ; y ++ ) {
+                xLeft[y] = 0;
+                while ( xLeft[y] < centre.x && terrain.get(centre.x-xLeft[y], y) !== TERRAIN_MASK_WALL) { xLeft[y]++}
+                xRight[y] = 0;
+                while ( xRight[y] < 50-centre.x && terrain.get(centre.x-xRight[y], y) !== TERRAIN_MASK_WALL) { xRight[y]++}
+            }
+        }
+
+        return { "yUp" :yUp,"yDown":yDown, "xRight":xRight,"xLeft":xLeft }
     },
 
     buildRoad: function(from, to) {
@@ -290,3 +311,29 @@ const construction = {
 };
 
 module.exports = construction;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

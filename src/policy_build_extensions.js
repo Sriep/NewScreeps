@@ -74,8 +74,8 @@ buildExtensions = function (room, numNeeded) {
     for (let i in spawns) {
         keyPts.push(spawns[i].pos)
     }
-    let start = construction.centerMass(keyPts);
-    //console.log("buildExtensions center mass", JSON.stringify(start));
+    let start = construction.centreMass(keyPts);
+    //console.log("buildExtensions centre mass", JSON.stringify(start));
     start = construction.closestNonWall(gf.roomPosFromPos(start, room.name));
     //console.log("buildExtensions start", JSON.stringify(start));
     //return;

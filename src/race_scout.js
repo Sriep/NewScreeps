@@ -5,10 +5,7 @@
  */
 
 const race_scout = {
-    MIN_PORTER_EC: 150,
-    CCM_COST: 150,
-
-    bodyCounts: function (ec) {
+    bodyCounts: function () {
         return {"work": 0, "carry": 0, "move" : 1}
     },
 

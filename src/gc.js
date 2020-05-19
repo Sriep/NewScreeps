@@ -38,6 +38,8 @@ const pgc = {
     POLICY_FOREIGN_MINING: "foreign_mining",
     POLICY_MINE_ROOM: "mine_room",
     POLICY_UPGRADER_IDLE: "upgrader_idle",
+    POLICY_BUILD_STORAGE: "build_storage",
+    POLICY_BUILD_LINK: "build_link",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -227,6 +229,8 @@ const gc = {
     POLICY_BUILD_TOWER: pgc.POLICY_BUILD_TOWER,
     POLICY_FOREIGN_MINING: pgc.POLICY_FOREIGN_MINING,
     POLICY_MINE_ROOM: pgc.POLICY_MINE_ROOM,
+    POLICY_BUILD_STORAGE: pgc.POLICY_BUILD_STORAGE,
+    POLICY_BUILD_LINK: pgc.POLICY_BUILD_LINK,
 
     //policy
     EXPLORE_CREEPS: 4,

@@ -723,9 +723,11 @@ findFreePostIfPossable = function (creeps, posts) {
 
 listSourceContainers = function(spawnRoom, colonies) {
     const containerInfo = [];
-    //console.log("listSourceContainers colonies", JSON.stringify(colonies), "spawn room", spawnRoom.name)
+    console.log("listSourceContainers colonies", JSON.stringify(colonies), "spawn room", spawnRoom.name);
     for (let colonyObj of colonies) {
-        const gameFlag = Game.flag[colonyObj.name];
+        console.log("listSourceContainers colonyObj",JSON.stringify(colonyObj));
+        console.log("listSourceContainers colonyObj.name",colonyObj.name);
+        const gameFlag = Game.flags[colonyObj.name];
         //for (let source of room.find(FIND_SOURCES)) {
         for (let sourceId in gameFlag.memory.sources) {
             //sFlag = Game.flags[source.id];

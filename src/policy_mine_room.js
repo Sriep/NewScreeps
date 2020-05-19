@@ -32,33 +32,34 @@ Policy.prototype.initilise = function () {
 // runs once every tick
 Policy.prototype.enact = function () {
     //return;
-    //console.log("POLICY_MINE_ROOM", this.home);
+    console.log("POLICY_MINE_ROOM", this.home);
     //if (this.home !== "W8N7") {
     //    return;
     //}
     if (this.m.spawnRoom) {
-        //console.log("POLICY_MINE_ROOM enact", this.home,"spawn room exits", this.m.spawnRoom);
+        console.log("POLICY_MINE_ROOM enact", this.home,"spawn room exits", this.m.spawnRoom);
         return;
     }
     if (Game.time + this.id % gc.NEUTRAL_ROOM_CHECK_RATE !== 0 ) {
        return;
     }
     if (!Game.rooms[this.home]) {
-        //console.log("POLICY_MINE_ROOM enact no asset in room")
+        console.log("POLICY_MINE_ROOM enact no asset in room");
         return
     }
 
-    //console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
+    console.log("POLICY_MINE_ROOM enact home", JSON.stringify(this.home));
 
     const spawnInfo = this.getSpawnRoom();
-    //console.log("POLICY_MINE_ROOM spawnInfo", JSON.stringify(spawnInfo));
+    console.log("POLICY_MINE_ROOM spawnInfo", JSON.stringify(spawnInfo));
     if (!spawnInfo.name) {
-        //console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
+        console.log("POLICY_MINE_ROOM enact no spawnInfo",JSON.stringify(spawnInfo));
         return;
     }
 
     const governor = policy.getGouvernerPolicy(spawnInfo.name);
-    //console.log("POLICY_MINE_ROOM about to call addColony");
+
+    console.log("POLICY_MINE_ROOM about to call addColony");
     if (governor.addColony(this.home, spawnInfo.profit, spawnInfo.parts)) {
         this.m.spawnRoom = spawnInfo.name;
         build(Game.rooms[this.home], Game.rooms[this.m.spawnRoom], spawnInfo.road);

@@ -37,7 +37,7 @@ Policy.prototype.enact = function () {
     if (state.getControllerPosts(room.controller.id)) {
         return;
     }
-    setContainerSites(room, controllerFlag);
+    setContainerSites(room);
 };
 
 setContainerSites = function(room) {
