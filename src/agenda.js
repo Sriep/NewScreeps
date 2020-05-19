@@ -12,11 +12,12 @@ const agenda = {
         [ gc.POLICY_RCL1, gc.ACTIVITY_FINISHED ],
         [
             gc.POLICY_PORTERS,
+            gc.ACTIVITY_NEUTRAL_COLONIES,
+            gc.POLICY_EXPLORE,
+            gc.POLICY_COLONIAL_OFFICE,
             gc.POLICY_BUILD_SOURCE_CONTAINERS,
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
-            gc.ACTIVITY_FOREIGN_MINING,
-            gc.POLICY_EXPLORE,
             gc.ACTIVITY_FINISHED
         ],
         [
@@ -27,7 +28,8 @@ const agenda = {
             gc.BUILD_ROAD_SOURCE_SOURCE,
             gc.BUILD_ROAD_SOURCE_CONTROLLER,
             gc.BUILD_ROAD_SPAWN_CONTROLLER,
-            gc.BUILD_ROAD_SOURCE_TOWERS, 
+            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.ACTIVITY_RESERVED_COLONIES,
             gc.ACTIVITY_FINISHED
         ],
         [
@@ -60,10 +62,13 @@ const agenda = {
         fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_CONTROLLER] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_SOURCE] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_SPAWN] = newBuildRoadBlockerPolicy;
+        fc[gc.BUILD_ROAD_SOURCE_SPAWN
+
+            ] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_EXTENSIONS] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_TOWERS] = newBuildRoadBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
+        fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;
         fc[gc.POLICY_WORKERS] = newPolicyReplacment;
         fc[gc.POLICY_HARVESTERS] = newPolicyReplacment;
@@ -72,7 +77,8 @@ const agenda = {
         fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_EXTENSIONS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_TOWER] = newBlockerPolicy;
-        fc[gc.ACTIVITY_FOREIGN_MINING] = newActivity;
+        fc[gc.ACTIVITY_NEUTRAL_COLONIES] = newActivity;
+        fc[gc.ACTIVITY_RESERVED_COLONIES] = newActivity;
         fc[gc.ACTIVITY_FINISHED]  = {
             "enact": function(){},
             "check": function(){ return false; },

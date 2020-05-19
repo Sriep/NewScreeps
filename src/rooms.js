@@ -127,6 +127,10 @@ const rooms = {
              }
         }
 
+        if (room.controller.level >= 1) {
+            Game.flags[room.name].memory.owned = true;
+        }
+
         /*
         console.log("room flagMyRoomStructures room",room.name);
         const links = room.find(FIND_STRUCTURES, {

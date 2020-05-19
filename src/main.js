@@ -37,7 +37,7 @@ function startup() {
     Memory.started = true;
     Memory.records = {};
     Memory.records["started"] = Game.time;
-    Memory.agenda = [];
+    Memory.records.agenda = [];
     Memory.records.policies = {};
     Memory.records.policies.created = {};
     Memory.records.policies.replaced = {};

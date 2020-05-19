@@ -13,12 +13,24 @@ const construction = require("construction");
 
 const policy = {
 
+    M : Memory.policies,
+
     enactPolicies: function() {
         if (undefined === Memory.policies) {
             Memory.policies = {};
         }
+        if (undefined === Memory.policyRates) {
+            Memory.policyRates = {};
+        }
         this.checkRoomPolicies();
         for (let id in Memory.policies) {
+            //Game.time % gc.FLAG_UPDATE_RATE === 0
+            //console.log("policy id", id, "Game.time + id",Game.time + id, "Memory.policyRates[id]",Memory.policyRates[id]
+            //,"Game.time + id % Memory.policyRates[id] ",(Game.time + id) % Memory.policyRates[id] )
+            if ((Game.time + id) % Memory.policyRates[id] !== 0) {
+                continue;
+            }
+
             //console.log("enact policies id", id, "type", Memory.policies[id].type);
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
@@ -132,7 +144,7 @@ const policy = {
         return undefined;
     },
 
-    activatePolicy: function(policyType, data, parentId) {
+    activatePolicy: function(policyType, data, parentId, policyRate) {
         console.log("activatePolicy type", policyType, "data", JSON.stringify(data), "parentid", parentId);
         if (parentId) {
             data.parentId = parentId;
@@ -153,6 +165,7 @@ const policy = {
         }
         //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
         Memory.policies[newPolicyId] = policy;
+        Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
         Memory.nextPolicyId = Memory.nextPolicyId + 1;
         Memory.records.policies.created[Game.time.toString()] = policy.type;
         return policy.id;
@@ -172,6 +185,7 @@ const policy = {
         //console.log("policy remove policy", id, "type",Memory.policies[id].type);
         this.removeFromParentChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
         delete Memory.policies[id];
+        delete Memory.policyRates[id];
         Memory.records.policies.replaced[Game.time.toString()] = {
             "time" : Game.time,
             "old" : policy.type,

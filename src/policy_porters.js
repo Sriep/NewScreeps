@@ -11,6 +11,7 @@ const budget = require("budget");
 const race = require("race");
 const flag = require("flag");
 const race_harvester = require("race_harvester");
+const memory = require("memory");
 
 function Policy  (id, data) {
     this.id = id;
@@ -178,10 +179,12 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        //console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
+        console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
         //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
         //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
-        const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
+        //const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
+        console.log("calcResources emory.values colonyObj.name",colonyObj.name,"this.home",this.home);
+        const valuesObj = memory.values(colonyObj.name, this.home);
         const valuesRoom = valuesObj[this.home];
         //console.log("pp this.updateRoomResources valuesRoom", JSON.stringify(valuesRoom));
         let values;

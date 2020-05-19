@@ -69,8 +69,8 @@ const gf = {
         const splitName = this.splitRoomName(roomName);
         return (splitName.EW === "E" || splitName.EW === "W")
                 && (splitName.NS === "N" || splitName.NS === "S")
-                && (0 <= splitName.x && splitName.x <= 50)
-                && (0 <= splitName.y && splitName.y <= 50)
+                && (0 <= splitName.x && splitName.x <= 999)
+                && (0 <= splitName.y && splitName.y <= 999)
                 && roomName.length >= 4 && roomName.length <= 8;
     },
 

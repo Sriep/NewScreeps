@@ -40,6 +40,7 @@ const pgc = {
     POLICY_UPGRADER_IDLE: "upgrader_idle",
     POLICY_BUILD_STORAGE: "build_storage",
     POLICY_BUILD_LINK: "build_link",
+    POLICY_COLONIAL_OFFICE: "colonial_office",
 
     THREE_MOVES: [
         {x:3, y:3}, {x:3,y:2}, {x:3, y:1}, {x:3,y:0}, {x:3, y:-1}, {x:3, y:-2}, {x:3,y:-3},
@@ -213,7 +214,8 @@ const gc = {
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
     ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
-    ACTIVITY_FOREIGN_MINING: pgc.ACTIVITY_FOREIGN_MINING,
+    ACTIVITY_NEUTRAL_COLONIES: "neutral_colonies",
+    ACTIVITY_RESERVED_COLONIES: "reserved_colonies",
     ACTIVITY_DISALLOWED: pgc.ACTIVITY_DISALLOWED,
     // policies
     POLICY_GOVERN: pgc.POLICY_GOVERN,
@@ -231,6 +233,7 @@ const gc = {
     POLICY_MINE_ROOM: pgc.POLICY_MINE_ROOM,
     POLICY_BUILD_STORAGE: pgc.POLICY_BUILD_STORAGE,
     POLICY_BUILD_LINK: pgc.POLICY_BUILD_LINK,
+    POLICY_COLONIAL_OFFICE: "colonial_office",
 
     //policy
     EXPLORE_CREEPS: 4,
@@ -272,6 +275,7 @@ const gc = {
     COLONY_PROFIT_MARGIN: 500,
     COLONY_PROFIT_PART_MARGIN: 10,
     COLONY_PARTS_MARGIN: 50,
+    REPLACEMENT_COLONY_PARTS_MARGIN: 50,
     PORTER_FUDGE_FACTOR: 1.5,
 
     // ownership

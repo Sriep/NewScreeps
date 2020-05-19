@@ -37,7 +37,7 @@ Policy.prototype.enact = function () {
     if (Game.rooms[this.roomName].controller.level !== this.m.rcl) {
         this.m.rcl = Game.rooms[this.roomName].controller.level;
         this.m.agendaIndex = -1;
-        Memory.agenda.push("rcl "+Game.rooms[this.roomName].controller.level.toString() + " " + Game.time.toString())
+        Memory.records.agenda.push("rcl "+Game.rooms[this.roomName].controller.level.toString() + " " + Game.time.toString())
     }
     this.govern();
 };
@@ -57,7 +57,7 @@ Policy.prototype.govern = function () {
         agenda.items()[nextAgendaItem].enact(nextAgendaItem, this.id);
 
         this.m.agendaIndex++;
-        Memory.records["rcl "+this.m.rcl][nextAgendaItem + " run"] = Game.time;
+        Memory.records.agenda.push(nextAgendaItem + " run " +  Game.time);
         //return;
     }
     //Memory.agenda.push(lastAgendaItem + " enacted " + Game.time.toString())
@@ -85,13 +85,25 @@ Policy.prototype.budget = function() {
        result["parts"] += colony.parts;
     }
     this.m.parts = result.parts;
-    result[gc.ACTIVITY_FOREIGN_MINING] = this.m[gc.ACTIVITY_FOREIGN_MINING];
+    //result[gc.ACTIVITY_FOREIGN_MINING] = this.m[gc.ACTIVITY_FOREIGN_MINING];
     //console.log("POLICY_GOVERN parts", this.m.parts, "budget this.m.colonies", JSON.stringify(this.m.colonies));
     return result
 };
 
+Policy.prototype.updateColonyInfo = function() {
+    this.m.parts = 0;
+    let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
+    this.m.colonies[0]["name"] = this.roomName;
+    this.m.colonies[0]["parts"] = localBudget.parts;
+    this.m.colonies[0]["profit"] = localBudget.profit;
+    this.m.colonies[0]["profitpart"] = localBudget.profitpart;
+    for (let colony of this.m.colonies) {
+        this.m.parts += this.m.colonies[0]["parts"];
+    }
+};
+
 Policy.prototype.addColony = function(roomName, profit, parts) {
-    if (!this.m[gc.ACTIVITY_FOREIGN_MINING]) {
+    if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
         return false;
     }
     console.log("POLICY_GOVERN addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
@@ -99,12 +111,14 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         console.log("POLICY_GOVERN addColony failed profit",profit,"martgin",gc.COLONY_PROFIT_MARGIN);
         return false;
     }
+
     for (let colony of this.m.colonies) {
         if (colony.name === roomName) {
             console.log("POLICY_GOVERN addColony already added");
             return false;
         }
     }
+    this.updateColonyInfo();
 
     let tempColonies = [...this.m.colonies];
     let tempParts = this.m.parts;
@@ -112,17 +126,15 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
 
     const newColonyProfitParts = profit/parts;
-    while (tempParts + parts + gc.COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
+    while (tempParts + parts + gc.REPLACEMENT_COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
         //console.log("POLICY_GOVERN addColony in while loop", JSON.stringify(tempColonies));
         if (newColonyProfitParts <= tempColonies[tempColonies.length-1].profitpart) {
             return false;
         }
         tempParts -= tempColonies[tempColonies.length-1].parts;
-        tempColonies.pop(); // todo what to do with pop results?
+        this.removeColony(tempColonies.pop());
     }
-    //console.log("POLICY_GOVERN before push tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
     a = tempColonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
-    //console.log("POLICY_GOVERN after push",a," tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
     tempColonies = tempColonies.sort( function (a,b)  {
         return b.profitpart - a.profitpart;
     });
@@ -130,8 +142,11 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
     console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
     this.m.colonies = tempColonies;
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
-    //this.budget();
     return true;
+};
+
+Policy.prototype.removeColony = function(colony) {
+    delete Game.flags[colony.name].memory.spawnRoom;
 };
 
 Policy.prototype.partsSurppliedLT = function() {

@@ -16,5 +16,14 @@ describe("gf", function() {
             assert.strictEqual(split.x, 7);
             assert.strictEqual(split.y, 8);
         });
+        it ("should recognise room names", function() {
+            assert(gf.validateRoomName("W7N7"));
+            assert(!gf.validateRoomName("the quick brown fox"));
+            assert(!gf.validateRoomName("N7W7"));
+            assert(gf.validateRoomName("E457S117"));
+            assert(gf.validateRoomName("E7N17"));
+            assert(gf.validateRoomName("W3S0"));
+            assert(!gf.validateRoomName("W-3S0"));
+        })
     });
 });

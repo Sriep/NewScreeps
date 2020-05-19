@@ -49,43 +49,39 @@ Policy.prototype.exploreRoom = function(newRoom) {
     if (!roomFlag) {
         gf.fatalError("should have room flag room " + newRoom);
     }
-    if (roomFlag.memory.explored ) {
+    const M = roomFlag.memory;
+    if (M.explored ) {
         return;
     }
-    roomFlag.memory.explored = true;
+    M.explored = true;
     if (!Game.rooms[newRoom].controller) {
         return;
     }
-
     if (Game.rooms[newRoom].controller.my) {
         return;
     }
 
-    let showsProfit = false;
-    const values = {};
+    if (!M.rooms) {
+        M.rooms = {};
+    }
     for (let name in Game.rooms) {
         const room = Game.rooms[name];
         if (!!room.controller && room.controller.my && room.controller.level > 1) {
-            values[name] = budget.valueNeutralRoom(newRoom, name, false);
-            console.log(newRoom,"values[name]", JSON.stringify(values[name]));
-            if (!showsProfit) {
-                showsProfit = values[name][gc.ROOM_NEUTRAL].profit > 0
-                    || values[name][gc.ROOM_NEUTRAL_ROADS].profit > 0
-                    || values[name][gc.ROOM_RESERVED_ROADS].profit > 0
-                    || values[name][gc.ROOM_RESERVED].profit > 0
-                    || values[name][gc.ROOM_OWNED].profit > 0
-                    || values[name][gc.ROOM_OWNED_ROADS].profit > 0
+            const value = budget.valueNeutralRoom(newRoom, name, false);
+            if (value[gc.ROOM_NEUTRAL].profit > 0
+                || value[gc.ROOM_RESERVED_ROADS].profit > 0
+                || value[gc.ROOM_OWNED].profit > 0) {
+                if (!M.rooms[name]) {
+                    M.rooms[name] = {}
+                }
+                M.rooms[name]["values"] = JSON.stringify(value);
+                M.rooms[name]["neutral"] = {"profit": value[gc.ROOM_NEUTRAL].profit, "parts": value[gc.ROOM_NEUTRAL].parts};
+                M.rooms[name]["reserved"] = {"profit": value[gc.ROOM_RESERVED_ROADS].profit, "parts": value[gc.ROOM_RESERVED_ROADS].parts};
+                M.rooms[name]["owned"] =  {"profit": value[gc.ROOM_OWNED].profit, "parts": value[gc.ROOM_OWNED].parts};
             }
-
         }
     }
 
-    if (!policy.getMiningPolicy(newRoom) && showsProfit) {
-        roomFlag.memory.values = JSON.stringify(values);
-        if (!roomFlag.memory.keeperLairs && !roomFlag.memory.invaderCore) {
-            policy.activatePolicy( gc.POLICY_MINE_ROOM, { "home" : newRoom, },);
-        }
-    }
 };
 
 Policy.prototype.sendExplorers = function(shortfall) {
@@ -107,7 +103,6 @@ Policy.prototype.sendExplorers = function(shortfall) {
         this.m.direction = (this.m.direction+2) % 8;
     }
 };
-
 
 Policy.prototype.draftReplacment = function() {
     return this
