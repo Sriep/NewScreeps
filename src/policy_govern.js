@@ -102,13 +102,30 @@ Policy.prototype.updateColonyInfo = function() {
     }
 };
 
-Policy.prototype.addColony = function(roomName, profit, parts) {
+Policy.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
+    const room = Game.rooms[this.roomName];
+    const energyLeft = room.controller.progressTotal - room.controller.progress;
+    const ltToNextLevel = energyLeft / (2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT); // todo something better
+    //console.log("checkPayback energyLeft",energyLeft,"ec",(2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT));
+    const ltToPayOff = startUpCost / profit;
+    //console.log("checkPayback startUpCost",startUpCost,"profit",profit)
+    //console.log("POLICY_GOVERN checkPayback ltToPayOff",ltToPayOff,"ltToNextLevel",ltToNextLevel)
+    return ltToPayOff < ltToNextLevel;
+};
+
+Policy.prototype.addColony = function(roomName, profit, parts, startUpCost) {
     if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
+        console.log("POLICY_GOVERN addColony !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");
         return false;
     }
-    console.log("POLICY_GOVERN addColony profit", profit, "parts",parts, "this.m.colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
     if (profit/parts < gc.COLONY_PROFIT_PART_MARGIN) {
         console.log("POLICY_GOVERN addColony failed profit",profit,"martgin",gc.COLONY_PROFIT_MARGIN);
+        return false;
+    }
+
+    if (!this.checkPaybackBeforeNextUpgrade(profit, startUpCost)) {
+        console.log("POLICY_GOVERN addColony checkPaybackBeforeNextUpgrade");
         return false;
     }
 
@@ -122,8 +139,8 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
 
     let tempColonies = [...this.m.colonies];
     let tempParts = this.m.parts;
-    console.log("POLICY_GOVERN tempParts", tempParts, "parts", parts, "margin",
-        gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
+    //console.log("POLICY_GOVERN tempParts", tempParts, "parts", parts, "margin",
+    //    gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
 
     const newColonyProfitParts = profit/parts;
     while (tempParts + parts + gc.REPLACEMENT_COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
@@ -134,12 +151,12 @@ Policy.prototype.addColony = function(roomName, profit, parts) {
         tempParts -= tempColonies[tempColonies.length-1].parts;
         this.removeColony(tempColonies.pop());
     }
-    a = tempColonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
+    tempColonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
     tempColonies = tempColonies.sort( function (a,b)  {
         return b.profitpart - a.profitpart;
     });
     this.m.parts = tempParts;
-    console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
+    //console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
     this.m.colonies = tempColonies;
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     return true;

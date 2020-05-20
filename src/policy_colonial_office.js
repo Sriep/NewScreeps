@@ -8,25 +8,8 @@ const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const flag = require("flag");
-
-const rs = Object.freeze({
-   "Free" : "free",
-   "Colony" : "colony",
-   "My" : "my",
-   "Foreign" : "foreign",
-   "ForeignColony" : "foreign_colony",
-   "Invader" : "invader",
-   "InvaderColony" : "invader_colony",
-   "SourceKeeper" : "source_keeper",
-});
-
-getStatus = function(controller) {
-    if (controller.my) {
-        return contoller.level>1 ? rs.My : rs.Colony;
-    }
-
-
-};
+const memory = require("memory");
+const cache = require("cache");
 
 // constructor
 function Policy  (id, data) {
@@ -50,10 +33,13 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
-    console.log("POLICY_COLONIAL_OFFICE");
+    if (Game.time + this.id % 5 !== 0) { // todo
+        return
+    }
+    //console.log("POLICY_COLONIAL_OFFICE");
     for (let flagName in Game.flags) {
         if (gf.validateRoomName(flagName)) {
-            console.log("POLICY_COLONIAL_OFFICE validated flagname", flagName);
+            //console.log("POLICY_COLONIAL_OFFICE validated flagname", flagName);
             if (!Game.flags[flagName].memory.owned
                 && !Game.flags[flagName].memory.spawnRoom) {
                this.checkRoom(flagName);
@@ -63,31 +49,48 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.checkRoom = function (roomName) {
-    console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
+    //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = Game.flags[roomName].memory;
     let profitableRooms = [];
     for (let name in m.rooms) {
         const governor = policy.getGouvernerPolicy(name);
-        console.log("checkRoom name", name, "governor", JSON.stringify(governor));
-        console.log("checkRoom m.rooms[name]", JSON.stringify(m.rooms[name]));
+        //console.log("checkRoom name", name, "governor", JSON.stringify(governor));
+        //console.log("checkRoom m.rooms[name]", JSON.stringify(m.rooms[name]));
+        const values = memory.values(roomName, name);
+
         if (governor.m[gc.ACTIVITY_RESERVED_COLONIES]) {
-            const profitParts = m.rooms[name]["reserved"]["profit"]/m.rooms[name]["reserved"]["parts"];
+            const profitParts = values["reserved"]["profit"]/values["reserved"]["parts"];
             if (profitParts > gc.COLONY_PROFIT_PART_MARGIN) {
-                profitableRooms.push({"governor":governor, "profitParts":profitParts, "info":m.rooms[name]["reserved"]})
+                profitableRooms.push({
+                    "governor":governor,
+                    "profitParts":profitParts,
+                    "info":values["reserved"]
+                })
             }
         } else if (governor.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
-            const profitParts = m.rooms[name]["neutral"]["profit"]/m.rooms[name]["reserved"]["parts"];
+            const profitParts = values["neutral"]["profit"]/values["reserved"]["parts"];
+            //console.log("POLICY_COLONIAL_OFFICE m.rooms[name]", JSON.stringify(m.rooms[name]));
+            //console.log("POLICY_COLONIAL_OFFICE values[neutral]", JSON.stringify(values["neutral"]));
             if ( profitParts > gc.COLONY_PROFIT_PART_MARGIN) {
-                profitableRooms.push({"governor":governor, "profitParts":profitParts,"info":m.rooms[name]["neutral"] })
+                profitableRooms.push({
+                    "governor":governor,
+                    "profitParts":profitParts,
+                    "info":values["neutral"]
+                })
             }
         }
     }
-    console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
+    //console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
     profitableRooms = profitableRooms.sort( (a,b) =>  {
         return b["profitParts"] - a["profitParts"];
     });
     for (let roomInfo of profitableRooms) {
-        if (roomInfo.governor.addColony(roomInfo.name, roomInfo.info.profit, roomInfo.info.parts)) {
+        if (roomInfo.governor.addColony(
+            roomName,
+            roomInfo.info.profit,
+            roomInfo.info.parts,
+            roomInfo.info.startUpCost,
+        )) {
             m.spawnRoom = roomInfo.governor.roomName;
             build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
             break;

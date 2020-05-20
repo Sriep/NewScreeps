@@ -33,7 +33,7 @@ State.prototype.enact = function () {
     const result = this.creep.transfer(target, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
-            console.log(this.creep.name, "in STATE_WORKER_TRANSFER OK", OK);
+            //console.log(this.creep.name, "in STATE_WORKER_TRANSFER OK", OK);
             break;
         case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
             console.log("STATE_WORKER_TRANSFER result", result);

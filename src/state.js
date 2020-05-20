@@ -620,7 +620,6 @@ const state = {
             return Game.flags[controllerId].memory.upgraderPosts;
         }
     }
-
 };
 
 module.exports = state;
@@ -670,6 +669,7 @@ freeHarvesterPost = function (sourceId, spawnRoom, ec) {
     //const sourceFlag = Game.flags[sourceId];
     //const posts = sourceFlag.memory.harvesterPosts;
     const posts = state.getSourcePosts(sourceId);
+    console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
     creeps = _.filter(Game.creeps, c =>
         c.memory.targetId === sourceId
         //&& race.getRace(c) === gc.RACE_HARVESTER

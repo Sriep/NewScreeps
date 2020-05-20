@@ -55,12 +55,31 @@ Policy.prototype.exploreRoom = function(newRoom) {
     }
     M.explored = true;
     if (!Game.rooms[newRoom].controller) {
+        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller");
         return;
     }
     if (Game.rooms[newRoom].controller.my) {
+        console.log("POLICY_EXPLORE Game.rooms[newRoom].controller.my");
         return;
     }
-
+    //if (!Game.rooms[newRoom].controller.owner) {
+    //    console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.owner");
+    //   return;
+    //}
+    if (Game.rooms[newRoom].controller.owner
+        && Game.rooms[newRoom].controller.owner.username.length > 0) {
+        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.owner.username.length > 0");
+        return;
+    }
+    //if (!Game.rooms[newRoom].controller.reservation > 0) {
+    //    console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.reservation");
+    //    return;
+    //}
+    if (Game.rooms[newRoom].controller.reservation
+        && Game.rooms[newRoom].controller.reservation.username.length > 0) {
+        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.reservation.username.length > 0");
+        return;
+    }
     if (!M.rooms) {
         M.rooms = {};
     }

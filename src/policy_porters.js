@@ -35,7 +35,7 @@ Policy.prototype.enact = function () {
     //console.log("POLICY_PORTERS resources", JSON.stringify(this.m.resources));
     const room = Game.rooms[this.home];
     ///if (!this.m.resources || (Game.time + this.id) % gc.CALC_ROOM_RESOURCES_RATE !== 0 ) {
-        if (room.controller < 3) {
+        if (room.controller.level < 3) {
             this.m.resources = this.calcResources(gc.ROOM_NEUTRAL, gc.ROOM_NEUTRAL_ROADS);
         } else {
             this.m.resources = this.calcResources(gc.ROOM_RESERVED, gc.ROOM_RESERVED_ROADS);
@@ -136,9 +136,7 @@ Policy.prototype.localResources = function () {
 
 Policy.prototype.calcResources = function (roomType1, roomType2) {
     let resources;
-
     this.m.curProduction = {};
-
     const homeRoom = Game.rooms[this.home];
     const ec = homeRoom.energyCapacityAvailable;
     const sourceEnergyLT = 30000;
@@ -179,19 +177,21 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
+        //console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
         //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
         //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
         //const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
-        console.log("calcResources emory.values colonyObj.name",colonyObj.name,"this.home",this.home);
+        //console.log("calcResources emory.values colonyObj.name",colonyObj.name,"this.home",this.home);
         const valuesObj = memory.values(colonyObj.name, this.home);
-        const valuesRoom = valuesObj[this.home];
+        //const valuesRoom = valuesObj[this.home];
         //console.log("pp this.updateRoomResources valuesRoom", JSON.stringify(valuesRoom));
         let values;
-        if(valuesRoom[roomType1].profit > valuesRoom[roomType2].profit) {
-            values = valuesRoom[roomType1];
+        //console.log("pp calcResources roomType1",roomType1,"roomType2",roomType2);
+        //console.log("calcResources valuesObj", JSON.stringify(valuesObj));
+        if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
+            values = valuesObj[roomType1];
         } else {
-            values = valuesRoom[roomType2];
+            values = valuesObj[roomType2];
         }
         //console.log("pp this.updateRoomResources values", JSON.stringify(values));
         let hW=0, pC=0, uW=0;

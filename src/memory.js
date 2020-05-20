@@ -15,11 +15,10 @@ const memory = {
             true
         );
     }
-
 };
 
 values = function(awayRoomName, spawnRoomName) {
-    console.log("memory values awayRoomName",awayRoomName,"spawnRoomName",spawnRoomName);
+    //console.log("memory values awayRoomName",awayRoomName,"spawnRoomName",spawnRoomName);
     return JSON.parse(Game.flags[awayRoomName].memory.rooms[spawnRoomName]["values"]);
 };
 

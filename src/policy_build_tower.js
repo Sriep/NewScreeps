@@ -14,9 +14,8 @@ function Policy  (id, data) {
     this.id = id;
     this.home = data.home;
     this.m = data.m;
-};
+}
 
-// runs first time policy is created only
 Policy.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
@@ -27,7 +26,6 @@ Policy.prototype.initilise = function () {
     return !!room && !!room.controller && room.controller.my;
 };
 
-// runs once every tick
 Policy.prototype.enact = function () {
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
@@ -52,10 +50,6 @@ Policy.prototype.enact = function () {
     policy.buildStructuresLooseSpiral(room, STRUCTURE_TOWER, wantedTowers, 0);
 };
 
-// runs once every tick before enact
-// return anything without a type field to delete the policy
-// return a valid policy to replace this policy with that
-// return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
