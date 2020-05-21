@@ -238,6 +238,7 @@ const gc = {
     POLICY_BUILD_STORAGE: pgc.POLICY_BUILD_STORAGE,
     POLICY_BUILD_LINK: pgc.POLICY_BUILD_LINK,
     POLICY_COLONIAL_OFFICE: "colonial_office",
+    POLICY_BUILD_EXTRACTOR: "build_extractor",
 
     //policy
     EXPLORE_CREEPS: 4,

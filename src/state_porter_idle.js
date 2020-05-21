@@ -24,16 +24,15 @@ State.prototype.enact = function () {
     const room = Game.rooms[this.homeId];
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
-    //console.log("STATE_PORTER_IDLE colonies", colonies,"ec", room.energyCapacityAvailable);
-    const container = state.findPorterSourceContainer(
+    const info = state.findPorterSourceContainer(
         room, colonies, room.energyCapacityAvailable
     );
-    if (container) {
-        this.creep.memory.targetId = container.id;
-        //console.log("STATE_PORTER_IDLE container pos", JSON.stringify(container));
+    console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
+    if (info.pos) {
+        this.creep.memory.targetId = info.sourceId;
         return state.switchToMovePos(
             this.creep,
-            container.pos,
+            info.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_WITHDRAW,
         );

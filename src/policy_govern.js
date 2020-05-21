@@ -138,8 +138,6 @@ Policy.prototype.addColony = function(roomName, profit, parts, startUpCost) {
 
     let tempColonies = [...this.m.colonies];
     let tempParts = this.m.parts;
-    //console.log("POLICY_GOVERN tempParts", tempParts, "parts", parts, "margin",
-    //    gc.COLONY_PARTS_MARGIN, " partsSurppliedLT", this.partsSurppliedLT());
 
     const newColonyProfitParts = profit/parts;
     while (tempParts + parts + gc.REPLACEMENT_COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {

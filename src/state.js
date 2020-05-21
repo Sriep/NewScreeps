@@ -66,14 +66,6 @@ const state = {
             gf.fatalError(creep.name + " move to position with no next sate provided."
                 + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
         }
-
-        //if (nextState === gc.STATE_WORKER_WITHDRAW) {
-        //   console.log("in switchToMovePos with STATE_WORKER_WITHDRAW"
-        //        + creep.name + " move to position with no next sate provided."
-        //   + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
-        //   gf.fatalError("switchToMovePos STATE_WORKER_WITHDRAW")
-        //}
-
         creep.memory.targetPos = targetPos;
         creep.memory.state = gc.STATE_MOVE_POS;
         creep.memory.moveRange = range;
@@ -140,57 +132,43 @@ const state = {
     //
     findPorterSourceContainer: function(spawnRoom, colonies, ec) {
         const porterCC = race.getBodyCounts(gc.RACE_PORTER, ec)["carry"] * 75;
-        //console.log("findPorterSourceContainer spawn room", spawnRoom.name,"porterCC",porterCC, "colonies", JSON.stringify(colonies),"ec", ec)
         const porters = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_PORTER
                 && c.memory.state === gc.STATE_MOVE_POS
                 && c.memory.state === gc.STATE_PORTER_TRANSFER
         });
-        //console.log("findPorterSourceContainer porters", porters.length);
-        const sourceContainers = this.listSourceContainers(spawnRoom, colonies);
-        //console.log("findPorterSourceContainer sourceContainers before", JSON.stringify(sourceContainers));
-        for (let container of sourceContainers) {
+        //console.log("findPorterSourceContainer colonies",JSON.stringify(colonies));
+        const containersInfo = this.listSourceContainers(colonies);
+
+        for (let container of containersInfo) {
             const tripsPerLifetimePerPorter = CREEP_LIFE_TIME / (2 * container.distance);
             const fPorters = porters.filter(p =>
                 p.memory.targetPos.x === container.pos.x
                 && p.memory.targetPos.y === container.pos.y
             );
-            //console.log(container.sourceId, "tripsPerLifetimePerPorter", tripsPerLifetimePerPorter, "fPorters length", fPorters.length);
-            sourceContainers["tripsLT"] = fPorters.length * tripsPerLifetimePerPorter;
-            //console.log("porter length", porters.filter(p =>
-            //    p.memory.targetPos.x === container.pos.x
-            //    && p.memory.targetPos.y === container.pos.y
-            //).length)
+            containersInfo["tripsLT"] = fPorters.length * tripsPerLifetimePerPorter;
             container["tripsLT"] = porters.filter(p =>
                 p.memory.targetPos.x === container.pos.x
                 && p.memory.targetPos.y === container.pos.y
             ).length * tripsPerLifetimePerPorter;
-            //console.log(container.sourceId, "sourceContainers[\"tripsLT\"] ", container["tripsLT"])
-        }
-        //console.log("findPorterSourceContainer sourceContainers after", JSON.stringify(sourceContainers));
-        sourceContainers.sort((c1, c2) => c1.tripsLT - c2.tripsLT);
-        //console.log("findPorterSourceContainer container", JSON.stringify(sourceContainers));
-        //console.log("findPorterSourceContainer tLT*pCC", sourceContainers[0].tripsLT * porterCC, "energy", gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY);
-        if (sourceContainers[0].tripsLT * porterCC >= gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY) {
-            //console.log("findPorterSourceContainer all sources have enough porters servicing");
+         }
+         containersInfo.sort((c1, c2) => c1.tripsLT - c2.tripsLT);
+        if (containersInfo[0].tripsLT * porterCC >= gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY) {
             return;
         }
 
-        //console.log("findPorterSourceContainer after sorting sourceContainers", JSON.stringify(sourceContainers));
-        let fullestContainer = undefined;
-        let maxEnergySoFar = -1;
-        let portersOnRoute = undefined;
-        for (let container of sourceContainers) {
+        console.log("findPorterSourceContainer containersInfo", JSON.stringify(containersInfo));
+        for (let info of containersInfo) {
             const harvesters = _.filter(Game.creeps, c => {
-                return c.memory.targetId === container.sourceId
+                return c.memory.targetId === info.sourceId
                     && race.getRace(c) === gc.RACE_HARVESTER
             });
-            //console.log(container.sourceId, "sourceId findPorterSourceContainer harvesters", JSON.stringify(harvesters));
-            if (harvesters.length === 0) {
-                //console.log("findPorterSourceContainer returning", JSON.stringify(container));
-                continue;
+
+            if (harvesters.length !== 0) {
+                return info.pos;
             }
 
+            /*
             if (portersOnRoute === undefined) {
                 portersOnRoute = container["tripsLT"];
                 fullestContainer = container;
@@ -202,26 +180,30 @@ const state = {
                 maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
                 fullestContainer = container;
             }
+            */
         }
+        return containersInfo[0].pos;
+        /*
         if (fullestContainer) {
             //console.log("fullestContainer", JSON.stringify(fullestContainer));
             return fullestContainer;
         }
         //console.log("no harvesters found!!!! go to fullest container");
-        for (let container of sourceContainers) {
+        for (let container of containersInfo) {
             if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
                 fullestContainer = container;
                 maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
             }
         }
-        return fullestContainer;
+        return fullestContainer;*/
     },
 
-    listSourceContainers: function(spawnRoom, colonies) {
+
+    listSourceContainers: function(colonies) {
         return  cache.global(
             listSourceContainers,
-            "listSourceContainers_" + spawnRoom.name,
-            [spawnRoom, colonies],
+            "listSourceContainers_" + colonies[0].name,
+            [colonies],
             true
         );
     },
@@ -646,9 +628,9 @@ listFreeHarvesterPosts = function (home, colonies, ec) {
     //    console.log("concating with", JSON.stringify(colonies));
     //    suppliedRooms = suppliedRooms.concat(colonies);
     //}
-    console.log("listFreeHarvesterPosts home", home,"colonies", JSON.stringify(colonies));
+    //console.log("listFreeHarvesterPosts home", home,"colonies", JSON.stringify(colonies));
     for (let colonyObj of colonies) {
-        console.log("listFreeHarvesterPosts colonyObj", JSON.stringify(colonyObj));
+        //console.log("listFreeHarvesterPosts colonyObj", JSON.stringify(colonyObj));
 
         //const colony = Game.rooms[colonyObj.name];
         //console.log("listFreeHarvesterPosts_I colony", colony.name);
@@ -733,17 +715,33 @@ findFreePostIfPossable = function (creeps, posts) {
 };
 //------------ nextFreeHarvesterPost----------------------------------------
 
-listSourceContainers = function(spawnRoom, colonies) {
+listSourceContainers = function(colonies) {
     const containerInfo = [];
-    console.log("listSourceContainers colonies", JSON.stringify(colonies), "spawn room", spawnRoom.name);
+    //console.log("listSourceContainers colonies", JSON.stringify(colonies));
     for (let colonyObj of colonies) {
+        //console.log(colonyObj.name,"listSourceContainers", JSON.stringify(Game.flags[colonyObj.name].memory.sources))
+        for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
+            const cPos = state.getSourceContainer(sourceId);
+            //console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
+            if (cPos) {
+                let distance = Game.flags[colonyObj.name].memory.sources[sourceId].distance;
+                if (!distance) {
+                    distance = 15; // todo fix hack
+                }
+                containerInfo.push({"pos" : cPos, "distance" : distance, "sourceId" : sourceId})
+            }
+        }
+    }
+    return containerInfo;
+};
+
+/*
         console.log("listSourceContainers colonyObj",JSON.stringify(colonyObj));
         console.log("listSourceContainers colonyObj.name",colonyObj.name);
-        const gameFlag = Game.flags[colonyObj.name];
-        //for (let source of room.find(FIND_SOURCES)) {
+        //if (!Game.rooms[colonyObj.name]) {
+        //    continue;
+        //}
         for (let sourceId in gameFlag.memory.sources) {
-            //sFlag = Game.flags[source.id];
-            //console.log(source.id, "listSourceContainers sFlag", JSON.stringify(sFlag.memory));
             const cPos = state.getSourceContainer(sourceId);
             if (cPos) {
                 let distance = gameFlag.memory.sources[sourceId].distance;
@@ -759,9 +757,8 @@ listSourceContainers = function(spawnRoom, colonies) {
                 //console.log(source.id, "listSourceContainers pushed", JSON.stringify(container))
             }
         }
-    }
-    return containerInfo;
-};
+*/
+
 
 
 
