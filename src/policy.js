@@ -84,6 +84,46 @@ const policy = {
         }
     },
 
+    activatePolicy: function(policyType, data, parentId, policyRate) {
+        console.log("activatePolicy type", policyType, "data", JSON.stringify(data), "parentid", parentId);
+        if (parentId) {
+            data.parentId = parentId;
+        }
+        const newPolicyId = this.getNextPolicyId();
+        const policyConstructor = require("policy_" + policyType);
+        //console.log("activatePolicy data", JSON.stringify(data));
+        const policy = new policyConstructor(newPolicyId, data);
+        Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
+        //console.log("calling initilise policy", JSON.stringify(policy));
+        if (!policy.initilise()) {
+            //console.log("Policy initilise failed no policy added policyType", policyType,
+             //   "data", JSON.stringify(data), "parentId", parentId);
+            delete Memory.policyRates[newPolicyId];
+            Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
+            return undefined;
+        }
+         if (parentId) {
+            Memory.policies[parentId].m.childTypes.push(policyType);
+        }
+        //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
+        Memory.policies[newPolicyId] = policy;
+
+        Memory.nextPolicyId = Memory.nextPolicyId + 1;
+        Memory.records.policies.created[Game.time.toString()] = policy.type;
+        return policy.id;
+    },
+
+    activateReplacePolicy: function(policyType, data, parentId, replaceList) {
+          for (let id in Memory.policies) {
+            if (Memory.policies[id].parentId === parentId
+                && replaceList.includes(Memory.policies[id].type)) {
+                this.removePolicy(id);
+            }
+        }
+         this.activatePolicy(policyType, data, parentId);
+    },
+
+
     isPolicy: function(parentId, type) {
         for ( let i in Memory.policies) {
             if (Memory.policies[i].type === type &&
@@ -96,6 +136,15 @@ const policy = {
     getPolicy: function(id) {
         const Policy = require("policy_" + Memory.policies[id].type);
         return new Policy(id, Memory.policies[id]);
+    },
+
+    getPolicyByType: function(type) {
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].type === type) {
+                return this.getPolicy(id);
+            }
+        }
+        return undefined;
     },
 
     savePolicy: function(policy) {
@@ -123,7 +172,7 @@ const policy = {
     getGouvernerPolicy : function(roomName) {
         for (let id in Memory.policies) {
             //console.log("getGouvernerPolicy roomName", roomName, "home",
-           //     Memory.policies[id].roomName, "type", Memory.policies[id].type);
+            //     Memory.policies[id].roomName, "type", Memory.policies[id].type);
             if (Memory.policies[id].roomName === roomName &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {
                 //console.log("found getGouvernerPolicy", id)
@@ -142,43 +191,6 @@ const policy = {
             }
         }
         return undefined;
-    },
-
-    activatePolicy: function(policyType, data, parentId, policyRate) {
-        console.log("activatePolicy type", policyType, "data", JSON.stringify(data), "parentid", parentId);
-        if (parentId) {
-            data.parentId = parentId;
-        }
-        const newPolicyId = this.getNextPolicyId();
-        const policyConstructor = require("policy_" + policyType);
-        //console.log("activatePolicy data", JSON.stringify(data));
-        const policy = new policyConstructor(newPolicyId, data);
-        //console.log("calling initilise policy", JSON.stringify(policy));
-        if (!policy.initilise()) {
-            //console.log("Policy initilise failed no policy added policyType", policyType,
-             //   "data", JSON.stringify(data), "parentId", parentId);
-            Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
-            return undefined;
-        }
-         if (parentId) {
-            Memory.policies[parentId].m.childTypes.push(policyType);
-        }
-        //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
-        Memory.policies[newPolicyId] = policy;
-        Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
-        Memory.nextPolicyId = Memory.nextPolicyId + 1;
-        Memory.records.policies.created[Game.time.toString()] = policy.type;
-        return policy.id;
-    },
-
-    activateReplacePolicy: function(policyType, data, parentId, replaceList) {
-          for (let id in Memory.policies) {
-            if (Memory.policies[id].parentId === parentId
-                && replaceList.includes(Memory.policies[id].type)) {
-                this.removePolicy(id);
-            }
-        }
-         this.activatePolicy(policyType, data, parentId);
     },
 
     removePolicy: function(id) {
@@ -314,9 +326,9 @@ const policy = {
             avoid.push(structs[i].pos)
         }
         const terrain = room.getTerrain();
-        const extensionPos = construction.looseSpiral(start, numNeeded + skip, avoid, terrain,1);
-        for ( let i = skip; i < extensionPos.length ; i++ ) {
-            const result = room.createConstructionSite(extensionPos[i].x, extensionPos[i].y, strucType);
+        const positions = construction.looseSpiral(start, numNeeded + skip, avoid, terrain,1);
+        for ( let i = skip; i < positions.length ; i++ ) {
+            const result = room.createConstructionSite(positions[i].x, positions[i].y, strucType);
             if (result !== OK) {
             }
         }

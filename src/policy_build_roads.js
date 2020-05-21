@@ -22,6 +22,7 @@ Policy.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
+    this.m.placed = false;
     this.home = Memory.policies[this.parentId].roomName;
     this.m.planned = false;
     const room = Game.rooms[this.m.roomName];
@@ -35,27 +36,28 @@ Policy.prototype.enact = function () {
     }
     const room = Game.rooms[this.m.roomName];
     switch (this.m.roads) {
-        case BUILD_ROAD_SOURCE_SPAWN:
+        case gc.BUILD_ROAD_SOURCE_SPAWN:
             construction.buildRoadSourceSpawn(room);
             break;
-        case BUILD_ROAD_SOURCE_CONTROLLER:
+        case gc.BUILD_ROAD_SOURCE_CONTROLLER:
             construction.buildRoadSourceController(room);
             break;
-        case BUILD_ROAD_SOURCE_EXTENSIONS:
+        case gc.BUILD_ROAD_SOURCE_EXTENSIONS:
             construction.buildRoadSourceExtensions(room);
             break;
-        case BUILD_ROAD_SOURCE_SOURCE:
+        case gc.BUILD_ROAD_SOURCE_SOURCE:
             construction.buildRoadSources(room);
             break;
-        case BUILD_ROAD_SPAWN_CONTROLLER:
+        case gc.BUILD_ROAD_SPAWN_CONTROLLER:
             construction.buildRoadSpawnController(room);
             break;
-        case BUILD_ROAD_SOURCE_TOWERS:
+        case gc.BUILD_ROAD_SOURCE_TOWERS:
             construction.buildRoadSourceTowers(room);
             break;
         default:
            gf.fatalError("building unknonw road "+ this.m.roads);
     }
+    this.m.placed = true;
 };
 
 // runs once every tick before enact
@@ -64,7 +66,7 @@ Policy.prototype.enact = function () {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.m.roomName];
-    return construction.roadsBuilt(room) ? false : this;
+    return construction.roadsBuilt(room) && this.m.placed ? false : this;
 };
 
 module.exports = Policy;

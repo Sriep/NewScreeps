@@ -51,14 +51,18 @@ Policy.prototype.spawns = function (room, resources) {
     const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
     const workers = policy.getCreeps(this.parentId, gc.RACE_WORKER).length;
     const porters = policy.getCreeps(this.parentId, gc.RACE_PORTER).length;
-    const upgraders = policy.getCreeps(this.parentId, gc.RACE_UPGRADER).length;
+    //const upgraders = policy.getCreeps(this.parentId, gc.RACE_UPGRADER).length;
+    const reservers = policy.getCreeps(this.parentId, gc.RACE_RESERVER).length;
     //console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders);
 
     const wHarvester = race.creepPartsAlive(this.parentId, gc.RACE_HARVESTER, WORK);
     const cWorker = race.creepPartsAlive(this.parentId, gc.RACE_WORKER, CARRY);
     const cPorter = race.creepPartsAlive(this.parentId, gc.RACE_PORTER, CARRY);
     const wUpgrader = race.creepPartsAlive(this.parentId, gc.RACE_UPGRADER, WORK);
-    console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,"cPorter",cPorter,"wUpgrader",wUpgrader);
+    const rReserver = race.creepPartsAlive(this.parentId, gc.RACE_RESERVER, CLAIM);
+    console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,
+        "reservers",reservers,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,
+        "cPorter",cPorter,"rReserver",rReserver);
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
@@ -79,6 +83,7 @@ Policy.prototype.spawns = function (room, resources) {
     const canBuildWorkers = cWorker < resources.wW;
     const canBuildPorters = cPorter < resources.pC - 0.1;
     const canBuildUpgrader = wUpgrader < resources.uW - 0.1;
+    const canBuildReserver = rReserver < resources.rC;
 
     if (room.energyAvailable < room.energyCapacityAvailable) {
         return;
@@ -112,6 +117,17 @@ Policy.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_PORTER,
+            gf.roomEc(room),
+            this.parentId,
+            gc.SPAWN_PRIORITY_LOCAL
+        );
+        return
+    }
+
+    if (canBuildReserver) {
+        policy.sendOrderToQueue(
+            room,
+            gc.RACE_RESERVER,
             gf.roomEc(room),
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
@@ -155,15 +171,13 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
             ratio * budget.portersCsRoom(homeRoom, homeRoom, false),
             ratio * budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
-        //console.log("pp ec<=MAX_EC_4 home", this.home,"this.updateRoomResources", JSON.stringify(resources));
-    } else {
+     } else {
         resources = this.updateRoomResources(
             this.home,
             budget.harvesterWsRoom(homeRoom, homeRoom, false),
             budget.portersCsRoom(homeRoom, homeRoom, false),
             budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
-        //console.log("pp ec>MAX_EC_4 home", this.home,"this.updateRoomResources", JSON.stringify(resources));
     }
     //console.log("POLICY_PORTERS production vector1", JSON.stringify(this.m.curProduction))
     this.m.curProduction[this.home] = Object.assign({}, resources);
@@ -172,22 +186,12 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
 
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
-    //console.log("pp colonies", JSON.stringify(colonies));
     for (let colonyObj of colonies) {
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        //console.log("pp this.updateRoomResources colonyObj",JSON.stringify(colonyObj));
-        //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
-        //console.log("pp this.updateRoomResources values",JSON.stringify(Game.flags[colonyObj.name].memory));
-        //const valuesObj = JSON.parse(Game.flags[colonyObj.name].memory["values"]);
-        //console.log("calcResources emory.values colonyObj.name",colonyObj.name,"this.home",this.home);
         const valuesObj = memory.values(colonyObj.name, this.home);
-        //const valuesRoom = valuesObj[this.home];
-        //console.log("pp this.updateRoomResources valuesRoom", JSON.stringify(valuesRoom));
         let values;
-        //console.log("pp calcResources roomType1",roomType1,"roomType2",roomType2);
-        //console.log("calcResources valuesObj", JSON.stringify(valuesObj));
         if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
             values = valuesObj[roomType1];
         } else {
@@ -208,7 +212,8 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         resources.hW += colonyResources.hW;
         resources.pC +=  colonyResources.pC;
         resources.wW +=  colonyResources.wW;
-        resources.uW +=  colonyResources.uW
+        resources.uW +=  colonyResources.uW;
+        resources.rC += values["sources"]["rC"];
         //console.log(colonyObj.name,"POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
     }
     //console.log("pp this.updateRoomResources", JSON.stringify(resources));

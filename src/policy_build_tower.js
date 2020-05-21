@@ -12,6 +12,7 @@ const policy = require("policy");
 function Policy  (id, data) {
     this.type = gc.POLICY_BUILD_TOWER;
     this.id = id;
+    this.parentId = data.parentId;
     this.home = data.home;
     this.m = data.m;
 }
@@ -32,7 +33,9 @@ Policy.prototype.enact = function () {
     }
     const room = Game.rooms[this.home];
     const rcl = room.controller.level;
-    const allowedTowers = CONTROLLER_STRUCTURES[STRUCTURE_TOWER[rcl]];
+    const allowedTowers = CONTROLLER_STRUCTURES[STRUCTURE_TOWER][rcl];
+    //console.log("POLICY_BUILD_TOWER rcl", rcl,"STRUCTURE_TOWER[rcl]", STRUCTURE_TOWER[rcl],
+    //    "CONTROLLER_STRUCTURES[STRUCTURE_TOWER[rcl]]",CONTROLLER_STRUCTURES[STRUCTURE_TOWER][rcl])
     const towers = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: STRUCTURE_TOWER }
     });
@@ -47,6 +50,8 @@ Policy.prototype.enact = function () {
          return;
     }
     const wantedTowers = allowedTowers - towers.length - beingBuilt.length;
+    //console.log("POLICY_BUILD_TOWER wantedTowers",wantedTowers,"allowedTowers",allowedTowers,
+    //    "towers.length",towers.length,"beingBuilt.length",beingBuilt.length)
     policy.buildStructuresLooseSpiral(room, STRUCTURE_TOWER, wantedTowers, 0);
 };
 

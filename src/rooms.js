@@ -40,12 +40,14 @@ const rooms = {
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {
-                m.sources[source.id]= { "ap" : economy.countAccessPoints(source.pos) }
+                m.sources[source.id]= { "ap" : economy.countAccessPoints(source.pos) };
+                source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
             }
         }
 
         if (room.controller) {
-            m.controller = { "id" : room.controller.id }
+            m.controller = { "id" : room.controller.id };
+            room.controller.pos.createFlag(room.controller.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
         }
 
         const minerals = room.find(FIND_MINERALS);

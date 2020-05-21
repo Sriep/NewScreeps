@@ -77,6 +77,7 @@ const gc = {
     RACE_UPGRADER: "upgrader",
     RACE_PORTER: "porter",
     RACE_SCOUT: "scout",
+    RACE_RESERVER: "reserver",
 
     MIN_HARVESTER_EC: 300,
     MAX_HARVESTER_EC: 800,
@@ -157,6 +158,9 @@ const gc = {
     STATE_UPGRADER_IDLE: "upgrader_idle",
     // scout
     STATE_SCOUT_IDLE: "scout_idle",
+    // claimer
+    STATE_RESERVER_IDLE: "reserver_idle",
+    STATE_RESERVER_RESERVE: "reserver_reserve",
     //tower
     STATE_TOWER_IDLE: "tower_idle",
     STATE_TOWER_DEFEND: "tower_defend",
@@ -261,6 +265,7 @@ const gc = {
     NEUTRAL_ROOM_CHECK_RATE: 10,
     CALC_ROOM_RESOURCES_RATE: 20,
     FREE_HARVESTER_POST_CACHE_RATE: 10,
+    COLONIAL_OFFICE_RATE: 10,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -365,11 +370,12 @@ const gc = {
     //creep body bases
     WMC_COST: 200,
     WWM_COST: 250,
+    CMMMM_COST: 800,
     CCM_COST: 75,
+    RESERVER_MOVE_CLAIM_RATIO: 4,
     PORTER_WORKER_CARRY_RATIO: 8/3,
     HARVESTER_WORKER_RATIO: 8/5,
     RPC_PORTER_CARRY_PARTS: [0, 4, 6, 10, 16, 24, 30, 33, 33],
-
 
     //screeps constants
     SORCE_REGEN_LT: 5,

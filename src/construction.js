@@ -190,9 +190,11 @@ const construction = {
     },
 
     looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
+        //console.log("looseSpiral start",JSON.stringify(start),"numNeeded",
+        //    numNeeded,"avoid",avoid,"terrain",terrain,"avoidRange",avoidRange);
         let range = 0;
         let spiral = [];
-        console.log("about to start lose spiral loop");
+        //console.log("about to start lose spiral loop");
         while (spiral.length < numNeeded) {
             range++;
             for (let dx = -1*range; dx <= range ; dx+=2 ) {

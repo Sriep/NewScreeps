@@ -38,7 +38,6 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.draftReplacment = function() {
-    // return this;
     const room = Game.rooms[this.home];
     return policy.areSourceContainersFinished(room) ? false : this;
 };

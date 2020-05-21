@@ -28,14 +28,15 @@ Policy.prototype.initilise = function () {
     this.m.freeRooms = {};
     this.m.invaderRooms = {};
     this.m.foreignRooms = {};
+    Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
     return true;
 };
 
 // runs once every tick
 Policy.prototype.enact = function () {
-    if (Game.time + this.id % 5 !== 0) { // todo
-        return
-    }
+    //if (Game.time + this.id % 5 !== 0) { // todo
+    //    return
+    //}
     //console.log("POLICY_COLONIAL_OFFICE");
     for (let flagName in Game.flags) {
         if (gf.validateRoomName(flagName)) {
@@ -49,8 +50,17 @@ Policy.prototype.enact = function () {
 };
 
 Policy.prototype.checkRoom = function (roomName) {
-    //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
+    console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = Game.flags[roomName].memory;
+    if (m.spawnRoom) {
+        console.log("room",roomName,"already has spawn room");
+        return;
+    }
+    if (!Game.rooms[roomName]) {
+        console.log(roomName, "no room visablity");
+        return;
+    }
+
     let profitableRooms = [];
     for (let name in m.rooms) {
         const governor = policy.getGouvernerPolicy(name);
@@ -80,7 +90,7 @@ Policy.prototype.checkRoom = function (roomName) {
             }
         }
     }
-    //console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
+    console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
     profitableRooms = profitableRooms.sort( (a,b) =>  {
         return b["profitParts"] - a["profitParts"];
     });

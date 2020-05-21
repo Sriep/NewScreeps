@@ -609,6 +609,12 @@ const state = {
         }
     },
 
+    getSourceLink : function (sourceId) {
+        if (Game.flags[sourceId]) {
+            return Game.flags[sourceId].memory.linkPos;
+        }
+    },
+
     getSourceContainer : function (sourceId) {
         if (Game.flags[sourceId]) {
             return Game.flags[sourceId].memory.containerPos;
@@ -619,7 +625,13 @@ const state = {
         if (Game.flags[controllerId]) {
             return Game.flags[controllerId].memory.upgraderPosts;
         }
-    }
+    },
+
+    getControllerLink : function (controllerId) {
+        if (Game.flags[controllerId]) {
+            return Game.flags[controllerId].memory.linkPos;
+        }
+    },
 };
 
 module.exports = state;
@@ -734,8 +746,11 @@ listSourceContainers = function(spawnRoom, colonies) {
             //console.log(source.id, "listSourceContainers sFlag", JSON.stringify(sFlag.memory));
             const cPos = state.getSourceContainer(sourceId);
             if (cPos) {
-                const distance = gameFlag.memory.sources[sourceId].distance;
+                let distance = gameFlag.memory.sources[sourceId].distance;
                 console.log("listSourceContainers distance",distance);
+                if (!distance) {
+                    distance = 15;
+                } // todo fix quick hack. distance only undefined in spawn room
                 const pos = new RoomPosition(cPos.x, cPos.y, colonyObj.name);
                 const container = state.findContainerAt(pos);
                 container["sourceId"] = sourceId;

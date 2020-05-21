@@ -113,12 +113,14 @@ State.prototype.pathLost = function () {
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 return state.switchTo(this.creep, creepRace + "_idle")
             } else {
+                return;
+                /*
                 // porter hack approaching crowed upgrade container
                 if (!Game.flags[this.creep.room.controller.id]) {
                     return;
                 }
                 const UpgradeContainerPoses = state.getControllerPosts(this.creep.room.controller.id);
-                if (!UpgradeContainerPoses) {
+                if (!UpgradeContainerPoses || !this.creep.targetPos) {
                     return;
                 }
                 for (let cPos of UpgradeContainerPoses) {
@@ -148,7 +150,7 @@ State.prototype.pathLost = function () {
                         }
                     }
                 }
-                return state.switchTo(this.creep, creepRace + "_full_idle")
+                return state.switchTo(this.creep, creepRace + "_full_idle")*/
             }
         case gc.RACE_UPGRADER:
             return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
