@@ -15,8 +15,9 @@ function State (creep) {
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
+
 State.prototype.enact = function () {
-    //console.log(this.creep.name,"STATE_PORTER_IDLE");
+    console.log(this.creep.name,"STATE_PORTER_IDLE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
@@ -30,6 +31,8 @@ State.prototype.enact = function () {
     console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
     if (info.pos) {
         this.creep.memory.targetId = info.sourceId;
+        //console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
+        undefined.break;
         return state.switchToMovePos(
             this.creep,
             info.pos,

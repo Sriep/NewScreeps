@@ -139,6 +139,7 @@ const state = {
         });
         //console.log("findPorterSourceContainer colonies",JSON.stringify(colonies));
         const containersInfo = this.listSourceContainers(colonies);
+        //console.log("findPorterSourceContainer containersInfo before", JSON.stringify(containersInfo));
 
         for (let container of containersInfo) {
             const tripsPerLifetimePerPorter = CREEP_LIFE_TIME / (2 * container.distance);
@@ -157,7 +158,7 @@ const state = {
             return;
         }
 
-        console.log("findPorterSourceContainer containersInfo", JSON.stringify(containersInfo));
+        console.log("findPorterSourceContainer containersInfo after", JSON.stringify(containersInfo));
         for (let info of containersInfo) {
             const harvesters = _.filter(Game.creeps, c => {
                 return c.memory.targetId === info.sourceId
@@ -165,37 +166,23 @@ const state = {
             });
 
             if (harvesters.length !== 0) {
-                return info.pos;
+                return info;
             }
+        }
 
-            /*
-            if (portersOnRoute === undefined) {
-                portersOnRoute = container["tripsLT"];
-                fullestContainer = container;
-                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
-            } else if (portersOnRoute > container["tripsLT"]){
-                return fullestContainer;
-            }
-            if (maxEnergySoFar < container.store.getUsedCapacity(RESOURCE_ENERGY) ) {
-                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
-                fullestContainer = container;
-            }
-            */
-        }
-        return containersInfo[0].pos;
-        /*
-        if (fullestContainer) {
-            //console.log("fullestContainer", JSON.stringify(fullestContainer));
-            return fullestContainer;
-        }
-        //console.log("no harvesters found!!!! go to fullest container");
-        for (let container of containersInfo) {
-            if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
-                fullestContainer = container;
-                maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
+        let maxEnergySoFar = 0;
+        let fullestContainer;
+        for (let info of containersInfo) {
+            cRoom = Game.rooms[info.pos.roomName];
+            if (cRoom) {
+                const container  = state.findContainerAt(new RoomPosition(info.x, info.y, info.roomName));
+                if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
+                    fullestContainer = container;
+                    maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
+                }
             }
         }
-        return fullestContainer;*/
+        return fullestContainer;
     },
 
 
@@ -717,14 +704,15 @@ findFreePostIfPossable = function (creeps, posts) {
 
 listSourceContainers = function(colonies) {
     const containerInfo = [];
-    //console.log("listSourceContainers colonies", JSON.stringify(colonies));
+    console.log("listSourceContainers colonies", JSON.stringify(colonies));
     for (let colonyObj of colonies) {
-        //console.log(colonyObj.name,"listSourceContainers", JSON.stringify(Game.flags[colonyObj.name].memory.sources))
+        console.log(colonyObj.name,"listSourceContainers sources", JSON.stringify(Game.flags[colonyObj.name].memory.sources));
         for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
             const cPos = state.getSourceContainer(sourceId);
-            //console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
+            console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
             if (cPos) {
                 let distance = Game.flags[colonyObj.name].memory.sources[sourceId].distance;
+                console.log(colonyObj.name, "distance",JSON.stringify(Game.flags[colonyObj.name].memory.sources));
                 if (!distance) {
                     distance = 15; // todo fix hack
                 }

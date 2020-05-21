@@ -15,15 +15,17 @@ const gc = require("gc");
 
 const inserted = {
     top: function () {
-       //const home = Game.rooms["W7N7"];
+
     },
 
     bottom: function () {
-        console.log("--------- piers inserted------------");
+        // console.log("--------- piers inserted------------");
         //const pp = policy.getRoomEconomyPolicy("W7N7");
         //const ppBudget = pp.localBudget();
         //console.log("budget for W7N7", JSON.stringify(ppBudget));
-
+        //const home = Game.rooms["W7N7"];
+        //const source = home.find(FIND_SOURCES);
+        //console.log(source[0],"soure", JSON.stringify(source[0]));
 
 
         //const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);

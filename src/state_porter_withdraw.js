@@ -10,7 +10,8 @@ const state = require("state");
 
 function State (creep) {
     this.type = gc.STATE_PORTER_WITHDRAW;
-    this.creep = creep
+    this.creep = creep;
+    this.m = this.creep.memory
 }
 
 State.prototype.enact = function () {
@@ -18,10 +19,21 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
 
-    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW");
+    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
     let target;
-    if (this.creep.memory.targetId) {
-        target = Game.getObjectById(this.creep.memory.targetId);
+    if (this.m.targetPos) {
+        //console.log("STATE_PORTER_WITHDRAW x", JSON.stringify(this.m.targetPos))
+        //const pos = new RoomPosition(
+        //    this.m.targetPos.x,
+        ///    this.m.targetPos.y,
+        //    this.m.targetPos.roomName
+        //);
+        //console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(pos))
+        target = state.findContainerAt(new RoomPosition(
+            this.m.targetPos.x,
+            this.m.targetPos.y,
+            this.m.targetPos.roomName
+        ))
     }
     if (!target) {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY > 0)) {

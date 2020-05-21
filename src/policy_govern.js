@@ -154,7 +154,7 @@ Policy.prototype.addColony = function(roomName, profit, parts, startUpCost) {
     });
     this.m.parts = tempParts;
     console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
-    this.m.colonies = tempColonies;
+    this.m.colonies = [...tempColonies];
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     return true;
 };
