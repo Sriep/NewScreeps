@@ -4,17 +4,16 @@
  * @author Piers Shepperson
  */
 
-const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 
 // constructor
 function Policy  (id, data) {
-    this.type = gc.POLICY_BUILD_LINK;
+    this.type = gc.POLICY_BUILD_EXTRACTORS;
     this.id = id;
     this.home = data.home;
     this.m = data.m;
-};
+}
 
 // runs first time policy is created only
 Policy.prototype.initilise = function () {
@@ -29,10 +28,21 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
+    const colonies = policy.getGouvernerPolicy(this.home).getColonies();
+    this.m.finished = true;
+    for (let colonyInfo of colonies) {
+        colony = Game.rooms[colonyInfo.name];
+        if (!colony) {
+            this.m.finished = false;
+            continue
+        }
+        const minerals = colony.find(FIND_MINERALS);
+        minerals.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
+    }
 };
 
 Policy.prototype.draftReplacment = function() {
-    return this
+    return this.m.finished ? false : this;
 };
 
 module.exports = Policy;
