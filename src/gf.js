@@ -66,6 +66,9 @@ const gf = {
         if (typeof roomName !== "string") {
             return false;
         }
+        if (roomName === "sim") {
+            return true;
+        }
         const splitName = this.splitRoomName(roomName);
         return (splitName.EW === "E" || splitName.EW === "W")
                 && (splitName.NS === "N" || splitName.NS === "S")

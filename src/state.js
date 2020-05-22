@@ -59,12 +59,12 @@ const state = {
         }
         if (!targetPos) {
             console.log("switchToMovePos", creep.name,"pos",targetPos,"range", range,"next",nextState);
-            gf.fatalError(creep.name + " move to position but no postion given"
+            gf.fatalError(creep.name + " move to position but no position given"
                 + " range " + range.toString() + " next state " + nextState);
         }
         if (!nextState) {
             gf.fatalError(creep.name + " move to position with no next sate provided."
-                + " targetr pos " + JSON.stringify(targetPos) + " range " + range.toString());
+                + " target pos " + JSON.stringify(targetPos) + " range " + range.toString());
         }
         creep.memory.targetPos = targetPos;
         creep.memory.state = gc.STATE_MOVE_POS;
@@ -338,8 +338,8 @@ const state = {
         }
 
         if (sources.length === 2 && room.controller.level === 1) {
-            path0 = room.findPath(sources[0].pos, room.controller.pos);
-            path1 = room.findPath(sources[1].pos, room.controller.pos);
+            const path0 = room.findPath(sources[0].pos, room.controller.pos);
+            const path1 = room.findPath(sources[1].pos, room.controller.pos);
             return path0.length > path1.length ? sources[1] : sources[0];
         }
 
@@ -653,7 +653,7 @@ const state = {
         //const posts = sourceFlag.memory.harvesterPosts;
         const posts = state.getSourcePosts(sourceId);
         console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
-        creeps = _.filter(Game.creeps, c =>
+        const creeps = _.filter(Game.creeps, c =>
             c.memory.targetId === sourceId
             //&& race.getRace(c) === gc.RACE_HARVESTER
         );

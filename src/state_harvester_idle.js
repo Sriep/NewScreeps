@@ -29,6 +29,7 @@ State.prototype.enact = function () {
         home.energyCapacityAvailable
     );
     if (nextPost) {
+        console.log(this.creep.name,"STATE_HARVESTER_IDLE",JSON.stringify(nextPost))
         this.m.targetId = nextPost.sourceId;
         state.switchToMovePos(
             this.creep,

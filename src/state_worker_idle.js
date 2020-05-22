@@ -55,7 +55,7 @@ State.prototype.findNewRoom = function(homeName) {
 };
 
 State.prototype.workToDo = function(colonyName) {
-    colony = Game.rooms[colonyName];
+    const colony = Game.rooms[colonyName];
     let nextConstructionSite = colony.find(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite) {
         return true;
