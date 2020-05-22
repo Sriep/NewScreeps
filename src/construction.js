@@ -235,8 +235,8 @@ const construction = {
             totalX += points[i].x;
             totalY += points[i].y
         }
-        cx = Math.round(totalX/points.length);
-        cy = Math.round(totalY/points.length);
+        const cx = Math.round(totalX/points.length);
+        const cy = Math.round(totalY/points.length);
         return {x: cx, y: cy };
     },
 /*

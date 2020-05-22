@@ -4,8 +4,8 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const gf = require("gf");
-const construction = require("construction");
+//const gf = require("gf");
+//const construction = require("construction");
 const policy = require("policy");
 
 // constructor
@@ -60,7 +60,7 @@ Policy.prototype.enact = function () {
     policy.buildStructuresLooseSpiral(room, STRUCTURE_EXTENSION, wantedExtensions, 3);
     //buildExtensions(room, wantedExtensions)
 };
-
+/*
 buildExtensions = function (room, numNeeded) {
     //console.log("buildExtensions room", room.name, "numNeeded", numNeeded);
     const sources = room.find(FIND_SOURCES);
@@ -98,7 +98,7 @@ buildExtensions = function (room, numNeeded) {
     }
     //}
 };
-
+*/
 // runs once every tick before enact
 // return anything without a type field to delete the policy
 // return a valid policy to replace this policy with that

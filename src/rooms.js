@@ -23,7 +23,7 @@ const rooms = {
     },
 
     flagPermanents: function (room) {
-        //console.log("room flag permanents room",room.name)
+        console.log("room flag permanents room",room.name);
         const m = Game.flags[room.name].memory;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
@@ -37,6 +37,7 @@ const rooms = {
         m.invaderCore = invaderCore.length > 0;
 
         const sources = room.find(FIND_SOURCES);
+        console.log("flag permanents sources",sources);
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {

@@ -161,8 +161,8 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {
-            console.log("flag.getRoomFlag(this.home)",JSON.stringify(flag.getRoomFlag(this.home)))
-            console.log("flag.getRoomFlag(this.home).memory",JSON.stringify(flag.getRoomFlag(this.home).memory))
+            //console.log("flag.getRoomFlag(this.home)",JSON.stringify(flag.getRoomFlag(this.home)))
+            //console.log("flag.getRoomFlag(this.home).memory",JSON.stringify(flag.getRoomFlag(this.home).memory))
             const ap = flag.getRoomFlag(this.home).memory.sources[source.id].ap;
             maxWs += Math.min(5, ap*hWperBody);
         }

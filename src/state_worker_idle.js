@@ -85,7 +85,7 @@ State.prototype.enactOld = function () {
     }
 
     const container = state.findCollectContainer(this.creep.room);
-    if (container) {
+    if (container && container.store.getUsedCapacity(RESOURCE_ENERGY)>0) {
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
             this.creep,

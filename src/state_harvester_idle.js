@@ -27,9 +27,9 @@ State.prototype.enact = function () {
         this.homeId,
         governor.getColonies(),
         home.energyCapacityAvailable
-    );
+    ).freePosts[0];
     if (nextPost) {
-        console.log(this.creep.name,"STATE_HARVESTER_IDLE",JSON.stringify(nextPost))
+        console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
         this.m.targetId = nextPost.sourceId;
         state.switchToMovePos(
             this.creep,
