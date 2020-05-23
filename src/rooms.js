@@ -9,8 +9,9 @@ const economy = require("economy");
 const rooms = {
 
     flag: function (room, force) {
+        //console.log("rooms flag Game.flags[room.name]",Game.flags[room.name],"force", force)
         if (!Game.flags[room.name] || force) {
-            console.log("room flag name", room.name, "force", force);
+            //console.log("room flag name", room.name, "force", force);
             const centre = new RoomPosition(25, 25, room.name);
             centre.createFlag(room.name);
 
@@ -23,7 +24,7 @@ const rooms = {
     },
 
     flagPermanents: function (room) {
-        console.log("room flag permanents room",room.name);
+        //console.log("room flag permanents room",room.name);
         const m = Game.flags[room.name].memory;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
@@ -37,7 +38,7 @@ const rooms = {
         m.invaderCore = invaderCore.length > 0;
 
         const sources = room.find(FIND_SOURCES);
-        console.log("flag permanents sources",sources);
+        //console.log("flag permanents sources",sources);
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {

@@ -82,9 +82,11 @@ function flagRooms() {
     if (Game.time % gc.FLAG_UPDATE_RATE === 0 ) {
         force = true;
     }
+    //console.log("main flag rooms")
     for ( let roomName in Game.rooms ) {
         if ( (Game.rooms[roomName].memory && (!Game.rooms[roomName].memory.flagged) || force) ) {
-            flag.flagRoom(roomName, true);
+            //console.log("main flag rooms inside for and if")
+            flag.flagRoom(roomName, force);
         }
     }
 

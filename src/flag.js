@@ -5,8 +5,8 @@
  */
 const rooms = require("rooms");
 const flag = {
-    flagRoom(roomName) {
-        rooms.flag(Game.rooms[roomName]);
+    flagRoom(roomName, force) {
+        rooms.flag(Game.rooms[roomName], force);
     },
 
     getRoomFlag(roomName) {
