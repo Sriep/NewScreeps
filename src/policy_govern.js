@@ -51,16 +51,17 @@ Policy.prototype.govern = function () {
     if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem].check(lastAgendaItem, this.id)) {
         if (this.m.agendaIndex !== -1) {
             //Memory.agenda.push(lastAgendaItem + " checked " + Game.time.toString())
+            console.log("POLICY_GOVERN check PASSED for", lastAgendaItem)
         }
         const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
-        console.log("govern check PASSED next", nextAgendaItem);
+        console.log("POLICY_GOVERN next item", nextAgendaItem);
         agenda.items()[nextAgendaItem].enact(nextAgendaItem, this.id);
-
+        console.log("POLICY_GOVERN enacted agemda item", nextAgendaItem);
         this.m.agendaIndex++;
-        Memory.records.agenda.push(nextAgendaItem + " run " +  Game.time);
-        //return;
+
+        return;
     }
-    //Memory.agenda.push(lastAgendaItem + " enacted " + Game.time.toString())
+    console.log("POLICY_GOVERN check failed",lastAgendaItem)
  };
 
 Policy.prototype.getColonies = function() {

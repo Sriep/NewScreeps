@@ -221,13 +221,14 @@ const policy = {
     },
 
     hasChildType: function(parentId, type) {
+        console.log("policy hasChildType parentId",parentId, "type",type);
         for (let id in Memory.policies) {
              if (Memory.policies[id].type === type
                  && Memory.policies[id].parentId === parentId) {
                 return true;
             }
         }
-         return false;
+        return false;
     },
 
     getCreeps: function(policyId, cRace) {

@@ -103,7 +103,7 @@ const activateNewRoadsPolicy = function ( agendaItem, parnetId)  {
 const newBuildRoadBlockerPolicy = {
     "enact": activateNewRoadsPolicy,
     "check": function ( agendaItem, parnetId)  {
-         return policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
+         return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
     },
 };
 
@@ -136,8 +136,7 @@ const newPolicyReplacment ={
 const newBlockerPolicy = {
     "enact": activateNewPolicy,
     "check": function (agendaItem, parnetId)  {
-        const hasChildType = policy.hasChildType(parnetId, agendaItem);
-         return !hasChildType;
+         return !policy.hasChildType(parnetId, agendaItem);
     },
 };
 

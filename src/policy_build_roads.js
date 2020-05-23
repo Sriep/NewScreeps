@@ -22,7 +22,6 @@ Policy.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
-    this.m.placed = false;
     this.home = Memory.policies[this.parentId].roomName;
     this.m.planned = false;
     const room = Game.rooms[this.m.roomName];
@@ -31,10 +30,12 @@ Policy.prototype.initilise = function () {
 
 // runs once every tick
 Policy.prototype.enact = function () {
+    console.log("POLICY_BUILD_ROADS roads",JSON.stringify(this));
     if (this.m.planned || Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
     const room = Game.rooms[this.m.roomName];
+    console.log("POLICY_BUILD_ROADS about to plan",this.m.roads);
     switch (this.m.roads) {
         case gc.BUILD_ROAD_SOURCE_SPAWN:
             construction.buildRoadSourceSpawn(room);
@@ -57,7 +58,7 @@ Policy.prototype.enact = function () {
         default:
            gf.fatalError("building unknonw road "+ this.m.roads);
     }
-    this.m.placed = true;
+    this.m.planned = true;
 };
 
 // runs once every tick before enact
@@ -66,7 +67,10 @@ Policy.prototype.enact = function () {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.m.roomName];
-    return construction.roadsBuilt(room) && this.m.placed ? false : this;
+    console.log("draftReplacment roads built?",construction.roadsBuilt(room)
+        , "planned", this.m.planned);
+    return this;
+    //return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 
 module.exports = Policy;

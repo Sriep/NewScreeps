@@ -107,40 +107,98 @@ const state = {
 
     nextFreeHarvesterPost : function (home, colonies, ec) {
         const spawnRoom = Game.rooms[home];
-        const freePosts = [];
-
         for (let colonyObj of colonies) {
             for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
                 const post = this.freeHarvesterPost(sourceId, spawnRoom, ec);
+                console.log("nextFreeHarvesterPost freeHarvesterPost", post);
                 if (post) {
-                    const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
-                    freePosts.push({ "sourceId": sourceId,  "post": postRp });
+                    return  new RoomPosition(post.x, post.y, colonyObj.name);
+                    //freePosts.push({ "sourceId": sourceId,  "post": postRp });
                 }
             }
         }
-        return { "freePosts" : freePosts, "cached" : Game.time };
+        console.log("nextFreeHarvesterPost dropped though, extrta rounding error harvester");
+        const creeps = _.filter(Game.creeps, c =>
+            c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
+        );
+        let leastLife = 9999999;
+        let bestPost;
+        for (let colonyObj of colonies) {
+            for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
+                const sPosts = state.getSourcePosts(sourceId);
+                const sPost = this.findFreePostIfPossable(creeps, sPosts);
+                if (!sPost ) {
+                    continue;
+                }
+                let lifeCreepsSource = 0;
+                const sourceCreeps = _.filter(creeps, c=> c.memory.targetId === sourceId);
+                for (let sc of sourceCreeps) {
+                    lifeCreepsSource += sourceCreeps.ticksToLive;
+                }
+                console.log("nextFreeHarvesterPost dropped before, lifeCreepsSource"
+                    ,lifeCreepsSource,"leastLife",leastLife,"bestPost",JSON.stringify(sPost));
+                if (lifeCreepsSource < leastLife) {
+                    leastLife = lifeCreepsSource;
+                    bestPost = sPost;
+                }
+                console.log("nextFreeHarvesterPost dropped after, lifeCreepsSource"
+                    ,lifeCreepsSource,"leastLife",leastLife)
+
+            }
+        }
+        return bestPost;
     },
 
-    nextFreeHarvesterPost2: function(home, colonies, ec) {
-        let list =  cache.global(
-            listFreeHarvesterPosts,
-            "listFreeHarvesterPosts_" + home,
-            [home, colonies, ec],
-            false
+    freeHarvesterPost : function (sourceId, spawnRoom, ec) {
+        const posts = state.getSourcePosts(sourceId);
+        const creeps = _.filter(Game.creeps, c =>
+            c.memory.targetId === sourceId
+            && race.getRace(c) === gc.RACE_HARVESTER
         );
-        if (list.cached + gc.FREE_HARVESTER_POST_CACHE_RATE < Game.time) {
-            list =  cache.global(
-                listFreeHarvesterPosts,
-                "listFreeHarvesterPosts_" + home,
-                [home, colonies, ec],
-                true
-            );
+        if (creeps.length === 0) {
+            return posts[0];
         }
-        //let list = listFreeHarvesterPosts_I(home, colonies, ec);
-        //console.log("nextFreeHarvesterPost list", JSON.stringify(list));
-        if (list.freePosts.length > 0) {
-            return list.freePosts.shift();
+        const maxHEc = this.maxHEc(ec);
+        console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
+        console.log(sourceId, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts));
+        if (creeps.length > maxHEc) {
+            console.log("freeHarvesterPost return false1");
+            return false;
         }
+        if (maxHEc === 1) {
+            const source = Game.getObjectById(sourceId);
+            if (!source) {
+                return false;
+            }
+            const distance = cache.distanceSourceSpawn(source, spawnRoom);
+            if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
+                return this.findFreePostIfPossable(creeps, posts);
+            } else {
+                console.log("freeHarvesterPost return false2");
+                return false;
+            }
+        }
+        if (creeps.length < maxHEc) {
+            return this.findFreePostIfPossable(creeps, posts);
+        }
+        return false;
+    },
+
+    findFreePostIfPossable : function (creeps, posts) {
+        //console.log("findFreePostIfPossable creep lenght", creeps.length, "posts", JSON.stringify(posts))
+        for (let post of posts) {
+            let taken = false;
+            for (let creep of creeps) {
+                if (creep.pos.x === post.x && creep.pos.y === post.y) {
+                    taken = true;
+                    break;
+                }
+            }
+            if (!taken) {
+                return post;
+            }
+        }
+        return false;
     },
 
     //------------ nextFreeHarvesterPost ---------------------------------------
@@ -648,60 +706,6 @@ const state = {
         }
     },
 
-    freeHarvesterPost : function (sourceId, spawnRoom, ec) {
-        //const sourceFlag = Game.flags[sourceId];
-        //const posts = sourceFlag.memory.harvesterPosts;
-        const posts = state.getSourcePosts(sourceId);
-        //console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
-        const creeps = _.filter(Game.creeps, c =>
-            c.memory.targetId === sourceId
-            //&& race.getRace(c) === gc.RACE_HARVESTER
-        );
-        if (creeps.length === 0) {
-            return posts[0];
-        }
-        const maxHEc = this.maxHEc(ec);
-        console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
-        console.log(sourceId, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts))
-        if (creeps.length > maxHEc) {
-            console.log("freeHarvesterPost return false1")
-            return false;
-        }
-        if (maxHEc === 1) {
-            const source = Game.getObjectById(sourceId);
-            if (!source) {
-                return false;
-            }
-            const distance = cache.distanceSourceSpawn(source, spawnRoom);
-            if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
-                return this.findFreePostIfPossable(creeps, posts);
-            } else {
-                console.log("freeHarvesterPost return false2")
-                return false;
-            }
-        }
-        if (creeps.length < maxHEc) {
-            return this.findFreePostIfPossable(creeps, posts);
-        }
-        return false;
-    },
-
-    findFreePostIfPossable : function (creeps, posts) {
-        //console.log("findFreePostIfPossable creep lenght", creeps.length, "posts", JSON.stringify(posts))
-        for (let post of posts) {
-            let taken = false;
-            for (let creep of creeps) {
-                if (creep.pos.x === post.x && creep.pos.y === post.y) {
-                    taken = true;
-                    break;
-                }
-            }
-            if (!taken) {
-                return post;
-            }
-        }
-        return false;
-    },
 };
 
 module.exports = state;
