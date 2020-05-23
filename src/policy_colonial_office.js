@@ -102,20 +102,20 @@ Policy.prototype.checkRoom = function (roomName) {
             roomInfo.info.startUpCost,
         )) {
             m.spawnRoom = roomInfo.governor.roomName;
-            build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
+            this.build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
             break;
         }
     }
 };
 
-build = function(colony, spawnRoom, useRoad) {
-    buildSourceSupport(colony, spawnRoom);
+Policy.prototype.build = function(colony, spawnRoom, useRoad) {
+    this.buildSourceSupport(colony, spawnRoom);
     if (useRoad) {
-        buildRoads(colony, spawnRoom)
+        this.buildRoads(colony, spawnRoom)
     }
 };
 
-buildSourceSupport = function(colony, spawnRoom) {
+Policy.prototype.buildSourceSupport = function(colony, spawnRoom) {
     console.log("buildSourceSupport colony", colony.name, "spawn room", spawnRoom.name);
     const roomFlag = flag.getRoomFlag(colony.name).memory;
     const sources = colony.find(FIND_SOURCES);
@@ -125,13 +125,13 @@ buildSourceSupport = function(colony, spawnRoom) {
     }
 };
 
-buildRoads = function(colony, spawnRoom) {
+Policy.prototype.buildRoads = function(colony, spawnRoom) {
     const spawns = spawnRoom.find(FIND_MY_SPAWNS);
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {
         const pathInfo = cache.path(souce, spawns, "spawn", 1, true);
         for (let pathPos of pathInfo) {
-            pos = gf.roomPosFromPos(pathPos);
+            const pos = gf.roomPosFromPos(pathPos);
             pos.createConstructionSite(STRUCTURE_ROAD)
         }
     }
