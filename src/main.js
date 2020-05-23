@@ -84,7 +84,7 @@ function flagRooms() {
     }
     for ( let roomName in Game.rooms ) {
         if ( (Game.rooms[roomName].memory && (!Game.rooms[roomName].memory.flagged) || force) ) {
-            flag.flagRoom(roomName, force);
+            flag.flagRoom(roomName, true);
         }
     }
 

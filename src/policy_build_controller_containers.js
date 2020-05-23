@@ -29,21 +29,23 @@ Policy.prototype.initilise = function () {
 };
 
 Policy.prototype.enact = function () {
-    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
+    console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
-        return;
+        //return;
     }
     const room = Game.rooms[this.home];
     if (state.getControllerPosts(room.controller.id)) {
+        const cp = state.getControllerPosts(room.controller.id);
+        console.log("POLICY_BUILD_CONTROLLER_CONTAINERS state.getControllerPosts",JSON.stringify(cp))
         return;
     }
-    setContainerSites(room);
+    this.setContainerSites(room);
 };
 
-setContainerSites = function(room) {
+Policy.prototype.setContainerSites = function(room) {
     const terrain = room.getTerrain();
     let spots = construction.coverArea(room.controller.pos, 3, terrain);
-    //console.log("setContainerSites spots", JSON.stringify(spots));
+    console.log("POLICY_BUILD_CONTROLLER_CONTAINERS setContainerSites spots", JSON.stringify(spots));
     if (spots.length === 0) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
@@ -56,8 +58,9 @@ setContainerSites = function(room) {
     Game.flags[room.controller.id].memory.upgraderPosts = spots;
 
     for (let spot of spots) {
-        //console.log("spot x", spot.x, "spoty", spot.y, "roomname", room.name, JSON.stringify(spot));
-        pos = gf.roomPosFromPos(spot, room.name);
+
+        const pos = gf.roomPosFromPos(spot, room.name);
+        console.log("bulding container at pos",JSON.stringify(pos))
         //const pos = new RoomPosition(spot.x, spot.y, room.name);
         const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
@@ -66,7 +69,7 @@ setContainerSites = function(room) {
     }
 };
 
-areControllerContainerFinished = function (room) {
+Policy.prototype.areControllerContainerFinished = function (room) {
     const posts = state.getControllerPosts(room.controller.id);
     if (!posts) {
         return false;
@@ -88,7 +91,7 @@ Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
     //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS draftReplacment");
     //console.log("areControllerContainerFinished", room.name, areControllerContainerFinished(room));
-    return areControllerContainerFinished(room) ? false : this;
+    return this.areControllerContainerFinished(room) ? false : this;
 };
 
 module.exports = Policy;

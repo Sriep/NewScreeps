@@ -582,10 +582,10 @@ const state = {
     },
 
     findNextSourceContainer : function (creep) {
-        if (creep.room.energyAvailable === gf.roomEc(creep.room)) {
+        //if (creep.room.energyAvailable === gf.roomEc(creep.room)) {
             //console.log("findNextSourceContainer room at capacity");
-            return undefined;
-        }
+            //return undefined;
+        //}
 
         const nextSpawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
         if (nextSpawn && nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
@@ -652,7 +652,7 @@ const state = {
         //const sourceFlag = Game.flags[sourceId];
         //const posts = sourceFlag.memory.harvesterPosts;
         const posts = state.getSourcePosts(sourceId);
-        console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
+        //console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
         const creeps = _.filter(Game.creeps, c =>
             c.memory.targetId === sourceId
             //&& race.getRace(c) === gc.RACE_HARVESTER

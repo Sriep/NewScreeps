@@ -32,7 +32,6 @@ State.prototype.enact = function () {
     if (info.pos) {
         this.creep.memory.targetId = info.sourceId;
         //console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
-        undefined.break;
         return state.switchToMovePos(
             this.creep,
             info.pos,

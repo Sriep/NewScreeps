@@ -111,6 +111,7 @@ const construction = {
     },
 
     coverArea: function (pos, range, terrain) {
+        console.log("coverArea pos", JSON.stringify(pos), "range", range, "terrain", terrain);
         const deltas = this.nxmDeltaArray(range, range);
         let valid = [];
         for ( let dxy of deltas) {
