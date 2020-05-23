@@ -112,8 +112,10 @@ const state = {
                 const post = this.freeHarvesterPost(sourceId, spawnRoom, ec);
                 console.log("nextFreeHarvesterPost freeHarvesterPost", post);
                 if (post) {
-                    return  new RoomPosition(post.x, post.y, colonyObj.name);
-                    //freePosts.push({ "sourceId": sourceId,  "post": postRp });
+                    return {
+                        "sourceId": sourceId,
+                        "post": new RoomPosition(post.x, post.y, colonyObj.name),
+                    };
                 }
             }
         }
@@ -122,7 +124,8 @@ const state = {
             c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
         );
         let leastLife = 9999999;
-        let bestPost;
+        let bestPost, bestSourceId;
+        let colony;
         for (let colonyObj of colonies) {
             for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
                 const sPosts = state.getSourcePosts(sourceId);
@@ -140,13 +143,18 @@ const state = {
                 if (lifeCreepsSource < leastLife) {
                     leastLife = lifeCreepsSource;
                     bestPost = sPost;
+                    bestSourceId = sourceId
+                    colony = colonyObj.name
                 }
                 console.log("nextFreeHarvesterPost dropped after, lifeCreepsSource"
                     ,lifeCreepsSource,"leastLife",leastLife)
 
             }
         }
-        return bestPost;
+        return {
+            "sourceId": bestSourceId,
+            "post": new RoomPosition(bestPost.x, bestPost.y, colony),
+        };
     },
 
     freeHarvesterPost : function (sourceId, spawnRoom, ec) {

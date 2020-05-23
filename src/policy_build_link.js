@@ -110,6 +110,28 @@ Policy.prototype.secondLinkPos = function() {
     Game.flags[room.controller.id].memory.linkPos = linkPos;
 };
 
+Policy.prototype.thirdLinkPos = function() {
+    const room = Game.rooms[this.home];
+    const sources = room.find(FIND_SOURCES);
+    let furthest;
+    let distance = 0;
+    for (let source of sources) {
+        if (state.getSourceLink(source)) {
+            continue
+        }
+        const d = room.findPath(source.pos, room.controller.pos).length;
+        if (d > distance) {
+            distance = d;
+            furthest = source;
+        }
+    }
+
+};
+
+Policy.prototype.getLinkPosAt = function(source) {
+
+}
+
 Policy.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
