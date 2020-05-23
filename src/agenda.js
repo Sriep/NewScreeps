@@ -118,8 +118,7 @@ const activateNewReplacementPolicy = function ( agendaItem, parnetId)  {
 
 const newActivity = {
     "enact": function (agendaItem, parnetId) {
-        parent = policy.getPolicy(parnetId);
-        parent.m[agendaItem] = true;
+        policy.getPolicy(parnetId).m[agendaItem] = true;
     },
     "check": function(){ return true; },
 };
