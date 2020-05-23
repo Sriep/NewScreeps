@@ -112,8 +112,8 @@ const state = {
         for (let colonyObj of colonies) {
             for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
                 const post = this.freeHarvesterPost(sourceId, spawnRoom, ec);
-                const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
                 if (post) {
+                    const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
                     freePosts.push({ "sourceId": sourceId,  "post": postRp });
                 }
             }
@@ -203,15 +203,15 @@ const state = {
 
     listSourceContainers : function(colonies) {
         const containerInfo = [];
-        console.log("listSourceContainers colonies", JSON.stringify(colonies));
+        //console.log("listSourceContainers colonies", JSON.stringify(colonies));
         for (let colonyObj of colonies) {
-            console.log(colonyObj.name,"listSourceContainers sources", JSON.stringify(Game.flags[colonyObj.name].memory.sources));
+            //console.log(colonyObj.name,"listSourceContainers sources", JSON.stringify(Game.flags[colonyObj.name].memory.sources));
             for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
                 const cPos = state.getSourceContainer(sourceId);
-                console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
+                //console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
                 if (cPos) {
                     let distance = Game.flags[colonyObj.name].memory.sources[sourceId].distance;
-                    console.log(colonyObj.name, "distance",JSON.stringify(Game.flags[colonyObj.name].memory.sources));
+                    //console.log(colonyObj.name, "distance",JSON.stringify(Game.flags[colonyObj.name].memory.sources));
                     if (!distance) {
                         distance = 15; // todo fix hack
                     }
@@ -661,10 +661,10 @@ const state = {
             return posts[0];
         }
         const maxHEc = this.maxHEc(ec);
-        //console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
-        //console.log(source.id, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts))
+        console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
+        console.log(sourceId, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts))
         if (creeps.length > maxHEc) {
-            //console.log("freeHarvesterPost return false1")
+            console.log("freeHarvesterPost return false1")
             return false;
         }
         if (maxHEc === 1) {
@@ -676,7 +676,7 @@ const state = {
             if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
                 return this.findFreePostIfPossable(creeps, posts);
             } else {
-                //console.log("freeHarvesterPost return false2")
+                console.log("freeHarvesterPost return false2")
                 return false;
             }
         }

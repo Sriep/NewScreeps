@@ -51,9 +51,9 @@ Policy.prototype.spawns = function (room, resources) {
     const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
     const workers = policy.getCreeps(this.parentId, gc.RACE_WORKER).length;
     const porters = policy.getCreeps(this.parentId, gc.RACE_PORTER).length;
-    //const upgraders = policy.getCreeps(this.parentId, gc.RACE_UPGRADER).length;
+    const upgraders = policy.getCreeps(this.parentId, gc.RACE_UPGRADER).length;
     const reservers = policy.getCreeps(this.parentId, gc.RACE_RESERVER).length;
-    //console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders);
+    console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,"upgraders",upgraders);
 
     const wHarvester = race.creepPartsAlive(this.parentId, gc.RACE_HARVESTER, WORK);
     const cWorker = race.creepPartsAlive(this.parentId, gc.RACE_WORKER, CARRY);
@@ -82,8 +82,8 @@ Policy.prototype.spawns = function (room, resources) {
     const canBuildHarvesters =  wHarvester < resources.hW;
     const canBuildWorkers = cWorker < resources.wW;
     const canBuildPorters = cPorter < resources.pC - 0.1;
-    const canBuildUpgrader = wUpgrader < resources.uW - 0.1;
-    const canBuildReserver = rReserver < resources.rC;
+    const canBuildUpgrader = wUpgrader < resources.uW - 0.2;
+    const canBuildReserver = rReserver < resources.rC - 0.2;
 
     if (room.energyAvailable < room.energyCapacityAvailable) {
         return;

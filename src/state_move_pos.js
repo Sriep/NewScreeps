@@ -91,7 +91,7 @@ State.prototype.pathLost = function () {
             //console.log(this.creep.name, "atHarvestingPost", sourceId);
             if (sourceId) {
                 console.log(this.creep.name,"STATE_HARVESTER_IDLE at harvesting pos", sourceId);
-                harvesters = state.getHarvestingHarvesters(this.creep.policyId);
+                const harvesters = state.getHarvestingHarvesters(this.creep.policyId);
                 for (let i in harvesters) {
                     if (harvester.memory.targetPos.x === this.creep.x
                         && harvester.memory.targetPos.y === this.creep.y) {

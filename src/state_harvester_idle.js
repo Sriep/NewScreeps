@@ -19,7 +19,7 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
     const home = Game.rooms[this.homeId];
 
     const governor = policy.getGouvernerPolicy(this.homeId);
@@ -28,6 +28,7 @@ State.prototype.enact = function () {
         governor.getColonies(),
         home.energyCapacityAvailable
     ).freePosts[0];
+    console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", nextPost);
     if (nextPost) {
         console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
         this.m.targetId = nextPost.sourceId;
