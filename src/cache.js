@@ -7,9 +7,9 @@ const gc = require("gc");
 
 const cache = {
 
-    global: function(_this, fn, name, args,  force) {
+    global: function( fn, _this, args, name, force) {
         if (!global[name] || force) {
-            global[name] = fn(...args).bind(_this);
+            global[name] = fn.apply(_this, args);
         }
         return global[name];
     },
