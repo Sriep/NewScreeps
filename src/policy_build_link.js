@@ -49,12 +49,15 @@ Policy.prototype.enact = function () {
     if (links.length + beingBuilt.length >= allowedLinks) {
         return;
     }
+
+    let newLinkPos;
     switch (links.length + beingBuilt.length) {
         case 0:
-            this.firstLinkPos();
+        case 2:
+            newLinkPos = this.sourceLinkPos();
             break;
         case 1:
-            this.secondLinkPos();
+            newLinkPos = this.controllerLinkPos();
             break;
         default:
             console.log("POLICY_BUILD_LINK not supported yet", links.length + beingBuilt.length)
@@ -64,38 +67,7 @@ Policy.prototype.enact = function () {
     policy.buildStructuresLooseSpiral(room, STRUCTURE_STORAGE, wantedLinks, 0);
 };
 
-Policy.prototype.firstLinkPos = function() {
-    const room = Game.rooms[this.home];
-    let source;
-    const sources = room.find(FIND_SOURCES);
-    if (sources.length === 1) {
-        source = source[0];
-    } else {
-        const path = [];
-        for (let source of sources) {
-            path.push(room.findPath(source.pos, room.controller.pos).length)
-        }
-        source = path[0] > path[1] ? sources[0] : sources[1];
-    }
-    const containerPos = state.getSourceContainer(source.id);
-    const terrain = room.getTerrain();
-    let adjacent = 0;
-    let linkPos;
-    for (let delta of gc.ONE_MOVE) {
-        if (terrain.get(containerPos.x+delta.x, containerPos.y+delta.y) !== TERRAIN_MASK_WALL) {
-            if (adjacent === 0) {
-                adjacent++
-            } else {
-                linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, room.name);
-                break;
-            }
-        }
-    }
-    linkPos.createConstructionSite(STRUCTURE_LINK);
-    Game.flags[source.id].memory.linkPos = linkPos;
-};
-
-Policy.prototype.secondLinkPos = function() {
+Policy.prototype.controllerLinkPos = function() {
     const room = Game.rooms[this.home];
     const terrain = room.getTerrain();
     const posts = state.getControllerPosts(room.controller.id);
@@ -110,10 +82,10 @@ Policy.prototype.secondLinkPos = function() {
     Game.flags[room.controller.id].memory.linkPos = linkPos;
 };
 
-Policy.prototype.thirdLinkPos = function() {
+Policy.prototype.sourceLinkPos = function() {
     const room = Game.rooms[this.home];
     const sources = room.find(FIND_SOURCES);
-    let furthest;
+    let furthestSource;
     let distance = 0;
     for (let source of sources) {
         if (state.getSourceLink(source)) {
@@ -122,15 +94,31 @@ Policy.prototype.thirdLinkPos = function() {
         const d = room.findPath(source.pos, room.controller.pos).length;
         if (d > distance) {
             distance = d;
-            furthest = source;
+            furthestSource = source;
         }
+    }
+    if (furthestSource) {
+        return this.getLinkPosAt(furthestSource)
     }
 
 };
 
 Policy.prototype.getLinkPosAt = function(source) {
-
-}
+    const containerPos = state.getSourceContainer(source.id);
+    const terrain = source.room.getTerrain();
+    let adjacent = 0;
+    let linkPos;
+    for (let delta of gc.ONE_MOVE) {
+        if (terrain.get(containerPos.x+delta.x, containerPos.y+delta.y) !== TERRAIN_MASK_WALL) {
+            if (adjacent === 0) {
+                adjacent++
+            } else {
+                linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, room.name);
+                return linkPos;
+            }
+        }
+    }
+};
 
 Policy.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;

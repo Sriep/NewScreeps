@@ -96,8 +96,8 @@ const policy = {
         Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
         //console.log("calling initilise policy", JSON.stringify(policy));
         if (!policy.initilise()) {
-            //console.log("Policy initilise failed no policy added policyType", policyType,
-             //   "data", JSON.stringify(data), "parentId", parentId);
+            console.log("Policy initilise failed no policy added policyType", policyType,
+                "data", JSON.stringify(data), "parentId", parentId);
             delete Memory.policyRates[newPolicyId];
             Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
@@ -105,7 +105,7 @@ const policy = {
          if (parentId) {
             Memory.policies[parentId].m.childTypes.push(policyType);
         }
-        //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
+        console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
         Memory.policies[newPolicyId] = policy;
 
         Memory.nextPolicyId = Memory.nextPolicyId + 1;

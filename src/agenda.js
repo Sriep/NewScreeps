@@ -34,6 +34,7 @@ const agenda = {
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.POLICY_BUILD_STORAGE,
             gc.ACTIVITY_FINISHED
         ],
@@ -77,6 +78,7 @@ const agenda = {
         fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_EXTENSIONS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_TOWER] = newBlockerPolicy;
+        fc[gc.POLICY_BUILD_STORAGE] = newBlockerPolicy;
         fc[gc.ACTIVITY_NEUTRAL_COLONIES] = newActivity;
         fc[gc.ACTIVITY_RESERVED_COLONIES] = newActivity;
         fc[gc.ACTIVITY_FINISHED]  = {

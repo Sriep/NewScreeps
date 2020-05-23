@@ -24,7 +24,7 @@ Policy.prototype.initilise = function () {
     }
     this.home = Memory.policies[this.parentId].roomName;
     this.m.planned = false;
-    const room = Game.rooms[this.m.roomName];
+    const room = Game.rooms[this.home];
     return !!room && !!room.controller && room.controller.my && this.m.roads;
 };
 
