@@ -39,7 +39,7 @@ Policy.prototype.enact = function () {
     if (this.m.planned || Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
-    const room = Game.rooms[this.m.roomName];
+    const room = Game.rooms[this.home];
     console.log("POLICY_BUILD_ROADS about to plan",this.roads);
     switch (this.roads) {
         case gc.BUILD_ROAD_SOURCE_SPAWN:
@@ -72,9 +72,8 @@ Policy.prototype.enact = function () {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    console.log("draftReplacment roads built?",construction.roadsBuilt(room)
-        , "planned", this.m.planned);
-   // return false;//  this;
+    //console.log("draftReplacment roads built?",construction.roadsBuilt(room)
+    //    , "planned", this.m.planned);
     return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 
