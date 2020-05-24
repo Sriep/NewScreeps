@@ -82,6 +82,7 @@ const gc = {
     MIN_HARVESTER_EC: 300,
     MAX_HARVESTER_EC: 800,
     HARVESTER_BODY: {
+        0 : [],
         300 : [C.WORK, C.WORK, C.CARRY, C.MOVE],
         350 : [C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
         400 : [C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE],
@@ -95,6 +96,7 @@ const gc = {
         800 : [C.WORK, C.WORK, C.WORK, C.WORK, C.WORK, C.CARRY, C.MOVE, C.MOVE, C.MOVE, C.MOVE, C.MOVE],
     },
     HARVESTER_BODY_COUNTS: {
+        0 : {"work": 0, "carry": 0, "move" : 0},
         300 : {"work": 2, "carry": 1, "move" : 1},
         350 : {"work": 2, "carry": 1, "move" : 2},
         400 : {"work": 2, "carry": 1, "move" : 2},

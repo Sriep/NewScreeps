@@ -15,7 +15,7 @@ function Policy  (id, data) {
     this.type = gc.POLICY_BUILD_CONTROLLER_CONTAINERS;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 // runs first time policy is created only

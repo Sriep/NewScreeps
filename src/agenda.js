@@ -40,19 +40,26 @@ const agenda = {
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
+            gc.POLICY_BUILD_TOWER,
             gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.ACTIVITY_FINISHED,
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.ACTIVITY_FINISHED ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.ACTIVITY_FINISHED
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
+            gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.ACTIVITY_FINISHED
         ],

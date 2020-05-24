@@ -11,7 +11,7 @@ function Policy  (id, data) {
     this.id = id;
     this.type = gc.POLICY_GOVERN;
     this.roomName = data.roomName;
-    this.m = data.m;
+    this.m = data;
 }
 
 Policy.prototype.initilise = function () {

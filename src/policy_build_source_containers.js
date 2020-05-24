@@ -14,7 +14,7 @@ function Policy  (id, data) {
     this.type = gc.POLICY_BUILD_SOURCE_CONTAINERS;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 Policy.prototype.initilise = function () {

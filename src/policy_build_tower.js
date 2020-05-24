@@ -14,7 +14,7 @@ function Policy  (id, data) {
     this.id = id;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 Policy.prototype.initilise = function () {

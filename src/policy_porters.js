@@ -18,7 +18,7 @@ function Policy  (id, data) {
     this.type = gc.POLICY_PORTERS;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 Policy.prototype.initilise = function () {
@@ -158,6 +158,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
     const ec = homeRoom.energyCapacityAvailable;
     const sourceEnergyLT = 30000;
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
+        console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)))
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {

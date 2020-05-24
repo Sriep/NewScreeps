@@ -15,7 +15,7 @@ function Policy  (id, data) {
     this.type = gc.POLICY_MINE_ROOM;
     this.id = id;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 // runs first time policy is created only

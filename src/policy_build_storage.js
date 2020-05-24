@@ -14,7 +14,7 @@ function Policy  (id, data) {
     this.id = id;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.m = data.m;
+    this.m = data;
 }
 
 // runs first time policy is created only
@@ -36,20 +36,22 @@ Policy.prototype.enact = function () {
     const room = Game.rooms[this.home];
     const rcl = room.controller.level;
     const allowedStorage = CONTROLLER_STRUCTURES[STRUCTURE_STORAGE][rcl];
-    const storage = room.find(FIND_MY_STRUCTURES, {
+    const storages = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: STRUCTURE_STORAGE }
     });
-    if (storage.length >= allowedStorage) {
+    if (storages.length >= allowedStorage) {
         this.m.finished = true;
         return;
     }
     const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
         filter: { structureType: STRUCTURE_STORAGE }
     });
-    if (storage.length + beingBuilt.length >= allowedStorage) {
+    if (storages.length + beingBuilt.length >= allowedStorage) {
         return;
     }
-    const wantedStorage = allowedStorage - storage.length - beingBuilt.length;
+    console.log("POLICY_BUILD_STORAGE allowedStorage",allowedStorage,"storages.length",storages.length
+        ,"beingBuilt.length",beingBuilt.length);
+    const wantedStorage = allowedStorage - storages.length - beingBuilt.length;
     policy.buildStructuresLooseSpiral(room, STRUCTURE_STORAGE, wantedStorage, 0);
 };
 
