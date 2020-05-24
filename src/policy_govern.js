@@ -11,7 +11,7 @@ function Policy  (id, data) {
     this.id = id;
     this.type = gc.POLICY_GOVERN;
     this.roomName = data.roomName;
-    this.m = data;
+    this.m = data.m;
 }
 
 Policy.prototype.initilise = function () {
@@ -22,15 +22,17 @@ Policy.prototype.initilise = function () {
     this.m.agendaIndex = -1;
     this.m.childTypes = [];
     this.m.colonies = [{ "name" : this.roomName }];
-    //console.log("this.m.colonies", JSON.stringify(this.m.colonies));
-    this.m.agenda = agenda.peace;
-    this.m[gc.ACTIVITY_FOREIGN_MINING] = false;
+
+    this.m.agenda = agenda.default_1;
+    this.m[gc.ACTIVITY_NEUTRAL_COLONIES] = false;
     this.m.parts = 0;
+    console.log("this.m.colonies", JSON.stringify(this.m.colonies),"this",JSON.stringify(this));
     return true;
 };
 
 Policy.prototype.enact = function () {
-    console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_FOREIGN_MINING],"colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_NEUTRAL_COLONIES],"colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN this", JSON.stringify(this));
     if (!Memory.records["rcl "+this.m.rcl] ) {
         Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }

@@ -15,7 +15,7 @@ const cache = require("cache");
 function Policy  (id, data) {
     this.type = gc.POLICY_COLONIAL_OFFICE;
     this.id = id;
-    this.m = data;
+    this.m = data.m;
 }
 
 // runs first time policy is created only

@@ -7,7 +7,7 @@ const gc = require("gc");
 const policy = require("policy");
 
 const agenda = {
-    peace: [
+    default_1: [
         [ gc.ACTIVITY_DISALLOWED ],
         [ gc.POLICY_RCL1, gc.ACTIVITY_FINISHED ],
         [

@@ -75,10 +75,7 @@ const policy = {
             const room = Game.rooms[roomName];
             if (!room.memory.policy || !Memory.policies[room.memory.policy] ) {
                 if (room.controller && room.controller.my) {
-                    //console.log("call activate policy checkRoomPolicies room", roomName);
                     room.memory.policy = this.activatePolicy(gc.POLICY_GOVERN, {roomName: roomName})
-                } else {
-                    //room.memory.policy = this.activatePolicy(gc.POLICY_NEUTRAL_ROOM, {roomId: roomId})
                 }
             }
         }

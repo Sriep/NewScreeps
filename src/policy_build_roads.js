@@ -8,12 +8,13 @@ const gf = require("gf");
 const gc = require("gc");
 const construction = require("construction");
 
-// constructor
+// constructor {"roads" : agendaItem},
 function Policy  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_ROADS;
     this.parentId = data.parentId;
     this.home = data.home;
+    this.roads = data.roads;
     this.m = data;
     console.log("POLICY_BUILD_ROADS constuctor this", JSON.stringify(this),
         "data",JSON.stringify(data));
@@ -39,8 +40,8 @@ Policy.prototype.enact = function () {
         return;
     }
     const room = Game.rooms[this.m.roomName];
-    console.log("POLICY_BUILD_ROADS about to plan",this.m.roads);
-    switch (this.m.roads) {
+    console.log("POLICY_BUILD_ROADS about to plan",this.roads);
+    switch (this.roads) {
         case gc.BUILD_ROAD_SOURCE_SPAWN:
             construction.buildRoadSourceSpawn(room);
             break;
@@ -60,7 +61,7 @@ Policy.prototype.enact = function () {
             construction.buildRoadSourceTowers(room);
             break;
         default:
-           gf.fatalError("building unknown road "+ this.m.roads);
+           gf.fatalError("building unknown road "+ this.roads);
     }
     this.m.planned = true;
 };
