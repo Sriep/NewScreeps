@@ -13,7 +13,7 @@ const flag = require("flag");
 const race_harvester = require("race_harvester");
 const memory = require("memory");
 
-function Policy  (id, data) {
+function PolicyPorters  (id, data) {
     this.id = id;
     this.type = gc.POLICY_PORTERS;
     this.parentId = data.parentId;
@@ -21,7 +21,7 @@ function Policy  (id, data) {
     this.m = data.m;
 }
 
-Policy.prototype.initilise = function () {
+PolicyPorters.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -30,7 +30,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyPorters.prototype.enact = function () {
     //console.log("POLICY_PORTERS budget", JSON.stringify( budget.porterRoom(Game.rooms[this.home])));
     //console.log("POLICY_PORTERS resources", JSON.stringify(this.m.resources));
     const room = Game.rooms[this.home];
@@ -45,7 +45,7 @@ Policy.prototype.enact = function () {
     console.log("POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
 };
 
-Policy.prototype.spawns = function (room, resources) {
+PolicyPorters.prototype.spawns = function (room, resources) {
     console.log("pp spawns resources", JSON.stringify(resources));
 
     const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
@@ -146,11 +146,11 @@ Policy.prototype.spawns = function (room, resources) {
     }
 };
 
-Policy.prototype.localResources = function () {
+PolicyPorters.prototype.localResources = function () {
 
 };
 
-Policy.prototype.calcResources = function (roomType1, roomType2) {
+PolicyPorters.prototype.calcResources = function (roomType1, roomType2) {
     let resources;
     this.m.curProduction = {};
     const homeRoom = Game.rooms[this.home];
@@ -158,7 +158,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
     const ec = homeRoom.energyCapacityAvailable;
     const sourceEnergyLT = 30000;
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)))
+        console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)));
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {
@@ -224,7 +224,7 @@ Policy.prototype.calcResources = function (roomType1, roomType2) {
     return resources
 };
 
-Policy.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
+PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
     //console.log("updateRoomResources roomName", roomName, "hW", hW, "pC", pC, "uW", uW);
     const room = Game.rooms[roomName];
     if (!room) { // todo cache updateRoomResources somehow so can return that if no sight on room
@@ -254,7 +254,7 @@ Policy.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
     return { "hW": hW, "pC" : porterCs, "wW" : workerWs,  "uW": upgradeWs };
 };
 
-Policy.prototype.localBudget = function() {
+PolicyPorters.prototype.localBudget = function() {
     room = Game.rooms[this.home];
     //console.log("pp localBudget localResources", JSON.stringify(this.m.localResoures));
     const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
@@ -298,11 +298,11 @@ Policy.prototype.localBudget = function() {
     };
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyPorters.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyPorters;
 
 
 

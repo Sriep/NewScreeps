@@ -8,12 +8,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StatePorterTransfer (creep) {
     this.type = gc.STATE_PORTER_TRANSFER;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StatePorterTransfer.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_PORTER_TRANSFER");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
@@ -55,6 +55,6 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
     }
     state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-}
+};
 
-module.exports = State;
+module.exports = StatePorterTransfer;

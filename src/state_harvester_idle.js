@@ -10,7 +10,7 @@ const state = require("state");
 const policy = require("policy");
 //const budget = require("budget");
 
-function State (creep) {
+function StateHarvesterIdle (creep) {
     this.creep = creep;
     this.state = gc.STATE_HARVESTER_IDLE;
     this.policyId = creep.memory.policyId;
@@ -18,7 +18,7 @@ function State (creep) {
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StateHarvesterIdle.prototype.enact = function () {
     console.log(this.creep.name, "STATE_HARVESTER_IDLE");
     const home = Game.rooms[this.homeId];
 
@@ -41,7 +41,7 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateHarvesterIdle;
 
 
 

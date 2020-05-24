@@ -8,7 +8,7 @@ const gc = require("gc");
 const policy = require("policy");
 const flag = require("flag");
 
-function Policy  (id, data) {
+function PolicyRcl1  (id, data) {
     this.id = id;
     this.type = gc.POLICY_RCL1;
     this.parentId = data.parentId;
@@ -16,7 +16,7 @@ function Policy  (id, data) {
     this.m = data;
 }
 
-Policy.prototype.initilise = function () {
+PolicyRcl1.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -27,7 +27,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyRcl1.prototype.enact = function () {
     //console.log("POLICY_RCL1 enact");
     const room = Game.rooms[this.home];
 
@@ -43,15 +43,15 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.budget = function() {
+PolicyRcl1.prototype.budget = function() {
     return { "net energy" : 0, "parts" : 0 };
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyRcl1.prototype.draftReplacment = function() {
     return Game.rooms[this.home].controller.level === 1 ? this : false;
 };
 
-module.exports = Policy;
+module.exports = PolicyRcl1;
 
 
 

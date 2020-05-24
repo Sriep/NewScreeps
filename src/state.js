@@ -110,7 +110,7 @@ const state = {
         for (let colonyObj of colonies) {
             for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
                 const post = this.freeHarvesterPost(sourceId, spawnRoom, ec);
-                console.log("nextFreeHarvesterPost freeHarvesterPost", post);
+                //console.log("nextFreeHarvesterPost freeHarvesterPost", post);
                 if (post) {
                     return {
                         "sourceId": sourceId,
@@ -119,7 +119,7 @@ const state = {
                 }
             }
         }
-        console.log("nextFreeHarvesterPost dropped though, extrta rounding error harvester");
+        //console.log("nextFreeHarvesterPost dropped though, extrta rounding error harvester");
         const creeps = _.filter(Game.creeps, c =>
             c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
         );
@@ -138,16 +138,16 @@ const state = {
                 for (let sc of sourceCreeps) {
                     lifeCreepsSource += sc.ticksToLive;
                 }
-                console.log("nextFreeHarvesterPost dropped before, lifeCreepsSource"
-                    ,lifeCreepsSource,"leastLife",leastLife,"bestPost",JSON.stringify(sPost));
+                //console.log("nextFreeHarvesterPost dropped before, lifeCreepsSource"
+                //    ,lifeCreepsSource,"leastLife",leastLife,"bestPost",JSON.stringify(sPost));
                 if (lifeCreepsSource < leastLife) {
                     leastLife = lifeCreepsSource;
                     bestPost = sPost;
                     bestSourceId = sourceId;
                     colony = colonyObj.name
                 }
-                console.log("nextFreeHarvesterPost dropped after, lifeCreepsSource"
-                    ,lifeCreepsSource,"leastLife",leastLife)
+                //console.log("nextFreeHarvesterPost dropped after, lifeCreepsSource"
+                //    ,lifeCreepsSource,"leastLife",leastLife)
             }
         }
         return {
@@ -166,8 +166,8 @@ const state = {
             return posts[0];
         }
         const maxHEc = this.maxHEc(ec);
-        console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
-        console.log(sourceId, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts));
+        //console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
+        //console.log(sourceId, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts));
         if (creeps.length > maxHEc) {
             console.log("freeHarvesterPost return false1");
             return false;
@@ -181,7 +181,7 @@ const state = {
             if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
                 return this.findFreePostIfPossable(creeps, posts);
             } else {
-                console.log("freeHarvesterPost return false2");
+                //console.log("freeHarvesterPost return false2");
                 return false;
             }
         }
@@ -222,23 +222,22 @@ const state = {
         const containersInfo = this.listSourceContainers(colonies);
         //console.log("findPorterSourceContainer containersInfo before", JSON.stringify(containersInfo));
 
-        for (let container of containersInfo) {
-            const tripsPerLifetimePerPorter = CREEP_LIFE_TIME / (2 * container.distance);
+        for (let info of containersInfo) {
+            const tripsPerLifetimePerPorter = CREEP_LIFE_TIME / (2 * info.distance);
             const fPorters = porters.filter(p =>
-                p.memory.targetPos.x === container.pos.x
-                && p.memory.targetPos.y === container.pos.y
+                p.memory.targetPos.x === info.pos.x
+                && p.memory.targetPos.y === info.pos.y
             );
             containersInfo["tripsLT"] = fPorters.length * tripsPerLifetimePerPorter;
-            container["tripsLT"] = porters.filter(p =>
-                p.memory.targetPos.x === container.pos.x
-                && p.memory.targetPos.y === container.pos.y
+            info["tripsLT"] = porters.filter(p =>
+                p.memory.targetPos.x === info.pos.x
+                && p.memory.targetPos.y === info.pos.y
             ).length * tripsPerLifetimePerPorter;
         }
         containersInfo.sort((c1, c2) => c1.tripsLT - c2.tripsLT);
         if (containersInfo[0].tripsLT * porterCC >= gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY) {
             return;
         }
-
         console.log("findPorterSourceContainer containersInfo after", JSON.stringify(containersInfo));
         for (let info of containersInfo) {
             const harvesters = _.filter(Game.creeps, c => {
@@ -247,14 +246,17 @@ const state = {
             });
 
             if (harvesters.length !== 0) {
-                return info;
+                const source = Game.getObjectById(info.sourceId);
+                if (source.energy > 0 && source.ticksToRegeneration <= info.distance) {
+                    return info;
+                }
             }
         }
 
         let maxEnergySoFar = 0;
         let fullestContainer;
         for (let info of containersInfo) {
-            cRoom = Game.rooms[info.pos.roomName];
+            const cRoom = Game.rooms[info.pos.roomName];
             if (cRoom) {
                 const container  = state.findContainerAt(new RoomPosition(info.x, info.y, info.roomName));
                 if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {

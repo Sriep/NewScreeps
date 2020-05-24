@@ -8,7 +8,7 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateUpgraderIdle (creep) {
     this.creep = creep;
     this.state = gc.STATE_UPGRADER_IDLE;
     this.policyId = creep.memory.policyId;
@@ -16,7 +16,7 @@ function State (creep) {
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StateUpgraderIdle.prototype.enact = function () {
     const home = Game.rooms[this.homeId];
     //console.log(this.creep.name, "STATE_UPGRADER_IDLE");
 
@@ -47,7 +47,7 @@ State.prototype.enact = function () {
     }
 };
 
-State.prototype.goUpgrade = function (post) {
+StateUpgraderIdle.prototype.goUpgrade = function (post) {
     const home = Game.rooms[this.homeId];
     if (!post) {
         post =  state.findFreeUpgraderPost(home);
@@ -65,7 +65,7 @@ State.prototype.goUpgrade = function (post) {
     );
 };
 
-module.exports = State;
+module.exports = StateUpgraderIdle;
 
 
 

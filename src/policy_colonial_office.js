@@ -12,14 +12,14 @@ const memory = require("memory");
 const cache = require("cache");
 
 // constructor
-function Policy  (id, data) {
+function PolicyColonialOffice  (id, data) {
     this.type = gc.POLICY_COLONIAL_OFFICE;
     this.id = id;
     this.m = data.m;
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyColonialOffice.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -33,7 +33,7 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyColonialOffice.prototype.enact = function () {
     //if (Game.time + this.id % 5 !== 0) { // todo
     //    return
     //}
@@ -49,7 +49,7 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.checkRoom = function (roomName) {
+PolicyColonialOffice.prototype.checkRoom = function (roomName) {
     console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = Game.flags[roomName].memory;
     if (m.spawnRoom) {
@@ -108,14 +108,14 @@ Policy.prototype.checkRoom = function (roomName) {
     }
 };
 
-Policy.prototype.build = function(colony, spawnRoom, useRoad) {
+PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
     this.buildSourceSupport(colony, spawnRoom);
     if (useRoad) {
         this.buildRoads(colony, spawnRoom)
     }
 };
 
-Policy.prototype.buildSourceSupport = function(colony, spawnRoom) {
+PolicyColonialOffice.prototype.buildSourceSupport = function(colony, spawnRoom) {
     console.log("buildSourceSupport colony", colony.name, "spawn room", spawnRoom.name);
     const roomFlag = flag.getRoomFlag(colony.name).memory;
     const sources = colony.find(FIND_SOURCES);
@@ -125,7 +125,7 @@ Policy.prototype.buildSourceSupport = function(colony, spawnRoom) {
     }
 };
 
-Policy.prototype.buildRoads = function(colony, spawnRoom) {
+PolicyColonialOffice.prototype.buildRoads = function(colony, spawnRoom) {
     const spawns = spawnRoom.find(FIND_MY_SPAWNS);
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {
@@ -138,11 +138,11 @@ Policy.prototype.buildRoads = function(colony, spawnRoom) {
 };
 
 
-Policy.prototype.draftReplacment = function() {
+PolicyColonialOffice.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyColonialOffice;
 
 
 

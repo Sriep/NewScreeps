@@ -7,12 +7,12 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerHarvest (creep) {
     this.type = gc.STATE_WORKER_HARVEST;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateWorkerHarvest.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_HARVEST")
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
@@ -46,6 +46,6 @@ State.prototype.enact = function () {
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_FULL_IDLE);
     }
-}
+};
 
-module.exports = State;
+module.exports = StateWorkerHarvest;

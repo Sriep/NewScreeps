@@ -9,15 +9,15 @@ const gc = require("gc");
 const policy = require("policy");
 
 // constructor
-function Policy  (id, data) {
-    this.type = gc.POLICY_BUILD_LINK;
+function PolicyBuildLinks  (id, data) {
+    this.type = gc.POLICY_BUILD_LINKS;
     this.id = id;
     this.home = data.home;
     this.m = data.m;
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyBuildLinks.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -28,7 +28,7 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyBuildLinks.prototype.enact = function () {
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
@@ -67,7 +67,7 @@ Policy.prototype.enact = function () {
     policy.buildStructuresLooseSpiral(room, STRUCTURE_STORAGE, wantedLinks, 0);
 };
 
-Policy.prototype.controllerLinkPos = function() {
+PolicyBuildLinks.prototype.controllerLinkPos = function() {
     const room = Game.rooms[this.home];
     const terrain = room.getTerrain();
     const posts = state.getControllerPosts(room.controller.id);
@@ -82,7 +82,7 @@ Policy.prototype.controllerLinkPos = function() {
     Game.flags[room.controller.id].memory.linkPos = linkPos;
 };
 
-Policy.prototype.sourceLinkPos = function() {
+PolicyBuildLinks.prototype.sourceLinkPos = function() {
     const room = Game.rooms[this.home];
     const sources = room.find(FIND_SOURCES);
     let furthestSource;
@@ -103,7 +103,7 @@ Policy.prototype.sourceLinkPos = function() {
 
 };
 
-Policy.prototype.getLinkPosAt = function(source) {
+PolicyBuildLinks.prototype.getLinkPosAt = function(source) {
     const containerPos = state.getSourceContainer(source.id);
     const terrain = source.room.getTerrain();
     let adjacent = 0;
@@ -120,11 +120,11 @@ Policy.prototype.getLinkPosAt = function(source) {
     }
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyBuildLinks.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildLinks;
 
 
 

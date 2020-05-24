@@ -7,7 +7,7 @@
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerIdle (creep) {
     this.type = gc.STATE_WORKER_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
@@ -16,7 +16,7 @@ function State (creep) {
     // console.log("STATE_WORKER_IDLE this", JSON.stringify(this));
 }
 
-State.prototype.enact = function () {
+StateWorkerIdle.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_WORKER_IDLE")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
@@ -36,7 +36,7 @@ State.prototype.enact = function () {
     return this.enactOld();
 };
 
-State.prototype.findNewRoom = function(homeName) {
+StateWorkerIdle.prototype.findNewRoom = function(homeName) {
     const governor = policy.getGouvernerPolicy(homeName);
     let colonies = governor.m.colonies;
     if (colonies.length === 0) {
@@ -54,7 +54,7 @@ State.prototype.findNewRoom = function(homeName) {
     return false;
 };
 
-State.prototype.workToDo = function(colonyName) {
+StateWorkerIdle.prototype.workToDo = function(colonyName) {
     const colony = Game.rooms[colonyName];
     let nextConstructionSite = colony.find(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite) {
@@ -67,7 +67,7 @@ State.prototype.workToDo = function(colonyName) {
     });
 };
 
-State.prototype.enactOld = function () {
+StateWorkerIdle.prototype.enactOld = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
     }
@@ -126,7 +126,7 @@ State.prototype.enactOld = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateWorkerIdle;
 
 
 

@@ -8,7 +8,7 @@ const gf = require("gf");
 //const flag = require("flag");
 const state = require("state");
 
-function State (creep) {
+function StateScoutIdle (creep) {
     this.type = gc.STATE_SCOUT_IDLE;
     this.creep = creep;
     //console.log("constructor STATE_SCOUT_IDLE memory", JSON.stringify(this.creep.memory));
@@ -16,7 +16,7 @@ function State (creep) {
     //console.log("constructor STATE_SCOUT_IDLE m", JSON.stringify(this.m));
 }
 
-State.prototype.enact = function () {
+StateScoutIdle.prototype.enact = function () {
     //const nextRoom = this.m.nextRoom;
     //console.log("STATE_SCOUT_IDLE enact this.m.nextRoom", this.m.nextRoom)
     let dir = this.m.direction;
@@ -98,7 +98,7 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateScoutIdle;
 
 
 

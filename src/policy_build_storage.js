@@ -9,7 +9,7 @@ const gc = require("gc");
 const policy = require("policy");
 
 // constructor
-function Policy  (id, data) {
+function PolicyBuildStorage  (id, data) {
     this.type = gc.POLICY_BUILD_STORAGE;
     this.id = id;
     this.parentId = data.parentId;
@@ -18,7 +18,7 @@ function Policy  (id, data) {
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyBuildStorage.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -29,7 +29,7 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyBuildStorage.prototype.enact = function () {
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
@@ -59,11 +59,11 @@ Policy.prototype.enact = function () {
 // return anything without a type field to delete the policy
 // return a valid policy to replace this policy with that
 // return this to change policy to itself, ie no change.
-Policy.prototype.draftReplacment = function() {
+PolicyBuildStorage.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildStorage;
 
 
 

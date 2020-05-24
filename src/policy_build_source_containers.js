@@ -9,7 +9,7 @@ const gc = require("gc");
 const policy = require("policy");
 //const state = require("state");
 
-function Policy  (id, data) {
+function PolicyBuildSourceContainers  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_SOURCE_CONTAINERS;
     this.parentId = data.parentId;
@@ -17,7 +17,7 @@ function Policy  (id, data) {
     this.m = data.m;
 }
 
-Policy.prototype.initilise = function () {
+PolicyBuildSourceContainers.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -26,7 +26,7 @@ Policy.prototype.initilise = function () {
     return !!room && !!room.controller && room.controller.my;
 };
 
-Policy.prototype.enact = function () {
+PolicyBuildSourceContainers.prototype.enact = function () {
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
@@ -37,12 +37,12 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyBuildSourceContainers.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
     return policy.areSourceContainersFinished(room) ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildSourceContainers;
 
 
 

@@ -10,7 +10,7 @@ const state = require("state");
 const construction = require("construction");
 
 // constructor
-function Policy  (id, data) {
+function PolicyBuildControllerContainers  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_CONTROLLER_CONTAINERS;
     this.parentId = data.parentId;
@@ -19,7 +19,7 @@ function Policy  (id, data) {
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyBuildControllerContainers.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -28,7 +28,7 @@ Policy.prototype.initilise = function () {
     return !!room && !!room.controller && room.controller.my;
 };
 
-Policy.prototype.enact = function () {
+PolicyBuildControllerContainers.prototype.enact = function () {
     console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         //return;
@@ -36,13 +36,13 @@ Policy.prototype.enact = function () {
     const room = Game.rooms[this.home];
     if (state.getControllerPosts(room.controller.id)) {
         const cp = state.getControllerPosts(room.controller.id);
-        console.log("POLICY_BUILD_CONTROLLER_CONTAINERS state.getControllerPosts",JSON.stringify(cp))
+        console.log("POLICY_BUILD_CONTROLLER_CONTAINERS state.getControllerPosts",JSON.stringify(cp));
         return;
     }
     this.setContainerSites(room);
 };
 
-Policy.prototype.setContainerSites = function(room) {
+PolicyBuildControllerContainers.prototype.setContainerSites = function(room) {
     const terrain = room.getTerrain();
     let spots = construction.coverArea(room.controller.pos, 3, terrain);
     console.log("POLICY_BUILD_CONTROLLER_CONTAINERS setContainerSites spots", JSON.stringify(spots));
@@ -60,7 +60,7 @@ Policy.prototype.setContainerSites = function(room) {
     for (let spot of spots) {
 
         const pos = gf.roomPosFromPos(spot, room.name);
-        console.log("bulding container at pos",JSON.stringify(pos))
+        console.log("bulding container at pos",JSON.stringify(pos));
         //const pos = new RoomPosition(spot.x, spot.y, room.name);
         const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
@@ -69,7 +69,7 @@ Policy.prototype.setContainerSites = function(room) {
     }
 };
 
-Policy.prototype.areControllerContainerFinished = function (room) {
+PolicyBuildControllerContainers.prototype.areControllerContainerFinished = function (room) {
     const posts = state.getControllerPosts(room.controller.id);
     if (!posts) {
         return false;
@@ -87,14 +87,14 @@ Policy.prototype.areControllerContainerFinished = function (room) {
 // return anything without a type field to delete the policy
 // return a valid policy to replace this policy with that
 // return this to change policy to itself, ie no change.
-Policy.prototype.draftReplacment = function() {
+PolicyBuildControllerContainers.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
     //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS draftReplacment");
     //console.log("areControllerContainerFinished", room.name, areControllerContainerFinished(room));
     return this.areControllerContainerFinished(room) ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildControllerContainers;
 
 
 

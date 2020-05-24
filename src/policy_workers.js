@@ -11,7 +11,7 @@ const flag = require("flag");
 const budget = require("budget");
 const race = require("race");
 
-function Policy  (id, data) {
+function PolicyWorkers  (id, data) {
     this.id = id;
     this.type = gc.POLICY_WORKERS;
     this.parentId = data.parentId;
@@ -19,7 +19,7 @@ function Policy  (id, data) {
     this.m = data;
 }
 
-Policy.prototype.initilise = function () {
+PolicyWorkers.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -34,7 +34,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyWorkers.prototype.enact = function () {
     console.log("POLICY_WORKERS enact budget room", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];
     const policyId = this.parentId;
@@ -82,20 +82,20 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.equilibriumWorkers = function()  {
+PolicyWorkers.prototype.equilibriumWorkers = function()  {
     return economy.totalSourceAccessPointsRoom(Game.rooms[this.home])+1;
 };
 
-Policy.prototype.budget = function() {
+PolicyWorkers.prototype.budget = function() {
     const netEnergy = budget.workerRoom(Game.rooms[this.home], this.equilibriumWorkers());
     return { "profit" : netEnergy, "parts" :  this.equilibriumWorkers()*3 };
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyWorkers.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyWorkers;
 
 
 

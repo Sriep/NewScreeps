@@ -6,14 +6,14 @@
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StatePorterFullIdle (creep) {
     this.type = gc.STATE_PORTER_FULL_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StatePorterFullIdle.prototype.enact = function () {
     console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
     if (this.creep.room.name !== this.homeId) {
         return state.switchMoveToRoom(
@@ -28,7 +28,7 @@ State.prototype.enact = function () {
     }
 
     const nextDelivery = state.findNextSourceContainer(this.creep);
-    console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery))
+    console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
     if (nextDelivery) {
          this.creep.memory.targetId = nextDelivery.id;
          return state.switchToMovePos(
@@ -40,7 +40,7 @@ State.prototype.enact = function () {
     }
 
     const container = state.findUpgradeContainerToFill(Game.rooms[this.homeId]);
-    console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container))
+    console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container));
     if (container) {
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
@@ -53,4 +53,4 @@ State.prototype.enact = function () {
 
 };
 
-module.exports = State;
+module.exports = StatePorterFullIdle;

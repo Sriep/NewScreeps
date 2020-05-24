@@ -7,14 +7,14 @@ const gc = require("gc");
 //const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerFullIdle (creep) {
     this.type = gc.STATE_WORKER_FULL_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StateWorkerFullIdle.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
     const home = Game.rooms[this.homeId];
     if (home.controller.ticksToDowngrade
@@ -84,4 +84,4 @@ State.prototype.enact = function () {
     );
 };
 
-module.exports = State;
+module.exports = StateWorkerFullIdle;

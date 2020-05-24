@@ -9,7 +9,7 @@ const gc = require("gc");
 const policy = require("policy");
 
 // constructor
-function Policy  (id, data) {
+function PolicyBuildTower  (id, data) {
     this.type = gc.POLICY_BUILD_TOWER;
     this.id = id;
     this.parentId = data.parentId;
@@ -17,7 +17,7 @@ function Policy  (id, data) {
     this.m = data.m;
 }
 
-Policy.prototype.initilise = function () {
+PolicyBuildTower.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -27,7 +27,7 @@ Policy.prototype.initilise = function () {
     return !!room && !!room.controller && room.controller.my;
 };
 
-Policy.prototype.enact = function () {
+PolicyBuildTower.prototype.enact = function () {
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
     }
@@ -55,11 +55,11 @@ Policy.prototype.enact = function () {
     policy.buildStructuresLooseSpiral(room, STRUCTURE_TOWER, wantedTowers, 0);
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyBuildTower.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildTower;
 
 
 

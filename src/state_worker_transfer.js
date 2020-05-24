@@ -7,13 +7,13 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerTransfer (creep) {
     //console.log("in porter constructor", creep.name)
     this.type = gc.STATE_WORKER_TRANSFER;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateWorkerTransfer.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_TRANSFER");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         console.log(this.creep.name, "in STATE_WORKER_TRANSFER this.creep.store.getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY)  );
@@ -67,4 +67,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateWorkerTransfer;

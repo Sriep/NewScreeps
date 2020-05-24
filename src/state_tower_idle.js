@@ -6,12 +6,12 @@
 
 const gc = require("gc");
 
-function State (structure) {
+function StateTowerIdle (structure) {
     this.type = gc.STATE_TOWER_IDLE;
     this.tower = structure;
 }
 
-State.prototype.enact = function () {
+StateTowerIdle.prototype.enact = function () {
     if (this.tower.pos.find(FIND_HOSTILE_CREEPS) > 0) {
         state.switchTo(this.tower, gc.STATE_TOWER_DEFEND)
     }
@@ -28,4 +28,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateTowerIdle;

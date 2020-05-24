@@ -8,7 +8,7 @@ const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
 
-function State (creep) {
+function StatePorterIdle (creep) {
     this.type = gc.STATE_PORTER_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
@@ -16,7 +16,7 @@ function State (creep) {
 }
 
 
-State.prototype.enact = function () {
+StatePorterIdle.prototype.enact = function () {
     console.log(this.creep.name,"STATE_PORTER_IDLE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
@@ -31,7 +31,7 @@ State.prototype.enact = function () {
     console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
     if (info.pos) {
         this.creep.memory.targetId = info.sourceId;
-        //console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
+        console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
         return state.switchToMovePos(
             this.creep,
             info.pos,
@@ -73,4 +73,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StatePorterIdle;

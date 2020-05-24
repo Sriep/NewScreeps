@@ -8,12 +8,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerWithdraw (creep) {
     this.type = gc.STATE_WORKER_WITHDRAW;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateWorkerWithdraw.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_WITHDRAW")
     let target;
     if (this.creep.memory.targetId) {
@@ -51,7 +51,6 @@ State.prototype.enact = function () {
             } else {
                 return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
             }
-            return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("transfer ERR_INVALID_ARGS");
         default:
@@ -61,6 +60,6 @@ State.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
     }
     state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
-}
+};
 
-module.exports = State;
+module.exports = StateWorkerWithdraw;

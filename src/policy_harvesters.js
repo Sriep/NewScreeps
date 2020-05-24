@@ -11,7 +11,7 @@ const state = require("state");
 const flag = require("flag");
 
 
-function Policy  (id, data) {
+function PolicyHarvesters  (id, data) {
     this.id = id;
     this.type = gc.POLICY_HARVESTERS;
     this.parentId = data.parentId;
@@ -19,7 +19,7 @@ function Policy  (id, data) {
     this.m = data.m;
 }
 
-Policy.prototype.initilise = function () {
+PolicyHarvesters.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -27,7 +27,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyHarvesters.prototype.enact = function () {
     console.log("POLICY_HARVESTERS enact budget", JSON.stringify(this.budget()));
     const room = Game.rooms[this.home];
 
@@ -84,15 +84,15 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.budget = function() {
+PolicyHarvesters.prototype.budget = function() {
     return budget.harvesterRoom(Game.rooms[this.home]);
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyHarvesters.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyHarvesters;
 
 
 

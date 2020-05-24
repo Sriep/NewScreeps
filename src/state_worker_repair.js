@@ -7,12 +7,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerRepair (creep) {
     this.type = gc.STATE_WORKER_REPAIR;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateWorkerRepair.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_WORKER_REPAIR")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
@@ -50,6 +50,6 @@ State.prototype.enact = function () {
         //this.creep.say("fixed")
         return state.switchToFullIdle(this.creep);
     }
-}
+};
 
-module.exports = State;
+module.exports = StateWorkerRepair;

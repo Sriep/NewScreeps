@@ -10,12 +10,12 @@ const state = require("state");
 const race = require("race");
 
 //depreciated, use STATE_MOVE_POSITION instead
-function State (creep) {
+function StateMoveTarget (creep) {
     this.type = gc.STATE_MOVE_TARGET;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateMoveTarget.prototype.enact = function () {
     //const target = Game.getObjectById(this.creep.memory.targetId);
     const flag = Game.flags[this.creep.memory.targetName];
     //console.log("STATE_MOVE_TARGET, flag pos", JSON.stringify(flag.pos), "flag name", flag.name);
@@ -51,4 +51,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateMoveTarget;

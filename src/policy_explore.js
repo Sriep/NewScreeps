@@ -10,7 +10,7 @@ const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
 
-function Policy  (id, data) {
+function PolicyExplore  (id, data) {
     this.id = id;
     this.type = gc.POLICY_EXPLORE;
     this.parentId = data.parentId;
@@ -18,7 +18,7 @@ function Policy  (id, data) {
     this.m = data;
 }
 
-Policy.prototype.initilise = function () {
+PolicyExplore.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -28,7 +28,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyExplore.prototype.enact = function () {
     const creeps = policy.getCreeps(this.id, gc.RACE_SCOUT);
     //console.log("POLICY_EXPLORE creeps", creeps.length);
     if (creeps.length < gc.EXPLORE_CREEPS) {
@@ -44,7 +44,7 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.exploreRoom = function(newRoom) {
+PolicyExplore.prototype.exploreRoom = function(newRoom) {
     let roomFlag = flag.getRoomFlag(newRoom);
     if (!roomFlag) {
         gf.fatalError("should have room flag room " + newRoom);
@@ -102,7 +102,7 @@ Policy.prototype.exploreRoom = function(newRoom) {
     }
 };
 
-Policy.prototype.sendExplorers = function(shortfall) {
+PolicyExplore.prototype.sendExplorers = function(shortfall) {
     for (let i = 0; i < shortfall; i++) {
         const data = {
             "body": race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
@@ -122,11 +122,11 @@ Policy.prototype.sendExplorers = function(shortfall) {
     }
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyExplore.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyExplore;
 
 
 

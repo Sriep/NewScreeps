@@ -8,18 +8,18 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StatePorterWithdraw (creep) {
     this.type = gc.STATE_PORTER_WITHDRAW;
     this.creep = creep;
     this.m = this.creep.memory
 }
 
-State.prototype.enact = function () {
+StatePorterWithdraw.prototype.enact = function () {
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
 
-    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
+    console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
     let target;
     if (this.m.targetPos) {
         //console.log("STATE_PORTER_WITHDRAW x", JSON.stringify(this.m.targetPos))
@@ -28,7 +28,7 @@ State.prototype.enact = function () {
         ///    this.m.targetPos.y,
         //    this.m.targetPos.roomName
         //);
-        //console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(pos))
+        console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(this.m.targetPos));
         target = state.findContainerAt(new RoomPosition(
             this.m.targetPos.x,
             this.m.targetPos.y,
@@ -70,25 +70,10 @@ State.prototype.enact = function () {
     } else {
         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
     }
-/* todo code to wait until full before returning. Do we need this?
-    const sources = this.creep.room.find(FIND_SOURCES);
-    let mySource;
-    for (let source of sources) {
-        if (source.pos.isNearTo(this.creep.memory.targetPos.x, this.creep.memory.targetPos.y)){
-            mySource = source;
-            break;
-        }
-    }
-    if (mySource) {
-        creeps = _.filter(Game.creeps, c => c.memory.targetId === mySource.id);
-        if (creeps.length > 0 && creeps[0].pos.isNearTo(mySource)) {
-            return;
-        }
-    }
-*/
+
 };
 
-module.exports = State;
+module.exports = StatePorterWithdraw;
 
 
 

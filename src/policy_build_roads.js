@@ -9,7 +9,7 @@ const gc = require("gc");
 const construction = require("construction");
 
 // constructor {"roads" : agendaItem},
-function Policy  (id, data) {
+function PolicyBuildRoads  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_ROADS;
     this.parentId = data.parentId;
@@ -21,7 +21,7 @@ function Policy  (id, data) {
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyBuildRoads.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -34,7 +34,7 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyBuildRoads.prototype.enact = function () {
     console.log("POLICY_BUILD_ROADS roads",JSON.stringify(this));
     if (this.m.planned || Game.time % gc.BUILD_CHECK_RATE !== 0) {
         return;
@@ -70,14 +70,14 @@ Policy.prototype.enact = function () {
 // return anything without a type field to delete the policy
 // return a valid policy to replace this policy with that
 // return this to change policy to itself, ie no change.
-Policy.prototype.draftReplacment = function() {
+PolicyBuildRoads.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
     console.log("draftReplacment roads built?",construction.roadsBuilt(room)
         , "planned", this.m.planned);
     return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildRoads;
 
 
 

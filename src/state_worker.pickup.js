@@ -7,16 +7,16 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerPickup (creep) {
     //console.log("in porter pickup constructor", creep.name)
     this.type = gc.STATE_WORKER_PICKUP;
-    this.creep = creep
-    this.policyId = creep.memory.policyId
+    this.creep = creep;
+    this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 
-State.prototype.enact = function () {
+StateWorkerPickup.prototype.enact = function () {
     const home = Game.rooms[this.homeId];
     const drop = home.findClosestByRange(FIND_STRUCTURES, {
         filter: { structureType: FIND_DROPPED_RESOURCES }
@@ -55,6 +55,6 @@ State.prototype.enact = function () {
         return state.switchTo(creep, gc.STATE_WORKER_IDLE);
     }
     state.switchTo(creep, gc.STATE_WORKER_FULL_IDLE);
-}
+};
 
-module.exports = State;
+module.exports = StateWorkerPickup;

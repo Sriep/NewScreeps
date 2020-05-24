@@ -8,12 +8,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateHarvesterBuild (creep) {
     this.type = gc.STATE_HARVESTER_BUILD;
     this.creep = creep;
 }
 
-State.prototype.enact = function () {
+StateHarvesterBuild.prototype.enact = function () {
     //console.log(this.creep.namne, "in", "STATE_HARVESTER_BUILD")
     if (state.spaceForHarvest(this.creep)) {
         //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity(RESOURCE_ENERGY))
@@ -81,4 +81,4 @@ State.prototype.enact = function () {
     //console.log(this.creep.name,"sucessful build");
 };
 
-module.exports = State;
+module.exports = StateHarvesterBuild;

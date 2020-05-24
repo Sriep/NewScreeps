@@ -8,12 +8,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StateWorkerReceive (creep) {
     this.type = gc.STATE_WORKER_RECEIVE;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateWorkerReceive.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_RECEIVE")
     const harvester = Game.creeps[this.creep.memory.targetId];
     if (!harvester || harvester.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
@@ -48,4 +48,4 @@ State.prototype.enact = function () {
     state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
 };
 
-module.exports = State;
+module.exports = StateWorkerReceive;

@@ -13,12 +13,12 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 
-function State (creep) {
+function StatePorterReceive (creep) {
     this.type = gc.STATE_PORTER_RECEIVE;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StatePorterReceive.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_PORTER_RECEIVE");
     const harvester = Game.creeps[this.creep.memory.targetId];
     if (!harvester || harvester.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
@@ -51,6 +51,6 @@ State.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-}
+};
 
-module.exports = State;
+module.exports = StatePorterReceive;

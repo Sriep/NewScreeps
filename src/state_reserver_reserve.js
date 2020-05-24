@@ -6,13 +6,13 @@
 
 const gc = require("gc");
 
-function State (creep) {
+function StateReserverReserve (creep) {
     this.type = gc.STATE_RESERVER_RESERVE;
     this.creep = creep;
     this.m = this.creep.memory;
 }
 
-State.prototype.enact = function () {
+StateReserverReserve.prototype.enact = function () {
     const contoller = Game.getObjectById(this.m.targetId);
     const result = this.creep.reserveController(contoller);
     switch (result) {
@@ -33,4 +33,4 @@ State.prototype.enact = function () {
      }
 };
 
-module.exports = State;
+module.exports = StateReserverReserve;

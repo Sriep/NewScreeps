@@ -6,13 +6,13 @@
 
 const gc = require("gc");
 
-function State (structure) {
+function StateTowerDefend (structure) {
     this.type = gc.STATE_TOWER_IDLE;
     this.tower = structure;
 }
 
 //todo need to improve.
-State.prototype.enact = function () {
+StateTowerDefend.prototype.enact = function () {
     if (this.tower.room.find(FIND_HOSTILE_CREEPS).length === 0) {
         state.switchTo(this.tower, gc.STATE_TOWER_IDLE)
     }
@@ -20,4 +20,4 @@ State.prototype.enact = function () {
     this.tower.attack(target);
 };
 
-module.exports = State;
+module.exports = StateTowerDefend;

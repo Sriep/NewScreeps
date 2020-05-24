@@ -7,12 +7,12 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateHarvesterLink (creep) {
     this.type = gc.STATE_HARVESTER_LINK;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateHarvesterLink.prototype.enact = function () {
     console.log(this.creep.name, "STATE_HARVESTER_LINK");
     const sourceLink = state.getObjAtPos(state.getSourceLinkPos(this.creep.memory.targetId), STRUCTURE_LINK);
     const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
@@ -72,7 +72,7 @@ State.prototype.enact = function () {
 
 };
 
-module.exports = State;
+module.exports = StateHarvesterLink;
 
 
 

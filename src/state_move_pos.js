@@ -10,12 +10,12 @@ const state = require("state");
 const race = require("race");
 const cache = require("cache");
 
-function State (creep) {
+function StateMovePos (creep) {
     this.type = gc.STATE_MOVE_POS;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateMovePos.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_MOVE_POS");
     const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos);
     //console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
@@ -81,7 +81,7 @@ State.prototype.enact = function () {
 
 };
 
-State.prototype.pathLost = function () {
+StateMovePos.prototype.pathLost = function () {
     const creepRace = race.getRace(this.creep);
     //console.log(this.creep.name, "STATE_MOVE_POS creep race", creepRace);
     //console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos));
@@ -164,7 +164,7 @@ State.prototype.pathLost = function () {
 
 
 
-module.exports = State;
+module.exports = StateMovePos;
 
 
 

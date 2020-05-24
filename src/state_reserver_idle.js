@@ -6,7 +6,7 @@
 
 const gc = require("gc");
 
-function State (creep) {
+function StateReserverIdle (creep) {
     this.type = gc.STATE_RESERVER_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
@@ -14,7 +14,7 @@ function State (creep) {
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StateReserverIdle.prototype.enact = function () {
     delete this.m.targetId;
     claimers = _.filter(Game.creeps, c => {
         return c.memory.policyId === policyId
@@ -51,7 +51,7 @@ State.prototype.enact = function () {
     );
 };
 
-module.exports = State;
+module.exports = StateReserverIdle;
 
 
 

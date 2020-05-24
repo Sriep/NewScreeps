@@ -6,13 +6,13 @@
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateUpgraderWithdraw (creep) {
     this.type = gc.STATE_UPGRADER_WITHDRAW;
     this.creep = creep;
     this.m = this.creep.memroy
 }
 
-State.prototype.enact = function () {
+StateUpgraderWithdraw.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
@@ -62,4 +62,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateUpgraderWithdraw;

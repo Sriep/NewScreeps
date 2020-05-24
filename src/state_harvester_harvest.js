@@ -7,12 +7,12 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateHarvesterHarvest (creep) {
     this.type = gc.STATE_HARVESTER_HARVEST;
     this.creep = creep
 }
 
-State.prototype.enact = function () {
+StateHarvesterHarvest.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store))
     if (!state.spaceForHarvest(this.creep)) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
@@ -45,4 +45,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateHarvesterHarvest;

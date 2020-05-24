@@ -7,14 +7,14 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 
-function State (creep) {
+function StateUpgraderUpgrade (creep) {
     this.type = gc.STATE_UPGRADER_UPGRADE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-State.prototype.enact = function () {
+StateUpgraderUpgrade.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
        return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
@@ -48,4 +48,4 @@ State.prototype.enact = function () {
     }
 };
 
-module.exports = State;
+module.exports = StateUpgraderUpgrade;

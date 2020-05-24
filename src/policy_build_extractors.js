@@ -8,7 +8,7 @@ const gc = require("gc");
 const policy = require("policy");
 
 // constructor
-function Policy  (id, data) {
+function PolicyBuildExtractors  (id, data) {
     this.type = gc.POLICY_BUILD_EXTRACTORS;
     this.id = id;
     this.home = data.home;
@@ -16,7 +16,7 @@ function Policy  (id, data) {
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyBuildExtractors.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -27,7 +27,7 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyBuildExtractors.prototype.enact = function () {
     const colonies = policy.getGouvernerPolicy(this.home).getColonies();
     this.m.finished = true;
     for (let colonyInfo of colonies) {
@@ -48,11 +48,11 @@ Policy.prototype.enact = function () {
     }
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyBuildExtractors.prototype.draftReplacment = function() {
     return this.m.finished ? false : this;
 };
 
-module.exports = Policy;
+module.exports = PolicyBuildExtractors;
 
 
 

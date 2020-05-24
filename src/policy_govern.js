@@ -7,14 +7,14 @@ const gc = require("gc");
 const agenda = require("agenda");
 const policy = require("policy");
 
-function Policy  (id, data) {
+function PolicyGovern  (id, data) {
     this.id = id;
     this.type = gc.POLICY_GOVERN;
     this.roomName = data.roomName;
     this.m = data.m;
 }
 
-Policy.prototype.initilise = function () {
+PolicyGovern.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -30,7 +30,7 @@ Policy.prototype.initilise = function () {
     return true;
 };
 
-Policy.prototype.enact = function () {
+PolicyGovern.prototype.enact = function () {
     console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_NEUTRAL_COLONIES],"colonies", JSON.stringify(this.m.colonies));
     console.log("POLICY_GOVERN this", JSON.stringify(this));
     if (!Memory.records["rcl "+this.m.rcl] ) {
@@ -44,7 +44,7 @@ Policy.prototype.enact = function () {
     this.govern();
 };
 
-Policy.prototype.govern = function () {
+PolicyGovern.prototype.govern = function () {
     if (this.m.agendaIndex >= this.m.agenda[this.m.rcl].length) {
         return;
     }
@@ -66,11 +66,11 @@ Policy.prototype.govern = function () {
     console.log("POLICY_GOVERN check failed",lastAgendaItem)
  };
 
-Policy.prototype.getColonies = function() {
+PolicyGovern.prototype.getColonies = function() {
     return [...this.m.colonies]
 };
 
-Policy.prototype.budget = function() {
+PolicyGovern.prototype.budget = function() {
     let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
     //console.log("POLICY_GOVERN getRoomEconomyPolicy parts", JSON.stringify(localBudget));
     //console.log("this.m.colonies",JSON.stringify(this.m.colonies), "this.rooName", this.roomName);
@@ -93,7 +93,7 @@ Policy.prototype.budget = function() {
     return result
 };
 
-Policy.prototype.updateColonyInfo = function() {
+PolicyGovern.prototype.updateColonyInfo = function() {
     this.m.parts = 0;
     let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
     this.m.colonies[0]["name"] = this.roomName;
@@ -105,7 +105,7 @@ Policy.prototype.updateColonyInfo = function() {
     }
 };
 
-Policy.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
+PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
     const room = Game.rooms[this.roomName];
     const energyLeft = room.controller.progressTotal - room.controller.progress;
     const ltToNextLevel = energyLeft / (2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT); // todo something better
@@ -116,7 +116,7 @@ Policy.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
     return ltToPayOff < ltToNextLevel;
 };
 
-Policy.prototype.addColony = function(roomName, profit, parts, startUpCost) {
+PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost) {
     console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
     if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
         console.log("POLICY_GOVERN addColony failed !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");
@@ -162,20 +162,20 @@ Policy.prototype.addColony = function(roomName, profit, parts, startUpCost) {
     return true;
 };
 
-Policy.prototype.removeColony = function(colony) {
+PolicyGovern.prototype.removeColony = function(colony) {
     delete Game.flags[colony.name].memory.spawnRoom;
 };
 
-Policy.prototype.partsSurppliedLT = function() {
+PolicyGovern.prototype.partsSurppliedLT = function() {
     const spawns = Game.rooms[this.roomName].find(FIND_MY_SPAWNS).length;
     return spawns * CREEP_LIFE_TIME / 3;
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyGovern.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+module.exports = PolicyGovern;
 
 
 
