@@ -13,29 +13,24 @@ function State (creep) {
 }
 
 State.prototype.enact = function () {
-    //console.log(this.creep.name,"in STATE_HARVESTER_TRANSFER")
     if (state.spaceForHarvest(this.creep)) {
         return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
     }
 
     if (!this.creep.memory.targetId) {
-        //console.log(this.creep.nane,"no target id")
         return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
     }
 
     const scPos = gf.roomPosFromPos(state.getSourceContainer(this.creep.memory.targetId));
     const container = state.findContainerAt(scPos);
-    //console.log("in STATE_HARVESTER_TRANSFER container", JSON.stringify(container))
     if (!container) {
-        //console.log("build")
         return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
     }
 
     if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
-        //console.log("repair")
         return state.switchTo(this.creep, gc.STATE_HARVESTER_REPAIR)
     }
-    //console.log("transfer")
+
     const result = this.creep.transfer(container, RESOURCE_ENERGY);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.

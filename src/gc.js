@@ -39,7 +39,7 @@ const pgc = {
     POLICY_MINE_ROOM: "mine_room",
     POLICY_UPGRADER_IDLE: "upgrader_idle",
     POLICY_BUILD_STORAGE: "build_storage",
-    POLICY_BUILD_LINK: "build_link",
+    POLICY_BUILD_LINKS: "build_links",
     POLICY_COLONIAL_OFFICE: "colonial_office",
 
     THREE_MOVES: [
@@ -154,6 +154,7 @@ const gc = {
     STATE_HARVESTER_REPAIR: "harvester_repair",
     STATE_HARVESTER_TRANSFER: "harvester_transfer",
     STATE_HARVESTER_HARVEST: "harvester_harvest",
+    STATE_HARVESTER_LINK: "harvester_link",
     // states upgrader
     STATE_UPGRADER_UPGRADE: "upgrader_upgrade",
     STATE_UPGRADER_WITHDRAW: "upgrader_withdraw",
@@ -238,7 +239,7 @@ const gc = {
     POLICY_FOREIGN_MINING: pgc.POLICY_FOREIGN_MINING,
     POLICY_MINE_ROOM: pgc.POLICY_MINE_ROOM,
     POLICY_BUILD_STORAGE: pgc.POLICY_BUILD_STORAGE,
-    POLICY_BUILD_LINK: pgc.POLICY_BUILD_LINK,
+    POLICY_BUILD_LINKS: pgc.POLICY_BUILD_LINKS,
     POLICY_COLONIAL_OFFICE: "colonial_office",
     POLICY_BUILD_EXTRACTORS: "build_extractors",
 

@@ -16,7 +16,7 @@ const agenda = {
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
             gc.ACTIVITY_NEUTRAL_COLONIES,
-            // gc.POLICY_EXPLORE,
+            //gc.POLICY_EXPLORE,
             gc.POLICY_COLONIAL_OFFICE,
             gc.ACTIVITY_FINISHED
         ],
@@ -40,6 +40,7 @@ const agenda = {
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.POLICY_BUILD_LINKS,
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
             gc.POLICY_BUILD_TOWER,
             gc.BUILD_ROAD_SOURCE_TOWERS,
@@ -47,19 +48,23 @@ const agenda = {
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            gc.POLICY_BUILD_LINKS,
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.ACTIVITY_FINISHED ],
+            gc.ACTIVITY_FINISHED
+        ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            //gc.POLICY_BUILD_LINKS,
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.POLICY_BUILD_TOWER,
             gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.ACTIVITY_FINISHED
         ],
         [
             gc.POLICY_BUILD_EXTENSIONS,
+            //gc.POLICY_BUILD_LINKS,
             gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
+            gc.POLICY_BUILD_TOWER,
             gc.BUILD_ROAD_SOURCE_TOWERS,
             gc.ACTIVITY_FINISHED
         ],

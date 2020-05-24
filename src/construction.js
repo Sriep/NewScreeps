@@ -105,11 +105,6 @@ const construction = {
     },
 
     roadsBuilt: function(room) {
-        const cs = room.find(FIND_MY_CONSTRUCTION_SITES, {
-            filter: { structureType: STRUCTURE_ROAD }
-        });
-        console.log("roadsBuilt cs", cs.length, "all js", JSON.stringify(cs));
-
         return room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_ROAD }
         }).length === 0;
@@ -195,6 +190,10 @@ const construction = {
         return nmDelta;
     },
 
+    findArea: function (start, avoid, terrain, points) {
+
+    },
+
     looseSpiral: function (start, numNeeded, avoid, terrain, avoidRange) {
         //console.log("looseSpiral start",JSON.stringify(start),"numNeeded",
         //    numNeeded,"avoid",avoid,"terrain",terrain,"avoidRange",avoidRange);
@@ -245,6 +244,7 @@ const construction = {
         const cy = Math.round(totalY/points.length);
         return {x: cx, y: cy };
     },
+
 /*
     closestNonWall: function (pos) {
         return cache.global(

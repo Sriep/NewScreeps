@@ -689,9 +689,12 @@ const state = {
         }
     },
 
-    getSourceLink : function (sourceId) {
+    getSourceLinkPos : function (sourceId) {
         if (Game.flags[sourceId]) {
-            return Game.flags[sourceId].memory.linkPos;
+            const l = gf.roomPosFromPos(Game.flags[sourceId].memory.linkPos);
+            if (l) {
+                return new RoomPosition(l.x, l.y, l.roomName);
+            }
         }
     },
 
@@ -707,164 +710,28 @@ const state = {
         }
     },
 
-    getControllerLink : function (controllerId) {
+    getControllerLinkPos : function(controllerId) {
         if (Game.flags[controllerId]) {
-            return Game.flags[controllerId].memory.linkPos;
+            const l = Game.flags[controllerId].memory.linkPos;
+            if (l) {
+                return new RoomPosition(l.x, l.y, l.roomName);
+            }
         }
     },
+
+    getObjAtPos(pos, type) {
+        if (pos) {
+            for (let struc of pos.lookFor(LOOK_STRUCTURES)) {
+                if (struc.structureType === type) {
+                    return struc;
+                }
+            }
+        }
+    }
 
 };
 
 module.exports = state;
-
-//------------ nextFreeHarvesterPost----------------------------------------
-/*
-listFreeHarvesterPosts = function (home, colonies, ec) {
-    const spawnRoom = Game.rooms[home];
-    const freePosts = [];
-
-    for (let colonyObj of colonies) {
-        for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
-            const post = freeHarvesterPost(sourceId, spawnRoom, ec);
-            const postRp =  new RoomPosition(post.x, post.y, colonyObj.name);
-            if (post) {
-                freePosts.push({ "sourceId": sourceId,  "post": postRp });
-            }
-        }
-    }
-    return { "freePosts" : freePosts, "cached" : Game.time };
-};
-
-
-maxHEc = function (ec) {
-    if (ec <= gc.MAX_EC_2WORK_HARVESTER) {
-        return 3;
-    } else if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        return 2;
-    }
-    return 1;
-};
-
-freeHarvesterPost = function (sourceId, spawnRoom, ec) {
-    //const sourceFlag = Game.flags[sourceId];
-    //const posts = sourceFlag.memory.harvesterPosts;
-    const posts = state.getSourcePosts(sourceId);
-    console.log("freeHarvesterPost sourceId",sourceId,"spawnRoom",spawnRoom,"ec",ec,"posts",JSON.stringify(posts));
-    creeps = _.filter(Game.creeps, c =>
-        c.memory.targetId === sourceId
-        //&& race.getRace(c) === gc.RACE_HARVESTER
-    );
-    if (creeps.length === 0) {
-        return posts[0];
-    }
-    const maxHEc = this.maxHEc(ec);
-    //console.log("freeHarvesterPost ec", ec, "maxHEc", maxHEc);
-    //console.log(source.id, "sourceid creeps.length", creeps.length, "posts", JSON.stringify(posts))
-    if (creeps.length > maxHEc) {
-        //console.log("freeHarvesterPost return false1")
-        return false;
-    }
-    if (maxHEc === 1) {
-        const source = Game.getObjectById(sourceId);
-        if (!source) {
-            return false;
-        }
-        const distance = cache.distanceSourceSpawn(source, spawnRoom);
-        if (creeps[0].ticksToLive < distance + gc.ASSIGN_HARVESTER_BUFFER) {
-            return findFreePostIfPossable(creeps, posts);
-        } else {
-            //console.log("freeHarvesterPost return false2")
-            return false;
-        }
-    }
-    if (creeps.length < maxHEc) {
-        return this.findFreePostIfPossable(creeps, posts);
-    }
-    return false;
-};
-
-findFreePostIfPossable = function (creeps, posts) {
-    //console.log("findFreePostIfPossable creep lenght", creeps.length, "posts", JSON.stringify(posts))
-    for (let post of posts) {
-        let taken = false;
-        for (let creep of creeps) {
-            if (creep.pos.x === post.x && creep.pos.y === post.y) {
-                taken = true;
-                break;
-            }
-        }
-        if (!taken) {
-            return post;
-        }
-    }
-    return false;
-};
-
-//------------ nextFreeHarvesterPost----------------------------------------
-
-listSourceContainers = function(colonies) {
-    const containerInfo = [];
-    console.log("listSourceContainers colonies", JSON.stringify(colonies));
-    for (let colonyObj of colonies) {
-        console.log(colonyObj.name,"listSourceContainers sources", JSON.stringify(Game.flags[colonyObj.name].memory.sources));
-        for (let sourceId in Game.flags[colonyObj.name].memory.sources) {
-            const cPos = state.getSourceContainer(sourceId);
-            console.log(colonyObj.name,"listSourceContainers cPos", JSON.stringify(cPos), "sourceId", sourceId);
-            if (cPos) {
-                let distance = Game.flags[colonyObj.name].memory.sources[sourceId].distance;
-                console.log(colonyObj.name, "distance",JSON.stringify(Game.flags[colonyObj.name].memory.sources));
-                if (!distance) {
-                    distance = 15; // todo fix hack
-                }
-                containerInfo.push({"pos" : cPos, "distance" : distance, "sourceId" : sourceId})
-            }
-        }
-    }
-    return containerInfo;
-};
-
-
-        console.log("listSourceContainers colonyObj",JSON.stringify(colonyObj));
-        console.log("listSourceContainers colonyObj.name",colonyObj.name);
-        //if (!Game.rooms[colonyObj.name]) {
-        //    continue;
-        //}
-        for (let sourceId in gameFlag.memory.sources) {
-            const cPos = state.getSourceContainer(sourceId);
-            if (cPos) {
-                let distance = gameFlag.memory.sources[sourceId].distance;
-                console.log("listSourceContainers distance",distance);
-                if (!distance) {
-                    distance = 15;
-                } // todo fix quick hack. distance only undefined in spawn room
-                const pos = new RoomPosition(cPos.x, cPos.y, colonyObj.name);
-                const container = state.findContainerAt(pos);
-                container["sourceId"] = sourceId;
-                container["distance"] = distance;
-                containerInfo.push(container);
-                //console.log(source.id, "listSourceContainers pushed", JSON.stringify(container))
-            }
-        }
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -31,13 +31,20 @@ Policy.prototype.enact = function () {
     const colonies = policy.getGouvernerPolicy(this.home).getColonies();
     this.m.finished = true;
     for (let colonyInfo of colonies) {
-        colony = Game.rooms[colonyInfo.name];
+        const colony = Game.rooms[colonyInfo.name];
         if (!colony) {
             this.m.finished = false;
             continue
         }
         const minerals = colony.find(FIND_MINERALS);
-        minerals.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
+        const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: { structureType: STRUCTURE_LINK }
+        });
+        if (beingBuilt.length < minerals.length) {
+            for (let mineral in minerals) {
+                mineral.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
+            }
+        }
     }
 };
 

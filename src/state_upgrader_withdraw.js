@@ -15,41 +15,47 @@ function State (creep) {
 State.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        //console.log("STATE_UPGRADER_WITHDRAW this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0"
-        //    ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY))
         return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
+    }
+
+    const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
+    if (controllerLink) {
+        if (this.creep.pos.isNearTo(controllerLink)) {
+            if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+                const result = this.creep.pos.withdraw(controllerLink, RESOURCE_ENERGY);
+                if (result === OK) {
+                    state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
+                }
+            }
+        }
     }
 
     const container = state.findUpgradeContainerNear(this.creep);
     if (!container) {
-        //console.log("STATE_UPGRADER_WITHDRAW !container")
         return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE)
     }
 
     if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        //console.log("STATE_UPGRADER_WITHDRAW this.container.store.getUsedCapacity(RESOURCE_ENERGY) === 0"
-        //    ,this.creep.store.getUsedCapacity(RESOURCE_ENERGY));
         return;
-        //return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
     }
 
     const result = this.creep.withdraw(container, RESOURCE_ENERGY);
     switch (result) {
-        case OK:                        // The operation has been scheduled successfully.
+        case OK:
             break;
-        case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
+        case  ERR_NOT_OWNER:
             return gf.fatalError("transfer ERR_NOT_OWNER");
-        case ERR_BUSY:                  // The creep is still being spawned.
+        case ERR_BUSY:
             return gf.fatalError("transfer ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:           // upgraders' bucket is empty
             return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
-        case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
+        case ERR_INVALID_TARGET:
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:
             return state.switchToFullIdle();
-        case ERR_NOT_IN_RANGE:          // The target is too far away.
+        case ERR_NOT_IN_RANGE:
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
-        case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
+        case ERR_INVALID_ARGS:
             return gf.fatalError("transfer ERR_INVALID_ARGS");
         default:
             return gf.fatalError("harvest unrecognised return value");
