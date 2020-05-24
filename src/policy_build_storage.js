@@ -12,6 +12,7 @@ const policy = require("policy");
 function Policy  (id, data) {
     this.type = gc.POLICY_BUILD_STORAGE;
     this.id = id;
+    this.parentId = data.parentId;
     this.home = data.home;
     this.m = data.m;
 }
@@ -34,7 +35,7 @@ Policy.prototype.enact = function () {
     }
     const room = Game.rooms[this.home];
     const rcl = room.controller.level;
-const allowedStorage = CONTROLLER_STRUCTURES[STRUCTURE_STORAGE[rcl]];
+    const allowedStorage = CONTROLLER_STRUCTURES[STRUCTURE_STORAGE][rcl];
     const storage = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: STRUCTURE_STORAGE }
     });

@@ -22,10 +22,10 @@ Policy.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
-    this.home = Memory.policies[this.parentId].roomName;
     this.m.planned = false;
+    this.home = Memory.policies[this.parentId].roomName;
     const room = Game.rooms[this.home];
-    return !!room && !!room.controller && room.controller.my && this.m.roads;
+    return !!room && !!room.controller && room.controller.my;
 };
 
 // runs once every tick

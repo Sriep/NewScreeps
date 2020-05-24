@@ -334,13 +334,13 @@ const policy = {
         }
         const terrain = room.getTerrain();
         const positions = construction.looseSpiral(start, numNeeded + skip, avoid, terrain,1);
+        //console.log("buildStructuresLooseSpiral positions",JSON.stringify(positions));
         for ( let i = skip; i < positions.length ; i++ ) {
             const result = room.createConstructionSite(positions[i].x, positions[i].y, strucType);
             if (result !== OK) {
             }
         }
     },
-
 };
 
 module.exports = policy;

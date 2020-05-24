@@ -25,7 +25,6 @@ Policy.prototype.initilise = function () {
     this.m.finished = false;
     this.home = Memory.policies[this.parentId].roomName;
     const room = Game.rooms[this.home];
-    console.log("POLICY_BUILD_EXTENSIONS initilise", JSON.stringify(this));
     return !!room && !!room.controller && room.controller.my;
 };
 
