@@ -105,9 +105,14 @@ const construction = {
     },
 
     roadsBuilt: function(room) {
+        const cs = room.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: { structureType: STRUCTURE_ROAD }
+        });
+        console.log("roadsBuilt cs", cs.length, "all js", JSON.stringify(cs));
+
         return room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_ROAD }
-        }) === 0;
+        }).length === 0;
     },
 
     coverArea: function (pos, range, terrain) {

@@ -136,19 +136,18 @@ const state = {
                 let lifeCreepsSource = 0;
                 const sourceCreeps = _.filter(creeps, c=> c.memory.targetId === sourceId);
                 for (let sc of sourceCreeps) {
-                    lifeCreepsSource += sourceCreeps.ticksToLive;
+                    lifeCreepsSource += sc.ticksToLive;
                 }
                 console.log("nextFreeHarvesterPost dropped before, lifeCreepsSource"
                     ,lifeCreepsSource,"leastLife",leastLife,"bestPost",JSON.stringify(sPost));
                 if (lifeCreepsSource < leastLife) {
                     leastLife = lifeCreepsSource;
                     bestPost = sPost;
-                    bestSourceId = sourceId
+                    bestSourceId = sourceId;
                     colony = colonyObj.name
                 }
                 console.log("nextFreeHarvesterPost dropped after, lifeCreepsSource"
                     ,lifeCreepsSource,"leastLife",leastLife)
-
             }
         }
         return {

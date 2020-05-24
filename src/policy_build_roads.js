@@ -72,8 +72,8 @@ Policy.prototype.enact = function () {
 // return this to change policy to itself, ie no change.
 Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    //console.log("draftReplacment roads built?",construction.roadsBuilt(room)
-    //    , "planned", this.m.planned);
+    console.log("draftReplacment roads built?",construction.roadsBuilt(room)
+        , "planned", this.m.planned);
     return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 
