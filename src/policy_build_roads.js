@@ -74,8 +74,8 @@ Policy.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
     console.log("draftReplacment roads built?",construction.roadsBuilt(room)
         , "planned", this.m.planned);
-    return false;//  this;
-    //return construction.roadsBuilt(room) && this.m.planned ? false : this;
+   // return false;//  this;
+    return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 
 module.exports = Policy;
