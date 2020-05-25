@@ -193,6 +193,14 @@ const gf = {
         return true;
     },
 
+    posPlusDeltaArray(pos, deltas) {
+        const rtv = [];
+        for (let delta of deltas) {
+            rtv.push({"x" : pos.x + delta.x, "y": pos.y + delta.y})
+        }
+        return rtv;
+    }
+
 };
 
 module.exports = gf;

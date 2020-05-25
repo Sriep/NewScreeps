@@ -32,7 +32,7 @@ PolicyGovern.prototype.initilise = function () {
 
 PolicyGovern.prototype.enact = function () {
     console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_NEUTRAL_COLONIES],"colonies", JSON.stringify(this.m.colonies));
-    console.log("POLICY_GOVERN this", JSON.stringify(this));
+    //console.log("POLICY_GOVERN this", JSON.stringify(this));
     if (!Memory.records["rcl "+this.m.rcl] ) {
         Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }
@@ -49,21 +49,21 @@ PolicyGovern.prototype.govern = function () {
         return;
     }
     const lastAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
-    console.log("govern lastAgendaItem", lastAgendaItem);
+    //console.log("govern lastAgendaItem", lastAgendaItem);
     if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem].check(lastAgendaItem, this.id)) {
         if (this.m.agendaIndex !== -1) {
             //Memory.agenda.push(lastAgendaItem + " checked " + Game.time.toString())
             console.log("POLICY_GOVERN check PASSED for", lastAgendaItem)
         }
         const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
-        console.log("POLICY_GOVERN next item", nextAgendaItem);
+        //console.log("POLICY_GOVERN next item", nextAgendaItem);
         agenda.items()[nextAgendaItem].enact(nextAgendaItem, this.id);
-        console.log("POLICY_GOVERN enacted agemda item", nextAgendaItem);
+        //console.log("POLICY_GOVERN enacted agemda item", nextAgendaItem);
         this.m.agendaIndex++;
 
         return;
     }
-    console.log("POLICY_GOVERN check failed",lastAgendaItem)
+    //console.log("POLICY_GOVERN check failed",lastAgendaItem)
  };
 
 PolicyGovern.prototype.getColonies = function() {
@@ -112,12 +112,12 @@ PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpC
     //console.log("checkPayback energyLeft",energyLeft,"ec",(2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT));
     const ltToPayOff = startUpCost / profit;
     //console.log("checkPayback startUpCost",startUpCost,"profit",profit)
-    console.log("POLICY_GOVERN checkPayback ltToPayOff",ltToPayOff,"ltToNextLevel",ltToNextLevel);
+    //console.log("POLICY_GOVERN checkPayback ltToPayOff",ltToPayOff,"ltToNextLevel",ltToNextLevel);
     return ltToPayOff < ltToNextLevel;
 };
 
 PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost) {
-    console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
+    //console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
     if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
         console.log("POLICY_GOVERN addColony failed !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");
         return false;

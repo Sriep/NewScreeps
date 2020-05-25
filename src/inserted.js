@@ -19,7 +19,7 @@ const inserted = {
     },
 
     bottom: function () {
-        // console.log("--------- piers inserted------------");
+        console.log("--------- piers inserted------------");
         //const pp = policy.getRoomEconomyPolicy("W7N7");
         //const ppBudget = pp.localBudget();
         //console.log("budget for W7N7", JSON.stringify(ppBudget));
@@ -49,19 +49,26 @@ const inserted = {
         //console.log("Game.rooms[newRoom].controller.owner", JSON.stringify(Game.rooms[newRoom].controller.reservation))
         //console.log("Game.rooms[newRoom].controller.owner.username.length r",
         //    JSON.stringify(Game.rooms[newRoom].controller.reservation.username.length ))
-
-        //if (!Memory.w) {
-        //Memory.w = 2;
-        //}
-        //Memory.n++;
-        //if (!Memory.n) {
-        //    Memory.n =2;
-        //}
-        //Memory.n++;
-        //const name = "W" + Memory.n.toString() + "N" + Memory.n.toString();
-        //const terrain = new Room.Terrain("E2S7");
-        //console.log(name, "terrain", JSON.stringify(terrain.getRawBuffer()))
-
+/*
+        if (!Memory.w) {
+        Memory.w = 2;
+        }
+        if (!Memory.n) {
+            Memory.n =2;
+        }
+        Memory.n++;
+        if (Memory.n > 10) {
+            Memory.n = 0;
+            Memory.w++
+        }
+        if (Memory.w > 10) {
+            return;
+        }
+        const name = "W" + Memory.w.toString() + "N" + Memory.n.toString();
+        console.log("n", Memory.n, "w",Memory.w, "name",name);
+        const terrain = new Room.Terrain(name);
+        console.log(name, "terrain", JSON.stringify(terrain.getRawBuffer()));
+*/
         //for (let w = 2 ; w < 10 ; w++) {
         //    for (let n = 2 ; n <10 ; n++) {
         //        const name = "W" + w.toString() + "N" + n.toString();
@@ -70,7 +77,7 @@ const inserted = {
         //    }
         //}
 
-        //console.log("--------- piers inserted done ------------")
+        console.log("--------- piers inserted done ------------")
     }
 
 };

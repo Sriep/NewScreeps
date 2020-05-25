@@ -7,8 +7,6 @@
 const assert = require('assert');
 const construction = require("../src/construction");
 const Terrain = require("./terrain");
-
-
 const pt = { x : 22, y : 13 };
 
 describe("construction", function() {
@@ -18,10 +16,10 @@ describe("construction", function() {
         it("return rectangle if fits", function() {
             const terrain = new Terrain("W7N7");
 
-            const data1 = construction.placeRectangle(terrain, {"x":22,"y":13}, 6, 4);
+            const data1 = construction.placeRectangle(terrain, {"x":25,"y":25}, 6, 4, []);
             console.log("data1", JSON.stringify(data1));
 
-            const data2 = construction.placeRectangle(terrain, {"x":12,"y":11}, 4, 6);
+            const data2 = construction.placeRectangle(terrain, {"x":12,"y":12}, 4, 6, []);
             console.log("data2", JSON.stringify(data2));
         });
 
@@ -31,17 +29,13 @@ describe("construction", function() {
             const data = construction.planWall_2(terrain);
             for (let x = 10 ; x < 40 ; x+= 5) {
                 const result = construction.canFitRectangle(terrain, x, 30, 6, 6, data);
-                //console.log("x",x,"y",30,"rec", JSON.stringify(result));
             }
         });
 
         it("show some working", function() {
             const terrain = new Terrain("W7N7");
             const data = construction.planWall_2(terrain, {x:12, y:11});
-            //console.log("xArray", JSON.stringify(data.xArray));
-            //console.log("yArray",JSON.stringify(data.yArray));
-            //console.log("------------------------------------------------------")
-        });
+       });
 
         it.skip("show some working", function() {
             const terrain = new Terrain("W7N7");
@@ -59,7 +53,6 @@ describe("construction", function() {
         it("should show best two points to put contaienr", function() {
            const terrainW7N7 = new Terrain("W7N7");
            const pts = construction.coverArea(pt, 3, terrainW7N7);
-           //console.log("construction.coverArea",JSON.stringify(pts))
            assert.strictEqual(pts[0].numPosts + pts[1].numPosts, 2*3*3);
         });
 
