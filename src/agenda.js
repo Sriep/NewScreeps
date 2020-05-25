@@ -16,7 +16,7 @@ const agenda = {
             gc.POLICY_BUILD_EXTENSIONS,
             gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
             gc.ACTIVITY_NEUTRAL_COLONIES,
-            //gc.POLICY_EXPLORE,
+            gc.POLICY_EXPLORE,
             gc.POLICY_COLONIAL_OFFICE,
             gc.ACTIVITY_FINISHED
         ],

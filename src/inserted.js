@@ -50,6 +50,26 @@ const inserted = {
         //console.log("Game.rooms[newRoom].controller.owner.username.length r",
         //    JSON.stringify(Game.rooms[newRoom].controller.reservation.username.length ))
 
+        //if (!Memory.w) {
+        //Memory.w = 2;
+        //}
+        //Memory.n++;
+        //if (!Memory.n) {
+        //    Memory.n =2;
+        //}
+        //Memory.n++;
+        //const name = "W" + Memory.n.toString() + "N" + Memory.n.toString();
+        //const terrain = new Room.Terrain("E2S7");
+        //console.log(name, "terrain", JSON.stringify(terrain.getRawBuffer()))
+
+        //for (let w = 2 ; w < 10 ; w++) {
+        //    for (let n = 2 ; n <10 ; n++) {
+        //        const name = "W" + w.toString() + "N" + n.toString();
+        //        const terrain = new Room.Terrain("E2S7");
+        //        console.log(name, "terrain", JSON.stringify(terrain.getRawBuffer()))
+        //    }
+        //}
+
         //console.log("--------- piers inserted done ------------")
     }
 

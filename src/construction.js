@@ -3,7 +3,7 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
-//const C = require("./Constants");
+const C = require("./Constants");
 //const TERRAIN_MASK_WALL = C.TERRAIN_MASK_WALL;
 
 const construction = {
@@ -111,11 +111,11 @@ const construction = {
     },
 
     coverArea: function (pos, range, terrain) {
-        console.log("coverArea pos", JSON.stringify(pos), "range", range, "terrain", terrain);
+        //console.log("coverArea pos", JSON.stringify(pos), "range", range, "terrain", terrain);
         const deltas = this.nxmDeltaArray(range, range);
         let valid = [];
         for ( let dxy of deltas) {
-            if (terrain.get(pos.x + dxy.x, pos.y+dxy.y) !== TERRAIN_MASK_WALL) {
+            if (terrain.get(pos.x + dxy.x, pos.y+dxy.y) !== C.TERRAIN_MASK_WALL) {
                 valid.push({x: pos.x+dxy.x, y: pos.y+dxy.y, adj: 0, missed : [], hit : [] });
             }
         }
@@ -222,7 +222,7 @@ const construction = {
     },
 
     pointOK: function(x, y, avoid, terrain, avoidRange) {
-        if (terrain.get(x, y) === TERRAIN_MASK_WALL) {
+        if (terrain.get(x, y) === C.TERRAIN_MASK_WALL) {
             return false;
         }
         for (let i in avoid) {
@@ -257,42 +257,118 @@ const construction = {
     closestNonWall: function (pos) {
         //console.log("in closestNonWall_I pos", JSON.stringify(pos));
         const terrain = Game.rooms[pos.roomName].getTerrain();
-        if (terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL) {
-            //console.log("closestNonWall_I not entered loop", terrain.get(pos.x, pos.y), "wall",TERRAIN_MASK_WALL)
+        if (terrain.get(pos.x, pos.y) !== C.TERRAIN_MASK_WALL) {
+            //console.log("closestNonWall_I not entered loop", terrain.get(pos.x, pos.y), "wall",C.TERRAIN_MASK_WALL)
             return pos
         }
-        //let range = 0;
-        //console.log("closestNonWall_I range");
-        //return (pos);
-        //while (range < 50) {
         for (let range = 0; range < 50; range++) {
-            //range++;
-            //console.log("In closest non wall range", range, "cpu", Game.cpu.getUsed());
-            //if (Game.cpu.Used > 50) {
-            //    console.log("large cpu", Game.cpu.getUsed());
-            //    return pos;
-            //}
-            for (let dx = -1*range; dx <= range ; dx++ ) {
+             for (let dx = -1*range; dx <= range ; dx++ ) {
                 for (let dy = -1*range; dy <= range ; dy++ ) {
-                    if (terrain.get(pos.x + dx, pos.y + dy) !== TERRAIN_MASK_WALL) {
+                    if (terrain.get(pos.x + dx, pos.y + dy) !== C.TERRAIN_MASK_WALL) {
                         return {x: pos.x + dx, y: pos.y + dy};
                     }
                 }
             }
         }
-        //console.log("closestNonWall_I fell though loop");
         return pos;
     },
 
-    planwall: function(terrain, centre, include, minSize) {
-        //{"up":0, "down" :0}
+    placeRectangle: function(terrain, centre, n, m) {
+        const data = this.planWall_2(terrain);
+        let range = 0;
+        while (range < 20) {
+            range++;
+            for (let dx = -1*range; dx <= range ; dx+=2 ) {
+                if (centre + dx < 5 || centre+dx >45) {
+                    continue
+                }
+                for (let dy = -1*range; dy <= range ; dy+=2 ) {
+                    if (centre + dx < 5 || centre+dx >45) {
+                        continue
+                    }
+                    const rectangle = this.canFitRectangle(terrain, centre.x+dx, centre.y+dy, n, m, data);
+                    if (rectangle) {
+                        return rectangle;
+                    }
+                }
+            }
+        }
+    },
+
+    canFitRectangle: function (terrain, x, y, n, m, data) {
+        if (terrain.get(x,y) === C.TERRAIN_MASK_WALL){
+            return false;
+        }
+        const t = n; n = Math.max(n,m); m = Math.min(t,m);
+        for (let dx = 0 ; dx < n ; dx++) {
+            for (let dy = 0; dy < m; dy++) {
+                //if (dy in data.yArray) {
+                    if (terrain.get(x + dx, y + dy) === C.TERRAIN_MASK_WALL) {
+                        //console.log("wall x",x + dx, "y",y + dy, "terrain", terrain.get(x + dx, y + dy),
+                        //    "C.TERRAIN_MASK_WALL",C.TERRAIN_MASK_WALL);
+                        return;
+                    }
+                //}
+            }
+        }
+        const pts = [];
+        for (let dx = 0 ; dx < n ; dx++) {
+            for (let dy = 0; dy < m; dy++) {
+                pts.push({"x":x+dx, "y":y+dy})
+            }
+        }
+        return pts;
+    },
+
+    planWall_2: function(terrain) {
+        const wallStateChangeY = [];
+        for (let x = 0 ; x < 50 ; x++) {
+            wallStateChangeY.push([]);
+            let lastTerrainWall = true;
+            for (let y = 0 ; y < 50 ; y++ ) {
+                if (terrain.get(x,y) === C.TERRAIN_MASK_WALL) {
+                    if (!lastTerrainWall) {
+                        wallStateChangeY[x].push(-y);
+                        lastTerrainWall = true;
+                    }
+                } else {
+                    if (lastTerrainWall) {
+                        wallStateChangeY[x].push(y);
+                        lastTerrainWall = false;
+                    }
+                }
+            }
+        }
+
+        const wallStateChangeX = [];
+        for (let y = 0 ; y < 50 ; y++) {
+            wallStateChangeX.push([]);
+            let lastTerrainWall = true;
+            for (let x = 0 ; x < 50 ; x++ ) {
+                if (terrain.get(x,y) === C.TERRAIN_MASK_WALL) {
+                    if (!lastTerrainWall) {
+                        wallStateChangeX[y].push(-x);
+                        lastTerrainWall = true;
+                    }
+                } else {
+                    if (lastTerrainWall) {
+                        wallStateChangeX[y].push(x);
+                        lastTerrainWall = false;
+                    }
+                }
+            }
+        }
+        return {"xArray": wallStateChangeX, "yArray": wallStateChangeY}
+    },
+
+    planwall_1: function(terrain, centre) {
         let yUp = [];
         let yDown = [];
         for( let x = 0 ; x < 50 ; x ++ ) {
             yDown[x] = 0;
-            while ( yDown[x] < centre.y && terrain.get(x, centre.y-yDown[x]) !== TERRAIN_MASK_WALL) { yDown[x]++}
+            while ( yDown[x] < centre.y && terrain.get(x, centre.y-yDown[x]) !== C.TERRAIN_MASK_WALL) { yDown[x]++}
             yUp[x] = 0;
-            while ( yUp[x] < 50-centre.y && terrain.get(x, centre.y+yUp[x]) !== TERRAIN_MASK_WALL) { yUp[x]++}
+            while ( yUp[x] < 50-centre.y && terrain.get(x, centre.y+yUp[x]) !== C.TERRAIN_MASK_WALL) { yUp[x]++}
         }
 
         let xRight = [];
@@ -300,12 +376,11 @@ const construction = {
         for( let y = 0 ; y < 50 ; y ++ ) {
             for( let y = 0 ; y < 50 ; y ++ ) {
                 xLeft[y] = 0;
-                while ( xLeft[y] < centre.x && terrain.get(centre.x-xLeft[y], y) !== TERRAIN_MASK_WALL) { xLeft[y]++}
+                while ( xLeft[y] < centre.x && terrain.get(centre.x-xLeft[y], y) !== C.TERRAIN_MASK_WALL) { xLeft[y]++}
                 xRight[y] = 0;
-                while ( xRight[y] < 50-centre.x && terrain.get(centre.x-xRight[y], y) !== TERRAIN_MASK_WALL) { xRight[y]++}
+                while ( xRight[y] < 50-centre.x && terrain.get(centre.x-xRight[y], y) !== C.TERRAIN_MASK_WALL) { xRight[y]++}
             }
         }
-
         return { "yUp" :yUp,"yDown":yDown, "xRight":xRight,"xLeft":xLeft }
     },
 
