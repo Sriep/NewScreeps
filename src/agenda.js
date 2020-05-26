@@ -143,12 +143,12 @@ const agenda = {
         fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
-        fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_CONTROLLER] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_SOURCE] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_SPAWN] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_EXTENSIONS] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_TOWERS] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SOURCE_CONTROLLER] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SOURCE_SOURCE] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SOURCE_SPAWN] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SOURCE_EXTENSIONS] = newBuildRoadBlockerPolicy;
+        //fc[gc.BUILD_ROAD_SOURCE_TOWERS] = newBuildRoadBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
         fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;
@@ -176,10 +176,10 @@ const activateNewPolicy = function ( activity, parnetId, params)  {
      policy.activatePolicy(activity, params ? params : {}, parnetId);
 };
 
-const activateNewRoadsPolicy = function ( activity, parnetId)  {
-    console.log("agenda activateNewRoadsPolicy", activity, parnetId);
-    policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : activity}, parnetId);
-};
+//const activateNewRoadsPolicy = function ( activity, parnetId)  {
+//    console.log("agenda activateNewRoadsPolicy", activity, parnetId);
+//    policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : activity}, parnetId);
+//};
 
 const activateNewReplacementPolicy = function ( activity, parnetId)  {
    policy.activateReplacePolicy(
@@ -190,12 +190,12 @@ const activateNewReplacementPolicy = function ( activity, parnetId)  {
     );
 };
 
-const newBuildRoadBlockerPolicy = {
-    "enact": activateNewRoadsPolicy,
-    "check": function ( _, parnetId)  {
-        return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
-    },
-};
+//const newBuildRoadBlockerPolicy = {
+//    "enact": activateNewRoadsPolicy,
+//    "check": function ( _, parnetId)  {
+//        return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
+//    },
+//};
 
 const newActivity = {
     "enact": function (activity, parnetId) {
