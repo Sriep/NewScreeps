@@ -14,9 +14,13 @@ function PolicyBuildRoads  (id, data) {
     this.type = gc.POLICY_BUILD_ROADS;
     this.parentId = data.parentId;
     this.home = data.home;
-    this.roads = data.roads;
+    //this.roads = data.roads;
+    this.fromFind = data.fromFind;
+    this.fromStruct = data.fromStruct;
+    this.toFind = data.toFind;
+    this.toStruct = data.toStruct;
     this.m = data;
-    console.log("POLICY_BUILD_ROADS constuctor this", JSON.stringify(this),
+    console.log("POLICY_BUILD_ROADS constructor this", JSON.stringify(this),
         "data",JSON.stringify(data));
 }
 
@@ -40,6 +44,11 @@ PolicyBuildRoads.prototype.enact = function () {
         return;
     }
     const room = Game.rooms[this.home];
+    construction.buildRoadsBetween(
+        room, this.fromFind, this.fromStruct, this.toFind, this.toStruct
+    );
+    /*
+
     console.log("POLICY_BUILD_ROADS about to plan",this.roads);
     switch (this.roads) {
         case gc.BUILD_ROAD_SOURCE_SPAWN:
@@ -62,7 +71,7 @@ PolicyBuildRoads.prototype.enact = function () {
             break;
         default:
            gf.fatalError("building unknown road "+ this.roads);
-    }
+    }*/
     this.m.planned = true;
 };
 
@@ -72,8 +81,8 @@ PolicyBuildRoads.prototype.enact = function () {
 // return this to change policy to itself, ie no change.
 PolicyBuildRoads.prototype.draftReplacment = function() {
     const room = Game.rooms[this.home];
-    console.log("draftReplacment roads built?",construction.roadsBuilt(room)
-        , "planned", this.m.planned);
+    //console.log("draftReplacment roads built?",construction.roadsBuilt(room)
+    //    , "planned", this.m.planned);
     return construction.roadsBuilt(room) && this.m.planned ? false : this;
 };
 

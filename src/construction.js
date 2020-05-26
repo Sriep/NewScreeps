@@ -104,6 +104,38 @@ const construction = {
         }
     },
 
+    buildRoadsBetween: function(room, fromFind, fromStruct, toFind, toStruct) {
+        let from;
+        if (fromStruct) {
+            from = room.find(fromFind, {
+                filter: { structureType: fromStruct }
+            });
+        } else {
+            from = room.find(fromFind);
+        }
+        let to;
+        if (toStruct) {
+            to = room.find(toFind, {
+                filter: { structureType: toStruct }
+            });
+        } else {
+            to = room.find(toFind);
+        }
+        for (let f of from) {
+            for (let t of to) {
+                this.buldRoad(f,t)
+            }
+        }
+    },
+
+    buildRoad: function(from, to) {
+        const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
+        const room = Game.rooms[from.roomName];
+        for(let step in path) {
+            room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+        }
+    },
+
     roadsBuilt: function(room) {
         return room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType: STRUCTURE_ROAD }
@@ -371,13 +403,6 @@ const construction = {
         return { "yUp" :yUp,"yDown":yDown, "xRight":xRight,"xLeft":xLeft }
     },
 
-    buildRoad: function(from, to) {
-        const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
-        const room = Game.rooms[from.roomName];
-        for(let step in path) {
-            room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
-        }
-    }
 };
 
 module.exports = construction;

@@ -139,7 +139,7 @@ FlagRooom.prototype.getLinkPos = function(terrain) {
 FlagRooom.prototype.buildStructure = function(type) {
     const room = Game.rooms[this.name];
     const rcl = room.controller.level;
-    console.log("rcl",rcl,"room.controller.level",room.controller.level)
+    console.log("type", type,"buildStructure this",JSON.stringify(this))
     const allowed = CONTROLLER_STRUCTURES[type][rcl];
     const built = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: type }
@@ -151,10 +151,10 @@ FlagRooom.prototype.buildStructure = function(type) {
         filter: { structureType: type }
     });
     if (built.length + beingBuilt.length < allowed) {
-        if (this.m.centre[type].length < built.length + beingBuilt.length) {
+        if (this.m.plan[type].length <= built.length + beingBuilt.length) {
             return false;
         }
-        const pt = this.m.centre[type][built.length + beingBuilt.length-1];
+        const pt = this.m.plan[type][built.length + beingBuilt.length];
         new RoomPosition(pt.x,pt.y,this.name).createConstructionSite(type)
     }
     return true;

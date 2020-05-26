@@ -31,7 +31,7 @@ PolicyGovern.prototype.initilise = function () {
 };
 
 PolicyGovern.prototype.enact = function () {
-    console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
+    //console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
     if (!Memory.records["rcl "+this.m.rcl] ) {
         //Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }
@@ -44,7 +44,7 @@ PolicyGovern.prototype.enact = function () {
 };
 
 PolicyGovern.prototype.govern = function () {
-    console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.roomName].controller.level)
+    //console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.roomName].controller.level)
     if (this.m.agendaIndex >= this.m.agenda[this.m.rcl].length) {
         return;
     }

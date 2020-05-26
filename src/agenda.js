@@ -22,41 +22,79 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS},
             { "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
-            { "activity": gc.POLICY_EXPLORE},
+            //{ "activity": gc.POLICY_EXPLORE},
             { "activity": gc.POLICY_COLONIAL_OFFICE},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
-            { "activity": gc.BUILD_ROAD_SOURCE_SPAWN},
-            { "activity": gc.BUILD_ROAD_SOURCE_SOURCE},
-            { "activity": gc.BUILD_ROAD_SOURCE_CONTROLLER},
-            { "activity": gc.BUILD_ROAD_SPAWN_CONTROLLER},
-            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_SPAWNS,
+                }},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_SOURCES,
+                }},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_CONTROLLER,
+                }},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_CONTROLLER,
+                }},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_TOWER,
+                }},
             { "activity": gc.ACTIVITY_RESERVED_COLONIES},
             { "activity": gc.ACTIVITY_FINISHED},
         ],
         [
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_STORAGE}},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
-            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_TOWER,
+                }},
             { "activity": gc.ACTIVITY_FINISHED},
         ],
         [
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
@@ -64,9 +102,17 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
-            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_TOWER,
+                }},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TERMINAL}},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
@@ -75,17 +121,26 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
-            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_MY_STRUCTURES,
+                    "toStruct" : STRUCTURE_EXTENSION,
+                }},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_POWER_SPAWN}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_OBSERVER}},
-            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+                    "fromFind" : FIND_SOURCES,
+                    "toFind" : FIND_STRUCTURES,
+                    "toStruct" : STRUCTURE_TOWER,
+                }},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
     ],
 
     items : function () {
         const fc = {};
+        fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
