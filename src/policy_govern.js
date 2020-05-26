@@ -31,7 +31,7 @@ PolicyGovern.prototype.initilise = function () {
 };
 
 PolicyGovern.prototype.enact = function () {
-    console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_NEUTRAL_COLONIES],"colonies", JSON.stringify(this.m.colonies));
+    console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
     if (!Memory.records["rcl "+this.m.rcl] ) {
         Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }
@@ -50,7 +50,7 @@ PolicyGovern.prototype.govern = function () {
     const lastAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
     console.log("govern lastAgendaItem", JSON.stringify(lastAgendaItem));
     if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem.activity].check(
-        lastAgendaItem,
+        lastAgendaItem.activity,
         this.id
     )) {
         if (this.m.agendaIndex !== -1) {
@@ -66,7 +66,7 @@ PolicyGovern.prototype.govern = function () {
         );
         console.log("POLICY_GOVERN enacted agemda item", JSON.stringify(nextAgendaItem));
         this.m.agendaIndex++;
-        //return;
+        return;
     }
     console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
  };

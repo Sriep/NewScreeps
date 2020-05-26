@@ -40,7 +40,8 @@ PolicyPlanBuilds.prototype.enact = function () {
 };
 
 PolicyPlanBuilds.prototype.draftReplacment = function() {
-    return this.m.finished ? false : this;
+    console.log("POLICY_PLAN_BUILDS draftReplacment this.m.finished",this.m.finished );
+    return this//  this.m.finished ? false : this;
 };
 
 module.exports = PolicyPlanBuilds;

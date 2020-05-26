@@ -115,18 +115,18 @@ const agenda = {
     }
 
 };
-const activateNewPolicy = function ( agendaItem, parnetId, params)  {
-     policy.activatePolicy(agendaItem, params ? params : {}, parnetId);
+const activateNewPolicy = function ( activity, parnetId, params)  {
+     policy.activatePolicy(activityItem, params ? params : {}, parnetId);
 };
 
-const activateNewRoadsPolicy = function ( agendaItem, parnetId)  {
-    console.log("agenda activateNewRoadsPolicy", agendaItem, parnetId);
-    policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : agendaItem}, parnetId);
+const activateNewRoadsPolicy = function ( activity, parnetId)  {
+    console.log("agenda activateNewRoadsPolicy", activity, parnetId);
+    policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : activity}, parnetId);
 };
 
-const activateNewReplacementPolicy = function ( agendaItem, parnetId)  {
+const activateNewReplacementPolicy = function ( activity, parnetId)  {
    policy.activateReplacePolicy(
-        agendaItem,
+       activity,
         { parentId: parnetId },
         parnetId,
         gc.ECONOMIES,
@@ -141,8 +141,8 @@ const newBuildRoadBlockerPolicy = {
 };
 
 const newActivity = {
-    "enact": function (agendaItem, parnetId) {
-        policy.getPolicy(parnetId).m[agendaItem] = true;
+    "enact": function (activity, parnetId) {
+        policy.getPolicy(parnetId).m[activity] = true;
     },
     "check": function(){ return true; },
 };
@@ -159,8 +159,8 @@ const newPolicyReplacment ={
 
 const newBlockerPolicy = {
     "enact": activateNewPolicy,
-    "check": function (agendaItem, parnetId)  {
-         return !policy.hasChildType(parnetId, agendaItem);
+    "check": function (activity, parnetId)  {
+         return !policy.hasChildType(parnetId, activity);
     },
 };
 

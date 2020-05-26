@@ -19,7 +19,7 @@ const inserted = {
     },
 
     bottom: function () {
-        console.log("--------- piers inserted------------");
+        //console.log("--------- piers inserted------------");
         //const pp = policy.getRoomEconomyPolicy("W7N7");
         //const ppBudget = pp.localBudget();
         //console.log("budget for W7N7", JSON.stringify(ppBudget));
@@ -77,7 +77,7 @@ const inserted = {
         //    }
         //}
 
-        console.log("--------- piers inserted done ------------")
+        //console.log("--------- piers inserted done ------------")
     }
 
 };
