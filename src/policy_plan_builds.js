@@ -3,7 +3,6 @@
  * Created by piers on 26/05/2020
  * @author Piers Shepperson
  */
-//const gf = require("gf");
 const gc = require("gc");
 const FlagRoom = require("flag_room");
 

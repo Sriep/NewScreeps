@@ -65,7 +65,7 @@ function FlagRooom (name) {
 
 FlagRooom.prototype.placeCentre = function (centre, start) {
     //console.log("FlagRooom placeCentre this", JSON.stringify(this));
-    console.log("placeCentre centre", JSON.stringify(centre),"start", JSON.stringify(start));
+    //console.log("placeCentre centre", JSON.stringify(centre),"start", JSON.stringify(start));
     const room = Game.rooms[this.name];
     let avoid = [];
     const sources = room.find(FIND_SOURCES);
@@ -139,7 +139,7 @@ FlagRooom.prototype.getLinkPos = function(terrain) {
 FlagRooom.prototype.buildStructure = function(type) {
     const room = Game.rooms[this.name];
     const rcl = room.controller.level;
-    const allowed = CONTROLLER_STRUCTURES[type][rcl];
+    const allowed = CONTROLLER_STRUCTURES[rcl][type];
     const built = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: type }
     });

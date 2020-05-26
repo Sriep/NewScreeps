@@ -102,7 +102,7 @@ const policy = {
          if (parentId) {
             Memory.policies[parentId].m.childTypes.push(policyType);
         }
-        console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
+        //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
         Memory.policies[newPolicyId] = policy;
 
         Memory.nextPolicyId = Memory.nextPolicyId + 1;

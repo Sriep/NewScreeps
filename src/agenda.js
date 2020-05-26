@@ -115,8 +115,9 @@ const agenda = {
     }
 
 };
+// {"structureType":STRUCTURE_SPAWN}
 const activateNewPolicy = function ( activity, parnetId, params)  {
-     policy.activatePolicy(activityItem, params ? params : {}, parnetId);
+     policy.activatePolicy(activity, params ? params : {}, parnetId);
 };
 
 const activateNewRoadsPolicy = function ( activity, parnetId)  {

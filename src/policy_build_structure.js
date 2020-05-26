@@ -4,15 +4,13 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-//const gf = require("gf");
-//const construction = require("construction");
-const policy = require("policy");
+const FlagRoom = require("flag_room");
 
 // constructor
 function PolicyBuildStructure  (id, data) {
     this.id = id;
     this.type = gc.POLICY_BUILD_STRUCTURE;
-    this.structureType = data.type;
+    this.structureType = data.structureType;
     this.parentId = data.parentId;
     this.home = data.home;
     this.m = data.m;
@@ -29,8 +27,9 @@ PolicyBuildStructure.prototype.initilise = function () {
 };
 
 // runs once every tick
-PolicyBuildStructureExtensions.prototype.enact = function () {
-    const fRoom = new flagRoom.FlagRooom(this.home);
+PolicyBuildStructure.prototype.enact = function () {
+    console.log("POLICY_BUILD_STRUCTURE this",JSON.stringify(this));
+    const fRoom = new FlagRoom(this.home);
     this.m.built = !fRoom.buildStructure(this.structureType)
 };
 
