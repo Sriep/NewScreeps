@@ -5,8 +5,7 @@
  */
 //const gf = require("gf");
 const gc = require("gc");
-const policy = require("policy");
-const flagRoom = require("flag_room");
+const FlagRoom = require("flag_room");
 
 // constructor
 function PolicyPlanBuilds  (id, data) {
@@ -30,7 +29,7 @@ PolicyPlanBuilds.prototype.initilise = function () {
 // runs once every tick
 PolicyPlanBuilds.prototype.enact = function () {
     console.log("POLICY_PLAN_BUILDS enact");
-    const fRoom = new flagRoom.FlagRooom(this.home);
+    const fRoom = new FlagRoom(this.home);
     const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS);
     fRoom.placeCentre(
         fRoom.CENTRE_6x6_1,
@@ -41,7 +40,7 @@ PolicyPlanBuilds.prototype.enact = function () {
 
 PolicyPlanBuilds.prototype.draftReplacment = function() {
     console.log("POLICY_PLAN_BUILDS draftReplacment this.m.finished",this.m.finished );
-    return this//  this.m.finished ? false : this;
+    return this.m.finished ? false : this;
 };
 
 module.exports = PolicyPlanBuilds;

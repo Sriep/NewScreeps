@@ -38,24 +38,24 @@ FlagRooom.prototype.CENTRE_6x6_1 = {
     "origin" : {"x":0,"y":0},
     "x_dim" : 6,
     "y_dim": 6,
-    STRUCTURE_LAB : [
+    "lab" : [
         {"x":2,"y":3},{"x":2,"y":4},{"x":3,"y":3},
         {"x":2,"y":5},
         {"x":1,"y":3},{"x":1,"y":2},{"x":2,"y":2},{"x":2,"y":3},{"x":2,"y":4},{"x":1,"y":4}
     ],
-    STRUCTURE_STORAGE : [{"x":4,"y":4}],
-    STRUCTURE_TERMINAL : [{"x":4,"y":5}],
-    STRUCTURE_LINK : [{"x":3,"y":5}],
-    STRUCTURE_SPAWN : [{"x":0,"y":0},{"x":3,"y":0},{"x":4,"y":0}],
-    STRUCTURE_POWER_SPAWN : [{"x":1,"y":0}],
+    "storage" : [{"x":4,"y":4}],
+    "terminal" : [{"x":4,"y":5}],
+    "link" : [{"x":3,"y":5}],
+    "spawn" : [{"x":0,"y":0},{"x":3,"y":0},{"x":4,"y":0}],
+    "powerSpawn" : [{"x":1,"y":0}],
     "stationary_creep" : {"x":3,"y":4},
-    STRUCTURE_ROAD : [
+    "road" : [
         {"x":0,"y":5},{"x":0,"y":4},{"x":0,"y":3},{"x":0,"y":2},{"x":0,"y":1},{"x":0,"y":0},
         {"x":1,"y":1},{"x":2,"y":1},{"x":3,"y":1},{"x":4,"y":1},{"x":5,"y":1},
         {"x":5,"y":0},{"x":5,"y":2},{"x":5,"y":3},{"x":5,"y":4},{"x":5,"y":5},
         {"x":4,"y":3}, {"x":3,"y":4}
     ],
-    STRUCTURE_OBSERVER:  [{"x":1,"y":5}]
+    "observer":  [{"x":1,"y":5}]
 };
 
 function FlagRooom (name) {
@@ -64,18 +64,15 @@ function FlagRooom (name) {
 }
 
 FlagRooom.prototype.placeCentre = function (centre, start) {
-    console.log("FlagRooom placeCentre this", JSON.stringify(this));
+    //console.log("FlagRooom placeCentre this", JSON.stringify(this));
     console.log("placeCentre centre", JSON.stringify(centre),"start", JSON.stringify(start));
     const room = Game.rooms[this.name];
-    if (!this.m.avoid) {
-        this.m.avoid = [];
-    }
+    let avoid = [];
     const sources = room.find(FIND_SOURCES);
     for (let source of sources) {
-        this.m.avoid = this.m.avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
+        avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
     }
-    this.m.avoid = this.m.avoid.concat(gf.posPlusDeltaArray(room.controller.pos, gc.THREE_MOVES));
-
+    avoid = avoid.concat(gf.posPlusDeltaArray(room.controller.pos, gc.THREE_MOVES));
     if (!start) {
         const mass = [];
         const sources = room.find(FIND_SOURCES);
@@ -87,39 +84,52 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
     }
 
     const terrain = new Room.Terrain(this.name);
-    centre["origin"] = construction.placeRectangle(terrain, start, centre.x_dim, centre.y_dim, avoid);
+    centre["origin"] = construction.placeRectangle(
+        terrain, start, centre.x_dim, centre.y_dim, avoid
+    );
     this.m["plan"] = centre;
     for ( let dx = 0 ; dx < centre.x_dim ; dx++ ) {
         for ( let dy = 0 ; dy < centre.y_dim ; dy++ ) {
-            this.m.avoid.push({"x":centre["origin"]+dx, "y":centre["origin"]+dy})
+            avoid.push({"x":centre["origin"]+dx, "y":centre["origin"]+dy})
         }
     }
-    this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, centre.origin);
-    this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, centre.origin);
-    this.m["plan"][STRUCTURE_LINK] = this.getLinkPos(terrain);
-    this.console.log("FlagRooom ",JSON.stringify(this));
+    this.m["plan"]["tower"] = this.getTowerPos(terrain, centre.origin, avoid);
+    this.m["plan"]["extension"] = this.getExtensionPos(terrain, centre.origin, avoid);
+    this.m["plan"]["link"] = this.getLinkPos(terrain);
+    //console.log("FlagRooom this.m[plan]",JSON.stringify(this.m["plan"]));
+    //console.log("FlagRooom this.m[plan][extension]",JSON.stringify(this.m["plan"]["extension"]));
 };
 
-FlagRooom.prototype.getExtensionPos = function(terrain, start) {
-    this.m["plan"][EXTENSION_5_3x3] = [];
+FlagRooom.prototype.getExtensionPos = function(terrain, start, avoid) {
+    //console.log("this.EXTENSION_5_3x3", JSON.stringify(this.EXTENSION_5_3x3));
+    //console.log("extension this.m[plan]", JSON.stringify(this.m["plan"]));
+    const rtv = [];
     for ( let i = 0 ; i < 12  ; i++ ) {
         const origin = construction.placeRectangle(
-            terrain, start, EXTENSION_5_3x3.x_dim, EXTENSION_5_3x3.y_dim, this.m.avoid
+            terrain, start, this.EXTENSION_5_3x3.x_dim, this.EXTENSION_5_3x3.y_dim, avoid
         );
-        for (let delta of EXTENSION_5_3x3) {
-            this.m.avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
-            this.m["plan"][STRUCTURE_TOWER].push({"x":origin.x+delta.x, "y":origin.y+delta.y});
+        for (let delta of this.EXTENSION_5_3x3["extension"]) {
+            avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
+            rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
         }
+        //console.log(i,"getExtensionPos origin", JSON.stringify(origin),"rtv",JSON.stringify(rtv));
+        //console.log(i,"getExtensionPos avoid", JSON.stringify(avoid));
     }
+    return rtv;
 };
 
-FlagRooom.prototype.getTowerPos = function(terrain, start) {
-    const origin = construction.placeRectangle(terrain, start, TOWER_3x3.x_dim, TOWER_3x3.y_dim, this.m.avoid);
-    this.m["plan"][STRUCTURE_TOWER] = [];
-    for (let delta of TOWER_3x3) {
-        this.m.avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
-        this.m["plan"][STRUCTURE_TOWER].push({"x":origin.x+delta.x, "y":origin.y+delta.y});
+FlagRooom.prototype.getTowerPos = function(terrain, start, avoid) {
+    //console.log("this.TOWER_3x3", JSON.stringify(this.TOWER_3x3));
+    const origin = construction.placeRectangle(
+        terrain, start, this.TOWER_3x3.x_dim, this.TOWER_3x3.y_dim, avoid
+    );
+    const rtv = [];
+    this.m["plan"]["tower"] = [];
+    for (let delta of this.TOWER_3x3["tower"]) {
+        avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
+        rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
     }
+    return rtv;
 };
 
 FlagRooom.prototype.getLinkPos = function(terrain) {

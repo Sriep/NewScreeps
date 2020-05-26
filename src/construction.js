@@ -265,11 +265,6 @@ const construction = {
     },
 
     placeRectangle: function(terrain, centre, n, m, avoid) {
-        //const terrain = new Room.Terrain(roomName);
-        for (let xy of avoid) {
-            terrain.set(xy.x, xy.y, C.TERRAIN_MASK_WALL);
-        }
-
         let range = 0;
         while (range < 20) {
             range++;
@@ -281,7 +276,7 @@ const construction = {
                     if (centre + dx < 5 || centre+dx >45) {
                         continue
                     }
-                    if (this.canFitRectangle(terrain, centre.x+dx, centre.y+dy, n, m)) {
+                    if (this.canFitRectangle(terrain, centre.x+dx, centre.y+dy, n, m, avoid)) {
                         return {"x":centre.x+dx, "y":centre.y+dy};
                     }
                 }
@@ -289,7 +284,7 @@ const construction = {
         }
     },
 
-    canFitRectangle: function (terrain, x, y, n, m) {
+    canFitRectangle: function (terrain, x, y, n, m, avoid) {
         if (terrain.get(x,y) === C.TERRAIN_MASK_WALL){
             return false;
         }
@@ -301,6 +296,11 @@ const construction = {
             for (let dy = 0; dy < m; dy++) {
                 if (terrain.get(x + dx, y + dy) === C.TERRAIN_MASK_WALL) {
                     return false;
+                }
+                for (let xy of avoid) {
+                    if (xy.x === x+dx && xy.y === y + dy) {
+                        return false;
+                    }
                 }
             }
         }
