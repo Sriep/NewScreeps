@@ -19,10 +19,6 @@ const pgc = {
     BUILD_ROAD_SOURCE_SOURCE: "build_road_source_source",
     BUILD_ROAD_SPAWN_CONTROLLER: "build_road_spawn_controller",
     BUILD_ROAD_SOURCE_TOWERS: "build_road_source_towers",
-    // Msc
-    FINISHED: "finished",
-    FOREIGN_MINING: "foreign_mining",
-    DISALLOWED: "disallowed",
     // policies
     POLICY_GOVERN: "govern",
     POLICY_EXPLORE: "explore",
@@ -220,10 +216,10 @@ const gc = {
     BUILD_ROAD_SPAWN_CONTROLLER: pgc.BUILD_ROAD_SPAWN_CONTROLLER,
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
-    ACTIVITY_FINISHED: pgc.ACTIVITY_FINISHED,
+    ACTIVITY_FINISHED: "finished",
     ACTIVITY_NEUTRAL_COLONIES: "neutral_colonies",
     ACTIVITY_RESERVED_COLONIES: "reserved_colonies",
-    ACTIVITY_DISALLOWED: pgc.ACTIVITY_DISALLOWED,
+    ACTIVITY_DISALLOWED: "disallowed",
     // policies
     POLICY_GOVERN: pgc.POLICY_GOVERN,
     POLICY_EXPLORE: pgc.POLICY_EXPLORE,

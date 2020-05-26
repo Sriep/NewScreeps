@@ -139,7 +139,8 @@ FlagRooom.prototype.getLinkPos = function(terrain) {
 FlagRooom.prototype.buildStructure = function(type) {
     const room = Game.rooms[this.name];
     const rcl = room.controller.level;
-    const allowed = CONTROLLER_STRUCTURES[rcl][type];
+    console.log("rcl",rcl,"room.controller.level",room.controller.level)
+    const allowed = CONTROLLER_STRUCTURES[type][rcl];
     const built = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: type }
     });

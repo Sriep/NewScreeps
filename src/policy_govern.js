@@ -33,17 +33,18 @@ PolicyGovern.prototype.initilise = function () {
 PolicyGovern.prototype.enact = function () {
     console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
     if (!Memory.records["rcl "+this.m.rcl] ) {
-        Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
+        //Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }
     if (Game.rooms[this.roomName].controller.level !== this.m.rcl) {
         this.m.rcl = Game.rooms[this.roomName].controller.level;
         this.m.agendaIndex = -1;
-        Memory.records.agenda.push("rcl "+Game.rooms[this.roomName].controller.level.toString() + " " + Game.time.toString())
+        //Memory.records.agenda.push("rcl "+Game.rooms[this.roomName].controller.level.toString() + " " + Game.time.toString())
     }
     this.govern();
 };
 
 PolicyGovern.prototype.govern = function () {
+    console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.roomName].controller.level)
     if (this.m.agendaIndex >= this.m.agenda[this.m.rcl].length) {
         return;
     }
@@ -54,7 +55,7 @@ PolicyGovern.prototype.govern = function () {
         this.id
     )) {
         if (this.m.agendaIndex !== -1) {
-            //Memory.agenda.push(lastAgendaItem + " checked " + Game.time.toString())
+            Memory.records.agenda.push(lastAgendaItem + " checked " + Game.time.toString());
             console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
         }
         const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
