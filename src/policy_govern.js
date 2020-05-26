@@ -32,7 +32,6 @@ PolicyGovern.prototype.initilise = function () {
 
 PolicyGovern.prototype.enact = function () {
     console.log("POLICY_GOVERN enact foreign mining", this.m[gc.ACTIVITY_NEUTRAL_COLONIES],"colonies", JSON.stringify(this.m.colonies));
-    //console.log("POLICY_GOVERN this", JSON.stringify(this));
     if (!Memory.records["rcl "+this.m.rcl] ) {
         Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
     }
@@ -49,21 +48,27 @@ PolicyGovern.prototype.govern = function () {
         return;
     }
     const lastAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
-    //console.log("govern lastAgendaItem", lastAgendaItem);
-    if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem].check(lastAgendaItem, this.id)) {
+    console.log("govern lastAgendaItem", JSON.stringify(lastAgendaItem));
+    if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem.activity].check(
+        lastAgendaItem,
+        this.id
+    )) {
         if (this.m.agendaIndex !== -1) {
             //Memory.agenda.push(lastAgendaItem + " checked " + Game.time.toString())
-            console.log("POLICY_GOVERN check PASSED for", lastAgendaItem)
+            console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
         }
         const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
-        //console.log("POLICY_GOVERN next item", nextAgendaItem);
-        agenda.items()[nextAgendaItem].enact(nextAgendaItem, this.id);
-        //console.log("POLICY_GOVERN enacted agemda item", nextAgendaItem);
+        console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
+        agenda.items()[nextAgendaItem.activity].enact(
+            nextAgendaItem.activity,
+            this.id,
+            nextAgendaItem.params
+        );
+        console.log("POLICY_GOVERN enacted agemda item", JSON.stringify(nextAgendaItem));
         this.m.agendaIndex++;
-
-        return;
+        //return;
     }
-    //console.log("POLICY_GOVERN check failed",lastAgendaItem)
+    console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
  };
 
 PolicyGovern.prototype.getColonies = function() {

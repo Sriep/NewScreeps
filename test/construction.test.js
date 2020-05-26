@@ -16,10 +16,10 @@ describe("construction", function() {
         it("return rectangle if fits", function() {
             const terrain = new Terrain("W7N7");
 
-            const data1 = construction.placeRectangle(terrain, {"x":25,"y":25}, 6, 4, []);
+            const data1 = construction.placeRectangle(terrain, {"x":25,"y":25}, 6, 6, []);
             console.log("data1", JSON.stringify(data1));
 
-            const data2 = construction.placeRectangle(terrain, {"x":12,"y":12}, 4, 6, []);
+            const data2 = construction.placeRectangle(terrain, {"x":12,"y":12}, 6, 6, []);
             console.log("data2", JSON.stringify(data2));
         });
 

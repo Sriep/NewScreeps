@@ -13,8 +13,9 @@ const flag = {
     },
 
     getRoom(roomName) {
+        this.flagRoom(roomName);
         const flagRoom = require("flag_room");
-        return new flagRoom(Game.flags[roomName].memory);
+        return new flagRoom.FlagRooom(roomName);
     },
 
     getRoomFlag(roomName) {

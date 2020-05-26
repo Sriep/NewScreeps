@@ -8,76 +8,89 @@ const policy = require("policy");
 
 const agenda = {
     default_1: [
-        [ gc.ACTIVITY_DISALLOWED ],
-        [ gc.POLICY_RCL1, gc.ACTIVITY_FINISHED ],
+        [ { "activity": gc.ACTIVITY_DISALLOWED} ],
         [
-            gc.POLICY_PORTERS,
-            gc.POLICY_BUILD_SOURCE_CONTAINERS,
-            gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_CONTROLLER_CONTAINERS,
-            gc.ACTIVITY_NEUTRAL_COLONIES,
-            gc.POLICY_EXPLORE,
-            gc.POLICY_COLONIAL_OFFICE,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_PLAN_BUILDS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN} },
+            { "activity": gc.POLICY_RCL1},
+            { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.BUILD_ROAD_SOURCE_SPAWN,
-            gc.BUILD_ROAD_SOURCE_SOURCE,
-            gc.BUILD_ROAD_SOURCE_CONTROLLER,
-            gc.BUILD_ROAD_SPAWN_CONTROLLER,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
-            gc.ACTIVITY_RESERVED_COLONIES,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_PORTERS},
+            { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS},
+            { "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
+            { "activity": gc.POLICY_EXPLORE},
+            { "activity": gc.POLICY_COLONIAL_OFFICE},
+            { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.POLICY_BUILD_STORAGE,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.BUILD_ROAD_SOURCE_SPAWN},
+            { "activity": gc.BUILD_ROAD_SOURCE_SOURCE},
+            { "activity": gc.BUILD_ROAD_SOURCE_CONTROLLER},
+            { "activity": gc.BUILD_ROAD_SPAWN_CONTROLLER},
+            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.ACTIVITY_RESERVED_COLONIES},
+            { "activity": gc.ACTIVITY_FINISHED},
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_LINKS,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
-            gc.ACTIVITY_FINISHED,
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_STORAGE}},
+            { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            gc.POLICY_BUILD_LINKS,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
+            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.ACTIVITY_FINISHED},
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            //gc.POLICY_BUILD_LINKS,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.ACTIVITY_FINISHED}
         ],
         [
-            gc.POLICY_BUILD_EXTENSIONS,
-            //gc.POLICY_BUILD_LINKS,
-            gc.BUILD_ROAD_SOURCE_EXTENSIONS,
-            gc.POLICY_BUILD_TOWER,
-            gc.BUILD_ROAD_SOURCE_TOWERS,
-            gc.ACTIVITY_FINISHED
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
+            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TERMINAL}},
+            { "activity": gc.ACTIVITY_FINISHED}
+        ],
+        [
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
+            { "activity": gc.BUILD_ROAD_SOURCE_EXTENSIONS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_POWER_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_OBSERVER}},
+            { "activity": gc.BUILD_ROAD_SOURCE_TOWERS},
+            { "activity": gc.ACTIVITY_FINISHED}
         ],
     ],
 
     items : function () {
         const fc = {};
+        fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
+        fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_CONTROLLER] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_SOURCE] = newBuildRoadBlockerPolicy;
-        fc[gc.BUILD_ROAD_SOURCE_SPAWN
-
-            ] = newBuildRoadBlockerPolicy;
+        fc[gc.BUILD_ROAD_SOURCE_SPAWN] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_EXTENSIONS] = newBuildRoadBlockerPolicy;
         fc[gc.BUILD_ROAD_SOURCE_TOWERS] = newBuildRoadBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
@@ -88,9 +101,6 @@ const agenda = {
         fc[gc.POLICY_PORTERS] = newPolicyReplacment;
         fc[gc.POLICY_BUILD_CONTROLLER_CONTAINERS] = newBlockerPolicy;
         fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
-        fc[gc.POLICY_BUILD_EXTENSIONS] = newBlockerPolicy;
-        fc[gc.POLICY_BUILD_TOWER] = newBlockerPolicy;
-        fc[gc.POLICY_BUILD_STORAGE] = newBlockerPolicy;
         fc[gc.ACTIVITY_NEUTRAL_COLONIES] = newActivity;
         fc[gc.ACTIVITY_RESERVED_COLONIES] = newActivity;
         fc[gc.ACTIVITY_FINISHED]  = {
@@ -105,20 +115,13 @@ const agenda = {
     }
 
 };
-const activateNewPolicy = function ( agendaItem, parnetId)  {
-     policy.activatePolicy(agendaItem, {}, parnetId);
+const activateNewPolicy = function ( agendaItem, parnetId, params)  {
+     policy.activatePolicy(agendaItem, params ? params : {}, parnetId);
 };
 
 const activateNewRoadsPolicy = function ( agendaItem, parnetId)  {
     console.log("agenda activateNewRoadsPolicy", agendaItem, parnetId);
     policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : agendaItem}, parnetId);
-};
-
-const newBuildRoadBlockerPolicy = {
-    "enact": activateNewRoadsPolicy,
-    "check": function ( agendaItem, parnetId)  {
-         return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
-    },
 };
 
 const activateNewReplacementPolicy = function ( agendaItem, parnetId)  {
@@ -128,6 +131,13 @@ const activateNewReplacementPolicy = function ( agendaItem, parnetId)  {
         parnetId,
         gc.ECONOMIES,
     );
+};
+
+const newBuildRoadBlockerPolicy = {
+    "enact": activateNewRoadsPolicy,
+    "check": function ( _, parnetId)  {
+        return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
+    },
 };
 
 const newActivity = {

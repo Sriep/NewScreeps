@@ -264,8 +264,8 @@ const construction = {
         return pos;
     },
 
-    placeRectangle: function(roomName, centre, n, m, avoid) {
-        const terrain = new Room.Terrain(roomName);
+    placeRectangle: function(terrain, centre, n, m, avoid) {
+        //const terrain = new Room.Terrain(roomName);
         for (let xy of avoid) {
             terrain.set(xy.x, xy.y, C.TERRAIN_MASK_WALL);
         }
@@ -281,9 +281,8 @@ const construction = {
                     if (centre + dx < 5 || centre+dx >45) {
                         continue
                     }
-                    const rectangle = this.canFitRectangle(terrain, centre.x+dx, centre.y+dy, n, m);
-                    if (rectangle) {
-                        return rectangle;
+                    if (this.canFitRectangle(terrain, centre.x+dx, centre.y+dy, n, m)) {
+                        return {"x":centre.x+dx, "y":centre.y+dy};
                     }
                 }
             }
@@ -305,13 +304,7 @@ const construction = {
                 }
             }
         }
-        const pts = [];
-        for (let dx = 0 ; dx < n ; dx++) {
-            for (let dy = 0; dy < m; dy++) {
-                pts.push({"x":x+dx, "y":y+dy})
-            }
-        }
-        return pts;
+        return true;
     },
 
     planWall_2: function(terrain) {
