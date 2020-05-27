@@ -90,7 +90,7 @@ FlagRooom.prototype.getLinkPos = function(terrain) {
 };
 
 FlagRooom.prototype.buildStructure = function(type) {
-    if (!this.m.plan[type] || this.m.plan[type].length) {
+    if (!this.m.plan[type] || this.m.plan[type].length === 0) {
         return false;
     }
     const room = Game.rooms[this.name];
