@@ -38,9 +38,9 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
         }
     }
     const terrain = new Room.Terrain(this.name);
-    this.m["plan"]["tower"] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
-    this.m["plan"]["extension"] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
-    this.m["plan"]["link"] = this.getLinkPos(terrain);
+    this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
+    this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
+    //this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(getLinkPos(terrain));
 };
 
 FlagRooom.prototype.findLocationForCentre = function(centre, avoid) {
@@ -64,7 +64,7 @@ FlagRooom.prototype.getExtensionPos = function(terrain, start, avoid) {
         const origin = construction.placeRectangle(
             terrain, start, tile.EXTENSION_5_3x3.x_dim, tile.EXTENSION_5_3x3.y_dim, avoid
         );
-        for (let delta of tile.EXTENSION_5_3x3["extension"]) {
+        for (let delta of tile.EXTENSION_5_3x3[STRUCTURE_EXTENSION]) {
             avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
             rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
         }
@@ -77,8 +77,8 @@ FlagRooom.prototype.getTowerPos = function(terrain, start, avoid) {
         terrain, start, tile.TOWER_3x3.x_dim, tile.TOWER_3x3.y_dim, avoid
     );
     const rtv = [];
-    this.m["plan"]["tower"] = [];
-    for (let delta of tile.TOWER_3x3["tower"]) {
+    this.m["plan"][STRUCTURE_TOWER] = [];
+    for (let delta of tile.TOWER_3x3[STRUCTURE_TOWER]) {
         avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
         rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
     }
@@ -90,6 +90,9 @@ FlagRooom.prototype.getLinkPos = function(terrain) {
 };
 
 FlagRooom.prototype.buildStructure = function(type) {
+    if (!this.m.plan[type] || this.m.plan[type].length) {
+        return false;
+    }
     const room = Game.rooms[this.name];
     const rcl = room.controller.level;
     console.log("type", type,"buildStructure this",JSON.stringify(this));
@@ -103,6 +106,11 @@ FlagRooom.prototype.buildStructure = function(type) {
     const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
         filter: { structureType: type }
     });
+    if (this.m.plan[type].length <= built.length + beingBuilt.length) {
+        return false;
+    }
+    //console.log("type", type, "this.m.plan[type]",this.m.plan[type],"beingBuilt"
+    //    ,beingBuilt.length,"built.lengt",built.length);
     if (built.length + beingBuilt.length < allowed) {
         if (this.m.plan[type].length <= built.length + beingBuilt.length) {
             return false;
