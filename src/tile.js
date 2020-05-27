@@ -46,7 +46,7 @@ const tile = {
         [C.STRUCTURE_LINK] : [{"x":3,"y":5}],
         [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":3,"y":0},{"x":4,"y":0}],
         [C.STRUCTURE_POWER_SPAWN] : [{"x":1,"y":0}],
-        "stationary_creep" : [{"x":3,"y":4}],
+        "cog" : [{"x":3,"y":4}],
         [C.STRUCTURE_ROAD] : [
             {"x":0,"y":5},{"x":0,"y":4},{"x":0,"y":3},{"x":0,"y":2},{"x":0,"y":1},{"x":0,"y":0},
             {"x":1,"y":1},{"x":2,"y":1},{"x":3,"y":1},{"x":4,"y":1},{"x":5,"y":1},
@@ -70,7 +70,7 @@ const tile = {
         [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
         [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":1,"y":1},{"x":5,"y":0}],
         [C.STRUCTURE_POWER_SPAWN] : [{"x":0,"y":2}],
-        "stationary_creep" : [{"x":3,"y":3},{"x":4,"y":2}],
+        "cog" : [{"x":3,"y":3},{"x":4,"y":2}],
         [C.STRUCTURE_OBSERVER]:  [{"x":0,"y":5}]
     },
 

@@ -32,8 +32,8 @@ const flag = {
         return new QueueSpawn(roomName);
     },
 
-    flag: function (room, force) {
-        if (!Game.flags[room.name] || force) {
+    flag: function (room) {
+        if (!Game.flags[room.name]) {
             const centre = new RoomPosition(25, 25, room.name);
             centre.createFlag(room.name);
 

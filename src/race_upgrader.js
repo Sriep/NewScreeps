@@ -35,7 +35,20 @@ const race_upgrader = {
                 gf.fatalError("bodycounts Cs are zero ec", ec)
         }
         return {"work": Ws, "carry": Cs, "move" : Ms};
-    }
+    },
+
+    boosts: [
+        { priority : 3, resource: RESOURCE_KEANIUM_HYDRIDE, part : CARRY },
+        { priority : 1, resource: RESOURCE_GHODIUM_HYDRIDE, part : WORK },
+
+        { priority : 3, resource : RESOURCE_KEANIUM_ACID, part : CARRY },
+        { priority : 1, resource : RESOURCE_GHODIUM_ACID, part : WORK },
+
+        { priority : 3, resource : RESOURCE_CATALYZED_KEANIUM_ACID, part : CARRY },
+        { priority : 1, resource : RESOURCE_CATALYZED_GHODIUM_ACID, part : WORK },
+
+    ]
+
 };
 
 module.exports = race_upgrader;

@@ -13,6 +13,7 @@ function PolicyBuildExtractors  (id, data) {
     this.id = id;
     this.home = data.home;
     this.m = data.m;
+    this.parentId = data.parentId;
 }
 
 // runs first time policy is created only
@@ -21,6 +22,8 @@ PolicyBuildExtractors.prototype.initilise = function () {
         this.m = {}
     }
     this.m.finished = false;
+    //console.log("PolicyBuildExtractors initilise", JSON.stringify(this));
+    //console.log("Memory.policies[this.parentId]", JSON.stringify(Memory.policies[this.parentId]))
     this.home = Memory.policies[this.parentId].roomName;
     const room = Game.rooms[this.home];
     return !!room && !!room.controller && room.controller.my;
@@ -28,6 +31,7 @@ PolicyBuildExtractors.prototype.initilise = function () {
 
 // runs once every tick
 PolicyBuildExtractors.prototype.enact = function () {
+    console.log("POLICY_BUILD_EXTRACTORS this", JSON.stringify(this))
     const colonies = policy.getGouvernerPolicy(this.home).getColonies();
     this.m.finished = true;
     for (let colonyInfo of colonies) {
@@ -37,11 +41,18 @@ PolicyBuildExtractors.prototype.enact = function () {
             continue
         }
         const minerals = colony.find(FIND_MINERALS);
-        const beingBuilt  = room.find(FIND_MY_CONSTRUCTION_SITES, {
-            filter: { structureType: STRUCTURE_LINK }
+        const built = colony.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_EXTRACTOR }
         });
-        if (beingBuilt.length < minerals.length) {
-            for (let mineral in minerals) {
+        if (built.length >= minerals.length) {
+            continue;
+        }
+
+        const beingBuilt  = colony.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: { structureType: STRUCTURE_EXTRACTOR }
+        });
+        if (beingBuilt.length + built.length < minerals.length) {
+            for (let mineral of minerals) {
                 mineral.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
             }
         }

@@ -160,9 +160,13 @@ const gc = {
     // claimer
     STATE_RESERVER_IDLE: "reserver_idle",
     STATE_RESERVER_RESERVE: "reserver_reserve",
-    //tower
+    // tower
     STATE_TOWER_IDLE: "tower_idle",
     STATE_TOWER_DEFEND: "tower_defend",
+    // cog
+    STATE_COG_IDLE: "cog_idle",
+    STATE_COG_WITHDRAW: "cog_withdraw",
+    STATE_COG_TRANSFER: "cog_transfer",
 
     MAX_STATE_STACK: 5,
 

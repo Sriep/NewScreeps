@@ -13,7 +13,13 @@ const race_reserver = {
             "move" : size * gc.RESERVER_MOVE_CLAIM_RATIO,
             "claim" : size
         }
-    }
+    },
+
+    boosts: [
+        { priority : 2, resource: RESOURCE_ZYNTHIUM_OXIDE, part : MOVE },
+        { priority : 2, resource : RESOURCE_ZYNTHIUM_ALKALIDE, part : MOVE },
+        { priority : 2, resource : RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, part : MOVE },
+    ],
 };
 
 module.exports = race_reserver;

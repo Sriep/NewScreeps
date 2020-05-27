@@ -44,7 +44,8 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
     this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
     this.setSourceContainers();
     this.setControllerContainers();
-    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.sourceLinkPos());
+    //this.m["plan"][STRUCTURE_LINK+"_2"] = this.sourcesLinkPos();
+    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.sourcesLinkPos())
 };
 
 FlagRooom.prototype.findLocationForCentre = function(centre, avoid) {
@@ -91,9 +92,11 @@ FlagRooom.prototype.getTowerPos = function(terrain, start, avoid) {
 
 FlagRooom.prototype.setSourceContainers = function () {
     const sources = Game.rooms[this.name].find(FIND_SOURCES);
-    for (let source in sources) {
+    console.log("setSourceContainers befor loop this.m",JSON.stringify(this.m));
+    for (let source of sources) {
+        //console.log("setSourceContainers room", source.room,"id",source.id);
         let spots = economy.findMostFreeNeighbours(
-            source.room, source.pos, 1
+            Game.rooms[this.name], source.pos, 1
         );
         if (spots.length === 0) {
             return gf.fatalError("findMostFreeNeighbours cant get to source");
@@ -102,6 +105,7 @@ FlagRooom.prototype.setSourceContainers = function () {
         spots[0].pos.roomName = source.room.name;
         this.m.sources[source.id]["containerPos"] = spots[0].pos;
     }
+    console.log("setSourceContainers after loop this.m",JSON.stringify(this.m));
 };
 
 FlagRooom.prototype.setControllerContainers = function () {
@@ -119,16 +123,16 @@ FlagRooom.prototype.setControllerContainers = function () {
     this.m.controller["upgraderPosts"] = spots;
 };
 
-FlagRooom.prototype.sourceLinkPos = function() {
+FlagRooom.prototype.sourcesLinkPos = function() {
     const links = [];
-    const sources = Game.rooms[this.name];(FIND_SOURCES);
+    const sources = Game.rooms[this.name].find(FIND_SOURCES);
     for (let source of sources) {
-        links.push(this.sourceLinkPos(source));
+        links.push(this.sLinkPos(source));
     }
     return links;
 };
 
-FlagRooom.prototype.sourceLinkPos = function(source) {
+FlagRooom.prototype.sLinkPos = function(source) {
     const containerPos = this.m.sources[source.id]["containerPos"];
     const terrain = source.room.getTerrain();
     let adjacent = 0;
@@ -138,7 +142,7 @@ FlagRooom.prototype.sourceLinkPos = function(source) {
             if (adjacent === 0) {
                 adjacent++
             } else {
-                linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, room.name);
+                linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, source.room.name);
                 return linkPos;
             }
         }
@@ -151,7 +155,7 @@ FlagRooom.prototype.buildStructure = function(type) {
     }
     const room = Game.rooms[this.name];
     const rcl = room.controller.level;
-    console.log("type", type,"buildStructure this",JSON.stringify(this));
+    //console.log("type", type,"buildStructure this",JSON.stringify(this));
     const allowed = CONTROLLER_STRUCTURES[type][rcl];
     const built = room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: type }
@@ -166,8 +170,8 @@ FlagRooom.prototype.buildStructure = function(type) {
         return false;
     }
 
-    console.log("type", type, "this.m.plan[type].length",this.m.plan[type].length,"beingBuilt"
-        ,beingBuilt.length,"built.length",built.length,"allowed", allowed);
+    //console.log("type", type, "this.m.plan[type].length",this.m.plan[type].length,"beingBuilt"
+    //    ,beingBuilt.length,"built.length",built.length,"allowed", allowed);
 
     if (built.length + beingBuilt.length < allowed) {
         if (this.m.plan[type].length <= built.length + beingBuilt.length) {
@@ -175,8 +179,8 @@ FlagRooom.prototype.buildStructure = function(type) {
         }
         const pt = this.m.plan[type][built.length + beingBuilt.length];
 
-        console.log("buildStructure pt",JSON.stringify(pt),"built.length + beingBuilt.length"
-            ,built.length + beingBuilt.length);
+        //console.log("buildStructure pt",JSON.stringify(pt),"built.length + beingBuilt.length"
+        //    ,built.length + beingBuilt.length);
 
         new RoomPosition(pt.x,pt.y,this.name).createConstructionSite(type)
     }

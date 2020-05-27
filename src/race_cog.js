@@ -1,18 +1,14 @@
 /**
  * @fileOverview screeps
- * Created by piers on 25/04/2020
+ * Created by piers on 27/05/2020
  * @author Piers Shepperson
  */
 
-const race_worker = {
-    WORKER_MAX_SIZE: 16,
-    BLOCKSIZE: 100 + 50 + 50,
+const race_cog = {
 
     bodyCounts: function (ec) {
-        const parts =  Math.floor(ec/this.BLOCKSIZE);
-        let  size = Math.min(parts, this.WORKER_MAX_SIZE);
-        size = Math.min(16, size);
-        return {"work": size, "carry": size, "move" : size};
+        const carry =  Math.min(49, (ec-BODYPART_COST[MOVE])/BODYPART_COST[WORK]);
+        return {"work": 0, "carry": carry, "move" : 1};
     },
 
     boosts: [
@@ -31,4 +27,4 @@ const race_worker = {
 
 };
 
-module.exports = race_worker;
+module.exports = race_cog;

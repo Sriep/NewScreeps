@@ -14,7 +14,13 @@ const race_harvester = {
             return gc.HARVESTER_BODY_COUNTS[gc.MAX_HARVESTER_EC];
         }
         return gc.HARVESTER_BODY_COUNTS[Math.floor(ec/50) * 50];
-    }
+    },
+
+    boosts: [
+        { priority : 1, resource: RESOURCE_UTRIUM_OXIDE, part : WORK },
+        { priority : 1, resource : RESOURCE_UTRIUM_ALKALIDE, part : WORK },
+        { priority : 1, resource : RESOURCE_CATALYZED_UTRIUM_ALKALIDE, part : WORK },
+    ]
 };
 
 module.exports = race_harvester;

@@ -25,7 +25,18 @@ const race_porter = {
 
     carryCapacity(ec) {
         return this.bodyCounts(ec)["carry"]*75;
-    }
+    },
+
+    boosts: [
+        { priority : 1, resource: RESOURCE_KEANIUM_HYDRIDE, part : CARRY },
+        { priority : 2, resource: RESOURCE_ZYNTHIUM_OXIDE, part : MOVE },
+
+        { priority : 1, resource : RESOURCE_KEANIUM_ACID, part : CARRY },
+        { priority : 2, resource : RESOURCE_ZYNTHIUM_ALKALIDE, part : MOVE },
+
+        { priority : 1, resource : RESOURCE_CATALYZED_KEANIUM_ACID, part : CARRY },
+        { priority : 2, resource : RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, part : MOVE },
+    ]
 
 };
 
