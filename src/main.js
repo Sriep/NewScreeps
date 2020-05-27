@@ -12,7 +12,6 @@ const policy = require("policy");
 const flag = require("flag");
 const records = require("records");
 
-
 module.exports.loop = function () {
     console.log("************************ Start ", Game.time," *********************************");
     inserted.top();

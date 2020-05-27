@@ -123,16 +123,15 @@ const construction = {
         }
         for (let f of from) {
             for (let t of to) {
-                this.buldRoad(f,t)
+                this.buildRoad(f,t)
             }
         }
     },
 
     buildRoad: function(from, to) {
-        const path = from.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
-        const room = Game.rooms[from.roomName];
+        const path = from.pos.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
         for(let step in path) {
-            room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+            from.room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
         }
     },
 

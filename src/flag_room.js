@@ -7,6 +7,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const construction = require("construction");
+const tile = require("tile");
 
 function FlagRooom (name) {
     this.name = name;
@@ -14,29 +15,13 @@ function FlagRooom (name) {
 }
 
 FlagRooom.prototype.placeCentre = function (centre, start) {
-    const room = Game.rooms[this.name];
-    let avoid = [];
-    const sources = room.find(FIND_SOURCES);
-    for (let source of sources) {
-        avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
-    }
-    avoid = avoid.concat(gf.posPlusDeltaArray(room.controller.pos, gc.THREE_MOVES));
-    if (!start) {
-        const mass = [];
-        const sources = room.find(FIND_SOURCES);
-        for (let source of sources) {
-            mass.push(source.pos);
-        }
-        mass.push(room.controller.pos);
-        start = construction.centreMass(mass);
-    }
-
-    const terrain = new Room.Terrain(this.name);
     this.m["plan"] = tile.getCopy(centre);
-    this.m["plan"]["origin"] = construction.placeRectangle(
-        terrain, start, this.m["plan"].x_dim, this.m["plan"].y_dim, avoid
-    );
-
+    if (start) {
+        this.m["plan"]["origin"] = start;
+    } else {
+        this.m["plan"]["origin"] = this.findLocationForCentre(centre);
+    }
+    tile.shiftToOrigin(this.m["plan"]);
     for ( let dx = 0 ; dx < this.m["plan"].x_dim ; dx++ ) {
         for ( let dy = 0 ; dy < this.m["plan"].y_dim ; dy++ ) {
             avoid.push({"x":this.m["plan"]["origin"]+dx, "y":this.m["plan"]["origin"]+dy})
@@ -45,6 +30,28 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
     this.m["plan"]["tower"] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"]["extension"] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"]["link"] = this.getLinkPos(terrain);
+};
+
+FlagRooom.prototype.findLocationForCentre = function(centre) {
+    const room = Game.rooms[this.name];
+    let avoid = [];
+    const sources = room.find(FIND_SOURCES);
+    for (let source of sources) {
+        avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
+    }
+    avoid = avoid.concat(gf.posPlusDeltaArray(room.controller.pos, gc.THREE_MOVES));
+
+    const mass = [];
+    for (let source of sources) {
+        mass.push(source.pos);
+    }
+    mass.push(room.controller.pos);
+    const start = construction.centreMass(mass);
+
+    const terrain = new Room.Terrain(this.name);
+    return construction.placeRectangle(
+        terrain, start, centre.x_dim, centre.y_dim, avoid
+    );
 };
 
 FlagRooom.prototype.getExtensionPos = function(terrain, start, avoid) {
