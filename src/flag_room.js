@@ -8,6 +8,8 @@ const gc = require("gc");
 const gf = require("gf");
 const construction = require("construction");
 const tile = require("tile");
+const economy = require("economy");
+
 
 function FlagRooom (name) {
     this.name = name;
@@ -40,7 +42,9 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
     const terrain = new Room.Terrain(this.name);
     this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
-    //this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(getLinkPos(terrain));
+    this.setSourceContainers();
+    this.setControllerContainers();
+    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.sourceLinkPos());
 };
 
 FlagRooom.prototype.findLocationForCentre = function(centre, avoid) {
@@ -85,8 +89,60 @@ FlagRooom.prototype.getTowerPos = function(terrain, start, avoid) {
     return rtv;
 };
 
-FlagRooom.prototype.getLinkPos = function(terrain) {
+FlagRooom.prototype.setSourceContainers = function () {
+    const sources = Game.rooms[this.name].find(FIND_SOURCES);
+    for (let source in sources) {
+        let spots = economy.findMostFreeNeighbours(
+            source.room, source.pos, 1
+        );
+        if (spots.length === 0) {
+            return gf.fatalError("findMostFreeNeighbours cant get to source");
+        }
+        this.m.sources[source.id]["harvesterPosts"] = spots[0].neighbours;
+        spots[0].pos.roomName = source.room.name;
+        this.m.sources[source.id]["containerPos"] = spots[0].pos;
+    }
+};
 
+FlagRooom.prototype.setControllerContainers = function () {
+    const room = Game.rooms[this.name];
+    const terrain = room.getTerrain();
+    let spots = construction.coverArea(room.controller.pos, 3, terrain);
+    if (spots.length === 0) {
+        return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
+    }
+    for (let spot of spots) {
+        spot.posts = spot.posts.sort( (p1, p2) => {
+            return room.controller.pos.getRangeTo(p1.x, p1.y) - room.controller.pos.getRangeTo(p2.x, p2.y)
+        });
+    }
+    this.m.controller["upgraderPosts"] = spots;
+};
+
+FlagRooom.prototype.sourceLinkPos = function() {
+    const links = [];
+    const sources = Game.rooms[this.name];(FIND_SOURCES);
+    for (let source of sources) {
+        links.push(this.sourceLinkPos(source));
+    }
+    return links;
+};
+
+FlagRooom.prototype.sourceLinkPos = function(source) {
+    const containerPos = this.m.sources[source.id]["containerPos"];
+    const terrain = source.room.getTerrain();
+    let adjacent = 0;
+    let linkPos;
+    for (let delta of gc.ONE_MOVE) {
+        if (terrain.get(containerPos.x+delta.x, containerPos.y+delta.y) !== TERRAIN_MASK_WALL) {
+            if (adjacent === 0) {
+                adjacent++
+            } else {
+                linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, room.name);
+                return linkPos;
+            }
+        }
+    }
 };
 
 FlagRooom.prototype.buildStructure = function(type) {
@@ -109,13 +165,19 @@ FlagRooom.prototype.buildStructure = function(type) {
     if (this.m.plan[type].length <= built.length + beingBuilt.length) {
         return false;
     }
-    //console.log("type", type, "this.m.plan[type]",this.m.plan[type],"beingBuilt"
-    //    ,beingBuilt.length,"built.lengt",built.length);
+
+    console.log("type", type, "this.m.plan[type].length",this.m.plan[type].length,"beingBuilt"
+        ,beingBuilt.length,"built.length",built.length,"allowed", allowed);
+
     if (built.length + beingBuilt.length < allowed) {
         if (this.m.plan[type].length <= built.length + beingBuilt.length) {
             return false;
         }
         const pt = this.m.plan[type][built.length + beingBuilt.length];
+
+        console.log("buildStructure pt",JSON.stringify(pt),"built.length + beingBuilt.length"
+            ,built.length + beingBuilt.length);
+
         new RoomPosition(pt.x,pt.y,this.name).createConstructionSite(type)
     }
     return true;

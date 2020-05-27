@@ -33,7 +33,7 @@ StateWorkerBuild.prototype.enact = function () {
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-            return gf.fatalError("ERR_INVALID_TARGET");
+            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.

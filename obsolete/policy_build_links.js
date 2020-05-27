@@ -100,7 +100,6 @@ PolicyBuildLinks.prototype.sourceLinkPos = function() {
     if (furthestSource) {
         return this.getLinkPosAt(furthestSource)
     }
-
 };
 
 PolicyBuildLinks.prototype.getLinkPosAt = function(source) {

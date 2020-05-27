@@ -50,7 +50,6 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function(room) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
     for (let spot of spots) {
-        //console.log("setContainerSites", JSON.stringify(spot));
         spot.posts = spot.posts.sort( (p1, p2) => {
             return room.controller.pos.getRangeTo(p1.x, p1.y) - room.controller.pos.getRangeTo(p2.x, p2.y)
         });
@@ -58,7 +57,6 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function(room) {
     Game.flags[room.controller.id].memory.upgraderPosts = spots;
 
     for (let spot of spots) {
-
         const pos = gf.roomPosFromPos(spot, room.name);
         console.log("bulding container at pos",JSON.stringify(pos));
         //const pos = new RoomPosition(spot.x, spot.y, room.name);

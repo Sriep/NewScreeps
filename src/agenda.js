@@ -9,14 +9,14 @@ const policy = require("policy");
 
 const agenda = {
     default_1: [
-        [ { "activity": gc.ACTIVITY_DISALLOWED} ],
-        [
+        [ { "activity": gc.ACTIVITY_DISALLOWED} ], //0
+        [ //1
             { "activity": gc.POLICY_PLAN_BUILDS},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN} },
             { "activity": gc.POLICY_RCL1},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
-        [
+        [ //2
             { "activity": gc.POLICY_PORTERS},
             { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
@@ -26,7 +26,7 @@ const agenda = {
             { "activity": gc.POLICY_COLONIAL_OFFICE},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
-        [
+        [ //3
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TOWER}},
             { "activity": gc.POLICY_BUILD_ROADS, "params" : {
@@ -60,7 +60,7 @@ const agenda = {
             { "activity": gc.ACTIVITY_RESERVED_COLONIES},
             { "activity": gc.ACTIVITY_FINISHED},
         ],
-        [
+        [ //4
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_ROADS, "params" : {
                     "fromFind" : FIND_SOURCES,
@@ -70,7 +70,7 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_STORAGE}},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
-        [
+        [ //5
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_ROADS, "params" : {
@@ -86,8 +86,9 @@ const agenda = {
                 }},
             { "activity": gc.ACTIVITY_FINISHED},
         ],
-        [
+        [ //6
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_EXTRACTORS},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
             { "activity": gc.POLICY_BUILD_ROADS, "params" : {
@@ -97,7 +98,7 @@ const agenda = {
                 }},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
-        [
+        [ //7
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
@@ -116,7 +117,7 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_TERMINAL}},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
-        [
+        [ //8
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_SPAWN}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
@@ -146,6 +147,7 @@ const agenda = {
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
         fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
+        fc[gc.POLICY_BUILD_EXTRACTORS] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;
         fc[gc.POLICY_WORKERS] = newPolicyReplacment;
         fc[gc.POLICY_HARVESTERS] = newPolicyReplacment;

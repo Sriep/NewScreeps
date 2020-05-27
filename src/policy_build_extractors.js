@@ -49,7 +49,8 @@ PolicyBuildExtractors.prototype.enact = function () {
 };
 
 PolicyBuildExtractors.prototype.draftReplacment = function() {
-    return this.m.finished ? false : this;
+    return this;
+    //return this.m.finished ? false : this;
 };
 
 module.exports = PolicyBuildExtractors;
