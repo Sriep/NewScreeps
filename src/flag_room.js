@@ -31,7 +31,10 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
     tile.shiftToOrigin(this.m["plan"]);
     for ( let dx = 0 ; dx < this.m["plan"].x_dim ; dx++ ) {
         for ( let dy = 0 ; dy < this.m["plan"].y_dim ; dy++ ) {
-            avoid.push({"x":this.m["plan"]["origin"]+dx, "y":this.m["plan"]["origin"]+dy})
+            avoid.push({
+                "x": this.m["plan"]["origin"].x + dx,
+                "y": this.m["plan"]["origin"].y + dy
+            })
         }
     }
     const terrain = new Room.Terrain(this.name);

@@ -144,12 +144,6 @@ const agenda = {
         fc[gc.POLICY_BUILD_ROADS] = skip;
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SOURCE_CONTROLLER] = newBuildRoadBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SOURCE_SOURCE] = newBuildRoadBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SOURCE_SPAWN] = newBuildRoadBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SOURCE_EXTENSIONS] = newBuildRoadBlockerPolicy;
-        //fc[gc.BUILD_ROAD_SOURCE_TOWERS] = newBuildRoadBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
         fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;
@@ -172,15 +166,10 @@ const agenda = {
     }
 
 };
-// {"structureType":STRUCTURE_SPAWN}
+
 const activateNewPolicy = function ( activity, parnetId, params)  {
      policy.activatePolicy(activity, params ? params : {}, parnetId);
 };
-
-//const activateNewRoadsPolicy = function ( activity, parnetId)  {
-//    console.log("agenda activateNewRoadsPolicy", activity, parnetId);
-//    policy.activatePolicy(gc.POLICY_BUILD_ROADS, {"roads" : activity}, parnetId);
-//};
 
 const activateNewReplacementPolicy = function ( activity, parnetId)  {
    policy.activateReplacePolicy(
@@ -200,17 +189,17 @@ const newActivity = {
     "enact": function (activity, parnetId) {
         policy.getPolicy(parnetId).m[activity] = true;
     },
-    "check": function(){ return true; },
+    "check": function() { return true; },
 };
 
 const newPolicy = {
     "enact": activateNewPolicy,
-    "check": function(){ console.log("agenda check return true"); return true; },
+    "check": function() { console.log("agenda check return true"); return true; },
 };
 
 const newPolicyReplacment ={
     "enact": activateNewReplacementPolicy,
-    "check": function(){ return true; },
+    "check": function() { return true; },
 };
 
 const newBlockerPolicy = {
