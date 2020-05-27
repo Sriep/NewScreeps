@@ -262,7 +262,7 @@ const state = {
             const cRoom = Game.rooms[info.pos.roomName];
             console.log("findPorterSourceContainer cRoom",cRoom.name);
             if (cRoom) {
-                const container  = state.findContainerAt(new RoomPosition(info.x, info.y, info.roomName));
+                const container  = state.findContainerAt(new RoomPosition(info.pos.x, info.pos.y, info.roomName));
                 console.log("findPorterSourceContainer2 container.store.getUsedCapacity", JSON.stringify(container.store.getUsedCapacity(RESOURCE_ENERGY)),
                     "maxEnergySoFar",maxEnergySoFar);
                 if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
