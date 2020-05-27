@@ -329,9 +329,11 @@ const construction = {
                 if (terrain.get(x + dx, y + dy) === C.TERRAIN_MASK_WALL) {
                     return false;
                 }
-                for (let xy of avoid) {
-                    if (xy.x === x+dx && xy.y === y + dy) {
-                        return false;
+                if (avoid) {
+                    for (let xy of avoid) {
+                        if (xy.x === x+dx && xy.y === y + dy) {
+                            return false;
+                        }
                     }
                 }
             }

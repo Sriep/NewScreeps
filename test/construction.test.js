@@ -13,29 +13,22 @@ describe("construction", function() {
 
     describe("can fit rectangle", function() {
 
-        it("return rectangle if fits", function() {
+        it("return rectangle's origin if placed", function() {
             const terrain = new Terrain("W7N7");
 
             const data1 = construction.placeRectangle(terrain, {"x":25,"y":25}, 6, 6, []);
-            console.log("data1", JSON.stringify(data1));
+            assert.strictEqual(data1.x, 24);
+            assert.strictEqual(data1.y, 24);
 
             const data2 = construction.placeRectangle(terrain, {"x":12,"y":12}, 6, 6, []);
-            console.log("data2", JSON.stringify(data2));
+            assert.strictEqual(data2.x, 8);
+            assert.strictEqual(data2.y, 10);
         });
 
-
-        it("return rectangle if fits", function() {
-            const terrain = new Terrain("W7N7");
-            const data = construction.planWall_2(terrain);
-            for (let x = 10 ; x < 40 ; x+= 5) {
-                const result = construction.canFitRectangle(terrain, x, 30, 6, 6, data);
-            }
+        it.skip("test2 planWall_2", function() {
+            //const terrain = new Terrain("W7N7");
+            //const data = construction.planWall_2(terrain, {x:12, y:11});
         });
-
-        it("show some working", function() {
-            const terrain = new Terrain("W7N7");
-            const data = construction.planWall_2(terrain, {x:12, y:11});
-       });
 
         it.skip("show some working", function() {
             const terrain = new Terrain("W7N7");
@@ -56,7 +49,7 @@ describe("construction", function() {
            assert.strictEqual(pts[0].numPosts + pts[1].numPosts, 2*3*3);
         });
 
-        it.skip("should return true if points within range", function() {
+        it("should return true if points within range", function() {
             const pt1 = {x:25,y:14};
             const pt2 = {x:18, y:13};
             const pt3 = {x:21, y:9};
