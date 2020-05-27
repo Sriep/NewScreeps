@@ -140,7 +140,8 @@ const agenda = {
 
     items : function () {
         const fc = {};
-        fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
+        // fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
+        fc[gc.POLICY_BUILD_ROADS] = skip;
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         //fc[gc.BUILD_ROAD_SPAWN_CONTROLLER] = newBuildRoadBlockerPolicy;
@@ -190,12 +191,10 @@ const activateNewReplacementPolicy = function ( activity, parnetId)  {
     );
 };
 
-//const newBuildRoadBlockerPolicy = {
-//    "enact": activateNewRoadsPolicy,
-//    "check": function ( _, parnetId)  {
-//        return !policy.hasChildType(parnetId, gc.POLICY_BUILD_ROADS);
-//    },
-//};
+const skip = {
+    "enact": function () {} ,
+    "check": function () { return true; }
+};
 
 const newActivity = {
     "enact": function (activity, parnetId) {

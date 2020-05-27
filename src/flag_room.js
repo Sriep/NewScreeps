@@ -15,11 +15,18 @@ function FlagRooom (name) {
 }
 
 FlagRooom.prototype.placeCentre = function (centre, start) {
+    let avoid = [];
+    const sources = Game.rooms[this.name].find(FIND_SOURCES);
+    for (let source of sources) {
+        avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
+    }
+    avoid = avoid.concat(gf.posPlusDeltaArray(Game.rooms[this.name].controller.pos, gc.THREE_MOVES));
+
     this.m["plan"] = tile.getCopy(centre);
     if (start) {
         this.m["plan"]["origin"] = start;
     } else {
-        this.m["plan"]["origin"] = this.findLocationForCentre(centre);
+        this.m["plan"]["origin"] = this.findLocationForCentre(centre, avoid);
     }
     tile.shiftToOrigin(this.m["plan"]);
     for ( let dx = 0 ; dx < this.m["plan"].x_dim ; dx++ ) {
@@ -27,25 +34,19 @@ FlagRooom.prototype.placeCentre = function (centre, start) {
             avoid.push({"x":this.m["plan"]["origin"]+dx, "y":this.m["plan"]["origin"]+dy})
         }
     }
+    const terrain = new Room.Terrain(this.name);
     this.m["plan"]["tower"] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"]["extension"] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"]["link"] = this.getLinkPos(terrain);
 };
 
-FlagRooom.prototype.findLocationForCentre = function(centre) {
-    const room = Game.rooms[this.name];
-    let avoid = [];
-    const sources = room.find(FIND_SOURCES);
-    for (let source of sources) {
-        avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
-    }
-    avoid = avoid.concat(gf.posPlusDeltaArray(room.controller.pos, gc.THREE_MOVES));
-
+FlagRooom.prototype.findLocationForCentre = function(centre, avoid) {
     const mass = [];
+    const sources = Game.rooms[this.name].find(FIND_SOURCES);
     for (let source of sources) {
         mass.push(source.pos);
     }
-    mass.push(room.controller.pos);
+    mass.push(Game.rooms[this.name].controller.pos);
     const start = construction.centreMass(mass);
 
     const terrain = new Room.Terrain(this.name);
