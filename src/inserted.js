@@ -20,6 +20,11 @@ const inserted = {
 
     bottom: function () {
         //console.log("--------- piers inserted------------");
+        //console.log("centre1", JSON.stringify(Game.flags["W7N7"].Memory))
+        //console.log("centre2", JSON.stringify(Memory.flags["W7N7"].plan))
+        //console.log("centre3", JSON.stringify(Game.flags["W7N7"].Memory.plan))
+
+/*
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER
         });
@@ -52,7 +57,7 @@ const inserted = {
             Memory.routes[porter.memory.targetId]["porters"].push(porter.name)
         }
         console.log("routes", JSON.stringify(Memory.routes));
-
+*/
     }
 };
 

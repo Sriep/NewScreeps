@@ -83,9 +83,7 @@ const tile = {
             return;
         }
         for (let key in tile) {
-            //console.log("tile",JSON.stringify(tile))
-            //console.log("key",key,"is array",Array.isArray(tile[key]),"tile[key]",JSON.stringify(tile[key]))
-            if (Array.isArray(tile[key])) {
+             if (Array.isArray(tile[key])) {
                 for ( let pt of tile[key]) {
                     pt.x += tile["origin"].x;
                     pt.y += tile["origin"].y;

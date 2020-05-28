@@ -248,7 +248,7 @@ const state = {
 
             if (harvesters.length !== 0) {
                 const source = Game.getObjectById(info.sourceId);
-                if (source.energy > 0 && source.ticksToRegeneration <= info.distance) {
+                if (source && source.energy > 0 && source.ticksToRegeneration <= info.distance) {
                     return info;
                 }
             }
@@ -570,7 +570,7 @@ const state = {
             const container = this.findContainerAt(pos);
             if (container
                 && container.store[RESOURCE_ENERGY]
-                    < s.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD
+                    < container.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD
                 && container.store[RESOURCE_ENERGY] < lowestEnergy) {
                     bestContainer = container;
                     lowestEnergy = container.store[RESOURCE_ENERGY];

@@ -15,6 +15,7 @@ const economy = {
     OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50
         , "energy.porter" : 40 , "worker" : 40},
 
+
     findMostFreeNeighbours: function (room, pos, range) {
         const terrain = room.getTerrain();
         let bestSpots = [];
@@ -351,6 +352,6 @@ const economy = {
         return accessPoints;
     },
 
-}
+};
 
 module.exports = economy;

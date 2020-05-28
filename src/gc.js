@@ -165,6 +165,9 @@ const gc = {
     // tower
     STATE_TOWER_IDLE: "tower_idle",
     STATE_TOWER_DEFEND: "tower_defend",
+    // lab
+    STATE_LAB_PEACE: "state_lab_peace",
+    STATE_LAB_WAR: "state_lab_war",
     // cog
     STATE_COG_IDLE: "cog_idle",
     STATE_COG_WITHDRAW: "cog_withdraw",
@@ -246,6 +249,7 @@ const gc = {
     POLICY_BUILD_EXTRACTORS: "build_extractors",
     POLICY_PLAN_BUILDS: "plan_builds",
     POLICY_BUILD_STRUCTURE: "build_structure",
+    POLICY_LABS: "labs",
 
     //policy
     PLANNED_BUILDS: true,
