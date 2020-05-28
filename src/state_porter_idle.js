@@ -18,6 +18,7 @@ function StatePorterIdle (creep) {
 
 StatePorterIdle.prototype.enact = function () {
     console.log(this.creep.name,"STATE_PORTER_IDLE");
+    delete this.creep.memory.targetId;
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
@@ -25,10 +26,11 @@ StatePorterIdle.prototype.enact = function () {
     const room = Game.rooms[this.homeId];
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
+    //{"pos" : cPos, "distance" : distance, "sourceId" : sourceId}
     const info = state.findPorterSourceContainer(
         room, colonies, room.energyCapacityAvailable
     );
-    //console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
+    console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
     if (info.pos) {
         this.creep.memory.targetId = info.sourceId;
         console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
@@ -71,6 +73,8 @@ StatePorterIdle.prototype.enact = function () {
             gc.STATE_PORTER_RECEIVE
         )
     }
+
+    undefined.break;
 };
 
 module.exports = StatePorterIdle;

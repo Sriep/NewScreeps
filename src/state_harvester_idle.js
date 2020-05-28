@@ -19,7 +19,7 @@ function StateHarvesterIdle (creep) {
 }
 
 StateHarvesterIdle.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE");
     const home = Game.rooms[this.homeId];
 
     const governor = policy.getGouvernerPolicy(this.homeId);
@@ -28,9 +28,9 @@ StateHarvesterIdle.prototype.enact = function () {
         governor.getColonies(),
         home.energyCapacityAvailable
     );
-    console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", nextPost);
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", nextPost);
     if (nextPost) {
-        console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
+        //console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
         this.m.targetId = nextPost.sourceId;
         state.switchToMovePos(
             this.creep,

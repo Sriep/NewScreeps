@@ -39,8 +39,10 @@ PolicyColonialOffice.prototype.enact = function () {
     //}
     //console.log("POLICY_COLONIAL_OFFICE");
     for (let flagName in Game.flags) {
+        if (!Game.rooms[flagName]) {
+            continue;
+        }
         if (gf.validateRoomName(flagName)) {
-            //console.log("POLICY_COLONIAL_OFFICE validated flagname", flagName);
             if (!Game.flags[flagName].memory.owned
                 && !Game.flags[flagName].memory.spawnRoom) {
                this.checkRoom(flagName);
@@ -50,14 +52,14 @@ PolicyColonialOffice.prototype.enact = function () {
 };
 
 PolicyColonialOffice.prototype.checkRoom = function (roomName) {
-    console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
+    //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = Game.flags[roomName].memory;
     if (m.spawnRoom) {
-        console.log("room",roomName,"already has spawn room");
+        //console.log("room",roomName,"already has spawn room");
         return;
     }
     if (!Game.rooms[roomName]) {
-        console.log(roomName, "no room visablity");
+        //console.log(roomName, "no room visablity");
         return;
     }
 
@@ -90,7 +92,7 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
             }
         }
     }
-    console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
+    //console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
     profitableRooms = profitableRooms.sort( (a,b) =>  {
         return b["profitParts"] - a["profitParts"];
     });
@@ -101,6 +103,7 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
             roomInfo.info.parts,
             roomInfo.info.startUpCost,
         )) {
+            console.log("checkRoom roomInfo", JSON.stringify(roomInfo));
             m.spawnRoom = roomInfo.governor.roomName;
             this.build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
             break;
@@ -109,6 +112,7 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
 };
 
 PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
+    console.log("PolicyColonialOffice build colony", colony.name,"spawnRoom", spawnRoom.name, "userroads", useRoad );
     this.buildSourceSupport(colony, spawnRoom);
     if (useRoad) {
         this.buildRoads(colony, spawnRoom)

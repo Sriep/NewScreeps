@@ -16,7 +16,7 @@ function StateWorkerTransfer (creep) {
 StateWorkerTransfer.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_TRANSFER");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        console.log(this.creep.name, "in STATE_WORKER_TRANSFER this.creep.store.getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY)  );
+        //console.log(this.creep.name, "in STATE_WORKER_TRANSFER this.creep.store.getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY)  );
         return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);

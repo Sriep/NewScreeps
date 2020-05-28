@@ -25,7 +25,7 @@ StateReserverIdle.prototype.enact = function () {
     let colonyIds = _.map(colonies, colony => {
         return { "name" : colony.name, "id": getRoomFlag(colony.name).memory.controller.id, "count" : 0};
     });
-    console.log("gc.STATE_RESERVER_IDLE", JSON.stringify(claimerActivity));
+    //console.log("gc.STATE_RESERVER_IDLE", JSON.stringify(claimerActivity));
     for ( let i = claimers.length-1 ; i >= 0 ; i-- ) {
         let found = false;
         for (let colony of colonyIds) {

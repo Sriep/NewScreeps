@@ -13,7 +13,7 @@ function StateHarvesterLink (creep) {
 }
 
 StateHarvesterLink.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_HARVESTER_LINK");
+    //console.log(this.creep.name, "STATE_HARVESTER_LINK");
     const sourceLink = state.getObjAtPos(state.getSourceLinkPos(this.creep.memory.targetId), STRUCTURE_LINK);
     const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
     if (!sourceLink || !controllerLink) {

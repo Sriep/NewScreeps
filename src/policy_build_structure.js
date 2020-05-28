@@ -28,7 +28,7 @@ PolicyBuildStructure.prototype.initilise = function () {
 
 // runs once every tick
 PolicyBuildStructure.prototype.enact = function () {
-    console.log("POLICY_BUILD_STRUCTURE this",JSON.stringify(this));
+    //console.log("POLICY_BUILD_STRUCTURE this",JSON.stringify(this));
     const fRoom = new FlagRoom(this.home);
     this.m.built = !fRoom.buildStructure(this.structureType)
 };

@@ -35,7 +35,7 @@ PolicyPorters.prototype.enact = function () {
     //console.log("POLICY_PORTERS resources", JSON.stringify(this.m.resources));
     const room = Game.rooms[this.home];
     ///if (!this.m.resources || (Game.time + this.id) % gc.CALC_ROOM_RESOURCES_RATE !== 0 ) {
-        if (room.controller.level < 3) {
+        if (room.controller.level <= 3) {
             this.m.resources = this.calcResources(gc.ROOM_NEUTRAL, gc.ROOM_NEUTRAL_ROADS);
         } else {
             this.m.resources = this.calcResources(gc.ROOM_RESERVED, gc.ROOM_RESERVED_ROADS);
@@ -146,19 +146,15 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     }
 };
 
-PolicyPorters.prototype.localResources = function () {
-
-};
-
 PolicyPorters.prototype.calcResources = function (roomType1, roomType2) {
     let resources;
     this.m.curProduction = {};
     const homeRoom = Game.rooms[this.home];
-    console.log("this.home", this.home);
+    //console.log("this.home", this.home);
     const ec = homeRoom.energyCapacityAvailable;
     const sourceEnergyLT = 30000;
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)));
+        //console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)));
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
         for (let source of homeRoom.find(FIND_SOURCES)) {
@@ -232,13 +228,13 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
     }
     //console.log("updateRoomResources room", room.name, roomName)
     let buildTicks, ratioHtoW;
-    if (room) {
+    //if (room) {
         buildTicks = economy.constructionRepairLeft(room);
         ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home], false);
-    } else {
-        buildTicks = 0;
-        ratioHtoW = 1.1;
-    }
+    //} else {
+    //    buildTicks = 0;
+    //    ratioHtoW = 1.1;
+    //}
     let workerWs = 0;
     let porterCs = pC;
     let upgradeWs = uW;
@@ -255,7 +251,7 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
 };
 
 PolicyPorters.prototype.localBudget = function() {
-    room = Game.rooms[this.home];
+    const room = Game.rooms[this.home];
     //console.log("pp localBudget localResources", JSON.stringify(this.m.localResoures));
     const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
     const hPartCount = hbc[WORK] + hbc[MOVE] + hbc[CARRY];

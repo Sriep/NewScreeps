@@ -92,7 +92,7 @@ FlagRooom.prototype.getTowerPos = function(terrain, start, avoid) {
 
 FlagRooom.prototype.setSourceContainers = function () {
     const sources = Game.rooms[this.name].find(FIND_SOURCES);
-    console.log("setSourceContainers befor loop this.m",JSON.stringify(this.m));
+    //console.log("setSourceContainers befor loop this.m",JSON.stringify(this.m));
     for (let source of sources) {
         //console.log("setSourceContainers room", source.room,"id",source.id);
         let spots = economy.findMostFreeNeighbours(
@@ -105,7 +105,7 @@ FlagRooom.prototype.setSourceContainers = function () {
         spots[0].pos.roomName = source.room.name;
         this.m.sources[source.id]["containerPos"] = spots[0].pos;
     }
-    console.log("setSourceContainers after loop this.m",JSON.stringify(this.m));
+    //console.log("setSourceContainers after loop this.m",JSON.stringify(this.m));
 };
 
 FlagRooom.prototype.setControllerContainers = function () {

@@ -132,14 +132,15 @@ const budget = {
         const sources = room.find(FIND_SOURCES);
         const spawns = home.find(FIND_MY_SPAWNS);
         const values = {};
-        const blank = {"setup": 0, "profit": 0, "parts" : 0, "startUpCost":0,"sources" : {}, "rC" : 0};
+        const blank = {"setup": 0, "profit": 0, "parts" : 0, "startUpCost":0,"sources" : {}};
         values[gc.ROOM_NEUTRAL] = Object.assign({}, blank);
         values[gc.ROOM_NEUTRAL_ROADS] = Object.assign({}, blank);
         values[gc.ROOM_RESERVED] = Object.assign({}, blank);
         values[gc.ROOM_RESERVED_ROADS] = Object.assign({}, blank);
         values[gc.ROOM_OWNED] = Object.assign({}, blank);
         values[gc.ROOM_OWNED_ROADS] = Object.assign({}, blank);
-
+        values[gc.ROOM_RESERVED]["rC"] = 0;
+        values[gc.ROOM_RESERVED_ROADS]["rC"] = 0;
         let sourcePathsRoad = [];
         let sourcePathNoRoad = [];
         let controllerPathRoad = [];
@@ -200,7 +201,6 @@ const budget = {
             values[gc.ROOM_OWNED_ROADS]["parts"] += or.parts.hW + or.parts.pC +or.parts.uW;
             values[gc.ROOM_OWNED_ROADS]["setup"] += or.startUpCost;
             values[gc.ROOM_OWNED_ROADS]["profit"] += or.netEnergy;
-
         }
 
         const rC = this.reserverParts(room, spawns, false, force);
@@ -297,6 +297,9 @@ const budget = {
     workersRoomRationHtoW : function (room, spawnRoom, useRoad) {
         //console.log("b workersRoomRationHtoW room", room.name,"spawnRoom", spawnRoom.name, "useroad", useRoad);
         const sources = room.find(FIND_SOURCES);
+        if (sources.length === 0) {
+            return 1;
+        }
         let avDistance = 0;
         let count = 0;
         for (let source of sources) {
@@ -318,9 +321,11 @@ const budget = {
                 );
                 count++;
             }
-            avDistance += cache.distanceSourceSpawn(source, spawnRoom, useRoad);
-            count++;
         }
+        if (count === 0) {
+            return 1;
+        }
+
         //avDistance = avDistance/sources.length;
         avDistance = avDistance/count;
         const workLt = CREEP_LIFE_TIME - avDistance;
@@ -328,6 +333,8 @@ const budget = {
         const tripsLt = workLt/tripTime;
         const energyPerWLt = tripsLt * CARRY_CAPACITY;
         const energyPerHlt = workLt * 2;
+        //console.log("room",room.name,"avDistance",avDistance,"sources", sources.length, "count", count);
+        //console.log("workersRoomRationHtoW energyPerWLt",energyPerWLt,"tripsLt",tripsLt,"tripTime",tripTime,"workLt",workLt)
         return energyPerHlt / energyPerWLt;
     },
 

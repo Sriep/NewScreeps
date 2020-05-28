@@ -38,7 +38,7 @@ StateWorkerFullIdle.prototype.enact = function () {
         );
     }
 
-    const nextSourceContainer = state.findNextSourceContainer(this.creep);
+    const nextSourceContainer = state.findNextEnergyContainer(this.creep);
     if (nextSourceContainer) {
         this.creep.memory.targetId = nextSourceContainer.id;
         return state.switchToMovePos(

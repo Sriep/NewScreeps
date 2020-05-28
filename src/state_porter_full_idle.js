@@ -15,6 +15,10 @@ function StatePorterFullIdle (creep) {
 
 StatePorterFullIdle.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
+    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+    }
+
     if (this.creep.room.name !== this.homeId) {
         return state.switchMoveToRoom(
             this.creep,
@@ -23,11 +27,7 @@ StatePorterFullIdle.prototype.enact = function () {
         );
     }
 
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-         return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
-    }
-
-    const nextDelivery = state.findNextSourceContainer(this.creep);
+    const nextDelivery = state.findNextEnergyContainer(this.creep);
     //console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
     if (nextDelivery) {
          this.creep.memory.targetId = nextDelivery.id;
@@ -46,6 +46,18 @@ StatePorterFullIdle.prototype.enact = function () {
         return state.switchToMovePos(
             this.creep,
             container.pos,
+            gc.RANGE_TRANSFER,
+            gc.STATE_PORTER_TRANSFER
+        );
+    }
+
+    const nextEnergyStorage = state.findNextEnergyStorage(this.creep);
+    //console.log("STATE_PORTER_FULL_IDLE nextEnergyStorage",JSON.stringify(nextEnergyStorage));
+    if (nextEnergyStorage) {
+        this.creep.memory.targetId = nextEnergyStorage.id;
+        return state.switchToMovePos(
+            this.creep,
+            nextEnergyStorage.pos,
             gc.RANGE_TRANSFER,
             gc.STATE_PORTER_TRANSFER
         );

@@ -29,14 +29,14 @@ PolicyBuildControllerContainers.prototype.initilise = function () {
 };
 
 PolicyBuildControllerContainers.prototype.enact = function () {
-    console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
+   // console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
     if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
         //return;
     }
     const room = Game.rooms[this.home];
     if (state.getControllerPosts(room.controller.id)) {
-        const cp = state.getControllerPosts(room.controller.id);
-        console.log("POLICY_BUILD_CONTROLLER_CONTAINERS state.getControllerPosts",JSON.stringify(cp));
+        //const cp = state.getControllerPosts(room.controller.id);
+        //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS state.getControllerPosts",JSON.stringify(cp));
         return;
     }
     this.setContainerSites(room);
@@ -45,7 +45,7 @@ PolicyBuildControllerContainers.prototype.enact = function () {
 PolicyBuildControllerContainers.prototype.setContainerSites = function(room) {
     const terrain = room.getTerrain();
     let spots = construction.coverArea(room.controller.pos, 3, terrain);
-    console.log("POLICY_BUILD_CONTROLLER_CONTAINERS setContainerSites spots", JSON.stringify(spots));
+    //console.log("POLICY_BUILD_CONTROLLER_CONTAINERS setContainerSites spots", JSON.stringify(spots));
     if (spots.length === 0) {
         return gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS findMostFreeNeighbours cant get to controller");
     }
@@ -58,7 +58,7 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function(room) {
 
     for (let spot of spots) {
         const pos = gf.roomPosFromPos(spot, room.name);
-        console.log("bulding container at pos",JSON.stringify(pos));
+        //console.log("bulding container at pos",JSON.stringify(pos));
         //const pos = new RoomPosition(spot.x, spot.y, room.name);
         const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {

@@ -74,6 +74,7 @@ const gc = {
     RACE_PORTER: "porter",
     RACE_SCOUT: "scout",
     RACE_RESERVER: "reserver",
+    RACE_LORRY: "lorry",
 
     MIN_HARVESTER_EC: 300,
     MAX_HARVESTER_EC: 800,
@@ -138,6 +139,7 @@ const gc = {
     STATE_WORKER_PICKUP: "worker_pickup",
     STATE_WORKER_RECEIVE: "worker_receive",
     // states porter
+    STATE_LORRY_IDLE: "lorry_idle",
     STATE_PORTER_IDLE:  "porter_idle",
     STATE_PORTER_PICKUP: "porter_pickup",
     STATE_PORTER_FULL_IDLE: "porter_full_idle",
@@ -276,6 +278,7 @@ const gc = {
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
+    REFILL_THRESHOLD: 0.8,
     EMERGENCY_DOWNGRADING_THRESHOLD: 3000,
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,

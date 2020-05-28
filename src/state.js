@@ -44,6 +44,7 @@ const state = {
     },
 
     switchToMoveFlag(creep, flag, range, nextState) {
+        console.log(creep.name,"switchToMoveFlag flag",flag.name,"range", range,"nextstate", nextState);
         creep.memory.state = gc.STATE_MOVE_TARGET;
         creep.memory.targetName = flag.name;
         creep.memory.moveRange = range;
@@ -266,13 +267,16 @@ const state = {
                 const container  = state.findContainerAt(new RoomPosition(info.pos.x, info.pos.y, info.pos.roomName));
                 //console.log("findPorterSourceContainer2 container.store.getUsedCapacity", JSON.stringify(container.store.getUsedCapacity(RESOURCE_ENERGY)),
                 //    "maxEnergySoFar",maxEnergySoFar);
+                if (!container) {
+                    continue;
+                }
                 if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
                     fullestContainer = container;
                     maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);
                 }
             }
         }
-        console.log("findPorterSourceContainer fullestContainer", JSON.stringify(fullestContainer));
+        //console.log("findPorterSourceContainer fullestContainer", JSON.stringify(fullestContainer));
         return fullestContainer;
     },
 
@@ -520,7 +524,6 @@ const state = {
                 if (Game.creeps[j].memory.targetPos.x === pos.x
                     && Game.creeps[j].memory.targetPos.y === pos.y
                     && Game.creeps[j].room.name === roomName) {
-                    //console.log("found",j,"at postion x",pos.x,"y",pos.y);
                     return false;
                 }
             }
@@ -560,27 +563,20 @@ const state = {
         if (!containerPosts) {
             return undefined;
         }
-        let container1, container2;
-        if (containerPosts[0]) {
-            const pos1 =  new RoomPosition(containerPosts[0].x, containerPosts[0].y, room.name);
-            container1 = this.findContainerAt(pos1);
+        let bestContainer;
+        let lowestEnergy = 9999;
+        for (let info of containerPosts) {
+            const pos = new RoomPosition(info.x, info.y, room.name);
+            const container = this.findContainerAt(pos);
+            if (container
+                && container.store[RESOURCE_ENERGY]
+                    < s.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD
+                && container.store[RESOURCE_ENERGY] < lowestEnergy) {
+                    bestContainer = container;
+                    lowestEnergy = container.store[RESOURCE_ENERGY];
+            }
         }
-        if (containerPosts[1]) {
-            const pos2 =  new RoomPosition(containerPosts[1].x, containerPosts[1].y, room.name);
-            container2 = this.findContainerAt(pos2);
-        }
-        if (!container1) {
-            return container2;
-        }
-        if (!container2)  {
-            return container1;
-        }
-        if (container1.store.getFreeCapacity(RESOURCE_ENERGY) >
-            container2.store.getFreeCapacity(RESOURCE_ENERGY)) {
-            return container1;
-        } else {
-            return container2;
-        }
+        return bestContainer;
     },
 
     creepSay: {
@@ -607,7 +603,7 @@ const state = {
     },
 
     findContainerAt : function (pos) {
-        console.log("findContainerAt", JSON.stringify(pos))
+        //console.log("findContainerAt", JSON.stringify(pos))
         if (!pos) {
             return undefined;
         }
@@ -657,32 +653,27 @@ const state = {
         return undefined;
     },
 
-    findNextSourceContainer : function (creep) {
-        //if (creep.room.energyAvailable === gf.roomEc(creep.room)) {
-            //console.log("findNextSourceContainer room at capacity");
-            //return undefined;
-        //}
-
-        const nextSpawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
-        if (nextSpawn && nextSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-            return nextSpawn
-        }
-
-        const nextSourceContainer = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: function(structure)  {
-                return ((structure.structureType === STRUCTURE_TOWER
-                    && structure.store[RESOURCE_ENERGY]
-                    < structure.store.getCapacity(RESOURCE_ENERGY)
-                    * gc.TOWER_REFILL_THRESHOLD)
-                    || structure.structureType === STRUCTURE_EXTENSION
-                    || structure.structureType === STRUCTURE_SPAWN)
-                    && (!structure.store.energy
-                        || structure.store.energy < structure.store.getCapacity(RESOURCE_ENERGY));
+    findNextEnergyContainer : function (creep) {
+        return creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            filter: s =>  {
+                return  (s.structureType === STRUCTURE_EXTENSION
+                || s.structureType === STRUCTURE_SPAWN)
+                && (s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD)
             }
         });
-        if (nextSourceContainer) {
-            return nextSourceContainer;
-        }
+    },
+
+    findNextEnergyStorage : function (creep) {
+        return creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            filter: s => {
+                return (s.structureType === STRUCTURE_TOWER
+                || s.structureType === STRUCTURE_STORAGE
+                || s.structureType === STRUCTURE_LINK
+                || s.structureType === STRUCTURE_TERMINAL
+                || s.structureType === STRUCTURE_LAB)
+                && (s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD)
+            }
+        })
     },
 
     maxHEc : function (ec) {

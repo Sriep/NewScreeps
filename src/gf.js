@@ -7,8 +7,8 @@ const gc = require("./gc");
 
 const gf = {
     fatalError: function (msg) {
-        console.log("{color-lightred}Fatal error: ",msg);
-        console.log("{color-lightred}" + Error().stack);
+        console.log("Fatal error: ",msg);
+        console.log(Error().stack);
         if (gc.DEBUG)
             {
                 throw(msg);
@@ -17,7 +17,7 @@ const gf = {
 
     assertEq: function (a, b, msg) {
         if (a !== b) {
-            console.log("{color-yellow}assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
+            console.log("assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
             this.fatalError("assert failed: " + msg)
         }
     },

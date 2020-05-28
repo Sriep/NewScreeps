@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("./gc");
+const C = require("./Constants");
 
 const race_harvester = {
     bodyCounts: function (ec) {
@@ -17,9 +18,9 @@ const race_harvester = {
     },
 
     boosts: [
-        { priority : 1, resource: RESOURCE_UTRIUM_OXIDE, part : WORK },
-        { priority : 1, resource : RESOURCE_UTRIUM_ALKALIDE, part : WORK },
-        { priority : 1, resource : RESOURCE_CATALYZED_UTRIUM_ALKALIDE, part : WORK },
+        { priority : 1, resource: C.RESOURCE_UTRIUM_OXIDE, part : C.WORK },
+        { priority : 1, resource : C.RESOURCE_UTRIUM_ALKALIDE, part : C.WORK },
+        { priority : 1, resource : C.RESOURCE_CATALYZED_UTRIUM_ALKALIDE, part : C.WORK },
     ]
 };
 

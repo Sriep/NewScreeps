@@ -131,7 +131,7 @@ const flag = {
 
                 Game.flags[source.id].memory.accessPoints = economy.countAccessPoints(source.pos);
             }
-            console.log("flagged souce", source.id,"ap", Game.flags[source.id].accessPoints)
+            //console.log("flagged souce", source.id,"ap", Game.flags[source.id].accessPoints)
         }
 
         if (room.controller) {

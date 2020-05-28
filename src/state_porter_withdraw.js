@@ -19,7 +19,7 @@ StatePorterWithdraw.prototype.enact = function () {
         return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
     }
 
-    console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
+   //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
     let target;
     if (this.m.targetPos) {
         //console.log("STATE_PORTER_WITHDRAW x", JSON.stringify(this.m.targetPos))

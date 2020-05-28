@@ -79,7 +79,7 @@ PolicyGovern.prototype.getColonies = function() {
 PolicyGovern.prototype.budget = function() {
     let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
     //console.log("POLICY_GOVERN getRoomEconomyPolicy parts", JSON.stringify(localBudget));
-    //console.log("this.m.colonies",JSON.stringify(this.m.colonies), "this.rooName", this.roomName);
+    console.log("this.m.colonies",JSON.stringify(this.m.colonies), "this.rooName", this.roomName);
 
     this.m.colonies[0]["parts"] = localBudget.parts;
     this.m.colonies[0]["profit"] = localBudget.profit;
@@ -123,7 +123,7 @@ PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpC
 };
 
 PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost) {
-    //console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
+    console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
     if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
         console.log("POLICY_GOVERN addColony failed !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");
         return false;

@@ -100,6 +100,7 @@ PolicyExplore.prototype.exploreRoom = function(newRoom) {
     if (colonialOffice) {
         colonialOffice.checkRoom(newRoom);
     }
+    //undefined.break;
 };
 
 PolicyExplore.prototype.sendExplorers = function(shortfall) {
