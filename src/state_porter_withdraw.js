@@ -28,7 +28,7 @@ StatePorterWithdraw.prototype.enact = function () {
         ///    this.m.targetPos.y,
         //    this.m.targetPos.roomName
         //);
-        console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(this.m.targetPos));
+        //console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(this.m.targetPos));
         target = state.findContainerAt(new RoomPosition(
             this.m.targetPos.x,
             this.m.targetPos.y,

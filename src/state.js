@@ -238,7 +238,7 @@ const state = {
         if (containersInfo[0].tripsLT * porterCC >= gc.SORCE_REGEN_LT * SOURCE_ENERGY_CAPACITY) {
             return;
         }
-        console.log("findPorterSourceContainer1 containersInfo after", JSON.stringify(containersInfo));
+        //console.log("findPorterSourceContainer1 containersInfo after", JSON.stringify(containersInfo));
         for (let info of containersInfo) {
             const harvesters = _.filter(Game.creeps, c => {
                 return c.memory.targetId === info.sourceId
@@ -252,19 +252,20 @@ const state = {
                 }
             }
         }
-        console.log("findPorterSourceContainer2 containersInfo after", JSON.stringify(containersInfo));
+        //console.log("findPorterSourceContainer2 containersInfo after", JSON.stringify(containersInfo));
 
         let maxEnergySoFar = 0;
         let fullestContainer;
         for (let info of containersInfo) {
-            console.log("findPorterSourceContainer2 info", JSON.stringify(info));
-            console.log("findPorterSourceContainer3 info.pos.roomName",JSON.stringify(info.pos.roomName));
+            //console.log("findPorterSourceContainer2 info", JSON.stringify(info));
+            //console.log("findPorterSourceContainer3 info.pos.roomName",JSON.stringify(info.pos.roomName));
             const cRoom = Game.rooms[info.pos.roomName];
-            console.log("findPorterSourceContainer cRoom",cRoom.name);
+            //console.log("findPorterSourceContainer cRoom",cRoom.name);
             if (cRoom) {
-                const container  = state.findContainerAt(new RoomPosition(info.pos.x, info.pos.y, info.roomName));
-                console.log("findPorterSourceContainer2 container.store.getUsedCapacity", JSON.stringify(container.store.getUsedCapacity(RESOURCE_ENERGY)),
-                    "maxEnergySoFar",maxEnergySoFar);
+                //console.log("findPorterSourceContainer2 info.pos.x",info.pos.x,"info.pos.y",info.pos.y,"info.roomName",info.pos.roomName);
+                const container  = state.findContainerAt(new RoomPosition(info.pos.x, info.pos.y, info.pos.roomName));
+                //console.log("findPorterSourceContainer2 container.store.getUsedCapacity", JSON.stringify(container.store.getUsedCapacity(RESOURCE_ENERGY)),
+                //    "maxEnergySoFar",maxEnergySoFar);
                 if (container.store.getUsedCapacity(RESOURCE_ENERGY) > maxEnergySoFar) {
                     fullestContainer = container;
                     maxEnergySoFar = container.store.getUsedCapacity(RESOURCE_ENERGY);

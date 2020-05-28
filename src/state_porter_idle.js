@@ -28,7 +28,7 @@ StatePorterIdle.prototype.enact = function () {
     const info = state.findPorterSourceContainer(
         room, colonies, room.energyCapacityAvailable
     );
-    console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
+    //console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
     if (info.pos) {
         this.creep.memory.targetId = info.sourceId;
         console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);

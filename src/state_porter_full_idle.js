@@ -14,7 +14,7 @@ function StatePorterFullIdle (creep) {
 }
 
 StatePorterFullIdle.prototype.enact = function () {
-    console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
+    //console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
     if (this.creep.room.name !== this.homeId) {
         return state.switchMoveToRoom(
             this.creep,
@@ -28,7 +28,7 @@ StatePorterFullIdle.prototype.enact = function () {
     }
 
     const nextDelivery = state.findNextSourceContainer(this.creep);
-    console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
+    //console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
     if (nextDelivery) {
          this.creep.memory.targetId = nextDelivery.id;
          return state.switchToMovePos(
@@ -40,7 +40,7 @@ StatePorterFullIdle.prototype.enact = function () {
     }
 
     const container = state.findUpgradeContainerToFill(Game.rooms[this.homeId]);
-    console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container));
+    //console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container));
     if (container) {
         this.creep.memory.targetId = container.id;
         return state.switchToMovePos(
