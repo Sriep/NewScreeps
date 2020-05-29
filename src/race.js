@@ -3,7 +3,7 @@
  * Created by piers on 24/04/2020
  * @author Piers Shepperson
  */
-
+const C = require("./Constants");
 //const flag = require("flag");
 //const gf = require("gf");
 
@@ -26,30 +26,34 @@ const race = {
 
     getCost(race, ec) {
         const bodyCounts = this.getBodyCounts(race, ec);
+        return this.getCostBody(bodyCounts);
+    },
+
+    getCostBody(bodyCounts) {
         let cost = 0;
-        if (bodyCounts[WORK]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[WORK];
+        if (bodyCounts[C.WORK]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.WORK];
         }
-        if (bodyCounts[MOVE]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[MOVE];
+        if (bodyCounts[C.MOVE]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.MOVE];
         }
-        if (bodyCounts[CARRY]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[CARRY];
+        if (bodyCounts[C.CARRY]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.CARRY];
         }
-        if (bodyCounts[ATTACK]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[ATTACK];
+        if (bodyCounts[C.ATTACK]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.ATTACK];
         }
-        if (bodyCounts[RANGED_ATTACK]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[RANGED_ATTACK];
+        if (bodyCounts[C.RANGED_ATTACK]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.RANGED_ATTACK];
         }
-        if (bodyCounts[TOUGH]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[TOUGH];
+        if (bodyCounts[C.TOUGH]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.TOUGH];
         }
-        if (bodyCounts[HEAL]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[HEAL];
+        if (bodyCounts[C.HEAL]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.HEAL];
         }
-        if (bodyCounts[CLAIM]) {
-            cost += bodyCounts[WORK]*BODYPART_COST[CLAIM];
+        if (bodyCounts[C.CLAIM]) {
+            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.CLAIM];
         }
     },
 
@@ -60,17 +64,17 @@ const race = {
         }
         let body = [];
 
-        for (let i = 0; i < bodyCounts[WORK]; i++) {
-            body.push(WORK);
+        for (let i = 0; i < bodyCounts[C.WORK]; i++) {
+            body.push(C.WORK);
         }
         if (bodyCounts[MOVE] < 1) {
             return undefined;
         }
-        for (let i = 0; i < bodyCounts[MOVE]; i++) {
-            body.push(MOVE);
+        for (let i = 0; i < bodyCounts[C.MOVE]; i++) {
+            body.push(C.MOVE);
         }
-        for (let i = 0; i < bodyCounts[CARRY]; i++) {
-            body.push(CARRY);
+        for (let i = 0; i < bodyCounts[C.CARRY]; i++) {
+            body.push(C.CARRY);
         }
         return body;
     },
@@ -124,7 +128,7 @@ const race = {
         const body = creep.body;
         let Ws = 0;
         for (let i in body) {
-            if (body[i] === WORK) {
+            if (body[i] === C.WORK) {
                 Ws++;
             }
         }
@@ -132,18 +136,8 @@ const race = {
     },
 
     repairPower: function(creep) {
-        return workParts(creep) * REPAIR_POWER;
+        return this.workParts(creep) * C.REPAIR_POWER;
     },
-/*
-    sendOrderToQueue : function(room, cRace, energy, policyId, priority) {
-        const data = {
-            body: this.body(cRace, energy),
-            name: cRace,// + "_" + energy.toString(),
-        };
-        const queue = flag.getSpawnQueue(room.name);
-        return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
-    },
-*/
 
 };
 

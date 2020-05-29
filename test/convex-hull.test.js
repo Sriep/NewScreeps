@@ -25,7 +25,7 @@ describe("conves-hull", function() {
                     }
                 }
             }
-            console.log("pts", JSON.stringify(pts));
+            //console.log("pts", JSON.stringify(pts));
             const boundary = convexHullTest.makeHull(pts);
             console.log("convex hull", JSON.stringify(boundary));
         });
