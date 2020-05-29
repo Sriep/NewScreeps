@@ -23,7 +23,7 @@ StateScoutIdle.prototype.enact = function () {
     if (!dir) {
         dir = TOP;
     }
-    //console.log("STATE_SCOUT_IDLE nextroom1", nextRoom, "creep room",this.creep.room.name );
+    //console.log("STATE_SCOUT_IDLE nextroom1", this.nextRoom, "creep",this.creep.name,"dir", dir);
     if (this.m.nextRoom) {
         if (this.m.nextRoom === this.creep.room.name) {
             const exits = Game.map.describeExits( this.m.nextRoom);
@@ -65,13 +65,13 @@ StateScoutIdle.prototype.enact = function () {
             NS: roomPos.NS,
             y: roomPos.y*1 + delta.y,
         });
-        //console.log("STATE_SCOUT_IDLE else this.m.nextRoom", this.m.nextRoom)
+        console.log("STATE_SCOUT_IDLE else this.m.nextRoom", this.m.nextRoom)
     }
-    myFlag = Game.flags[this.creep.name];
+    const myFlag = Game.flags[this.creep.name];
     //console.log("myFlag pos", JSON.stringify(myFlag));
     if (myFlag) {
         if (myFlag.pos.roomName === this.creep.room.name) {
-            //console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
+            console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
             if (!gf.validateRoomName(this.m.nextRoom)) {
                 delete this.m.nextRoom;
                 this.m.dir = this.m.direction + 2% 8;
@@ -94,7 +94,7 @@ StateScoutIdle.prototype.enact = function () {
         }
     } else {
         const newPosition =  new RoomPosition(25, 25, this.creep.room.name);
-        result = newPosition.createFlag(this.creep.name);
+        newPosition.createFlag(this.creep.name);
     }
 };
 

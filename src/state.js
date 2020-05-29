@@ -658,7 +658,7 @@ const state = {
             filter: s =>  {
                 return  (s.structureType === STRUCTURE_EXTENSION
                 || s.structureType === STRUCTURE_SPAWN)
-                && (s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY) * gc.REFILL_THRESHOLD)
+                && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY)
             }
         });
     },
