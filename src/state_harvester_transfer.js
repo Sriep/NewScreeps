@@ -20,8 +20,8 @@ StateHarvesterTransfer.prototype.enact = function () {
     if (!this.creep.memory.targetId) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_IDLE);
     }
-
-    const scPos = gf.roomPosFromPos(state.getSourceContainerPos(this.creep.memory.targetId));
+    const fRoom = new RoomFlag(this.creep.memory.targetPos.roomName);
+    const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.creep.memory.targetId));
     const container = state.findContainerAt(scPos);
     if (!container) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_BUILD)

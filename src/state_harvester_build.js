@@ -7,6 +7,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const RoomFlag = require("room_flag");
 
 function StateHarvesterBuild (creep) {
     this.type = gc.STATE_HARVESTER_BUILD;
@@ -19,8 +20,8 @@ StateHarvesterBuild.prototype.enact = function () {
         //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity(RESOURCE_ENERGY))
          state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
     }
-
-    const scPos = gf.roomPosFromPos(state.getSourceContainerPos(this.creep.memory.targetId));
+    const fRoom = new RoomFlag(this.creep.memory.targetPos.roomName);
+    const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.creep.memory.targetId));
     //console.log("scPos of contienr", JSON.stringify(scPos) )
     const container = state.findContainerAt(scPos);
     if (container) {

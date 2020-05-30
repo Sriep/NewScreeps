@@ -7,9 +7,9 @@ const gc = require("gc");
 const gf = require("gf");
 const race = require("race");
 const flag = require("flag");
-const economy = require("economy");
 const state = require("state");
 const construction = require("construction");
+const FlagRoom = require("flag_room");
 
 const policy = {
 
@@ -259,39 +259,42 @@ const policy = {
         return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
     },
 
-    buildSourceContainer : function (source) {
+    buildSourceContainer : function (obj) {
         //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
-        if (state.getSourceContainerPos(source.id)) {
-            return;
-        }
-
+        //if (state.getSourceContainerPos(obj.id)) {
+        //    return;
+        //}
+/*
         let spots = economy.findMostFreeNeighbours(
-            source.room, source.pos, 1
+            obj.room, obj.pos, 1
         );
         if (spots.length === 0) {
             return gf.fatalError("findMostFreeNeighbours cant get to source");
         }
-        let sourceFlag = Game.flags[source.id];
+        let sourceFlag = Game.flags[obj.id];
         if (!sourceFlag) {
-            source.pos.createFlag(source.id);
-            sourceFlag = Game.flags[source.id];
+            obj.pos.createFlag(obj.id);
+            sourceFlag = Game.flags[obj.id];
         }
         sourceFlag.memory.harvesterPosts = spots[0].neighbours;
-        spots[0].pos.roomName = source.room.name;
+        spots[0].pos.roomName = obj.room.name;
         sourceFlag.memory.containerPos = spots[0].pos;
-        if (state.findContainerOrConstructionAt(gf.roomPosFromPos(spots[0].pos))) {
+        */
+        const fRoom = new FlagRoom(obj.room.name);
+        const cPos = fRoom.getSourceContainerPos();
+        if (state.findContainerOrConstructionAt(gf.roomPosFromPos(cPos))) {
             return;
         }
-        const result = gf.roomPosFromPos(spots[0].pos).createConstructionSite(STRUCTURE_CONTAINER);
+        const result = gf.roomPosFromPos(cPos).createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
             gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
         }
     },
 
     areSourceContainersFinished : function (room) {
-        const sources = room.find(FIND_SOURCES);
-        for (let source of sources) {
-            const cPos = state.getSourceContainerPos(source.id);
+        const fRoom = new FlagRoom(room.name);
+        for (let sourceId in fRoom.getSources()) {
+            const cPos = fRoom.getSourceContainerPos(sourceId);
             if (!cPos) {
                 return false;
             }

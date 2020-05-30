@@ -3,12 +3,13 @@
  * Created by piers on 29/05/2020
  * @author Piers Shepperson
  */
-const state = require("state");
 const gc = require("gc");
+const FlagRoom = require("flag_room");
 
 const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done
-        const upgraderPosts = state.getControllerPosts(room.controller.id);
+        const fRoom = new FlagRoom(room.name);
+        const upgraderPosts = fRoom.getControllerPosts();
         let lowestUserCount = 9999;
         let bestPost;
         for ( let i = 0; i < upgraderPosts.length ; i++ ) {

@@ -3,7 +3,7 @@
  * Created by piers on 27/05/2020
  * @author Piers Shepperson
  */
-const FlagRoom = require("flag_room");
+const FlagOwnedRoom = require("flag_owned_room");
 
 function StateCogIdle (creep) {
     this.type = gc.STATE_COG_IDLE;
@@ -12,7 +12,7 @@ function StateCogIdle (creep) {
 }
 
 StateCogIdle.prototype.enact = function () {
-    const fRoom = new FlagRoom(this.home);
+    const fRoom = new FlagOwnedRoom(this.home);
     const pos = gf.roomPosFromPos(fRoom.m.plan["cog"][0], this.creep.room.name);
     return state.switchToMovePos(
         this.creep,

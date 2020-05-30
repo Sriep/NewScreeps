@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 
+const C = require("./Constants");
 //const gf = require("gf");
 const gc = require("gc");
 //const policy = require("policy");
@@ -37,11 +38,11 @@ PolicyLabs.prototype.assesBoosts = function() {
     const totals = this.countResources();
     const products = {};
     for (let reagent1 of totals) {
-        if (REACTIONS[reagent1]) {
+        if (C.REACTIONS[reagent1]) {
             for (let reagent2 of totals) {
-                if (REACTIONS[reagent1][reagent2]) {
+                if (C.REACTIONS[reagent1][reagent2]) {
                     products.push({
-                        [REACTIONS[reagent1][reagent2]] : {
+                        [C.REACTIONS[reagent1][reagent2]] : {
                             reagent1:  reagent1,
                             reagent2:  reagent2,}
                     })
@@ -54,9 +55,9 @@ PolicyLabs.prototype.assesBoosts = function() {
         return products
     }
     for (let reagent1 in products) {
-        if (REACTIONS[reagent1]) {
+        if (C.REACTIONS[reagent1]) {
             for (let reagent2 of totals) {
-                if (REACTIONS[reagent1][reagent2]) {
+                if (C.REACTIONS[reagent1][reagent2]) {
                     products.push({
                         reagent1:  reagent1,
                         reagent2:  reagent2,
@@ -65,11 +66,11 @@ PolicyLabs.prototype.assesBoosts = function() {
                 }
             }
             for (let reagent2 in products) {
-                if (REACTIONS[reagent1][reagent2]) {
+                if (C.REACTIONS[reagent1][reagent2]) {
                     products.push({
                         reagent1:  reagent1,
                         reagent2:  reagent2,
-                        result: REACTIONS[reagent1][reagent2]
+                        result: C.REACTIONS[reagent1][reagent2]
                     })
                 }
             }
@@ -81,10 +82,10 @@ PolicyLabs.prototype.assesBoosts = function() {
 
 PolicyLabs.prototype.countResources = function() {
     const totalStore = {};
-    const structures = Game.rooms[this.home].find(FIND_MY_STRUCTURES, { filter: s => {
-            return s.structureType === STRUCTURE_LAB
-                || s.structureType === STRUCTURE_STORAGE
-                || s.structureType === STRUCTURE_TERMINAL
+    const structures = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES, { filter: s => {
+            return s.structureType === C.STRUCTURE_LAB
+                || s.structureType === C.STRUCTURE_STORAGE
+                || s.structureType === C.STRUCTURE_TERMINAL
         }
     });
     for( let structure of structures) {

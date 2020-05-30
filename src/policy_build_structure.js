@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const FlagRoom = require("flag_room");
+const FlagOwnedRoom = require("flag_owned_room");
 
 // constructor
 function PolicyBuildStructure  (id, data) {
@@ -29,7 +29,7 @@ PolicyBuildStructure.prototype.initilise = function () {
 // runs once every tick
 PolicyBuildStructure.prototype.enact = function () {
     //console.log("POLICY_BUILD_STRUCTURE this",JSON.stringify(this));
-    const fRoom = new FlagRoom(this.home);
+    const fRoom = new FlagOwnedRoom(this.home);
     this.m.built = !fRoom.buildStructure(this.structureType)
 };
 

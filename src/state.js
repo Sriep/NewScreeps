@@ -8,6 +8,7 @@ const gf = require("gf");
 const economy = require("economy");
 const race = require("race");
 const flag = require("flag");
+const FlagRoom = require("flag_room");
 
 const state = {
 
@@ -27,7 +28,7 @@ const state = {
     },
 
     enact : function(obj, memory) {
-        //console.log("state eneact", obj, "memory", JSON.stringify(memory));
+        //console.log("state eneact", obj, "type", obj.structureType, "memory", JSON.stringify(memory));
         if (this.stackDepth > gc.MAX_STATE_STACK) {
             return;
         }
@@ -38,8 +39,8 @@ const state = {
         }
         const requireString = "state_" + memory.state;
         const stateConstructor = require(requireString);
-        const creepState = new stateConstructor(obj);
-        creepState.enact()
+        const objState = new stateConstructor(obj);
+        objState.enact()
     },
 
     //--------------------- state switches -------------------------------------
@@ -100,11 +101,11 @@ const state = {
     //--------------------- state switches end----------------------------------
 
     countHarvesterPosts: function(room) {
-        const sources = room.find(FIND_SOURCES);
+        const fRoom = new FlagRoom(room.name);
         let posts = 0;
-        for (let source of sources) {
-            if (state.getSourcePosts(source.id)) {
-                posts += state.getSourcePosts(source.id).length;
+        for (let sourceId in fRoom.getSources()) {
+            if (fRoom.getSourcePosts(sourceId)) {
+                posts += fRoom.getSourcePosts(sourceId).length;
             }
         }
         return posts;
@@ -131,17 +132,12 @@ const state = {
     },
 
     atHarvestingPost: function(pos) {
-        let sources = Game.rooms[pos.roomName].find(FIND_SOURCES);
-        for (let source of sources) {
-            //const flag = Game.flags[source.id];
-            //if (!flag) { // left room
-            //    return false;
-            //}
-            //const posts = flag.memory.harvesterPosts;
-            const posts = state.getSourcePosts(source.id);
-            for (let j in posts) {
-                if (pos.x === posts[j].x && pos.y ===posts[j].y) {
-                    return source.id
+        const fRoom = new FlagRoom(pos.roomName);
+        for (let sourceId in fRoom.getSources()) {
+            const posts = fRoom.getSourcePosts(sourceId);
+            for (let post of posts) {
+                if (pos.x === post.x && pos.y ===post.y) {
+                    return sourceId
                 }
             }
         }
@@ -202,10 +198,10 @@ const state = {
     },
 
     getHarvestContainersPos: function (room) {
-        const sources = room.find(FIND_SOURCES);
+        const fRoom = new FlagRoom(room.name);
         const containersPos = [];
-        for (let source of sources) {
-            const cPos = state.getSourceContainerPos(source.id);
+        for (let sourceId in fRoom.getSources()) {
+            const cPos = fRoom.getSourceContainerPos(sourceId);
             if (cPos) {
                 containersPos.push(gf.roomPosFromPos(cPos));
             }
@@ -240,8 +236,9 @@ const state = {
         });
     },
 
-    atUpgradingPost: function(pos) { // done
-        const posts = state.getControllerPosts(Game.rooms[pos.roomName].controller.id);
+    atUpgradingPost: function(pos) {
+        const fRoom = new FlagRoom(pos.roomName);
+        const posts = fRoom.getControllerPosts();
         for (let i in posts) {
             if (pos.x === posts[i].x && pos.y === posts[i].y){
                 return true;
@@ -311,12 +308,12 @@ const state = {
     },
 */
 
-    getSourcePosts : function (sourceId) {
-        if (Game.flags[sourceId]) {
-            return Game.flags[sourceId].memory.harvesterPosts;
-        }
-    },
-
+    //getSourcePosts : function (sourceId) {
+    //    if (Game.flags[sourceId]) {
+    //        return Game.flags[sourceId].memory.harvesterPosts;
+    //    }
+    //},
+/*
     getSourceLinkPos : function (sourceId) {
         if (Game.flags[sourceId]) {
             const l = gf.roomPosFromPos(Game.flags[sourceId].memory.linkPos);
@@ -338,15 +335,6 @@ const state = {
         }
     },
 
-    getControllerLinkPos : function(controllerId) {
-        if (Game.flags[controllerId]) {
-            const l = Game.flags[controllerId].memory.linkPos;
-            if (l) {
-                return new RoomPosition(l.x, l.y, l.roomName);
-            }
-        }
-    },
-
     getMineralContainerPos : function(mineralId) {
         if (Game.flags[mineralId]) {
             return Game.flags[mineralId].memory.containerPos;
@@ -358,6 +346,16 @@ const state = {
             return Game.flags[mineralId].memory.harvesterPosts;
         }
     },
+
+    getControllerLinkPos : function(controllerId) {
+        if (Game.flags[controllerId]) {
+            const l = Game.flags[controllerId].memory.linkPos;
+            if (l) {
+                return new RoomPosition(l.x, l.y, l.roomName);
+            }
+        }
+    },
+    */
 
     getObjAtPos(pos, type) {
         if (pos) {

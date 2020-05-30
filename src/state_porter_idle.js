@@ -8,6 +8,7 @@ const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
 const race = require("race");
+const FlagRoom= require("flag_room");
 
 function StatePorterIdle (creep) {
     this.type = gc.STATE_PORTER_IDLE;
@@ -82,10 +83,11 @@ module.exports = StatePorterIdle;
 
 StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
     let containersInfo = this.listHarvestContainers(colonies);
-
+    //console.log("nextHarvestContainer containersInfo", JSON.stringify(containersInfo))
     containersInfo = containersInfo.sort((c1, c2) =>
         c2.container.store.getUsedCapacity() - c1.container.store.getUsedCapacity()
     );
+
     for (let info of containersInfo) {
         if (info.container.store.getUsedCapacity() === 0) {
             break;
@@ -120,34 +122,42 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
     });
     const containerInfo = [];
     for (let colony of colonies) {
-        const m = Game.flags[colony.name].memory;
-        for (let sourceId in m.sources) {
-            let cPos = state.getSourceContainerPos(sourceId);
+        console.log("listHarvestContainers colony", JSON.stringify(colony));
+        const colonyRoom = new FlagRoom(colony.name);
+        console.log("listHarvestContainers memory", JSON.stringify(m));
+        for (let sourceId in colonyRoom.getSources()) {
+            let cPos = colonyRoom.getSourceContainerPos(sourceId);
             if (cPos) {
                 cPos = gf.roomPosFromPos(cPos, colony.name);
-                let distance = m.sources[sourceId].distance;
-                if (!distance) {
-                    distance = 15; // todo fix hack
+                const container  = state.findContainerAt(cPos);
+                if (container) {
+                    //let distance = m.sources[sourceId].distance;
+                    //if (!distance) {
+                    //    distance = 15; // todo fix hack
+                    //}
+                    containerInfo.push({
+                        "porters" : porters.filter( c => c.memory.targetId === sourceId).length,
+                        "pos" : cPos,
+                        "distance" : m.sources[sourceId].distance,
+                        "id" : sourceId,
+                        "container" : state.findContainerAt(cPos)
+                    })
                 }
+            }
+        }
+        let cPos = colonyRoom.getMineralContainerPos();
+        if (cPos) {
+            cPos = gf.roomPosFromPos(cPos, colony.name);
+            const container  = state.findContainerAt(cPos);
+            if (container) {
                 containerInfo.push({
-                    "porters" : porters.filter( c => c.memory.targetId === sourceId).length,
+                    "porters" : porters.filter( c => c.memory.targetId === m.mineral.id).length,
                     "pos" : cPos,
-                    "distance" : distance,
-                    "id" : sourceId,
+                    "distance" : m.mineral.distance,
+                    "id" : m.mineral.id,
                     "container" : state.findContainerAt(cPos)
                 })
             }
-        }
-        let cPos = state.getMineralContainerPos(m.mineral.id);
-        if (cPos) {
-            cPos = gf.roomPosFromPos(cPos, colony.name);
-            containerInfo.push({
-                "porters" : porters.filter( c => c.memory.targetId === m.mineral.id).length,
-                "pos" : cPos,
-                "distance" : m.mineral.distance,
-                "id" : m.mineral.id,
-                "container" : state.findContainerAt(cPos)
-            })
         }
     }
     return containerInfo;

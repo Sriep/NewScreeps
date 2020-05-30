@@ -31,7 +31,7 @@ PolicyBuildExtractors.prototype.initilise = function () {
 
 // runs once every tick
 PolicyBuildExtractors.prototype.enact = function () {
-    console.log("POLICY_BUILD_EXTRACTORS this", JSON.stringify(this))
+    console.log("POLICY_BUILD_EXTRACTORS this", JSON.stringify(this));
     const colonies = policy.getGouvernerPolicy(this.home).getColonies();
     this.m.finished = true;
     for (let colonyInfo of colonies) {
@@ -53,6 +53,7 @@ PolicyBuildExtractors.prototype.enact = function () {
         });
         if (beingBuilt.length + built.length < minerals.length) {
             for (let mineral of minerals) {
+                policy.buildSourceContainer(mineral);
                 mineral.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
             }
         }

@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const FlagRoom = require("flag_room");
+const FlagOwnedRoom = require("flag_owned_room");
 const tile = require("tile");
 
 // constructor
@@ -29,7 +29,7 @@ PolicyPlanBuilds.prototype.initilise = function () {
 // runs once every tick
 PolicyPlanBuilds.prototype.enact = function () {
     console.log("POLICY_PLAN_BUILDS enact");
-    const fRoom = new FlagRoom(this.home);
+    const fRoom = new FlagOwnedRoom(this.home);
     const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS);
     fRoom.placeCentre(tile.CENTRE_6x6_2,spawns.length > 0 ? spawns[0].pos : undefined);
     this.m.finished = true;

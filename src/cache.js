@@ -82,6 +82,7 @@ const cache = {
             //console.log("cache distance from", from.id, "toArraylength", toArray.length, "name", name,
             //    "range", range, "userRoad", useRoad, "redo", redo, "cacheR", cacheResult)
             //console.log("cache distance p", JSON.stringify(p))
+            return
         }
         if (!p.incomplete) {
             return p.cost

@@ -6,6 +6,7 @@
 const gc = require("gc");
 const state = require("state");
 const stateUpgrader = require("state_upgrader");
+const FlagOwnedRoom = require("flag_owned_room");
 
 function StateUpgraderWithdraw (creep) {
     this.type = gc.STATE_UPGRADER_WITHDRAW;
@@ -18,8 +19,8 @@ StateUpgraderWithdraw.prototype.enact = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
     }
-
-    const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
+    const fRoom = new FlagOwnedRoom(this.creep.room.name);
+    const controllerLink = state.getObjAtPos(fRoom.controllerLinkPos(), STRUCTURE_LINK);
     if (controllerLink) {
         if (this.creep.pos.isNearTo(controllerLink)) {
             if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {

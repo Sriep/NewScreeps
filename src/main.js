@@ -5,9 +5,7 @@
  */
 
 const inserted = require("inserted");
-const gc = require("gc");
 const state = require("state");
-//const rooms = require("rooms");
 const policy = require("policy");
 const flag = require("flag");
 const records = require("records");
@@ -19,8 +17,8 @@ module.exports.loop = function () {
         startup();
         records.startup()
     }
+    
     freeCreeps();
-    flagRooms();
     enactPolicies();
     buildingAct();
     moveCreeps();
@@ -45,9 +43,12 @@ function startup() {
 }
 
 function freeCreeps() {
-    for(let c in Memory.creeps) {
-        if(!Game.creeps[c]) {
-            delete Memory.creeps[c];
+    for(let name in Memory.creeps) {
+        if (Game.flags[name]) {
+            Game.flags[name].remove();
+        }
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
         }
     }
 }
@@ -62,6 +63,7 @@ function buildingAct() {
             }
         });
         for (let building of buildings) {
+            //console.log("building",building,"type",building.structureType);
             state.enactBuilding(building)
         }
     }
@@ -83,19 +85,4 @@ function spawnCreeps() {
             flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
         }
     }
-}
-
-function flagRooms() {
-    let force = false;
-    if (Game.time % gc.FLAG_UPDATE_RATE === 0 ) {
-        force = true;
-    }
-    //console.log("main flag rooms")
-    for ( let roomName in Game.rooms ) {
-        if ( (Game.rooms[roomName].memory && (!Game.rooms[roomName].memory.flagged) || force) ) {
-            //console.log("main flag rooms inside for and if")
-            flag.flagRoom(roomName, force); //------
-        }
-    }
-
 }

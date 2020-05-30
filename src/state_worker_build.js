@@ -14,33 +14,39 @@ function StateWorkerBuild (creep) {
 }
 
 StateWorkerBuild.prototype.enact = function () {
-    //console.log(this.creep.name, "in STATE_WORKER_BUILD")
+    console.log(this.creep.name, "in STATE_WORKER_BUILD");
     if (this.creep.store.getUsedCapacity() === 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
+        console.log("STATE_WORKER_BUILD no target id", this.creep.memory.targetId);
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const result = this.creep.build(target);
+    console.log("STATE_WORKER_BUILD result", result);
     switch (result) {
-        case OK:                        // The operation has been scheduled successfully.
+        case OK:
             break;
-        case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
+        case  ERR_NOT_OWNER:
             return gf.fatalError("ERR_NOT_OWNER");
-        case ERR_BUSY:                  // The creep is still being spawned.
+        case ERR_BUSY:
             return gf.fatalError("ERR_BUSY");
-        case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
+        case ERR_NOT_ENOUGH_RESOURCES:
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
-        case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
+        case ERR_INVALID_TARGET:
+            // no longer valid build, maybe the room's rcl dropped.
+            target.remove();
+            delete this.creep.memory.targetId;
             return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
-        case ERR_NOT_IN_RANGE:          // The target is too far away.
+        case ERR_NOT_IN_RANGE:
             return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
-        case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
+        case ERR_NO_BODYPART:
             return gf.fatalError("ERR_NO_BODYPART");
         default:
             return gf.fatalError("no valid result");
     }
+    console.log("STATE_WORKER_BUILD dropped though")
 };
 
 module.exports = StateWorkerBuild;

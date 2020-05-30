@@ -20,7 +20,6 @@ const economy = {
         const terrain = room.getTerrain();
         let bestSpots = [];
         let maxSoFar = -1;
-        //let delta = gc.DELTA_MOVES[range];
         let delta;
         switch (range) {
             case 0: delta = [{x:0, y:0}]; break;
@@ -29,51 +28,38 @@ const economy = {
             case 3: delta = gc.THREE_MOVES; break;
             default: return gf.fatalError("findMostFreeNeighbours range to big = " + range.toString());
         }
-        //console.log("one move", JSON.toString(gc.ONE_MOVE))
-
         const nonWallPos = [];
         for (let i in delta) {
             const x = pos.x + delta[i].x;
             const y = pos.y + delta[i].y;
             if (terrain.get(x,y) !== TERRAIN_MASK_WALL) {
-                //console.log(x,y,"x y non wall")
                 nonWallPos.push({ x:delta[i].x, y: delta[i].y })
             }
         }
-        //console.log("nonWallPos", JSON.stringify(nonWallPos))
         for (let i in nonWallPos) {
             let rebase = _.map(nonWallPos, function(d) {
                 return { x: d.x - nonWallPos[i].x, y: d.y - nonWallPos[i].y };
             });
-            //console.log("rebase", JSON.stringify(rebase))
             const x = pos.x + nonWallPos[i].x;
             const y = pos.y + nonWallPos[i].y;
-            ///console.log("delta", JSON.stringify(delta));
-            //console.log(x,y,"rebase", JSON.stringify(rebase))
             const join = this.intersect(rebase, gc.ONE_MOVE);
-            //console.log(x,y,"xy join", JSON.stringify(join))
-
-            const nonWalls = this.countNonWallNeighbours(x, y, terrain, join)
-            //console.log(x,y, "maxSoFar", maxSoFar,"nonWalls",JSON.stringify(nonWalls))
+            const nonWalls = this.countNonWallNeighbours(x, y, terrain, join);
             if (nonWalls.count > maxSoFar) {
                 bestSpots.length = 0;
-                bestSpots = []
+                bestSpots = [];
                 bestSpots.push({
                     pos: new RoomPosition(x, y, room.name),
                     neighbours: nonWalls.neighbours
-                })
+                });
                 maxSoFar = nonWalls.count;
             } else if (nonWalls.count === maxSoFar) {
                 bestSpots.push({
                     pos: new RoomPosition(x, y, room.name),
                     neighbours: nonWalls.neighbours
                 })
-                //bestSpots.push({x:x, y:y})
-            }
-            //console.log("best spots", JSON.stringify(bestSpots))
+             }
 
         }
-        //console.log("bestSpots", JSON.stringify(bestSpots))
         return bestSpots;
     },
 
@@ -102,7 +88,7 @@ const economy = {
             //console.log(i,"i one move", gc.ONE_MOVE[i], "x",x,"X",x,"Y",Y,"y",y)
             //console.log("PIERS",X,Y,"terrain", terrain.get(X,Y), "wall",TERRAIN_MASK_WALL)
             if (terrain.get(X,Y) !== TERRAIN_MASK_WALL) {
-                count++
+                count++;
                 neighbours.push({x: X, y:Y})
             }
             //console.log("count", count);
@@ -139,8 +125,8 @@ const economy = {
     estimateHomePorters : function(room) {
         rcl = room.controller.level;
         const carryParts = gc.RPC_PORTER_CARRY_PARTS[rcl];
-        const roundTrip = this.roundTripLength(room, gc.RACE_PORTER)
-        const tripsPerLife = (CREEP_LIFE_TIME - roundTrip) / roundTrip
+        const roundTrip = this.roundTripLength(room, gc.RACE_PORTER);
+        const tripsPerLife = (CREEP_LIFE_TIME - roundTrip) / roundTrip;
 
         const energyPerPorter = carryParts * CARRY_CAPACITY * tripsPerLife;
         return Math.ceil(this.totalSourceCapacity(room) / energyPerPorter);
@@ -322,7 +308,7 @@ const economy = {
 
     countAccessPoints: function (pos)
     {
-        const terrain = Game.rooms[pos.roomName].getTerrain()
+        const terrain = Game.rooms[pos.roomName].getTerrain();
         let accessPoints = 0;
         if (terrain.get(pos.x+1, pos.y) !== TERRAIN_MASK_WALL) {
             accessPoints = accessPoints+1;

@@ -19,7 +19,7 @@ StateTowerDefend.prototype.enact = function () {
     if (this.tower.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return
     }
-    const target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    const target = this.tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     this.tower.attack(target);
 };
 

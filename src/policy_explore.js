@@ -124,7 +124,7 @@ PolicyExplore.prototype.sendExplorers = function(shortfall) {
 };
 
 PolicyExplore.prototype.draftReplacment = function() {
-    return this
+    return Game.map.describeExits(this.home) ? this : false;
 };
 
 module.exports = PolicyExplore;
