@@ -22,6 +22,7 @@ module.exports.loop = function () {
     freeCreeps();
     flagRooms();
     enactPolicies();
+    buildingAct();
     moveCreeps();
     spawnCreeps();
 
@@ -51,6 +52,21 @@ function freeCreeps() {
     }
 }
 
+function buildingAct() {
+    for (let roomName in Game.rooms) {
+        const buildings = Game.rooms[roomName].find(FIND_MY_STRUCTURES,  {
+            filter: s => {
+                return s.structureType === STRUCTURE_TOWER
+                    || s.structureType ===  STRUCTURE_TERMINAL
+                    || s.structureType ===  STRUCTURE_LAB
+            }
+        });
+        for (let building of buildings) {
+            state.enactBuilding(building)
+        }
+    }
+}
+
 function moveCreeps() {
     for (let name in Game.creeps) {
         state.enactCreep(Game.creeps[name]);
@@ -64,14 +80,7 @@ function enactPolicies() {
 function spawnCreeps() {
     for (let i in Game.spawns) {
         if (!Game.spawns[i].spawning) {
-            //console.log("main spawn loop energy avaliable", Game.spawns[i].room.energyAvailable);
-            //if (Game.spawns[i].room.energyAvailable >= BODYPART_COST[MOVE]) {
-                //console.log("main spawnCreeps about to get queue");
-                //const q = flag.getSpawnQueue(Game.spawns[i].room.name);
-                //console.log("main spawnCreeps",Game.spawns[i].room.name,  "queue is", JSON.stringify(q));
             flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
-                //console.log("spawn at", Game.spawns[i].room.name,"result", r)
-            //}
         }
     }
 }
@@ -85,7 +94,7 @@ function flagRooms() {
     for ( let roomName in Game.rooms ) {
         if ( (Game.rooms[roomName].memory && (!Game.rooms[roomName].memory.flagged) || force) ) {
             //console.log("main flag rooms inside for and if")
-            flag.flagRoom(roomName, force);
+            flag.flagRoom(roomName, force); //------
         }
     }
 

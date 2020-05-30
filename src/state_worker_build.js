@@ -15,12 +15,12 @@ function StateWorkerBuild (creep) {
 
 StateWorkerBuild.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_BUILD")
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
+    if (this.creep.store.getUsedCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (!target) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const result = this.creep.build(target);
     switch (result) {
@@ -33,9 +33,9 @@ StateWorkerBuild.prototype.enact = function () {
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");
         default:

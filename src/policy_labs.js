@@ -4,12 +4,12 @@
  * @author Piers Shepperson
  */
 
-const gf = require("gf");
+//const gf = require("gf");
 const gc = require("gc");
-const policy = require("policy");
+//const policy = require("policy");
 
 // constructor
-function Policy  (id, data) {
+function PolicyLabs  (id, data) {
     this.type = gc.POLICY_LABS;
     this.id = id;
     this.home = data.home;
@@ -18,7 +18,7 @@ function Policy  (id, data) {
 }
 
 // runs first time policy is created only
-Policy.prototype.initilise = function () {
+PolicyLabs.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -26,11 +26,107 @@ Policy.prototype.initilise = function () {
 };
 
 // runs once every tick
-Policy.prototype.enact = function () {
+PolicyLabs.prototype.enact = function () {
 };
 
-Policy.prototype.draftReplacment = function() {
+PolicyLabs.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = Policy;
+PolicyLabs.prototype.assesBoosts = function() {
+    const totals = this.countResources();
+    const products = {};
+    for (let reagent1 of totals) {
+        if (REACTIONS[reagent1]) {
+            for (let reagent2 of totals) {
+                if (REACTIONS[reagent1][reagent2]) {
+                    products.push({
+                        [REACTIONS[reagent1][reagent2]] : {
+                            reagent1:  reagent1,
+                            reagent2:  reagent2,}
+                    })
+                }
+            }
+        }
+    }
+    let productCount = Object.keys(products).length;
+    if (productCount === 0) {
+        return products
+    }
+    for (let reagent1 in products) {
+        if (REACTIONS[reagent1]) {
+            for (let reagent2 of totals) {
+                if (REACTIONS[reagent1][reagent2]) {
+                    products.push({
+                        reagent1:  reagent1,
+                        reagent2:  reagent2,
+                        result: REACTIONS[reagent1][reagent2]
+                    })
+                }
+            }
+            for (let reagent2 in products) {
+                if (REACTIONS[reagent1][reagent2]) {
+                    products.push({
+                        reagent1:  reagent1,
+                        reagent2:  reagent2,
+                        result: REACTIONS[reagent1][reagent2]
+                    })
+                }
+            }
+        }
+    }
+
+
+};
+
+PolicyLabs.prototype.countResources = function() {
+    const totalStore = {};
+    const structures = Game.rooms[this.home].find(FIND_MY_STRUCTURES, { filter: s => {
+            return s.structureType === STRUCTURE_LAB
+                || s.structureType === STRUCTURE_STORAGE
+                || s.structureType === STRUCTURE_TERMINAL
+        }
+    });
+    for( let structure of structures) {
+        for (let resource in structure.store) {
+            if (totalStore[resource]) {
+                totalStore[resource] += structure.store[resource]
+            } else {
+                totalStore[resource] = structure.store[resource];
+            }
+        }
+    }
+    return totalStore;
+};
+
+
+module.exports = PolicyLabs;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

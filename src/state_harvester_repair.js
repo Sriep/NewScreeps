@@ -15,17 +15,17 @@ function StateHarvesterRepair (creep) {
 
 StateHarvesterRepair.prototype.enact = function () {
     if (state.spaceForHarvest(this.creep)) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
     }
 
-    const scPos = gf.roomPosFromPos(state.getSourceContainer(this.creep.memory.targetId));
+    const scPos = gf.roomPosFromPos(state.getSourceContainerPos(this.creep.memory.targetId));
     const container = state.findContainerAt(scPos);
     if (!container) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_BUILD)
     }
 
     if (container.hits === container.hitsMax) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER)
     }
 
     const result = this.creep.repair(container);

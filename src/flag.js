@@ -5,15 +5,16 @@
  */
 
 const economy = require("economy");
+const cache = require("cache");
 const gc = require("gc");
 
 const flag = {
-    flagRoom(roomName, force) {
-        this.flag(Game.rooms[roomName], force);
-    },
+    //flagRoom(roomName) {
+    //    this.flag(Game.rooms[roomName]);
+    //},
 
     getRoom(roomName) {
-        this.flagRoom(roomName);
+        this.flagRoom(roomName); //-------
         const flagRoom = require("flag_room");
         return new flagRoom.FlagRooom(roomName);
     },
@@ -21,10 +22,20 @@ const flag = {
     getRoomFlag(roomName) {
         let roomFlag = Game.flags[roomName];
         if (!roomFlag) {
-            this.flagRoom(roomName);
+            this.flagRoom(roomName); //-----
             roomFlag = Game.flags[roomName]
         }
         return roomFlag;
+    },
+
+    getFlag(obj) {
+        let objFlag = Game.flags[obj.id];
+        if (!objFlag) {
+            obj.pos.createFlag(obj.id);
+            objFlag = Game.flags[obj.id];
+            Game.flags[obj.id].memory.state = obj.structureType + "_idle"
+        }
+        return objFlag;
     },
 
     getSpawnQueue(roomName) {
@@ -32,8 +43,10 @@ const flag = {
         return new QueueSpawn(roomName);
     },
 
-    flag: function (room) {
-        if (!Game.flags[room.name]) {
+    flagRoom: function (roomName) {
+        console.log("flagRoom", roomName,"Game.flags[roomName]",Game.flags[roomName]);
+        if (!Game.flags[roomName]) {
+            const room = Game.rooms[roomName];
             const centre = new RoomPosition(25, 25, room.name);
             centre.createFlag(room.name);
 
@@ -46,6 +59,7 @@ const flag = {
     },
 
     flagPermanents: function (room) {
+        console.log("flagPermanents", room.name);
         const m = Game.flags[room.name].memory;
 
         const keeperLairs = room.find(FIND_STRUCTURES, {
@@ -62,7 +76,10 @@ const flag = {
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {
-                m.sources[source.id]= { "ap" : economy.countAccessPoints(source.pos) };
+                m.sources[source.id]= {
+                    "ap" : economy.countAccessPoints(source.pos),
+                    "distance" : cache.distanceSourceSpawn(source, room, false)
+                };
                 source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
             }
         }
@@ -74,7 +91,11 @@ const flag = {
 
         const minerals = room.find(FIND_MINERALS);
         if (minerals.length > 0) {
-            m.mineral = {"id" : minerals[0].id, "type":minerals[0].type}
+            m.mineral = {
+                "id" : minerals[0].id,
+                "type":minerals[0].type,
+                "distance" : cache.distanceSourceSpawn(minerals[0], room, false)
+            }
         }
 
         m.flagged = true;
@@ -124,7 +145,8 @@ const flag = {
     },
 
     flagMyRoomStructures: function (room) {
-        const sources = room.find(FIND_SOURCES);
+      /*
+      const sources = room.find(FIND_SOURCES);
         for ( let source of sources ) {
             if (!Game.flags[source.id]) {
                 source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
@@ -152,7 +174,7 @@ const flag = {
         if (room.controller.level >= 1) {
             Game.flags[room.name].memory.owned = true;
         }
-
+*/
         /*
         console.log("room flagMyRoomStructures room",room.name);
         const links = room.find(FIND_STRUCTURES, {

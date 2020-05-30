@@ -18,9 +18,9 @@ StateHarvesterLink.prototype.enact = function () {
     const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
     if (!sourceLink || !controllerLink) {
         if (state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
         } else {
-            return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
         }
     }
 

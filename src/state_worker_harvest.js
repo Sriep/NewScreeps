@@ -14,8 +14,8 @@ function StateWorkerHarvest (creep) {
 
 StateWorkerHarvest.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_HARVEST")
-    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    if (this.creep.store.getFreeCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     if (target.energy > 0) {
@@ -44,7 +44,7 @@ StateWorkerHarvest.prototype.enact = function () {
         }
     }
     if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_FULL_IDLE);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_FULL_IDLE);
     }
 };
 

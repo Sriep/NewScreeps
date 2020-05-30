@@ -15,20 +15,13 @@ function StatePorterWithdraw (creep) {
 }
 
 StatePorterWithdraw.prototype.enact = function () {
-    if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    if (this.creep.store.getFreeCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
 
    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
     let target;
     if (this.m.targetPos) {
-        //console.log("STATE_PORTER_WITHDRAW x", JSON.stringify(this.m.targetPos))
-        //const pos = new RoomPosition(
-        //    this.m.targetPos.x,
-        ///    this.m.targetPos.y,
-        //    this.m.targetPos.roomName
-        //);
-        //console.log("STATE_PORTER_WITHDRAW pos", JSON.stringify(this.m.targetPos));
         target = state.findContainerAt(new RoomPosition(
             this.m.targetPos.x,
             this.m.targetPos.y,
@@ -36,10 +29,10 @@ StatePorterWithdraw.prototype.enact = function () {
         ))
     }
     if (!target) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY > 0)) {
-            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+        if (this.creep.store.getUsedCapacity() > 0) {
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
         } else {
-            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
         }
     }
 
@@ -52,11 +45,11 @@ StatePorterWithdraw.prototype.enact = function () {
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("transfer ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -65,10 +58,10 @@ StatePorterWithdraw.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
     delete this.creep.memory.next_state;
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+    if (this.creep.store.getUsedCapacity() > 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     } else {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
     }
 
 };

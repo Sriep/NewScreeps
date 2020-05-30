@@ -280,12 +280,12 @@ PolicyPorters.prototype.localBudget = function() {
         this.m.localResoures.wW
     );
 
-    console.log("POLICY_PORTERS localBudget parts", parts, "rtv", JSON.stringify({
-        "profit" : profit,
-        "parts" : parts,
-        "profitpart" : profit/parts,
-        "spawnPartsLT" : spawnCapacity,
-    }));
+    //console.log("POLICY_PORTERS localBudget parts", parts, "rtv", JSON.stringify({
+    //    "profit" : profit,
+    //    "parts" : parts,
+    //    "profitpart" : profit/parts,
+    //    "spawnPartsLT" : spawnCapacity,
+    //}));
     return {
         "profit" : profit,
         "parts" : parts,

@@ -14,8 +14,8 @@ function StateWorkerUpgrade (creep) {
 
 StateWorkerUpgrade.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_UPGRADE")
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_IDLE)
+    if (this.creep.store.getUsedCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
     const result = this.creep.upgradeController(target);
@@ -23,14 +23,14 @@ StateWorkerUpgrade.prototype.enact = function () {
         case OK:                        // The operation has been scheduled successfully.
             break;
         case  ERR_NOT_OWNER:            // You are not the owner of this creep, or the room controller is owned or reserved by another player..
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
             //return gf.fatalError("ERR_NOT_OWNER");
         case ERR_BUSY:                  // The creep is still being spawned.
             return gf.fatalError("ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
             //return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("ERR_NOT_IN_RANGE");

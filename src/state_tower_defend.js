@@ -16,6 +16,9 @@ StateTowerDefend.prototype.enact = function () {
     if (this.tower.room.find(FIND_HOSTILE_CREEPS).length === 0) {
         state.switchTo(this.tower, gc.STATE_TOWER_IDLE)
     }
+    if (this.tower.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return
+    }
     const target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     this.tower.attack(target);
 };

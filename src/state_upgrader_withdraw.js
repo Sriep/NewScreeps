@@ -5,6 +5,7 @@
  */
 const gc = require("gc");
 const state = require("state");
+const stateUpgrader = require("state_upgrader");
 
 function StateUpgraderWithdraw (creep) {
     this.type = gc.STATE_UPGRADER_WITHDRAW;
@@ -15,7 +16,7 @@ function StateUpgraderWithdraw (creep) {
 StateUpgraderWithdraw.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        return state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
     }
 
     const controllerLink = state.getObjAtPos(state.getControllerLinkPos(this.creep.room.controller.id), STRUCTURE_LINK);
@@ -24,15 +25,15 @@ StateUpgraderWithdraw.prototype.enact = function () {
             if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 const result = this.creep.pos.withdraw(controllerLink, RESOURCE_ENERGY);
                 if (result === OK) {
-                    state.switchTo(this.creep, gc.STATE_UPGRADER_UPGRADE)
+                    state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
                 }
             }
         }
     }
 
-    const container = state.findUpgradeContainerNear(this.creep);
+    const container = stateUpgrader.findUpgradeContainerNear(this.creep);
     if (!container) {
-        return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_IDLE)
     }
 
     if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
@@ -48,7 +49,7 @@ StateUpgraderWithdraw.prototype.enact = function () {
         case ERR_BUSY:
             return gf.fatalError("transfer ERR_BUSY");
         case ERR_NOT_ENOUGH_RESOURCES:           // upgraders' bucket is empty
-            return state.switchTo(this.creep, gc.STATE_UPGRADER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_IDLE);
         case ERR_INVALID_TARGET:
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:

@@ -123,6 +123,12 @@ PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpC
 };
 
 PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost) {
+    if (roomName === this.roomName) {
+        console.log("addColony roomName", roomName,"profit", profit,"parts",parts, "startup", startUpCost);
+        gf.fatalError("cannot be a colony of itself");
+        return false
+    }
+
     console.log("POLICY_GOVERN addColony", roomName, "profit", profit, "parts",parts, "startUpCost", startUpCost);
     if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
         console.log("POLICY_GOVERN addColony failed !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");

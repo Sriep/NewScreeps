@@ -13,7 +13,7 @@ function StateLorryIdle (creep) {
 }
 
 StateLorryIdle.prototype.enact = function () {
-    state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
+    state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE)
 };
 
 module.exports = StateLorryIdle;

@@ -15,22 +15,16 @@ function StatePorterTransfer (creep) {
 
 StatePorterTransfer.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_PORTER_TRANSFER");
-    if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
+    if (this.creep.store.getUsedCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE)
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
-    if (!target || !target.store.getFreeCapacity(RESOURCE_ENERGY)) {
-        //console.log("target bad", target,"capacity",target.store.getFreeCapacity(RESOURCE_ENERGY) )
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
-            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-        } else {
-            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
-        }
+    const resource = this.findTransferResource(target.store, this.creep.store);
+    if (!resource) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
-    if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
-    }
-    const result = this.creep.transfer(target, RESOURCE_ENERGY);
+
+    const result = this.creep.transfer(target, resource);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -51,10 +45,34 @@ StatePorterTransfer.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (target.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(this.creep, gc.STATE_PORTER_IDLE)
+};
+
+StatePorterTransfer.prototype.findTransferResource = function(target, source) {
+    for (let resource in source) {
+        if (target.getFreeCapacity(resource) > 0 && source[resource] > 0) {
+            return resource;
+        }
     }
-    state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
 };
 
 module.exports = StatePorterTransfer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

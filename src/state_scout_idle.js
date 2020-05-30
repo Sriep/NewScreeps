@@ -71,7 +71,7 @@ StateScoutIdle.prototype.enact = function () {
     //console.log("myFlag pos", JSON.stringify(myFlag));
     if (myFlag) {
         if (myFlag.pos.roomName === this.creep.room.name) {
-            console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
+            //console.log("STATE_SCOUT_IDLE move flag this.m.nextRoom", this.m.nextRoom)
             if (!gf.validateRoomName(this.m.nextRoom)) {
                 delete this.m.nextRoom;
                 this.m.dir = this.m.direction + 2% 8;

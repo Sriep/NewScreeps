@@ -7,7 +7,7 @@ const C = require("./Constants");
 const gc = require("gc");
 
 function StateTowerIdle (structure) {
-    this.type = gc.STATE_LAB_PEACE;
+    this.type = gc.STATE_LAB_IDLE;
     this.lab = structure;
 }
 
@@ -35,9 +35,9 @@ StateTowerIdle.prototype.enact = function () {
 
 StateTowerIdle.prototype.makeResource = function (resource) {
     const reaction = this.findReactionToMake(resource);
-    const lab1 = this.findLabWith(resource.reagent1, this.lab);
+    const lab1 = this.findLabWith(reaction.reagent1, this.lab);
     if (lab1) {
-        const lab2 = this.findLabWith(resource.reagent2, this.lab);
+        const lab2 = this.findLabWith(reaction.reagent2, this.lab);
         if (lab2) {
             return this.lab.runReaction(lab1, lab2);
         }

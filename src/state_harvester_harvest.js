@@ -15,7 +15,7 @@ function StateHarvesterHarvest (creep) {
 StateHarvesterHarvest.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store))
     if (!state.spaceForHarvest(this.creep)) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
     }
     const source = Game.getObjectById(this.creep.memory.targetId);
 

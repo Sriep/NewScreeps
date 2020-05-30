@@ -114,6 +114,9 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
 PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
     console.log("PolicyColonialOffice build colony", colony.name,"spawnRoom", spawnRoom.name, "userroads", useRoad );
     this.buildSourceSupport(colony, spawnRoom);
+    if (colony.controller.level >= 6) {
+        this.buildExtractor(colony, spawnRoom)
+    }
     if (useRoad) {
         this.buildRoads(colony, spawnRoom)
     }
@@ -126,6 +129,26 @@ PolicyColonialOffice.prototype.buildSourceSupport = function(colony, spawnRoom) 
     for (let source of sources) {
         policy.buildSourceContainer(source);
         roomFlag.sources[source.id]["distance"] = cache.distanceSourceController(source, spawnRoom);
+    }
+};
+
+PolicyColonialOffice.prototype.buildExtractor = function(colony, spawnRoom) {
+    console.log("buildExtractor colony", colony.name, "spawn room", spawnRoom.name);
+    const roomFlag = flag.getRoomFlag(colony.name).memory;
+    const minerals = colony.find(FIND_MINERALS);
+    for (let mineral of minerals) {
+        policy.buildSourceContainer(mineral);
+        roomFlag.mineral["distance"] = cache.distanceSourceController(mineral, spawnRoom);
+        const structs = mineral.pos.lookFor(LOOK_STRUCTURES);
+        let found = false;
+        for (let struct of structs) {
+            if (struct.structureType === STRUCTURE_EXTRACTOR) {
+                found = true;
+            }
+        }
+        if  (!found) {
+            mineral.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
+        }
     }
 };
 

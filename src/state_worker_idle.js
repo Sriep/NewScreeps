@@ -19,7 +19,7 @@ function StateWorkerIdle (creep) {
 StateWorkerIdle.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_WORKER_IDLE")
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
 
     if (this.workToDo(this.homeId)) {
@@ -69,7 +69,7 @@ StateWorkerIdle.prototype.workToDo = function(colonyName) {
 
 StateWorkerIdle.prototype.enactOld = function () {
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
 
     const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {

@@ -61,7 +61,7 @@ const inserted = {
             }
             Memory.routes[porter.memory.targetId]["porters"].push(porter.name)
         }
-        console.log("routes", JSON.stringify(Memory.routes));
+        //console.log("routes", JSON.stringify(Memory.routes));
 
     }
 };

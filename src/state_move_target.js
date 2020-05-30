@@ -20,11 +20,11 @@ StateMoveTarget.prototype.enact = function () {
     const flag = Game.flags[this.creep.memory.targetName];
     //console.log("STATE_MOVE_TARGET, flag pos", JSON.stringify(flag.pos), "flag name", flag.name);
     if (!flag) {
-        return state.switchTo(this.creep, race.getRace(this.creep) + "_idle");
+        return state.switchTo(this.creep, this.creep.memory, race.getRace(this.creep) + "_idle");
     }
     if (this.creep.pos.inRangeTo(flag.pos, this.creep.memory.moveRange)) {
         //console.log("STATE_MOVE_TARGET creep", JSON.stringify(this.creep.pos), "cloes to", JSON.stringify(flag.pos))
-        return state.switchTo(this.creep, this.creep.memory.next_state)
+        return state.switchTo(this.creep, this.creep.memory, this.creep.memory.next_state)
     }
     const result = this.creep.moveTo(flag, {reusePath: 5});
     //console.log("STATE_MOVE_TARGET move result", result)

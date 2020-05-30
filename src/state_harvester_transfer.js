@@ -14,21 +14,21 @@ function StateHarvesterTransfer (creep) {
 
 StateHarvesterTransfer.prototype.enact = function () {
     if (state.spaceForHarvest(this.creep)) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
     }
 
     if (!this.creep.memory.targetId) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_IDLE);
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_IDLE);
     }
 
-    const scPos = gf.roomPosFromPos(state.getSourceContainer(this.creep.memory.targetId));
+    const scPos = gf.roomPosFromPos(state.getSourceContainerPos(this.creep.memory.targetId));
     const container = state.findContainerAt(scPos);
     if (!container) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_BUILD)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_BUILD)
     }
 
     if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_REPAIR)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_REPAIR)
     }
 
     const result = this.creep.transfer(container, RESOURCE_ENERGY);
@@ -53,7 +53,7 @@ StateHarvesterTransfer.prototype.enact = function () {
             return gf.fatalError("harvest unrecognised return value");
     }
 
-    state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
+    state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
 };
 
 module.exports = StateHarvesterTransfer;

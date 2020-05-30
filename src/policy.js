@@ -261,7 +261,7 @@ const policy = {
 
     buildSourceContainer : function (source) {
         //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
-        if (state.getSourceContainer(source.id)) {
+        if (state.getSourceContainerPos(source.id)) {
             return;
         }
 
@@ -291,7 +291,7 @@ const policy = {
     areSourceContainersFinished : function (room) {
         const sources = room.find(FIND_SOURCES);
         for (let source of sources) {
-            const cPos = state.getSourceContainer(source.id);
+            const cPos = state.getSourceContainerPos(source.id);
             if (!cPos) {
                 return false;
             }

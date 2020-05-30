@@ -23,10 +23,10 @@ StatePorterPickup.prototype.enact = function () {
     });
 
     if (!drop) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
-            return state.switchTo(this.creep, gc.STATE_PORTER_FULL_IDLE);
+        if (this.creep.store.getUsedCapacity() > 0) {
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
         } else {
-            return state.switchTo(this.creep, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
         }
     }
 
@@ -51,10 +51,10 @@ StatePorterPickup.prototype.enact = function () {
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        return state.switchTo(creep, gc.STATE_PORTER_IDLE);
+    if (creep.store.getUsedCapacity() === 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
     }
-    state.switchTo(creep, gc.STATE_PORTER_FULL_IDLE);
+    state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
 };
 
 module.exports = StatePorterPickup;

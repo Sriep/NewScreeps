@@ -17,14 +17,14 @@ StateHarvesterBuild.prototype.enact = function () {
     //console.log(this.creep.namne, "in", "STATE_HARVESTER_BUILD")
     if (state.spaceForHarvest(this.creep)) {
         //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity(RESOURCE_ENERGY))
-         state.switchTo(this.creep, gc.STATE_HARVESTER_HARVEST);
+         state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
     }
 
-    const scPos = gf.roomPosFromPos(state.getSourceContainer(this.creep.memory.targetId));
+    const scPos = gf.roomPosFromPos(state.getSourceContainerPos(this.creep.memory.targetId));
     //console.log("scPos of contienr", JSON.stringify(scPos) )
     const container = state.findContainerAt(scPos);
     if (container) {
-        return state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER)
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER)
     }
 
     let site = state.findContainerConstructionAt(gf.roomPosFromPos(scPos, this.creep.room.name));
@@ -68,7 +68,7 @@ StateHarvesterBuild.prototype.enact = function () {
             //console.log("space for harvest", state.spaceForHarvest(this.creep))
             //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
             gf.fatalError("STATE_HARVESTER_BUILD returned ERR_INVALID_TARGET");
-            state.switchTo(this.creep, gc.STATE_HARVESTER_TRANSFER);
+            state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
             break;
             //return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.

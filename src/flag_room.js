@@ -9,11 +9,12 @@ const gf = require("gf");
 const construction = require("construction");
 const tile = require("tile");
 const economy = require("economy");
-
+const flag = require("flag");
 
 function FlagRooom (name) {
     this.name = name;
-    this.m = Game.flags[name].memory;
+    this.m = flag.getRoomFlag(name).memory;
+    console.log("FlagRooom m", JSON.stringify(this.m))
 }
 
 FlagRooom.prototype.placeCentre = function (centre, start) {

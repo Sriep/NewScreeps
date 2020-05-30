@@ -17,7 +17,7 @@ function StateUpgraderUpgrade (creep) {
 StateUpgraderUpgrade.prototype.enact = function () {
     //console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-       return state.switchTo(this.creep, gc.STATE_UPGRADER_WITHDRAW);
+       return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_WITHDRAW);
     }
     this.creep.memory.targetPos = this.creep.pos;
     const home = Game.rooms[this.homeId];
@@ -39,7 +39,7 @@ StateUpgraderUpgrade.prototype.enact = function () {
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             gf.fatalError("ERR_NOT_IN_RANGE");
-            return state.switchTo(creep, gc.STATE_UPGRADER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_IDLE);
 
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("ERR_NO_BODYPART");

@@ -3,6 +3,8 @@
  * Created by piers on 12/05/2020
  * @author Piers Shepperson
  */
+const C = require("./Constants");
+
 const race_upgrader = {
 
     WWCM_COST: 300,
@@ -38,14 +40,14 @@ const race_upgrader = {
     },
 
     boosts: [
-        { priority : 3, resource: RESOURCE_KEANIUM_HYDRIDE, part : CARRY },
-        { priority : 1, resource: RESOURCE_GHODIUM_HYDRIDE, part : WORK },
+        { priority : 3, resource: C.RESOURCE_KEANIUM_HYDRIDE, part : C.CARRY },
+        { priority : 1, resource: C.RESOURCE_GHODIUM_HYDRIDE, part : C.WORK },
 
-        { priority : 3, resource : RESOURCE_KEANIUM_ACID, part : CARRY },
-        { priority : 1, resource : RESOURCE_GHODIUM_ACID, part : WORK },
+        { priority : 3, resource : C.RESOURCE_KEANIUM_ACID, part : C.CARRY },
+        { priority : 1, resource : C.RESOURCE_GHODIUM_ACID, part : C.WORK },
 
-        { priority : 3, resource : RESOURCE_CATALYZED_KEANIUM_ACID, part : CARRY },
-        { priority : 1, resource : RESOURCE_CATALYZED_GHODIUM_ACID, part : WORK },
+        { priority : 3, resource : C.RESOURCE_CATALYZED_KEANIUM_ACID, part : C.CARRY },
+        { priority : 1, resource : C.RESOURCE_CATALYZED_GHODIUM_ACID, part : C.WORK },
 
     ]
 

@@ -15,6 +15,9 @@ StateTowerIdle.prototype.enact = function () {
     if (this.tower.pos.find(FIND_HOSTILE_CREEPS) > 0) {
         state.switchTo(this.tower, gc.STATE_TOWER_DEFEND)
     }
+    if (this.tower.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        return
+    }
 
     let damagedStructure = this.tower.pos.find(FIND_MY_STRUCTURES, {
         filter: (s) =>  { return this.tower.pos.inRangeTo(s.pos)

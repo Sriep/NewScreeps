@@ -6,6 +6,7 @@
 const gc = require("gc");
 //const gf = require("gf");
 const state = require("state");
+const statePorter = require("state_porter");
 
 function StateWorkerFullIdle (creep) {
     this.type = gc.STATE_WORKER_FULL_IDLE;
@@ -38,7 +39,7 @@ StateWorkerFullIdle.prototype.enact = function () {
         );
     }
 
-    const nextSourceContainer = state.findNextEnergyContainer(this.creep);
+    const nextSourceContainer = statePorter.findNextEnergyContainer(this.creep);
     if (nextSourceContainer) {
         this.creep.memory.targetId = nextSourceContainer.id;
         return state.switchToMovePos(

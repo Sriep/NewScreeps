@@ -124,6 +124,17 @@ const race = {
         return lifeLeft;
     },
 
+    partCount : function(creep, type) {
+        const body = creep.body;
+        let parts = 0;
+        for (let i in body) {
+            if (body[i].type === type) {
+                parts++;
+            }
+        }
+        return parts;
+    },
+
     workParts: function(creep) {
         const body = creep.body;
         let Ws = 0;

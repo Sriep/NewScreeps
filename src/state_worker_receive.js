@@ -16,11 +16,11 @@ function StateWorkerReceive (creep) {
 StateWorkerReceive.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_WORKER_RECEIVE")
     const harvester = Game.creeps[this.creep.memory.targetId];
-    if (!harvester || harvester.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    if (!harvester || harvester.store.getUsedCapacity() === 0) {
+        if (this.creep.store.getUsedCapacity() > 0) {
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
         } else {
-            return state.switchTo(this.creep, gc.STATE_WORKER_IDLE);
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
         }
     }
 
@@ -37,15 +37,15 @@ StateWorkerReceive.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE); // todo improve
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE); // todo improve
         case ERR_NOT_IN_RANGE:          // The target is too far away.
-            return state.switchTo(this.creep, gc.STATE_WORKER_IDLE); // todo improve
+            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE); // todo improve
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
             return gf.fatalError("transfer ERR_INVALID_ARGS");
         default:
             return gf.fatalError("harvest unrecognised return value");
     }
-    state.switchTo(this.creep, gc.STATE_WORKER_FULL_IDLE);
+    state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
 };
 
 module.exports = StateWorkerReceive;
