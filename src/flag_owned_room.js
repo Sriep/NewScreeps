@@ -101,13 +101,13 @@ FlagOwnedRoom.prototype.setSourcesLinkPos = function() {
 FlagOwnedRoom.prototype.setControllerLinkPos = function() {
     const room = Game.rooms[this.name];
     const terrain = room.getTerrain();
+    console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
     const posts = this.m.controller.upgraderPosts;
     for (let delta of gc.ONE_MOVE) {
         if (terrain.get(posts.x+delta.x, posts.y+delta.y) !== TERRAIN_MASK_WALL) {
             return new RoomPosition(posts.x+delta.x, posts.y+delta.y, room.name);
         }
     }
-
 };
 
 FlagOwnedRoom.prototype.sourceLinkPos = function(id) {

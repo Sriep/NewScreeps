@@ -72,6 +72,7 @@ const flag = {
         m.invaderCore = invaderCore.length > 0;
 
         const sources = room.find(FIND_SOURCES);
+        console.log("flag sources", sources);
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {
@@ -82,7 +83,7 @@ const flag = {
                 source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
             }
         }
-
+        console.log("flag controller", room.controller);
         if (room.controller) {
             m.controller = { "id" : room.controller.id };
             room.controller.pos.createFlag(room.controller.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
@@ -183,8 +184,9 @@ const flag = {
         }
         spots[0].neighbours.unshift(spots[0].neighbours.splice(containerIndex, 1)[0]);
         memoryObj["harvesterPosts"] = spots[0].neighbours;
-
+        console.log("setContainerAndPosts harvesterPosts", JSON.stringify(harvesterPosts));
         spots[0].pos.roomName = obj.room.name;
+        console.log("setContainerAndPosts containerPos", JSON.stringify(containerPos));
         memoryObj["containerPos"] = spots[0].pos;
     },
 
