@@ -17,7 +17,7 @@ module.exports.loop = function () {
         startup();
         records.startup()
     }
-    
+
     freeCreeps();
     enactPolicies();
     buildingAct();

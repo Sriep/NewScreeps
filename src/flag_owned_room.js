@@ -42,8 +42,9 @@ FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
     const terrain = new Room.Terrain(this.name);
     this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
-    //this.m["plan"][STRUCTURE_LINK+"_2"] = this.sourcesLinkPos();
-    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.sourcesLinkPos())
+
+    this.m["plan"][STRUCTURE_LINK].push(this.setControllerLinkPos());
+    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos())
 };
 
 FlagOwnedRoom.prototype.findLocationForCentre = function(centre, avoid) {
@@ -97,11 +98,19 @@ FlagOwnedRoom.prototype.setSourcesLinkPos = function() {
     return links;
 };
 
-FlagOwnedRoom.prototype.sourceLinkPos = function(id) {
+FlagOwnedRoom.prototype.setControllerLinkPos = function() {
+    const room = Game.rooms[this.name];
+    const terrain = room.getTerrain();
+    const posts = this.m.controller.upgraderPosts;
+    for (let delta of gc.ONE_MOVE) {
+        if (terrain.get(posts.x+delta.x, posts.y+delta.y) !== TERRAIN_MASK_WALL) {
+            return new RoomPosition(posts.x+delta.x, posts.y+delta.y, room.name);
+        }
+    }
 
 };
 
-FlagOwnedRoom.prototype.controllerLinkPos = function() {
+FlagOwnedRoom.prototype.sourceLinkPos = function(id) {
 
 };
 

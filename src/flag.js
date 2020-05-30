@@ -43,7 +43,7 @@ const flag = {
     },
 
     flagRoom: function (roomName) {
-        //console.log("flagRoom", roomName,"Game.flags[roomName]",Game.flags[roomName]);
+        console.log("flagRoom", roomName,"Game.flags[roomName]",Game.flags[roomName]);
         if (!Game.flags[roomName]) {
             const room = Game.rooms[roomName];
             const centre = new RoomPosition(25, 25, room.name);
@@ -144,6 +144,7 @@ const flag = {
 
 
     setMineralContainers : function(room) {
+        console.log("setMineralContainers", room.name);
         const m = Game.flags[room.name].memory;
         const minerals = room.find(FIND_MINERALS);
         if ( minerals.length > 1) {
@@ -154,6 +155,7 @@ const flag = {
     },
 
     setSourceContainers : function (room) {
+        console.log("setSourceContainers", room.name);
         const m = Game.flags[room.name].memory;
         const sources = room.find(FIND_SOURCES);
         for (let source of sources) {
@@ -162,6 +164,7 @@ const flag = {
     },
 
     setContainerAndPosts : function(obj, memoryObj) {
+        console.log("setContainerAndPosts", obj);
         let spots = economy.findMostFreeNeighbours(
             obj.room, obj.pos, 1
         );
@@ -180,11 +183,12 @@ const flag = {
         spots[0].neighbours.unshift(spots[0].neighbours.splice(containerIndex, 1)[0]);
         memoryObj["harvesterPosts"] = spots[0].neighbours;
 
-        spots[0].pos.roomName = source.room.name;
+        spots[0].pos.roomName = obj.room.name;
         memoryObj["containerPos"] = spots[0].pos;
     },
 
     setControllerContainers : function (room) {
+        console.log("setControllerContainers", room.name);
         const m = Game.flags[room.name].memory;
         const terrain = room.getTerrain();
         let spots = construction.coverArea(room.controller.pos, 3, terrain);
