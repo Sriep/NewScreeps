@@ -5,6 +5,7 @@
  */
 
 const economy = require("economy");
+const construction = require("construction");
 const gc = require("gc");
 
 const flag = {
