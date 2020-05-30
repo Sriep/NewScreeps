@@ -13,7 +13,7 @@ const flag = require("flag");
 function FlagOwnedRoom (name) {
     this.name = name;
     this.m = flag.getRoomFlag(name).memory;
-    console.log("FlagRooom m", JSON.stringify(this.m))
+    //console.log("FlagRooom m", JSON.stringify(this.m))
 }
 
 FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
@@ -101,10 +101,11 @@ FlagOwnedRoom.prototype.setSourcesLinkPos = function() {
 FlagOwnedRoom.prototype.setControllerLinkPos = function() {
     const room = Game.rooms[this.name];
     const terrain = room.getTerrain();
-    console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
-    const posts = this.m.controller.upgraderPosts;
+    //console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
+    const posts = this.m.controller.upgraderPosts[0];
     for (let delta of gc.ONE_MOVE) {
         if (terrain.get(posts.x+delta.x, posts.y+delta.y) !== TERRAIN_MASK_WALL) {
+            //console.log("setControllerLinkPos x",posts.x+delta.x,"y",posts.y+delta.y,"name", room.name)
             return new RoomPosition(posts.x+delta.x, posts.y+delta.y, room.name);
         }
     }

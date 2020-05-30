@@ -281,7 +281,7 @@ const policy = {
         sourceFlag.memory.containerPos = spots[0].pos;
         */
         const fRoom = new FlagRoom(obj.room.name);
-        const cPos = fRoom.getSourceContainerPos();
+        const cPos = fRoom.getSourceContainerPos(obj.id);
         if (state.findContainerOrConstructionAt(gf.roomPosFromPos(cPos))) {
             return;
         }

@@ -9,7 +9,7 @@ const flag = require("flag");
 function FlagRoom (name) {
     this.name = name;
     this.m = flag.getRoomFlag(name).memory;
-    console.log("FlagRoom m", JSON.stringify(this.m))
+    //console.log("FlagRoom m", JSON.stringify(this.m))
 }
 
 FlagRoom.prototype.getSources = function () {
@@ -29,6 +29,7 @@ FlagRoom.prototype.getSourcePosts = function(sourceId) {
 };
 
 FlagRoom.prototype.getSourceContainerPos = function (sourceId) {
+    //console.log("getSourceContainerPos", sourceId, "mem", JSON.stringify(this.m.sources));
     return this.m.sources[sourceId].containerPos;
 };
 
