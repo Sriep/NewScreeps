@@ -3,7 +3,7 @@
  * Created by piers on 05/05/2020
  * @author Piers Shepperson
  */
-const gf = require("gf");
+//const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
@@ -85,9 +85,9 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     const canBuildUpgrader = wUpgrader < resources.uW - 0.2;
     const canBuildReserver = rReserver < resources.rC - 0.2;
 
-    if (room.energyAvailable < room.energyCapacityAvailable) {
-        return;
-    }
+    //if (room.energyAvailable < room.energyCapacityAvailable) {
+    //    return;
+    //}
 
     if (canBuildHarvesters
         && (!canBuildWorkers || wHarvester <= cWorker
@@ -95,7 +95,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_HARVESTER,
-            gf.roomEc(room),
+            room.energyCapacityAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
@@ -106,7 +106,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_WORKER,
-            gf.roomEc(room),
+            room.energyCapacityAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
@@ -117,7 +117,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_PORTER,
-            gf.roomEc(room),
+            room.energyCapacityAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
@@ -128,7 +128,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_RESERVER,
-            gf.roomEc(room),
+            room.energyCapacityAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );
@@ -139,7 +139,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         policy.sendOrderToQueue(
             room,
             gc.RACE_UPGRADER,
-            gf.roomEc(room),
+            room.energyCapacityAvailable,
             this.parentId,
             gc.SPAWN_PRIORITY_LOCAL
         );

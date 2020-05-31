@@ -7,7 +7,7 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
-const RoomFlag = require("room_flag");
+const RoomFlag = require("flag_room");
 
 function StateHarvesterBuild (creep) {
     this.type = gc.STATE_HARVESTER_BUILD;

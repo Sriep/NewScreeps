@@ -20,13 +20,16 @@ StateUpgraderWithdraw.prototype.enact = function () {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
     }
     const fRoom = new FlagOwnedRoom(this.creep.room.name);
-    const controllerLink = state.getObjAtPos(fRoom.controllerLinkPos(), STRUCTURE_LINK);
-    if (controllerLink) {
-        if (this.creep.pos.isNearTo(controllerLink)) {
-            if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-                const result = this.creep.pos.withdraw(controllerLink, RESOURCE_ENERGY);
-                if (result === OK) {
-                    state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
+    const cLinkPos = fRoom.controllerLinkPos();
+    if (cLinkPos) {
+        const controllerLink = state.getObjAtPos(cLinkPos, STRUCTURE_LINK);
+        if (controllerLink) {
+            if (this.creep.pos.isNearTo(controllerLink)) {
+                if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+                    const result = this.creep.pos.withdraw(controllerLink, RESOURCE_ENERGY);
+                    if (result === OK) {
+                        state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE)
+                    }
                 }
             }
         }

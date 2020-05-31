@@ -28,6 +28,13 @@ FlagRoom.prototype.getSourcePosts = function(sourceId) {
     return this.m.sources[sourceId].harvesterPosts;
 };
 
+FlagRoom.prototype.getContainerPos = function (id) {
+    if (id === this.m.mineral.id) {
+        return this.getMineralContainerPos();
+    }
+    return this.getSourceContainerPos(id);
+};
+
 FlagRoom.prototype.getSourceContainerPos = function (sourceId) {
     //console.log("getSourceContainerPos", sourceId, "mem", JSON.stringify(this.m.sources));
     return this.m.sources[sourceId].containerPos;
@@ -36,8 +43,6 @@ FlagRoom.prototype.getSourceContainerPos = function (sourceId) {
 FlagRoom.prototype.getControllerPosts = function () {
     return this.m.controller.upgraderPosts;
 };
-
-
 
 FlagRoom.prototype.getMineralContainerPos = function() {
     return this.m.mineral.containerPos;

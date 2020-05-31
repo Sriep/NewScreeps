@@ -14,17 +14,18 @@ function StateWorkerBuild (creep) {
 }
 
 StateWorkerBuild.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_WORKER_BUILD");
+    //console.log(this.creep.name, "in STATE_WORKER_BUILD");
     if (this.creep.store.getUsedCapacity() === 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
+    //console.log("STATE_WORKER_BUILD target",target,"target",JSON.stringify(target));
     if (!target) {
-        console.log("STATE_WORKER_BUILD no target id", this.creep.memory.targetId);
+        //console.log("STATE_WORKER_BUILD no target id", this.creep.memory.targetId);
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const result = this.creep.build(target);
-    console.log("STATE_WORKER_BUILD result", result);
+    //console.log("STATE_WORKER_BUILD result", result);
     switch (result) {
         case OK:
             break;
@@ -36,6 +37,7 @@ StateWorkerBuild.prototype.enact = function () {
             return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:
             // no longer valid build, maybe the room's rcl dropped.
+            //console.log(this.creep.name,"STATE_WORKER_BUILD ERR_INVALID_TARGET")
             target.remove();
             delete this.creep.memory.targetId;
             return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
@@ -46,7 +48,7 @@ StateWorkerBuild.prototype.enact = function () {
         default:
             return gf.fatalError("no valid result");
     }
-    console.log("STATE_WORKER_BUILD dropped though")
+    //console.log("STATE_WORKER_BUILD dropped though")
 };
 
 module.exports = StateWorkerBuild;

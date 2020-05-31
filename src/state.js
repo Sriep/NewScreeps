@@ -50,7 +50,7 @@ const state = {
     },
 
     switchToMoveFlag(creep, flag, range, nextState) {
-        console.log(creep.name,"switchToMoveFlag flag",flag.name,"range", range,"nextstate", nextState);
+        //console.log(creep.name,"switchToMoveFlag flag",flag.name,"range", range,"nextstate", nextState);
         creep.memory.state = gc.STATE_MOVE_TARGET;
         creep.memory.targetName = flag.name;
         creep.memory.moveRange = range;

@@ -28,56 +28,72 @@ PolicyLabs.prototype.initilise = function () {
 
 // runs once every tick
 PolicyLabs.prototype.enact = function () {
+    const products = this.assesBoosts(3);
+    console.log("POLICY_LABS products", JSON.stringify(products));
 };
 
 PolicyLabs.prototype.draftReplacment = function() {
     return this
 };
 
-PolicyLabs.prototype.assesBoosts = function() {
+PolicyLabs.prototype.assesBoosts = function(numLabs) {
     const totals = this.countResources();
-    const products = {};
+    let products = {};
     for (let reagent1 of totals) {
         if (C.REACTIONS[reagent1]) {
             for (let reagent2 of totals) {
                 if (C.REACTIONS[reagent1][reagent2]) {
-                    products.push({
-                        [C.REACTIONS[reagent1][reagent2]] : {
+                    products[C.REACTIONS[reagent1][reagent2]] = {
                             reagent1:  reagent1,
-                            reagent2:  reagent2,}
-                    })
+                            reagent2:  reagent2,
+                    }
                 }
             }
         }
     }
     let productCount = Object.keys(products).length;
-    if (productCount === 0) {
+    if (numLabs < 5 || productCount === 0) {
         return products
     }
+
+    products = this.findProducts(totals, products);
+    const productCount2 = Object.keys(products).length;
+    if (numLabs < 7 || productCount === newProductCount) {
+        return products
+    }
+
+    products = this.findProducts(totals, products);
+    const productCount3 = Object.keys(products).length;
+    if (numLabs < 9 || productCount2 === productCount3) {
+        return products
+    }
+
+    products = this.findProducts(totals, products);
+    return products
+};
+
+PolicyLabs.prototype.findProducts = function(totals, products) {
     for (let reagent1 in products) {
         if (C.REACTIONS[reagent1]) {
             for (let reagent2 of totals) {
                 if (C.REACTIONS[reagent1][reagent2]) {
-                    products.push({
+                    products[C.REACTIONS[reagent1][reagent2]] = {
                         reagent1:  reagent1,
                         reagent2:  reagent2,
-                        result: REACTIONS[reagent1][reagent2]
-                    })
+                    }
                 }
             }
             for (let reagent2 in products) {
                 if (C.REACTIONS[reagent1][reagent2]) {
-                    products.push({
+                    products[C.REACTIONS[reagent1][reagent2]] = {
                         reagent1:  reagent1,
                         reagent2:  reagent2,
-                        result: C.REACTIONS[reagent1][reagent2]
-                    })
+                    }
                 }
             }
         }
     }
-
-
+    return products;
 };
 
 PolicyLabs.prototype.countResources = function() {

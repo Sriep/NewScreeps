@@ -36,7 +36,7 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
         for ( let id in this.m.spawns[i]) {
             const data = this.m.spawns[i][id];
             if  (!data) { // probably should not happen.
-                console.log("spawnNext if  (!data) had data", data,"deleting",i,id);
+                //console.log("spawnNext if  (!data) had data", data,"deleting",i,id);
                 delete this.m.spawns[i][id];
                 continue;
             }
@@ -46,20 +46,20 @@ SpawnQueue.prototype.spawnNext = function (spawnObj) {
                 this.m.nextCreepId = this.m.nextCreepId +1;
             }
             if (result === ERR_BUSY || result === ERR_NOT_ENOUGH_ENERGY) {
-                console.log("spawnNext result", result, "Try again later");
+                //console.log("spawnNext result", result, "Try again later");
                 return result;
             }
             delete this.m.spawns[i][id];
             if (result === OK) {
                 if (result !== OK) {
-                    console.log("body",data.body, "name", name, "opts", optsDryRun);
+                    //console.log("body",data.body, "name", name, "opts", optsDryRun);
                     return gf.fatalError("spawn gives different result to dry run", result)
                 }
                 this.m.nextCreepId = this.m.nextCreepId +1;
                 return OK;
             }
             if (result === ERR_NOT_OWNER && result !== ERR_NAME_EXISTS) {
-                console.log("body",data.body, "name", name, "opts", optsDryRun);
+                //console.log("body",data.body, "name", name, "opts", optsDryRun);
                 return gf.fatalError("spawnCreep failed result");
             }
             delete this.m.spawns[i][id];

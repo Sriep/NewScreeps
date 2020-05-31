@@ -7,6 +7,7 @@
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
+const FlagRoom = require("flag_room");
 
 // constructor
 function PolicyBuildControllerContainers  (id, data) {
@@ -37,7 +38,7 @@ PolicyBuildControllerContainers.prototype.enact = function () {
     //if (fRoom.getControllerPosts()) {
     //     return;
     //}
-    this.setContainerSites(room);
+    this.setContainerSites();
 };
 
 PolicyBuildControllerContainers.prototype.setContainerSites = function() {
@@ -59,10 +60,13 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function() {
     const posts = fRoom.getControllerPosts();
     for (let post of posts) {
         const pos = gf.roomPosFromPos(post);
-        const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
-        if (result !== OK) {
-            gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS controller container construction failed " + result.toString());
+        if (!state.findContainerOrConstructionAt(gf.roomPosFromPos(pos))) {
+            const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
+            if (result !== OK) {
+                gf.fatalError("POLICY_BUILD_CONTROLLER_CONTAINERS controller container construction failed " + result.toString());
+            }
         }
+
     }
 };
 

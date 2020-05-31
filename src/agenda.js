@@ -94,6 +94,7 @@ const agenda = {
             { "activity": gc.POLICY_BUILD_EXTRACTORS},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LINK}},
             { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_LAB}},
+            { "activity": gc.POLICY_LABS},
             { "activity": gc.POLICY_BUILD_ROADS, "params" : {
                     "fromFind" : FIND_SOURCES,
                     "toFind" : FIND_MY_STRUCTURES,
@@ -149,6 +150,7 @@ const agenda = {
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;
+        fc[gc.POLICY_LABS] = newPolicy;
         fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
         fc[gc.POLICY_BUILD_EXTRACTORS] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;

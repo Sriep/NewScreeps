@@ -260,28 +260,9 @@ const policy = {
     },
 
     buildSourceContainer : function (obj) {
-        //console.log("POLICY_BUILD_SOURCE_CONTAINERS buildSourceContainer");
-        //if (state.getSourceContainerPos(obj.id)) {
-        //    return;
-        //}
-/*
-        let spots = economy.findMostFreeNeighbours(
-            obj.room, obj.pos, 1
-        );
-        if (spots.length === 0) {
-            return gf.fatalError("findMostFreeNeighbours cant get to source");
-        }
-        let sourceFlag = Game.flags[obj.id];
-        if (!sourceFlag) {
-            obj.pos.createFlag(obj.id);
-            sourceFlag = Game.flags[obj.id];
-        }
-        sourceFlag.memory.harvesterPosts = spots[0].neighbours;
-        spots[0].pos.roomName = obj.room.name;
-        sourceFlag.memory.containerPos = spots[0].pos;
-        */
+        console.log("buildSourceContainer objid",obj.id,"obj",JSON.stringify(obj));
         const fRoom = new FlagRoom(obj.room.name);
-        const cPos = fRoom.getSourceContainerPos(obj.id);
+        const cPos = fRoom.getContainerPos(obj.id);
         if (state.findContainerOrConstructionAt(gf.roomPosFromPos(cPos))) {
             return;
         }

@@ -11,7 +11,7 @@ const FlagRoom = require("flag_room");
 const statePorter = {
 
     findUpgradeContainerToFill : function(room) {
-        const fRoom = FlagRoom(room.name);
+        const fRoom = new FlagRoom(room.name);
         const containerPosts = fRoom.getControllerPosts();
         if (!containerPosts) {
             return undefined;

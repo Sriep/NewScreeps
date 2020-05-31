@@ -24,7 +24,7 @@ StateHarvesterIdle.prototype.enact = function () {
 
     const governor = policy.getGouvernerPolicy(this.homeId);
     const nextPost = this.nextFreeHarvesterPost(governor.getColonies());
-    console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
     if (nextPost) {
         //console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
         this.m.targetId = nextPost.id;

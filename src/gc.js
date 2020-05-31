@@ -169,6 +169,8 @@ const gc = {
     STATE_LAB_IDLE: "state_lab_idle",
     STATE_LAB_PEACE: "state_lab_peace",
     STATE_LAB_WAR: "state_lab_war",
+    // terminal
+    STATE_TERMINAL_IDLE: "terminal_idle",
     // cog
     STATE_COG_IDLE: "cog_idle",
     STATE_COG_WITHDRAW: "cog_withdraw",

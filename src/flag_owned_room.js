@@ -115,6 +115,10 @@ FlagOwnedRoom.prototype.sourceLinkPos = function(id) {
 
 };
 
+FlagOwnedRoom.prototype.controllerLinkPos = function(id) {
+
+};
+
 FlagOwnedRoom.prototype.sLinkPos = function(source) {
     const containerPos = this.m.sources[source.id]["containerPos"];
     const terrain = source.room.getTerrain();
