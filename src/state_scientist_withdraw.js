@@ -38,7 +38,7 @@ StateScientistWithdraw.prototype.enact = function () {
     for (let lab of labs) {
         const lFlag = Game.flags[lab.id];
         const flagResource = lr.resource(lFlag.color, lFlag.secondaryColor);
-        if (lab.mineralType !== flagResource) {
+        if (flagResource && lab.mineralType && lab.mineralType !== flagResource) {
             const ok = this.creep.withdraw(lab, lab.mineralType);
             if  (ok) {
                 return state.switchTo(this.creep, this.creep.memory, state.STATE_SCIENTIST_TRANSFER);

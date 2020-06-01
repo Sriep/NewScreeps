@@ -22,12 +22,13 @@ StatePorterWithdraw.prototype.enact = function () {
    //console.log(this.creep.name, "in STATE_PORTER_WITHDRAW this.creep.m", JSON.stringify(this.m));
     let target;
     if (this.m.targetPos) {
-        target = state.findContainerAt(new RoomPosition(
+        target = this.getTarget(new RoomPosition(
             this.m.targetPos.x,
             this.m.targetPos.y,
-            this.m.targetPos.roomName
+            this.creep.room.name
         ))
     }
+
     if (!target) {
         if (this.creep.store.getUsedCapacity() > 0) {
             return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
@@ -36,7 +37,7 @@ StatePorterWithdraw.prototype.enact = function () {
         }
     }
 
-    const result = this.creep.withdraw(target, RESOURCE_ENERGY);
+    const result = this.creep.withdraw(target.struct, target.resource);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -64,6 +65,30 @@ StatePorterWithdraw.prototype.enact = function () {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
     }
 
+};
+
+StatePorterWithdraw.prototype.getTarget = function(pos) {
+    const StructAt = pos.lookFor(LOOK_STRUCTURES);
+    for (let struct of StructAt) {
+        switch(struct.structureType) {
+            case STRUCTURE_CONTAINER:
+            case STRUCTURE_STORAGE:
+            case STRUCTURE_TERMINAL:
+                return {struct: struct, resource: RESOURCE_ENERGY};
+            case STRUCTURE_LINK:
+                if (gf.loadFromFlag(struct)) {
+                    return {struct: struct, resource: RESOURCE_ENERGY};
+                }
+                break;
+            case STRUCTURE_LAB:
+                const lFlag = Game.flags[lab.id];
+                if (struct.mineralType !== lr.resource(lFlag.color, lFlag.secondaryColor)) {
+                    return {struct: struct, resource: struct.mineralType};
+                }
+                break;
+            default:
+        }
+    }
 };
 
 module.exports = StatePorterWithdraw;

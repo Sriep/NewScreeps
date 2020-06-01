@@ -37,7 +37,7 @@ StatePorterTransfer.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
-            return state.switchToFullIdle();
+            return state.switchTo(this.creep, this.m, gc.STATE_PORTER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("transfer ERR_NOT_IN_RANGE");
         case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -47,9 +47,21 @@ StatePorterTransfer.prototype.enact = function () {
     }
 };
 
-StatePorterTransfer.prototype.findTransferResource = function(target, source) {
-    for (let resource in source) {
-        if (target.getFreeCapacity(resource) > 0 && source[resource] > 0) {
+StatePorterTransfer.prototype.findTransferResource = function(target, store) {
+    if (target.structureType === STRUCTURE_LAB) {
+        const lFlag = Game.flags[lab.id];
+        const resource = lr.resource(lFlag.color, lFlag.secondaryColor)
+        if (resource && store[resource] > 0) {
+            return resource;
+        }
+        if (target.store.getFreeCapacity(RESOURCE_ENERGY) && store[RESOURCE_ENERGY] > 0) {
+            return RESOURCE_ENERGY;
+        }
+        return;
+    }
+
+    for (let resource in store) {
+        if (target.getFreeCapacity(resource) > 0 && store[resource] > 0) {
             return resource;
         }
     }

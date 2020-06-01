@@ -106,36 +106,38 @@ StatePorterFullIdle.prototype.mainResource = function (store) {
 
 module.exports = StatePorterFullIdle;
 
-StatePorterFullIdle.prototype.findNextMineralStorage = function (resource) {
+StatePorterFullIdle.prototype.findNextMineralStorage = function () {
+    const room = this.creep.room;
     const labs = this.creep.room.find(FIND_MY_STRUCTURES, {
         filter: lab =>  {
-            return  lab.structureType === STRUCTURE_LAB
-                && lab.store[resource] > 0
-                && lab.store.getFreeCapacity(resource) >= this.creep.store[resource]
+            if (lab.structureType === STRUCTURE_LAB) {
+                const lFlag = Game.flags[lab.id];
+                const resource = lr.resource(lFlag.color, lFlag.secondaryColor);
+                return  resource && this.creep.store[resource] > 0
+                    && lab.store.getUsedCapacity(resource) <
+                    lab.store.getCapacity(resource)*gc.LAB_REFILL_THRESHOLD
+            } else {
+                return false;
+            }
         }
     });
     if (labs.length > 0) {
         return labs[0];
     }
 
-    const storage = this.creep.room.find(FIND_MY_STRUCTURES, {
-        filter: s => { return s.structureType === STRUCTURE_STORAGE }
-    });
-    if (storage &&
-        storage.store.getFreeCapacity() >= this.creep.store[resource]) {
-        return storage
+    if (room.terminal) {
+        const tFlag = Game.flags[room.terminal.id];
+        if (this.creep.store[lr.resource(tFlag.color, tFlag.secondaryColor)] > 0) {
+            return room.terminal
+        }
     }
 
-    const terminal = this.creep.room.find(FIND_MY_STRUCTURES, {
-        filter: s => { return s.structureType === STRUCTURE_TERMINAL }
-    });
-    if (terminal &&
-        storage.store.getFreeCapacity() > 0) {
-        return terminal
+    if (room.storage && room.storage.store.getFreeCapacity() >= 0) {
+        return room.storage
     }
 
-    if (storage && storage.store.getFreeCapacity() > 0) {
-        return storage;
+    if (room.terminal && room.terminal.store.getFreeCapacity() > 0) {
+        return room.terminal
     }
 };
 

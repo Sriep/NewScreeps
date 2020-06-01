@@ -117,6 +117,8 @@ StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
 };
 
 StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
+    this.chekcFlags();
+
     let porters = _.filter(Game.creeps, c => {
         return  c.memory.targetId && race.getRace(c) === gc.RACE_PORTER
     });
@@ -161,6 +163,36 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
     }
     return containerInfo;
 };
+
+StatePorterIdle.prototype.checkFlags = function () {
+    const foRoom = new FlagOwnedRoom(this.home);
+    const labPos = foRoom.plan.lab.slice(foRoom.plan.base_labs);
+    const labs = room.find(FIND_MY_STRUCTURES, {
+        filter: obj => {
+            if (obj.structureType === STRUCTURE_LAB) {
+                for (let pos of labPos) {
+                    if (pos.x === obj.pos.x && pos.y === obj.pos.y) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    });
+    for (let lab of labs) {
+        const lFlag = Game.flags[lab.id];
+        const flagResource = lr.resource(lFlag.color, lFlag.secondaryColor);
+        if (flagResource && lab.mineralType && lab.mineralType !== flagResource) {
+            return state.switchToMovePos(
+                this.creep,
+                lab.pos,
+                gc.RANGE_TRANSFER,
+                gc.STATE_PORTER_TRANSFER
+            )
+        }
+    }
+};
+
 
 
 
