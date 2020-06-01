@@ -92,7 +92,7 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
             }
         }
     }
-    //console.log("checkRoom profitableRooms",JSON.stringify(profitableRooms));
+    console.log("POLICY_COLONIAL_OFFICE checkRoom profitableRooms",JSON.stringify(profitableRooms));
     profitableRooms = profitableRooms.sort( (a,b) =>  {
         return b["profitParts"] - a["profitParts"];
     });

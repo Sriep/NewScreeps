@@ -9,6 +9,7 @@ const gf = require("gf");
 const construction = require("construction");
 const tile = require("tile");
 const flag = require("flag");
+const lr = require("lab_reactions");
 
 function FlagOwnedRoom (name) {
     this.name = name;
@@ -140,9 +141,8 @@ FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
         { filter: s => { return s.structureType === C.STRUCTURE_LAB }
         }
     );
-    //const rMap = gf.reagentMap(boost, stores);
-    const mapping = gf.mapReagentsToLabs(
-        gf.reagentMap(boost, stores),
+    const mapping = lr.mapReagentsToLabs(
+        lr.reagentMap(boost, stores),
         [...Array(labs.length).keys()],
         [...Array(labs.length).keys()],
         [],
@@ -150,31 +150,27 @@ FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
         this.m.base_labs
     );
     this.colourLabFlags(mapping);
-//(leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs)
-    //this.colourLabFlags(labs, reagents);//.concat(Array(8).fill(boost)));
 };
-
-
 
 /*
 FlagOwnedRoom.prototype.reagentSplit = function(labs, boost, store) {
     let reagents = [boost];
-    reagents = gf.expandReagentArray(reagents, store);
+    reagents = lr.expandReagentArray(reagents, store);
     if (labs.length <= 4) {
         return reagents
     }
 
-    reagents = gf.expandReagentArray(reagents, store);
+    reagents = lr.expandReagentArray(reagents, store);
     if (labs.length <= 6) {
         return reagents
     }
 
-    reagents = gf.expandReagentArray(reagents, store);
+    reagents = lr.expandReagentArray(reagents, store);
     if (labs.length < 10 || this.m.plan.base_labs <= 4) {
         return reagents
     }
 
-    return gf.expandReagentArray(reagents, store);
+    return lr.expandReagentArray(reagents, store);
 };
 */
 

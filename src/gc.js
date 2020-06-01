@@ -172,27 +172,14 @@ const gc = {
     STATE_LAB_WAR: "state_lab_war",
     // terminal
     STATE_TERMINAL_IDLE: "terminal_idle",
-    // cog
-    STATE_COG_IDLE: "cog_idle",
-    STATE_COG_WITHDRAW: "cog_withdraw",
-    STATE_COG_TRANSFER: "cog_transfer",
+    // scientist
+    STATE_SCIENTIST_IDLE: "scientist_idle",
+    STATE_SCIENTIST_WITHDRAW:  "scientist_withdraw",
+    STATE_SCIENTIST_TRANSFER:  "scientist_transfer",
 
     MAX_STATE_STACK: 5,
 
-    //flag colours
-    FLAG_PERMANENT_COLOUR:      C.COLORS_ALL[C.COLOR_BLUE],
-    FLAG_SOURCE_COLOUR:         C.COLORS_ALL[C.COLOR_YELLOW],
-    FLAG_CONTROLLER_COLOUR:     C.COLORS_ALL[C.COLOR_PURPLE],
-    FLAG_MINERAL_COLOUR:        C.COLORS_ALL[C.COLOR_GREY],
-    FLAG_KEEPERS_LAIR_COLOUR:   C.COLORS_ALL[C.COLOR_ORANGE],
-    FLAG_STRUCTURE_COLOUR:      C.COLORS_ALL[C.COLOR_BROWN],
-    FLAG_LINK_COLOUR:           C.COLORS_ALL[C.COLOR_CYAN],
-    FLAG_HARVEST_KEEPER_COLOUR: C.COLORS_ALL[C.COLOR_RED],
-    FLAG_PORTAL_COLOUR:         C.COLORS_ALL[C.COLOR_BLUE],
-    FLAG_TERMINAL_COLOUR:       C.COLORS_ALL[C.COLOR_PURPLE],
-    FLAG_LAB_COLOUR:            C.COLORS_ALL[C.COLOR_GREY],
-    FLAG_CONTAINER_COLOUR:      C.COLORS_ALL[C.COLOR_BROWN],
-    FLAG_IGNORE_COLOUR:         C.COLORS_ALL[C.COLOR_RED],
+
 
     ATOMIC_RESOURCES: [
         C.RESOURCE_HYDROGEN,
@@ -239,8 +226,12 @@ const gc = {
         C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
     ],
 
+    //flag colours
+    FLAG_CLEAR_OBJ:         { color : C.COLOR_WHITE , secondaryColor : C.COLOR_RED },
+    FLAG_STORAGE_OBJ:       { color : C.COLOR_WHITE , secondaryColor : C.COLOR_WHITE },
+
     LAB_COLOURS: {
-        [C.RESOURCE_ENERGY] : { color : C.COLOR_WHITE , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_ENERGY] : { color : C.COLOR_YELLOW , secondaryColor : C.COLOR_YELLOW },
         [C.RESOURCE_POWER] : { color : C.COLOR_RED , secondaryColor : C.COLOR_RED },
 
         [C.RESOURCE_HYDROGEN] : { color : C.COLOR_GREY , secondaryColor : C.COLOR_WHITE },
@@ -383,6 +374,7 @@ const gc = {
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
     REFILL_THRESHOLD: 0.8,
+    LAB_REFILL_THRESHOLD: 0.8,
     EMERGENCY_DOWNGRADING_THRESHOLD: 3000,
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,

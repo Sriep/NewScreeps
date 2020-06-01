@@ -75,7 +75,7 @@ PolicyGovern.prototype.govern = function () {
 PolicyGovern.prototype.getColonies = function() {
     return [...this.m.colonies]
 };
-
+/*
 PolicyGovern.prototype.budget = function() {
     let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
     //console.log("POLICY_GOVERN getRoomEconomyPolicy parts", JSON.stringify(localBudget));
@@ -98,6 +98,7 @@ PolicyGovern.prototype.budget = function() {
     //console.log("POLICY_GOVERN parts", this.m.parts, "budget this.m.colonies", JSON.stringify(this.m.colonies));
     return result
 };
+*/
 
 PolicyGovern.prototype.updateColonyInfo = function() {
     this.m.parts = 0;
@@ -107,7 +108,7 @@ PolicyGovern.prototype.updateColonyInfo = function() {
     this.m.colonies[0]["profit"] = localBudget.profit;
     this.m.colonies[0]["profitpart"] = localBudget.profitpart;
     for (let colony of this.m.colonies) {
-        this.m.parts += this.m.colonies[0]["parts"];
+        this.m.parts += this.m.colonies[colony]["parts"];
     }
 };
 
@@ -151,7 +152,7 @@ PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost
 
     this.updateColonyInfo();
 
-    let tempColonies = [...this.m.colonies];
+    let tempColonies = JSON.parse(JSON.stringify(this.m.colonies.splice(0,1)));
     let tempParts = this.m.parts;
 
     const newColonyProfitParts = profit/parts;
@@ -169,7 +170,9 @@ PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost
     });
     this.m.parts = tempParts;
     console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
-    this.m.colonies = [...tempColonies];
+    const temp = this.m.colonies[0];
+    this.m.colonies = JSON.parse(JSON.stringify(tempColonies));
+    this.m.colonies.unshift(temp);
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     return true;
 };
