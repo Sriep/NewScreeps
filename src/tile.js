@@ -38,9 +38,10 @@ const tile = {
         "y_dim": 6,
         [C.STRUCTURE_LAB] : [
             {"x":2,"y":3},{"x":2,"y":4},{"x":3,"y":3},
-            {"x":2,"y":5},
-            {"x":1,"y":3},{"x":1,"y":2},{"x":2,"y":2},{"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4}
+            {"x":2,"y":5},{"x":1,"y":3},{"x":1,"y":2},
+            {"x":2,"y":2},{"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4}
         ],
+        ["base_labs"] : 4,
         [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
         [C.STRUCTURE_TERMINAL] : [{"x":4,"y":5}],
         [C.STRUCTURE_LINK] : [{"x":3,"y":5}],
@@ -65,12 +66,37 @@ const tile = {
             {"x":2,"y":4},{"x":3,"y":1},{"x":4,"y":1},
             {"x":1,"y":3},{"x":1,"y":4},{"x":5,"y":2},{"x":5,"y":3}
         ],
+        ["base_labs"] : 4,
         [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
         [C.STRUCTURE_TERMINAL] : [{"x":3,"y":4}],
         [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
         [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":1,"y":1},{"x":5,"y":0}],
         [C.STRUCTURE_POWER_SPAWN] : [{"x":0,"y":2}],
         "cog" : [{"x":3,"y":3},{"x":4,"y":2}],
+        [C.STRUCTURE_OBSERVER]:  [{"x":0,"y":5}]
+    },
+
+    CENTRE_6x6_3 : {
+        "origin" : {"x":0,"y":0},
+        "x_dim" : 6,
+        "y_dim": 6,
+        [C.STRUCTURE_LAB] : [
+            {"x":2,"y":2},{"x":2,"y":3},{"x":3,"y":2},
+            {"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4},
+            {"x":3,"y":1},{"x":2,"y":1},{"x":1,"y":1},{"x":4,"y":1}
+        ],
+        ["lab_map"] : [
+            [1,2,3,4,5,6,7,8,9],[0,2,3,4,5,6,7,8,9],[0,1,3,4,5,6,7,8,9],
+            [0,1,2,4,5,6,7,8],[0,1,2,3,5],[0,1,2,3,4],
+            [0,1,2,3,7,8,9],[0,1,2,3,6,8,9],[0,1,2,3,6,7],[0,1,2,6,7]
+        ],
+        ["base_labs"] : 4,
+        [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
+        [C.STRUCTURE_TERMINAL] : [{"x":3,"y":4}],
+        [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
+        [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":0,"y":2},{"x":5,"y":0}],
+        [C.STRUCTURE_POWER_SPAWN] : [{"x":5,"y":2}],
+        "scientist" : [{"x":3,"y":3}],
         [C.STRUCTURE_OBSERVER]:  [{"x":0,"y":5}]
     },
 

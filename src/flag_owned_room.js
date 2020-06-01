@@ -13,7 +13,6 @@ const flag = require("flag");
 function FlagOwnedRoom (name) {
     this.name = name;
     this.m = flag.getRoomFlag(name).memory;
-    //console.log("FlagRooom m", JSON.stringify(this.m))
 }
 
 FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
@@ -136,6 +135,66 @@ FlagOwnedRoom.prototype.sLinkPos = function(source) {
     }
 };
 
+FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
+    const labs = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES,
+        { filter: s => { return s.structureType === C.STRUCTURE_LAB }
+        }
+    );
+    //const rMap = gf.reagentMap(boost, stores);
+    const mapping = gf.mapReagentsToLabs(
+        gf.reagentMap(boost, stores),
+        [...Array(labs.length).keys()],
+        [...Array(labs.length).keys()],
+        [],
+        this.m.lab_map,
+        this.m.base_labs
+    );
+    this.colourLabFlags(mapping);
+//(leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs)
+    //this.colourLabFlags(labs, reagents);//.concat(Array(8).fill(boost)));
+};
+
+
+
+/*
+FlagOwnedRoom.prototype.reagentSplit = function(labs, boost, store) {
+    let reagents = [boost];
+    reagents = gf.expandReagentArray(reagents, store);
+    if (labs.length <= 4) {
+        return reagents
+    }
+
+    reagents = gf.expandReagentArray(reagents, store);
+    if (labs.length <= 6) {
+        return reagents
+    }
+
+    reagents = gf.expandReagentArray(reagents, store);
+    if (labs.length < 10 || this.m.plan.base_labs <= 4) {
+        return reagents
+    }
+
+    return gf.expandReagentArray(reagents, store);
+};
+*/
+
+FlagOwnedRoom.prototype.colourLabFlags = function(labs, mappings) {
+    for ( let i in mappings ) {
+        colours = gc.LAB_COLOURS[mappings[i]];
+        Game.flags[labs[i].id].setColor(
+            colours.color, colours.secondaryColor
+        )
+    }
+};
+/*
+FlagOwnedRoom.prototype.colourLabFlags = function(labs, colours) {
+    for ( let i = 0 ; i< labs.length ; i++ ) {
+        Game.flags[labs[i].id].setColor(
+            colours[i].color, colours[i].secondaryColor
+        )
+    }
+};
+*/
 FlagOwnedRoom.prototype.buildStructure = function(type) {
     if (!this.m.plan[type] || this.m.plan[type].length === 0) {
         return false;

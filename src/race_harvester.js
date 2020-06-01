@@ -14,6 +14,7 @@ const race_harvester = {
         if (ec > gc.MAX_HARVESTER_EC) {
             return gc.HARVESTER_BODY_COUNTS[gc.MAX_HARVESTER_EC];
         }
+        //console.log("harvester bodycounts ec", ec, "Mathfllor", Math.floor(ec/50) * 50)
         return gc.HARVESTER_BODY_COUNTS[Math.floor(ec/50) * 50];
     },
 

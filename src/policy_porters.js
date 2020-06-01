@@ -63,6 +63,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,
         "reservers",reservers,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,
         "cPorter",cPorter,"rReserver",rReserver);
+    console.log("pp spawns energy",room.energyAvailable,"capacity",room.energyCapacityAvailable);
 
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
@@ -85,64 +86,80 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     const canBuildUpgrader = wUpgrader < resources.uW - 0.2;
     const canBuildReserver = rReserver < resources.rC - 0.2;
 
-    //if (room.energyAvailable < room.energyCapacityAvailable) {
-    //    return;
-    //}
-
     if (canBuildHarvesters
         && (!canBuildWorkers || wHarvester <= cWorker
         && (!canBuildPorters || wHarvester <= cPorter))) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_HARVESTER,
-            room.energyCapacityAvailable,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
-        return;
+        console.log("pp canBuildHarvesters cost",race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable),"enrgy",room.energyAvailable);
+        if (race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable)
+            <= room.energyAvailable) {
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_HARVESTER,
+                room.energyCapacityAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+            return;
+        }
     }
 
     if (canBuildWorkers) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_WORKER,
-            room.energyCapacityAvailable,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
-        return;
+        if (race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable)
+            <= room.energyAvailable) {
+            console.log("pp canBuildWorkers cost",race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable),"enrgy",room.energyAvailable);
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_WORKER,
+                room.energyCapacityAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+            return;
+        }
     }
 
     if (canBuildPorters) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_PORTER,
-            room.energyCapacityAvailable,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
-        return
+        console.log("pp canBuildPorters cost",race.getCost(gc.RACE_PORTER, room.energyCapacityAvailable),"enrgy",room.energyAvailable);
+        if (race.getCost(gc.RACE_PORTER, room.energyCapacityAvailable)
+            <= room.energyAvailable) {
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_PORTER,
+                room.energyCapacityAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+            return
+        }
     }
 
     if (canBuildReserver) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_RESERVER,
-            room.energyCapacityAvailable,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
-        return
+        if (race.getCost(gc.RACE_RESERVER, room.energyCapacityAvailable)
+            <= room.energyAvailable) {
+            console.log("pp canBuildReserver cost",race.getCost(gc.RACE_RESERVER, room.energyCapacityAvailable),"enrgy",room.energyAvailable);
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_RESERVER,
+                room.energyCapacityAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+            return
+        }
     }
 
     if (canBuildUpgrader) {
-        policy.sendOrderToQueue(
-            room,
-            gc.RACE_UPGRADER,
-            room.energyCapacityAvailable,
-            this.parentId,
-            gc.SPAWN_PRIORITY_LOCAL
-        );
+        if (race.getCost(gc.RACE_UPGRADER, room.energyCapacityAvailable)
+            <= room.energyAvailable) {
+            console.log("pp canBuildUpgrader cost",race.getCost(gc.RACE_UPGRADER, room.energyCapacityAvailable),"enrgy",room.energyAvailable);
+            policy.sendOrderToQueue(
+                room,
+                gc.RACE_UPGRADER,
+                room.energyCapacityAvailable,
+                this.parentId,
+                gc.SPAWN_PRIORITY_LOCAL
+            );
+        }
     }
 };
 
@@ -213,7 +230,7 @@ PolicyPorters.prototype.calcResources = function (roomType1, roomType2) {
         resources.pC +=  colonyResources.pC;
         resources.wW +=  colonyResources.wW;
         resources.uW +=  colonyResources.uW;
-        resources.rC += values["sources"]["rC"];
+        resources.rC += values["rC"];
         //console.log(colonyObj.name,"POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
     }
     //console.log("pp this.updateRoomResources", JSON.stringify(resources));
@@ -226,15 +243,10 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
     if (!room) { // todo cache updateRoomResources somehow so can return that if no sight on room
         return { "hW": hW, "pC" : pC, "wW" : 0,  "uW": uW };
     }
-    //console.log("updateRoomResources room", room.name, roomName)
     let buildTicks, ratioHtoW;
-    //if (room) {
-        buildTicks = economy.constructionRepairLeft(room);
-        ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home], false);
-    //} else {
-    //    buildTicks = 0;
-    //    ratioHtoW = 1.1;
-    //}
+
+    buildTicks = economy.constructionRepairLeft(room);
+    ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home], false);
     let workerWs = 0;
     let porterCs = pC;
     let upgradeWs = uW;
@@ -242,11 +254,7 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
         porterCs = 0;
         upgradeWs = 0;
         workerWs = ratioHtoW * hW;
-        //console.log("pp updateRoomResources workerWs",workerWs,"ratioHtoW",ratioHtoW,"hW",ratioHtoW)
     }
-    //upgradeWs =  uW * porterCs / pC;
-    //console.log("updateRoomResources buildTicks",buildTicks,"ratioHtoW",ratioHtoW,"workerWs",workerWs);
-    //console.log("updateRoomResources ratioWtoP",ratioWtoP, "porterCs", porterCs);
     return { "hW": hW, "pC" : porterCs, "wW" : workerWs,  "uW": upgradeWs };
 };
 

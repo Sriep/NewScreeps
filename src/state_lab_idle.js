@@ -5,115 +5,48 @@
  */
 const C = require("./Constants");
 const gc = require("gc");
+const gf = require("gf");
 
-function StateTowerIdle (structure) {
+function StateLabIdle (structure) {
     this.type = gc.STATE_LAB_IDLE;
     this.lab = structure;
+    this.flag = Game.flags[structure.id];
 }
 
-StateTowerIdle.prototype.enact = function () {
-    if (this.lab.cooldown > 0) {
-        return;
-    }
-    const store = this.lab.store;
-    if (store[C.RESOURCE_ENERGY] === 0
-        || store[C.RESOURCE_HYDROGEN] > 0
-        || store[C.RESOURCE_OXYGEN] > 0
-        || store[C.RESOURCE_UTRIUM] > 0
-        || store[C.RESOURCE_LEMERGIUM] > 0
-        || store[C.RESOURCE_KEANIUM] > 0
-        || store[C.RESOURCE_ZYNTHIUM] > 0
-        || store[C.RESOURCE_CATALYST] > 0
-    ) {
-        return
-    }
-    if (store[C.RESOURCE_ENERGY] === store.getUsedCapacity()) {
-        return this.emptyLab()
-    }
-    this.makeResource(this.findLabsMineral(this.lab.store));
-};
-
-StateTowerIdle.prototype.makeResource = function (resource) {
-    const reaction = this.findReactionToMake(resource);
-    const lab1 = this.findLabWith(reaction.reagent1, this.lab);
-    if (lab1) {
-        const lab2 = this.findLabWith(reaction.reagent2, this.lab);
-        if (lab2) {
-            return this.lab.runReaction(lab1, lab2);
-        }
-    }
-};
-
-StateTowerIdle.prototype.findReactionToMake = function(resource) {
-    for (let reagent1 in C.REACTIONS) {
-        for (let reagent2 in C.REACTIONS[reagent1]) {
-            if (C.REACTIONS[reagent1][reagent2] === resource) {
-                return { reagent1: reagent1, reagent2 :reagent2 }
-            }
-        }
-    }
-};
-
-StateTowerIdle.prototype.findLabWith = function(resource, lab) {
-    const labs = this.lab.room.find(FIND_MY_STRUCTURES, {
-        filter: l => { return l.structureType === STRUCTURE_LAB
-            && (lab ? lab.pos.inRangeTo(l, 2) : true)}
-    });
-    for (let lab of labs) {
-        if (lab.store[resource] > C.LAB_REACTION_AMOUNT) {
-            return lab;
-        }
-    }
-};
-
-StateTowerIdle.prototype.labsMineral = function(store) {
-    for(let resource in store) {
-        if (resource !== C.RESOURCE_ENERGY) {
-            return resource;
-        }
-    }
-};
-
-StateTowerIdle.prototype.emptyLab = function () {
-    const labs = this.lab.room.find(FIND_MY_STRUCTURES, { filter: l => {
-            return l.structureType === STRUCTURE_LAB
-                && l.id !== this.lab.id
-        }
-    });
-    let lab1, lab2;
-    for (let lab of labs) {
-        if (!this.lab.pos.inRangeTo(lab, 2)) {
-            continue;
-        }
-        const resource = this.labsMineral(lab.store);
-        if (!resource
-            || !C.REACTIONS[resource]
-            || lab.store[resource] < C.LAB_REACTION_AMOUNT) {
-            continue
-        }
-        for (let reagent in C.REACTIONS[resource]) {
-            const rlab = this.findLabWith(reagent, this.lab);
-            if (lab2) {
-                lab1 = lab;
-                lab2 = rlab;
-            }
-            let found = false;
-            for (let otherLab of labs) {
-                if (this.labsMineral(otherLab.store) === reagent) {
-                    found = true;
+StateLabIdle.prototype.enact = function () {
+    const resourceId = gf.resource(this.flag.color, this.flag.secondaryColor);
+    if (resourceId) {
+        const reagents = gf.reagents(resourceId);
+        if (reagents) {
+            const lab1s = this.lab.room.find(C.FIND_STRUCTURES, {
+                filter: l => {
+                    return l.structureType === C.STRUCTURE_LAB
+                        && l.mineralType === reagents[0]
+                        && l.store[reagents[0]] > C.LAB_REACTION_AMOUNT
+                        && this.lab.pos.inRangeTo(l, gc.RANGE_REACTION) ;
                 }
-            }
-            if (!found) {
-                return this.lab.runReaction(lab, rlab);
+            });
+            const lab2s = this.lab.room.find(C.FIND_STRUCTURES, {
+                filter: l => {
+                    return l.structureType === C.STRUCTURE_LAB
+                        && l.mineralType === reagents[1]
+                        && l.store[reagents[1]] > C.LAB_REACTION_AMOUNT
+                        && this.lab.pos.inRangeTo(l, gc.RANGE_REACTION);
+                }
+            });
+            //console.log(lab.room,"move lab",lab,lab1s, lab2s);
+            if (lab1s.length > 0 && lab2s.length > 0) {
+                const result = this.lab.runReaction(lab1s[0], lab2s[0]);
+                console.log("lab reaction result", result);
+                // console.log(lab.room,lab,"runReaction",result);
             }
         }
     }
-    if (lab1 && lab2) {
-        return this.lab.runReaction(lab1, lab2);
-    }
 };
 
-module.exports = StateTowerIdle;
+
+
+module.exports = StateLabIdle;
 
 
 

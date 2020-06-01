@@ -44,10 +44,10 @@ function startup() {
 
 function freeCreeps() {
     for(let name in Memory.creeps) {
-        if (Game.flags[name]) {
-            Game.flags[name].remove();
-        }
         if(!Game.creeps[name]) {
+            if (Game.flags[name]) {
+                Game.flags[name].remove();
+            }
             delete Memory.creeps[name];
         }
     }

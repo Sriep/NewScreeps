@@ -218,7 +218,7 @@ const policy = {
     },
 
     hasChildType: function(parentId, type) {
-        console.log("policy hasChildType parentId",parentId, "type",type);
+        //console.log("policy hasChildType parentId",parentId, "type",type);
         for (let id in Memory.policies) {
              if (Memory.policies[id].type === type
                  && Memory.policies[id].parentId === parentId) {
@@ -260,7 +260,7 @@ const policy = {
     },
 
     buildSourceContainer : function (obj) {
-        console.log("buildSourceContainer objid",obj.id,"obj",JSON.stringify(obj));
+        //console.log("buildSourceContainer objid",obj.id,"obj",JSON.stringify(obj));
         const fRoom = new FlagRoom(obj.room.name);
         const cPos = fRoom.getContainerPos(obj.id);
         if (state.findContainerOrConstructionAt(gf.roomPosFromPos(cPos))) {

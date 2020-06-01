@@ -7,7 +7,7 @@
 const cache = require("cache");
 const gc = require("gc");
 const race = require("race");
-const gf = require("gf");
+//const gf = require("gf");
 
 const budget = {
 /*
@@ -67,8 +67,8 @@ const budget = {
     },
 */
     workerRoom: function(room, numWorkers) {
-        const workerCost = numWorkers * race.getCost(gc.RACE_WORKER, gf.roomEc(room));
-        const wsPerWorker = race.getBodyCounts(gc.RACE_WORKER, gf.roomEc(room));
+        const workerCost = numWorkers * race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable);
+        const wsPerWorker = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
         const sources = room.find(FIND_SOURCES);
         let dAvSourceController = 0;
         let dAvSourceSpawn = 0;
@@ -90,10 +90,10 @@ const budget = {
 
     porterRoom: function (room) {
         const budgetHarvesterWs = budget.harvesterWsRoom(room, room, false);
-        const budgetUpgradersWs =  budget.upgradersWsRoom(room, gf.roomEc(room), false);
+        const budgetUpgradersWs =  budget.upgradersWsRoom(room, room.energyCapacityAvailable, false);
         const portersCsRoom = budget.portersCsRoom(room, room, false);
-        const harvesterCount = Math.ceil(budgetHarvesterWs*gc.WWM_COST/gf.roomEc(room));
-        const upgradersCount = Math.ceil(budgetUpgradersWs*gc.WWM_COST/gf.roomEc(room));
+        const harvesterCount = Math.ceil(budgetHarvesterWs*gc.WWM_COST/room.energyCapacityAvailable);
+        const upgradersCount = Math.ceil(budgetUpgradersWs*gc.WWM_COST/room.energyCapacityAvailable);
         const harvestersCost = budgetHarvesterWs*gc.WWM_COST + harvesterCount*BODYPART_COST[CARRY];
         const upgradersCost = budgetUpgradersWs*gc.WWM_COST + upgradersCount*BODYPART_COST[CARRY];
         const portersCost =  portersCsRoom*gc.CCM_COST;
@@ -132,13 +132,19 @@ const budget = {
         const sources = room.find(FIND_SOURCES);
         const spawns = home.find(FIND_MY_SPAWNS);
         const values = {};
-        const blank = {"setup": 0, "profit": 0, "parts" : 0, "startUpCost":0,"sources" : {}, "rC": 0};
+        //const blank = {"setup": 0, "profit": 0, "parts" : 0, "startUpCost":0,"sources" : {}, "rC": 0};
         values[gc.ROOM_NEUTRAL] = Object.assign({}, blank);
+        values[gc.ROOM_NEUTRAL][sources] = {};
         values[gc.ROOM_NEUTRAL_ROADS] = Object.assign({}, blank);
+        values[gc.ROOM_NEUTRAL_ROADS][sources] = {};
         values[gc.ROOM_RESERVED] = Object.assign({}, blank);
+        values[gc.ROOM_RESERVED][sources] = {};
         values[gc.ROOM_RESERVED_ROADS] = Object.assign({}, blank);
+        values[gc.ROOM_RESERVED_ROADS][sources] = {};
         values[gc.ROOM_OWNED] = Object.assign({}, blank);
+        values[gc.ROOM_OWNED][sources] = {};
         values[gc.ROOM_OWNED_ROADS] = Object.assign({}, blank);
+        values[gc.ROOM_OWNED_ROADS][sources] = {};
         //values[gc.ROOM_RESERVED]["rC"] = 0;
         //values[gc.ROOM_RESERVED_ROADS]["rC"] = 0;
         let sourcePathsRoad = [];

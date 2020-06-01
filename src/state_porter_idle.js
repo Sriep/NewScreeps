@@ -122,6 +122,9 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
     });
     const containerInfo = [];
     for (let colony of colonies) {
+        if (!Game.rooms[colony.name]) {
+            continue;
+        }
         //console.log("listHarvestContainers colony", JSON.stringify(colony));
         const colonyRoom = new FlagRoom(colony.name);
         //console.log("listHarvestContainers memory", JSON.stringify(colonyRoom.m));

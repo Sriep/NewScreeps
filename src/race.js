@@ -35,26 +35,28 @@ const race = {
             cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.WORK];
         }
         if (bodyCounts[C.MOVE]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.MOVE];
+            cost += bodyCounts[C.MOVE]*C.BODYPART_COST[C.MOVE];
         }
         if (bodyCounts[C.CARRY]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.CARRY];
+            cost += bodyCounts[C.CARRY]*C.BODYPART_COST[C.CARRY];
         }
         if (bodyCounts[C.ATTACK]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.ATTACK];
+            cost += bodyCounts[C.ATTACK]*C.BODYPART_COST[C.ATTACK];
         }
         if (bodyCounts[C.RANGED_ATTACK]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.RANGED_ATTACK];
+            cost += bodyCounts[C.RANGED_ATTACK]*C.BODYPART_COST[C.RANGED_ATTACK];
         }
         if (bodyCounts[C.TOUGH]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.TOUGH];
+            cost += bodyCounts[C.TOUGH]*C.BODYPART_COST[C.TOUGH];
         }
         if (bodyCounts[C.HEAL]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.HEAL];
+            cost += bodyCounts[C.HEAL]*C.BODYPART_COST[C.HEAL];
         }
         if (bodyCounts[C.CLAIM]) {
-            cost += bodyCounts[C.WORK]*C.BODYPART_COST[C.CLAIM];
+            cost += bodyCounts[C.CLAIM]*C.BODYPART_COST[C.CLAIM];
         }
+        //console.log("race getCostBody cost",cost, "bodyCounts", JSON.stringify(bodyCounts));
+        return cost;
     },
 
     body: function (race, ec) {

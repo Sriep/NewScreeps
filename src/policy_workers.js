@@ -67,7 +67,7 @@ PolicyWorkers.prototype.enact = function () {
     //console.log("ps rhs", Math.floor(room.energyAvailable/gc.WMC_COST),
     //    "=== ", Math.floor(gf.roomEc(room)/gc.WMC_COST));
     if (Math.floor(room.energyAvailable/gc.WMC_COST)
-            >= Math.floor(gf.roomEc(room)/gc.WMC_COST)) {
+            >= Math.floor(room.energyCapacityAvailable/gc.WMC_COST)) {
         //console.log("pw workers",workers, "<= acces poitns", economy.totalSourceAccessPointsRoom(room));
         if (workers <= this.equilibriumWorkers()) {
             //console.log("send order to queue");

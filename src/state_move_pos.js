@@ -18,15 +18,11 @@ function StateMovePos (creep) {
 StateMovePos.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_MOVE_POS");
     const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos);
-    //console.log(this.creep, "move towardsSTATE_MOVE_POS", JSON.stringify(targetPos), "range", this.creep.memory.moveRange);
-    //console.log("check creep pos", JSON.stringify(this.creep.pos),
-    //    "is in rage",  this.creep.memory.moveRange, "of target", JSON.stringify(targetPos))
-    //console.log("result of this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)", this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange))
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
         if (this.creep.memory.moveRange === 0) {
-            //console.log("STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
-            //    JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+            console.log(this.creep.name, "STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
+                JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
         }
         return state.switchTo(this.creep, this.creep.memory, this.creep.memory.next_state)
     }
@@ -88,11 +84,11 @@ StateMovePos.prototype.pathLost = function () {
     switch(creepRace) {
         case gc.RACE_HARVESTER:
             const sourceId = state.atHarvestingPost(this.creep.pos);
-            //console.log(this.creep.name, "atHarvestingPost", sourceId);
+            //console.log(this.creep.name, "STATE_MOVE_POS atHarvestingPost", sourceId);
             if (sourceId) {
-                console.log(this.creep.name,"STATE_HARVESTER_IDLE at harvesting pos", sourceId);
+                console.log(this.creep.name,"STATE_MOVE_POS at harvesting pos", sourceId);
                 const harvesters = state.getHarvestingHarvesters(this.creep.policyId);
-                for (let i in harvesters) {
+                for (let harvester of harvesters) {
                     if (harvester.memory.targetPos.x === this.creep.x
                         && harvester.memory.targetPos.y === this.creep.y) {
                         delete harvester.memory.targetPos;

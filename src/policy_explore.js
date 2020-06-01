@@ -24,13 +24,15 @@ PolicyExplore.prototype.initilise = function () {
     }
     this.home = Memory.policies[this.parentId].roomName;
     this.m.direction = TOP;
-
     return true;
 };
 
 PolicyExplore.prototype.enact = function () {
+    if (!this.m.direction) {
+        this.m.direction = TOP;
+    }
     const creeps = policy.getCreeps(this.id, gc.RACE_SCOUT);
-    //console.log("POLICY_EXPLORE creeps", creeps.length);
+    //console.log("POLICY_EXPLORE creeps", creeps.length,"m",JSON.stringify(this.m));
     if (creeps.length < gc.EXPLORE_CREEPS) {
         const orders = flag.getSpawnQueue(this.home).orders(this.id);
         if (creeps.length + orders.length < gc.EXPLORE_CREEPS) {
@@ -45,6 +47,32 @@ PolicyExplore.prototype.enact = function () {
 };
 
 PolicyExplore.prototype.exploreRoom = function(newRoom) {
+    const room = Game.rooms[newRoom];
+    if (!room) {
+        //console.log("POLICY_EXPLORE !Game.rooms[newRoom] no sight on room");
+        return;
+    }
+    if (!room.controller) {
+        //console.log("POLICY_EXPLORE !room.controller");
+        return;
+    }
+    if (room.controller.my) {
+        //console.log("POLICY_EXPLORE room.controller.my");
+        return;
+    }
+
+    if (room.controller.owner
+        && room.controller.owner.username.length > 0) {
+        //console.log("POLICY_EXPLORE !room.controller.owner.username.length > 0");
+        return;
+    }
+
+    if (room.controller.reservation
+        && Groom.controller.reservation.username.length > 0) {
+       // console.log("POLICY_EXPLORE !room.controller.reservation.username.length > 0");
+        return;
+    }
+
     let roomFlag = flag.getRoomFlag(newRoom);
     if (!roomFlag) {
         gf.fatalError("should have room flag room " + newRoom);
@@ -53,26 +81,6 @@ PolicyExplore.prototype.exploreRoom = function(newRoom) {
         return;
     }
     roomFlag.memory.explored = true;
-    if (!Game.rooms[newRoom].controller) {
-        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller");
-        return;
-    }
-    if (Game.rooms[newRoom].controller.my) {
-        console.log("POLICY_EXPLORE Game.rooms[newRoom].controller.my");
-        return;
-    }
-
-    if (Game.rooms[newRoom].controller.owner
-        && Game.rooms[newRoom].controller.owner.username.length > 0) {
-        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.owner.username.length > 0");
-        return;
-    }
-
-    if (Game.rooms[newRoom].controller.reservation
-        && Game.rooms[newRoom].controller.reservation.username.length > 0) {
-        console.log("POLICY_EXPLORE !Game.rooms[newRoom].controller.reservation.username.length > 0");
-        return;
-    }
     if (!roomFlag.memory.rooms) {
         roomFlag.memory.rooms = {};
     }
@@ -104,6 +112,7 @@ PolicyExplore.prototype.exploreRoom = function(newRoom) {
 };
 
 PolicyExplore.prototype.sendExplorers = function(shortfall) {
+    console.log("sendExplorers shortfall", shortfall,"this.m.direction",this.m.direction);
     for (let i = 0; i < shortfall; i++) {
         const data = {
             "body": race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
@@ -113,6 +122,7 @@ PolicyExplore.prototype.sendExplorers = function(shortfall) {
             }},
             "name": gc.RACE_SCOUT + "_50",
         };
+        console.log("sendExplorers data",JSON.stringify(data));
         flag.getSpawnQueue(this.home).addSpawn(
             data,
             gc.SPAWN_PRIORITY_MISC,

@@ -35,6 +35,9 @@ StateHarvesterHarvest.prototype.enact = function () {
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             return gf.fatalError("ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
+            console.log(this.creep.name,"STATE_HARVESTER_HARVEST pos",
+                JSON.stringify(this.creep.pos), "source pos", source.pos, "sourceid", source.id, "type", source.type);
+            //return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_IDLE);
             return gf.fatalError("ERR_NOT_IN_RANGE");
         case ERR_TIRED:        // The extractor or the deposit is still cooling down.
             return ERR_TIRED;

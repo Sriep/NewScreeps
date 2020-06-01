@@ -17,16 +17,16 @@ const agenda = {
             { "activity": gc.ACTIVITY_FINISHED}
         ],
         [ //2
-            //{ "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
-            //{ "activity": gc.POLICY_EXPLORE},
-            //{ "activity": gc.POLICY_COLONIAL_OFFICE},
             { "activity": gc.POLICY_PORTERS},
-            { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS},
             { "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
             { "activity": gc.POLICY_EXPLORE},
             { "activity": gc.POLICY_COLONIAL_OFFICE},
+            { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS},
+            //{ "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
+            //{ "activity": gc.POLICY_EXPLORE},
+            //{ "activity": gc.POLICY_COLONIAL_OFFICE},
             { "activity": gc.ACTIVITY_FINISHED}
         ],
         [ //3

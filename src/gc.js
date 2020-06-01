@@ -75,6 +75,7 @@ const gc = {
     RACE_SCOUT: "scout",
     RACE_RESERVER: "reserver",
     RACE_LORRY: "lorry",
+    RACE_SCIENTIST: "scientist",
 
     MIN_HARVESTER_EC: 300,
     MAX_HARVESTER_EC: 800,
@@ -193,11 +194,17 @@ const gc = {
     FLAG_CONTAINER_COLOUR:      C.COLORS_ALL[C.COLOR_BROWN],
     FLAG_IGNORE_COLOUR:         C.COLORS_ALL[C.COLOR_RED],
 
-    COMPOUND_RESOURCES: [
-        C.RESOURCE_HYDROXIDE,
-        C.RESOURCE_ZYNTHIUM_KEANITE,
-        C.RESOURCE_UTRIUM_LEMERGITE,
-    
+    ATOMIC_RESOURCES: [
+        C.RESOURCE_HYDROGEN,
+        C.RESOURCE_OXYGEN,
+        C.RESOURCE_UTRIUM,
+        C.RESOURCE_LEMERGIUM,
+        C.RESOURCE_KEANIUM,
+        C.RESOURCE_ZYNTHIUM,
+        C.RESOURCE_CATALYST,
+    ],
+
+    BOOSTS_RESOURCES: [
         C.RESOURCE_UTRIUM_HYDRIDE,
         C.RESOURCE_UTRIUM_OXIDE,
         C.RESOURCE_KEANIUM_HYDRIDE,
@@ -231,6 +238,57 @@ const gc = {
         C.RESOURCE_CATALYZED_GHODIUM_ACID,
         C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
     ],
+
+    LAB_COLOURS: {
+        [C.RESOURCE_ENERGY] : { color : C.COLOR_WHITE , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_POWER] : { color : C.COLOR_RED , secondaryColor : C.COLOR_RED },
+
+        [C.RESOURCE_HYDROGEN] : { color : C.COLOR_GREY , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_OXYGEN] : { color :  C.COLOR_YELLOW, secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_UTRIUM] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_KEANIUM] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_LEMERGIUM] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_ZYNTHIUM] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_CATALYST] : { color : C.COLOR_RED , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_GHODIUM] : { color : C.COLOR_BROWN , secondaryColor : C.COLOR_WHITE },
+
+        [C.RESOURCE_HYDROXIDE] : { color : C.COLOR_CYAN , secondaryColor : C.COLOR_WHITE },
+        [C.RESOURCE_ZYNTHIUM_KEANITE] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_PURPLE },
+        [C.RESOURCE_UTRIUM_LEMERGITE] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_GREEN },
+
+        [C.RESOURCE_UTRIUM_HYDRIDE] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_GREY },
+        [C.RESOURCE_UTRIUM_OXIDE] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_YELLOW },
+        [C.RESOURCE_KEANIUM_HYDRIDE] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_GREY },
+        [C.RESOURCE_KEANIUM_OXIDE] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_YELLOW },
+        [C.RESOURCE_LEMERGIUM_HYDRIDE] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_GREY },
+        [C.RESOURCE_LEMERGIUM_OXIDE] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_YELLOW },
+        [C.RESOURCE_ZYNTHIUM_HYDRIDE] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_GREY },
+        [C.RESOURCE_ZYNTHIUM_OXIDE] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_YELLOW },
+        [C.RESOURCE_GHODIUM_HYDRIDE] : { color : C.COLOR_BROWN , secondaryColor : C.COLOR_GREY },
+        [C.RESOURCE_GHODIUM_OXIDE] : { color : C.COLOR_BROWN  , secondaryColor : C.COLOR_YELLOW },
+
+        [C.RESOURCE_UTRIUM_ACID] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_ORANGE },
+        [C.RESOURCE_UTRIUM_ALKALIDE] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_CYAN },
+        [C.RESOURCE_KEANIUM_ACID] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_ORANGE },
+        [C.RESOURCE_KEANIUM_ALKALIDE] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_CYAN },
+        [C.RESOURCE_LEMERGIUM_ACID] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_ORANGE },
+        [C.RESOURCE_LEMERGIUM_ALKALIDE] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_CYAN },
+        [C.RESOURCE_ZYNTHIUM_ACID] : { color : C.COLOR_ORANGE , secondaryColor :C.COLOR_ORANGE  },
+        [C.RESOURCE_ZYNTHIUM_ALKALIDE] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_CYAN },
+        [C.RESOURCE_GHODIUM_ACID] : { color : C.COLOR_BROWN , secondaryColor : C.COLOR_ORANGE },
+        [C.RESOURCE_GHODIUM_ALKALIDE] : { color : C.COLOR_BROWN , secondaryColor : C.COLOR_CYAN },
+
+        [C.RESOURCE_CATALYZED_UTRIUM_ACID] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_RED },
+        [C.RESOURCE_CATALYZED_UTRIUM_ALKALIDE] : { color : C.COLOR_BLUE , secondaryColor : C.COLOR_BLUE },
+        [C.RESOURCE_CATALYZED_KEANIUM_ACID] : { color : C.COLOR_PURPLE , secondaryColor : C.COLOR_RED },
+        [C.RESOURCE_CATALYZED_KEANIUM_ALKALIDE] : { color :  C.COLOR_PURPLE, secondaryColor : C.COLOR_BLUE },
+        [C.RESOURCE_CATALYZED_LEMERGIUM_ACID] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_RED },
+        [C.RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] : { color : C.COLOR_GREEN , secondaryColor : C.COLOR_BLUE },
+        [C.RESOURCE_CATALYZED_ZYNTHIUM_ACID] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_RED },
+        [C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] : { color : C.COLOR_ORANGE , secondaryColor : C.COLOR_BLUE },
+        [C.RESOURCE_CATALYZED_GHODIUM_ACID] : { color : C.COLOR_BROWN , secondaryColor : C.COLOR_RED },
+        [C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE] : { color : C.COLOR_BROWN , secondaryColor :  C.COLOR_BLUE },
+    },
 
     //Ranges
     RANGE_HARVEST: 1,
