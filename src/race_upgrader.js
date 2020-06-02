@@ -40,17 +40,40 @@ const race_upgrader = {
     },
 
     boosts: [
-        { priority : 3, resource: C.RESOURCE_KEANIUM_HYDRIDE, part : C.CARRY },
-        { priority : 1, resource: C.RESOURCE_GHODIUM_HYDRIDE, part : C.WORK },
-
-        { priority : 3, resource : C.RESOURCE_KEANIUM_ACID, part : C.CARRY },
-        { priority : 1, resource : C.RESOURCE_GHODIUM_ACID, part : C.WORK },
-
-        { priority : 3, resource : C.RESOURCE_CATALYZED_KEANIUM_ACID, part : C.CARRY },
-        { priority : 1, resource : C.RESOURCE_CATALYZED_GHODIUM_ACID, part : C.WORK },
-
+        C.RESOURCE_CATALYZED_GHODIUM_ACID,
+        C.RESOURCE_GHODIUM_ACID,
+        C.RESOURCE_GHODIUM_HYDRIDE,
     ]
 
 };
 
 module.exports = race_upgrader;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

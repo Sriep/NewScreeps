@@ -36,7 +36,7 @@ const lr = {
         }
         return map;
     },
-
+/*
     mapReagentsToLabs1: function (labs, resources, numBaseResources, numBaseLabs, labMap,) {
         if (numBaseLabs < numBaseResources
             || numBaseResources < 0
@@ -91,8 +91,19 @@ const lr = {
             }
         }
     },
+*/
+    mapReagentsToLabs : function(reagentMap, numLabs, centerTile) {
+        return this.mapReagentsToLabsI(
+            reagentMap,
+            [...Array(numLabs).keys()],
+            [...Array(numLabs).keys()],
+            [],
+            centerTile.lab_map,
+            centerTile.lab_map.slice(0,centerTile.base_labs)
+        )
+    },
 
-    mapReagentsToLabs : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
+    mapReagentsToLabsI : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
         if (labsInRange.length === 0 || labsLeft.length === 0) {
             return { ok:false }
         }
@@ -103,7 +114,7 @@ const lr = {
                 let mapping = [];
                 while (rightStack.length > 0 || !ok) {
                     const left = rightStack.pop();
-                    const right = this.mapReagentsToLabs(
+                    const right = this.mapReagentsToLabsI(
                         left.map,
                         left.labsInRange.filter(v => labsLeft.includes(v) && v !== lab),
                         labsLeft.filter(v => v !== lab),
@@ -127,7 +138,7 @@ const lr = {
                     map: leftMap[1],
                     labsInRange: labMap(labsInRange[i]),
                 });
-                const left = this.mapReagentsToLabs(
+                const left = this.mapReagentsToLabsI(
                     leftMap[0],
                     labMap(labsInRange[i]).filter(v => labsLeft.includes(v)),
                     labsLeft.filter(v => v !== labsInRange[i]),
@@ -140,7 +151,7 @@ const lr = {
             }
         } else {
             console.log("leftMap", JSON.stringify(leftMap));
-            gf.fatalError("something wrong in mapReagentsToLabs")
+            gf.fatalError("something wrong in mapReagentsToLabsI")
         }
     },
 

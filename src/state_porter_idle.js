@@ -9,6 +9,7 @@ const state = require("state");
 const policy = require("policy");
 const race = require("race");
 const FlagRoom= require("flag_room");
+const FlagOwnedRoom = require("flag_owned_room");
 
 function StatePorterIdle (creep) {
     this.type = gc.STATE_PORTER_IDLE;
@@ -117,7 +118,7 @@ StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
 };
 
 StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
-    this.chekcFlags();
+    this.checkFlags();
 
     let porters = _.filter(Game.creeps, c => {
         return  c.memory.targetId && race.getRace(c) === gc.RACE_PORTER
@@ -165,6 +166,9 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
 };
 
 StatePorterIdle.prototype.checkFlags = function () {
+    if (!this.creep.room.controller.my || this.creep.room.controller.level < 6) {
+        return;
+    }
     const foRoom = new FlagOwnedRoom(this.home);
     const labPos = foRoom.plan.lab.slice(foRoom.plan.base_labs);
     const labs = room.find(FIND_MY_STRUCTURES, {

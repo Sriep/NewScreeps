@@ -13,6 +13,7 @@ const lr = require("lab_reactions");
 
 function FlagOwnedRoom (name) {
     this.name = name;
+    //console.log("FlagOwnedRoom name", name);
     this.m = flag.getRoomFlag(name).memory;
 }
 
@@ -135,7 +136,7 @@ FlagOwnedRoom.prototype.sLinkPos = function(source) {
         }
     }
 };
-
+// mapReagentsToLabs : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
 FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
     const labs = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES,
         { filter: s => { return s.structureType === C.STRUCTURE_LAB }

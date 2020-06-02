@@ -81,6 +81,17 @@ const race = {
         return body;
     },
 
+    creepBoosted: function (creep, boost) {
+        for (let part of creep.body) {
+            if (part.boost) {
+                if (!boost || (boost && part.boost === boost)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
     partsFromBody: function(body, part) {
         let count=0;
         for (let i in body) {

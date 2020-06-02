@@ -128,6 +128,8 @@ const gc = {
     // states common
     STATE_MOVE_POS: "move_pos",
     STATE_MOVE_TARGET: "move_target",
+    STATE_BOOST_CREEP: "boost_creep",
+    STATE_FIND_BOOST: "find_boost",
     // states worker
     STATE_WORKER_IDLE: "worker_idle",
     STATE_WORKER_UPGRADE: "worker_upgrade",
@@ -282,11 +284,13 @@ const gc = {
     },
 
     //Ranges
+    RANGE_POST: 0,
     RANGE_HARVEST: 1,
     RANGE_BUILD: 3,
     RANGE_REPAIR: 3,
     RANGE_UPGRADE: 3,
     RANGE_TRANSFER: 1,
+    RANGE_BOOST: 1,
     RANGE_ATTACK: 1,
     RANGE_RANGED_ATTACK: 3,
     RANGE_HEAL: 3,
@@ -375,6 +379,7 @@ const gc = {
     TOWER_REFILL_THRESHOLD: 0.8,
     REFILL_THRESHOLD: 0.8,
     LAB_REFILL_THRESHOLD: 0.8,
+    CONTAINER_EMPTY_THRESHOLD: 0.1,
     EMERGENCY_DOWNGRADING_THRESHOLD: 3000,
     STRUCTURE_REPAIR_THRESHOLD: 0.5,
     CONTAINER_REPAIR_THRESHOLD: 0.5,

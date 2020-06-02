@@ -21,6 +21,7 @@ const flag = {
 
     getRoomFlag(roomName) {
         let roomFlag = Game.flags[roomName];
+        //console.log("getRoomFlag roomFlag",roomFlag);
         if (!roomFlag) {
             this.flagRoom(roomName); //-----
             roomFlag = Game.flags[roomName]
@@ -47,13 +48,16 @@ const flag = {
         //console.log("flagRoom", roomName,"Game.flags[roomName]",Game.flags[roomName]);
         if (!Game.flags[roomName]) {
             const room = Game.rooms[roomName];
-            const centre = new RoomPosition(25, 25, room.name);
-            centre.createFlag(room.name);
+            //console.log("flagRoom room", room.name);
+            if (room) {
+                const centre = new RoomPosition(25, 25, room.name);
+                centre.createFlag(room.name);
 
-            this.flagPermanents(room);
-            this.setSourceContainers(room);
-            this.setControllerContainers(room);
-            this.setMineralContainers(room);
+                this.flagPermanents(room);
+                this.setSourceContainers(room);
+                this.setControllerContainers(room);
+                this.setMineralContainers(room);
+            }
         }
     },
 

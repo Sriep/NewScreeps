@@ -5,7 +5,7 @@
  */
 const gc = require("gc");
 const gf = require("gf");
-const economy = require("economy");
+//const economy = require("economy");
 const race = require("race");
 const flag = require("flag");
 const FlagRoom = require("flag_room");
@@ -165,36 +165,6 @@ const state = {
             }
         }
         return containers[maxIndex];
-    },
-
-    workerFindTargetSource: function(room, creep) {
-        let sources = room.find(FIND_SOURCES);
-        if (sources.length === 0)  {
-            return undefined;
-        }
-
-        if (sources.length === 2 && room.controller.level === 1) {
-            const path0 = room.findPath(sources[0].pos, room.controller.pos);
-            const path1 = room.findPath(sources[1].pos, room.controller.pos);
-            return path0.length > path1.length ? sources[1] : sources[0];
-        }
-
-        sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
-        for (let source of sources)  {
-            if (!!state.atHarvestingPost(creep.pos)) {
-                return source;
-            }
-            const sourceCreeps = _.filter(Game.creeps, function (c) {
-                return c.memory.targetId === source.id;
-            });
-            if (sourceCreeps.length === 0) {
-                return source;
-            }
-            if (sourceCreeps.length < economy.countAccessPoints(source.pos)) {
-                return source;
-            }
-        }
-        return undefined;
     },
 
     getHarvestContainersPos: function (room) {

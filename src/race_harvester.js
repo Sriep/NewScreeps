@@ -14,14 +14,13 @@ const race_harvester = {
         if (ec > gc.MAX_HARVESTER_EC) {
             return gc.HARVESTER_BODY_COUNTS[gc.MAX_HARVESTER_EC];
         }
-        //console.log("harvester bodycounts ec", ec, "Mathfllor", Math.floor(ec/50) * 50)
         return gc.HARVESTER_BODY_COUNTS[Math.floor(ec/50) * 50];
     },
 
     boosts: [
-        { priority : 1, resource: C.RESOURCE_UTRIUM_OXIDE, part : C.WORK },
-        { priority : 1, resource : C.RESOURCE_UTRIUM_ALKALIDE, part : C.WORK },
-        { priority : 1, resource : C.RESOURCE_CATALYZED_UTRIUM_ALKALIDE, part : C.WORK },
+        C.RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
+        C.RESOURCE_UTRIUM_ALKALIDE,
+        C.RESOURCE_UTRIUM_OXIDE,
     ]
 };
 

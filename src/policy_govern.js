@@ -99,7 +99,7 @@ PolicyGovern.prototype.budget = function() {
     return result
 };
 */
-
+/*
 PolicyGovern.prototype.updateColonyInfo = function() {
     this.m.parts = 0;
     let localBudget = policy.getRoomEconomyPolicy(this.roomName).localBudget();
@@ -108,10 +108,11 @@ PolicyGovern.prototype.updateColonyInfo = function() {
     this.m.colonies[0]["profit"] = localBudget.profit;
     this.m.colonies[0]["profitpart"] = localBudget.profitpart;
     for (let colony of this.m.colonies) {
-        this.m.parts += this.m.colonies[colony]["parts"];
+        this.m.parts += colony["parts"];
     }
+    return
 };
-
+*/
 PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
     const room = Game.rooms[this.roomName];
     const energyLeft = room.controller.progressTotal - room.controller.progress;
@@ -150,13 +151,11 @@ PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost
         }
     }
 
-    this.updateColonyInfo();
-
-    let tempColonies = JSON.parse(JSON.stringify(this.m.colonies.splice(0,1)));
+    let tempColonies = JSON.parse(JSON.stringify(this.m.colonies.slice(1)));
     let tempParts = this.m.parts;
 
     const newColonyProfitParts = profit/parts;
-    while (tempParts + parts + gc.REPLACEMENT_COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
+    while (this.m.parts + parts + gc.REPLACEMENT_COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
         //console.log("POLICY_GOVERN addColony in while loop", JSON.stringify(tempColonies));
         if (newColonyProfitParts <= tempColonies[tempColonies.length-1].profitpart) {
             return false;
@@ -168,11 +167,14 @@ PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost
     tempColonies = tempColonies.sort( function (a,b)  {
         return b.profitpart - a.profitpart;
     });
-    this.m.parts = tempParts;
-    console.log("POLICY_GOVERN after sort tempparts", tempParts,"temp colonies", JSON.stringify(tempColonies));
-    const temp = this.m.colonies[0];
-    this.m.colonies = JSON.parse(JSON.stringify(tempColonies));
-    this.m.colonies.unshift(temp);
+    //this.m.parts = tempParts;
+    console.log("POLICY_GOVERN after sort temp parts", tempParts,"temp colonies", JSON.stringify(tempColonies));
+    this.m.colonies = [];
+    this.m.colonies.push(policy.getRoomEconomyPolicy(this.roomName).localBudget());
+    this.m.colonies = this.m.colonies.concat(tempColonies);
+    for (let colony of this.m.colonies) {
+        this.m.parts += colony["parts"];
+    }
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     return true;
 };

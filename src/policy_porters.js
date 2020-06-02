@@ -295,6 +295,7 @@ PolicyPorters.prototype.localBudget = function() {
     //    "spawnPartsLT" : spawnCapacity,
     //}));
     return {
+        "name" : this.home,
         "profit" : profit,
         "parts" : parts,
         "profitpart" : profit/parts,

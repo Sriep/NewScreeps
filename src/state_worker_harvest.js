@@ -9,15 +9,17 @@ const state = require("state");
 
 function StateWorkerHarvest (creep) {
     this.type = gc.STATE_WORKER_HARVEST;
-    this.creep = creep
+    this.creep = creep;
+    this.m = this.creep.memory
 }
 
 StateWorkerHarvest.prototype.enact = function () {
-    //console.log(this.creep.name, "in STATE_WORKER_HARVEST")
+    console.log(this.creep.name, "in STATE_WORKER_HARVEST creep pos",JSON.stringify(this.creep.pos));
     if (this.creep.store.getFreeCapacity() === 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
+    console.log(this.creep.name, "in STATE_WORKER_HARVEST target pos",JSON.stringify(target.pos),"target",JSON.stringify(target));
     if (target.energy > 0) {
         const result = this.creep.harvest(target);
         switch (result) {
@@ -34,6 +36,9 @@ StateWorkerHarvest.prototype.enact = function () {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
+                //console.log(this.creep.name,"STATE_WORKER_HARVEST ERR_NOT_IN_RANGE m"
+                //    , JSON.stringify(this.creep.m), "memory", this.creep.memory);
+                //return state.switchTo(this.creep, this.m, gc.STATE_WORKER_IDLE);
                 return gf.fatalError("ERR_NOT_IN_RANGE");
             case ERR_TIRED:        // The extractor or the deposit is still cooling down.
                 return ERR_TIRED;

@@ -15,14 +15,12 @@ const race_lorry = {
     },
 
     boosts: [
-        { priority : 1, resource: C.RESOURCE_KEANIUM_HYDRIDE, part : C.CARRY },
-        { priority : 2, resource: C.RESOURCE_ZYNTHIUM_OXIDE, part : C.MOVE },
-
-        { priority : 1, resource : C.RESOURCE_KEANIUM_ACID, part : C.CARRY },
-        { priority : 2, resource : C.RESOURCE_ZYNTHIUM_ALKALIDE, part : C.MOVE },
-
-        { priority : 1, resource : C.RESOURCE_CATALYZED_KEANIUM_ACID, part : C.CARRY },
-        { priority : 2, resource : C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, part : C.MOVE },
+        C.RESOURCE_CATALYZED_KEANIUM_ACID,
+        C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,
+        C.RESOURCE_KEANIUM_ACID,
+        C.RESOURCE_ZYNTHIUM_ALKALIDE,
+        C.RESOURCE_KEANIUM_HYDRIDE,
+        C.RESOURCE_ZYNTHIUM_OXIDE,
     ]
 
 };

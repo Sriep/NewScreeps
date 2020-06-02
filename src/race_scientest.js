@@ -3,6 +3,7 @@
  * Created by piers on 27/05/2020
  * @author Piers Shepperson
  */
+const C = require("./Constants");
 
 const race_scientist = {
 
@@ -12,9 +13,9 @@ const race_scientist = {
     },
 
     boosts: [
-        { priority : 1, resource: RESOURCE_KEANIUM_HYDRIDE, part : CARRY },
-        { priority : 1, resource : RESOURCE_KEANIUM_ACID, part : CARRY },
-        { priority : 1, resource : RESOURCE_CATALYZED_KEANIUM_ACID, part : CARRY },
+        C.RESOURCE_CATALYZED_KEANIUM_ACID,
+        C.RESOURCE_KEANIUM_ACID,
+        C.RESOURCE_KEANIUM_HYDRIDE,
     ]
 
 };

@@ -279,14 +279,14 @@ const budget = {
         const energy2 = energy - this.convertPartsToEnergy(hWs, pCs, uWs1,0);
         const uWs2 = this.upgraderWsFromDistance(20, energy2);
         const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs2,0);
-        console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2);
-        console.log("valueSourceNoRoad", JSON.stringify({
-            "parts": { "hW": hWs, "pC": pCs, "uW": uWs2 },
-            "startUpCost": startUpCost,
-            "runningCostRepair": runningCostRepair,
-            "runningCostCreeps": creepCosts,
-            "netEnergy": energy - runningCostRepair - creepCosts,
-        }));
+        //console.log("hWs", hWs, "pCs", pCs, "uWs2", uWs2);
+        //console.log("valueSourceNoRoad", JSON.stringify({
+        //    "parts": { "hW": hWs, "pC": pCs, "uW": uWs2 },
+        //    "startUpCost": startUpCost,
+        //    "runningCostRepair": runningCostRepair,
+        //    "runningCostCreeps": creepCosts,
+        //    "netEnergy": energy - runningCostRepair - creepCosts,
+        //}));
         return {
             "parts": { "hW": hWs, "pC": pCs, "uW": uWs2 },
             "startUpCost": startUpCost,

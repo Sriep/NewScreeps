@@ -9,6 +9,7 @@ const C = require("../src/Constants");
 const gc = require("../src/gc");
 //const gf = require("../src/gf");
 const lr = require("../src/lab_reactions");
+const tile = require("../src/tile");
 
 describe("lab reactions", function() {
     describe("resource and lab", function() {
@@ -148,9 +149,69 @@ describe("lab reactions", function() {
                 [C.RESOURCE_GHODIUM] : 1000,
             };
             const map1 = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, store);
-            //console.log("map", JSON.stringify(map1))
+            assert.strictEqual( map1.length, 2);
+            console.log("map", JSON.stringify(map1), map1.length);
             const map2 = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, {});
-            // console.log("map", JSON.stringify(map2))
+            assert.strictEqual( map2.length, 2);
+            console.log("map", JSON.stringify(map2), map2.length)
+        })
+    });
+    //const mapping = lr.mapReagentsToLabs(
+    //    lr.reagentMap(boost, stores),
+    //    [...Array(labs.length).keys()],
+    //    [...Array(labs.length).keys()],
+    //    [],
+    //    this.m.lab_map,
+    //    this.m.base_labs
+    //);
+    //mapReagentsToLabs : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs)
+    describe("mapReagentsToLabs", function() {
+        it("map resoures to labs", function() {
+            store = {
+                [C.RESOURCE_GHODIUM] : 1000,
+            };
+            const rMap = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, store);
+            const numLabs = 1;
+            //const centre = tile.CENTRE_6x6_3;
+
+            const mapping = lr.mapReagentsToLabs(
+                rMap,
+                numLabs,
+                tile.getCopy(tile.CENTRE_6x6_3)
+            );
+            console.log("mapping", mapping);
         })
     })
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

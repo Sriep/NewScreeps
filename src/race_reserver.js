@@ -15,11 +15,7 @@ const race_reserver = {
         }
     },
 
-    boosts: [
-        { priority : 2, resource: RESOURCE_ZYNTHIUM_OXIDE, part : MOVE },
-        { priority : 2, resource : RESOURCE_ZYNTHIUM_ALKALIDE, part : MOVE },
-        { priority : 2, resource : RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, part : MOVE },
-    ],
+    boosts: [],
 };
 
 module.exports = race_reserver;

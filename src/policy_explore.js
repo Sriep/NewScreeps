@@ -49,27 +49,27 @@ PolicyExplore.prototype.enact = function () {
 PolicyExplore.prototype.exploreRoom = function(newRoom) {
     const room = Game.rooms[newRoom];
     if (!room) {
-        console.log("POLICY_EXPLORE !Game.rooms[newRoom] no sight on room");
+        //console.log("POLICY_EXPLORE !Game.rooms[newRoom] no sight on room");
         return;
     }
     if (!room.controller) {
-        console.log("POLICY_EXPLORE !room.controller");
+        //console.log("POLICY_EXPLORE !room.controller");
         return;
     }
     if (room.controller.my) {
-        console.log("POLICY_EXPLORE room.controller.my");
+        //console.log("POLICY_EXPLORE room.controller.my");
         return;
     }
 
     if (room.controller.owner
         && room.controller.owner.username.length > 0) {
-        console.log("POLICY_EXPLORE !room.controller.owner.username.length > 0");
+        //console.log("POLICY_EXPLORE !room.controller.owner.username.length > 0");
         return;
     }
 
     if (room.controller.reservation
         && room.controller.reservation.username.length > 0) {
-        console.log("POLICY_EXPLORE !room.controller.reservation.username.length > 0");
+        //console.log("POLICY_EXPLORE !room.controller.reservation.username.length > 0");
         return;
     }
 

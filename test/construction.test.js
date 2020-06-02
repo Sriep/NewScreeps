@@ -24,7 +24,7 @@ describe("construction", function() {
             assert.strictEqual(data2.x, 8);
             assert.strictEqual(data2.y, 10);
         });
-
+/*
         it.skip("test2 planWall_2", function() {
             //const terrain = new Terrain("W7N7");
             //const data = construction.planWall_2(terrain, {x:12, y:11});
@@ -40,6 +40,7 @@ describe("construction", function() {
             console.log("xLeft",JSON.stringify(data.xLeft));
             console.log("------------------------------------------------------")
         });
+ */
     });
 
     describe("cover  area", function() {

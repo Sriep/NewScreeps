@@ -256,7 +256,12 @@ const policy = {
             name: cRace + "_" + energy.toString(),
         };
         const queue = flag.getSpawnQueue(room.name);
-        return queue.addSpawn(data, priority, policyId,  cRace + "_idle");
+        return queue.addSpawn(
+            data,
+            priority,
+            policyId,
+            room.controller.level < 6 ? cRace + "_idle" : gc.STATE_FIND_BOOST,
+        );
     },
 
     buildSourceContainer : function (obj) {

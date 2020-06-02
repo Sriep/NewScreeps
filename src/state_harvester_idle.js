@@ -31,7 +31,7 @@ StateHarvesterIdle.prototype.enact = function () {
         state.switchToMovePos(
             this.creep,
             nextPost.pos,
-            0,
+            gc.RANGE_POST,
             gc.STATE_HARVESTER_HARVEST,
         );
     }

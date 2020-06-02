@@ -17,17 +17,15 @@ const race_worker = {
     },
 
     boosts: [
-        { priority : 3, resource: C.RESOURCE_KEANIUM_HYDRIDE, part : C.CARRY },
-        { priority : 1, resource: C.RESOURCE_LEMERGIUM_HYDRIDE, part : C.WORK },
-        { priority : 2, resource: C.RESOURCE_ZYNTHIUM_OXIDE, part : C.MOVE },
-
-        { priority : 3, resource : C.RESOURCE_KEANIUM_ACID, part : C.CARRY },
-        { priority : 1, resource : C.RESOURCE_LEMERGIUM_ACID, part : C.CARRY },
-        { priority : 2, resource : C.RESOURCE_ZYNTHIUM_ALKALIDE, part : C.MOVE },
-
-        { priority : 3, resource : C.RESOURCE_CATALYZED_KEANIUM_ACID, part : C.CARRY },
-        { priority : 1, resource : C.RESOURCE_CATALYZED_LEMERGIUM_ACID, part : C.WORK },
-        { priority : 2, resource : C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, part : C.MOVE },
+        C.RESOURCE_CATALYZED_LEMERGIUM_ACID,
+        C.RESOURCE_LEMERGIUM_ACID,
+        C.RESOURCE_LEMERGIUM_HYDRIDE,
+        //C.RESOURCE_CATALYZED_KEANIUM_ACID,
+        //C.RESOURCE_KEANIUM_ACID,
+        //C.RESOURCE_KEANIUM_HYDRIDE,
+        //C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,
+        //C.RESOURCE_ZYNTHIUM_ALKALIDE,
+        //C.RESOURCE_ZYNTHIUM_OXIDE,
     ]
 
 };
