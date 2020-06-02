@@ -93,72 +93,142 @@ const lr = {
     },
 */
     mapReagentsToLabs : function(reagentMap, numLabs, centerTile) {
+        //const leafLabs = centerTile.lab_map.slice(0,centerTile.base_labs);
+        //console.log("leafLabs", JSON.stringify(leafLabs));
         return this.mapReagentsToLabsI(
+            [],
             reagentMap,
             [...Array(numLabs).keys()],
             [...Array(numLabs).keys()],
             [],
             centerTile.lab_map,
-            centerTile.lab_map.slice(0,centerTile.base_labs)
+            [...Array(centerTile.base_labs).keys()],
         )
     },
 
-    mapReagentsToLabsI : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
+    mapReagentsToLabsI : function (mappedSoFar, map, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
+        //console.log("mapReagentsToLabsI leftMap", JSON.stringify(map),"mapped so far", mappedSoFar, "rightStack", JSON.stringify(rightStack));
         if (labsInRange.length === 0 || labsLeft.length === 0) {
+            console.log("returning",JSON.stringify({ ok:false }));
             return { ok:false }
         }
-        if (leftMap.length === 1) {
-            const leafLabsOk = leafLabs.filter(v => labsInRange.includes(v));
-            for ( let lab of leafLabsOk) {
-                let ok = true;
-                let mapping = [];
-                while (rightStack.length > 0 || !ok) {
-                    const left = rightStack.pop();
-                    const right = this.mapReagentsToLabsI(
-                        left.map,
-                        left.labsInRange.filter(v => labsLeft.includes(v) && v !== lab),
-                        labsLeft.filter(v => v !== lab),
+        //console.log("leftMap.length",map.length,"leftMap",JSON.stringify(map));
+        if (map.length === 1) {
+            if (!Array.isArray(map)) {
+                map = [map]
+            }
+            for (let done of mappedSoFar) {
+                console.log("map",JSON.stringify(map), "done",JSON.stringify(done), "done[map[0]",JSON.stringify(done[map[0]]),
+                    "labsInRange",JSON.stringify(labsInRange), "includes", labsInRange.includes(done[map[0]]));
+                if (done[map[0]]>=0 && labsInRange.includes(done[map[0]])) {
+                    const result = this.mapReagentsToLabsIExpandRightStack(
+                        mappedSoFar,
                         rightStack,
+                        labsLeft,
                         labMap,
                         leafLabs
                     );
-                    ok = right.ok;
-                    if (ok) {
-                        mapping = mapping.concat(right.mapping);
+                    if (result.ok) {
+                        return result;
                     }
                 }
-                if (ok) {
-                    mapping[lab] = leftMap[0];
-                    return { "ok": true, "mapping": mapping }
+            }
+
+            const leafLabsOk = leafLabs.filter(v => labsInRange.includes(v));
+            if (leafLabsOk.length < 1) {
+                return { "ok" : false }
+            }
+
+            for ( let lab of leafLabsOk) {
+                //console.log("map",JSON.stringify(map),"lab",lab,"mappedSoFar",JSON.stringify(mappedSoFar))
+                const result = this.mapReagentsToLabsIExpandRightStack(
+                    this.addToMapping(mappedSoFar, map, lab),
+                    rightStack,
+                    labsLeft.filter(l => l !== lab),
+                    labMap,
+                    leafLabs.filter(l => l !== lab),
+                );
+                if (result.ok) {
+                    return result;
                 }
             }
-        } if (leftMap.length === 2) {
+            return { "ok" : false }
+
+        } else if (map.length === 2) {
+
+            const flatMap = map.flat(10).sort().join("");
+            for (let done of mappedSoFar) {
+                if (done[flatMap] && labsInRange.includes(done[flatMap])) {
+                    const result = this.mapReagentsToLabsIExpandRightStack(
+                        mappedSoFar,
+                        rightStack,
+                        labsLeft,
+                        labMap,
+                        leafLabs
+                    );
+                    if (result.ok) {
+                        return result;
+                    }
+                }
+            }
+//(mappedSoFar, map, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
             for ( let i = labsInRange.length-1 ; i >= 0 ; i-- ) {
                 rightStack.push({
-                    map: leftMap[1],
-                    labsInRange: labMap(labsInRange[i]),
+                    map: map[1],
+                    labsInRange: labMap[labsInRange[i]],
                 });
                 const left = this.mapReagentsToLabsI(
-                    leftMap[0],
-                    labMap(labsInRange[i]).filter(v => labsLeft.includes(v)),
-                    labsLeft.filter(v => v !== labsInRange[i]),
+                    this.addToMapping(mappedSoFar, map, i),
+                    map[0],
+                    labMap[labsInRange[i]].filter(v => labsLeft.includes(v)),
+                    labsLeft.filter(l => l !== labsInRange[i]),
                     rightStack,
                     labMap,
+                    leafLabs.filter(l => l !== labsInRange[i]),
                 );
                 if (left.ok) {
+                    //console.log("returning",JSON.stringify(left));
                     return left;
                 }
             }
         } else {
-            console.log("leftMap", JSON.stringify(leftMap));
+            console.log("leftMap", JSON.stringify(map));
             gf.fatalError("something wrong in mapReagentsToLabsI")
         }
+        //console.log("mapReagentsToLabsI dropped through")
+        return { ok : false }
     },
 
+    mapReagentsToLabsIExpandRightStack(mappedSoFar, rightStack, labsLeft, labMap, leafLabs) {
+        let result = { ok : true, "mapping" : mappedSoFar};
+        while (rightStack.length > 0) {
+            const left = rightStack.pop();
+            result = this.mapReagentsToLabsI(
+                result.mapping,
+                left.map,
+                left.labsInRange,
+                labsLeft,
+                rightStack,
+                labMap,
+                leafLabs
+            );
+            if (!result.ok) {
+               return result;
+            }
+        }
+        return result;
+    },
+
+    addToMapping(mappedSoFar, node, labNum) {
+        //console.log("addToMapping node", JSON.stringify(node),"labNum", labNum, "mapped so far", JSON.stringify(mappedSoFar));
+        let newMapping = [...mappedSoFar];
+        newMapping.push({[node.flat(10).sort().join("")]: labNum});
+        newMapping = [...new Set(newMapping)];
+        return newMapping;
+    },
+
+
     expandReagentArray : function (reagents, storage) {
-        //console.log("expandReagentArray reagents",JSON.stringify(reagents)
-        //    ,"storage",JSON.stringify(storage))
-        //console.log("!storage[ZK]", "ZK" in storage, storage["ZK"])
         let temp = [...reagents];
         let atoms = [];
         for (let reagent of reagents) {
@@ -168,7 +238,6 @@ const lr = {
                 atoms.push(reagent)
             }
         }
-        //console.log("atoms",JSON.stringify(atoms), "temp",JSON.stringify(temp));
         return [...new Set(atoms.concat(temp))];
     },
 

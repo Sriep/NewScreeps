@@ -144,41 +144,6 @@ const state = {
         return false;
     },
 
-    findCollectContainer: function(room) {
-        const containerPos = this.getHarvestContainersPos(room);
-        let containers = [];
-        for (let i in containerPos) {
-            const container = this.findContainerAt(gf.roomPosFromPos(containerPos[i]), room.name);
-            if (container) {
-                containers.push(container);
-            }
-        }
-        if (containers.length === 0) {
-            return undefined;
-        }
-        let maxSoFar = -1;
-        let maxIndex = -1;
-        for (let i in containers) {
-            if (containers[i].store.getUsedCapacity(RESOURCE_ENERGY) > maxSoFar) {
-                maxSoFar = containers[i].store.getUsedCapacity(RESOURCE_ENERGY);
-                maxIndex = i;
-            }
-        }
-        return containers[maxIndex];
-    },
-
-    getHarvestContainersPos: function (room) {
-        const fRoom = new FlagRoom(room.name);
-        const containersPos = [];
-        for (let sourceId in fRoom.getSources()) {
-            const cPos = fRoom.getSourceContainerPos(sourceId);
-            if (cPos) {
-                containersPos.push(gf.roomPosFromPos(cPos));
-            }
-        }
-        return containersPos;
-    },
-
     numHarvestersHarvesting: function(policyId) { //done
         return _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId === policyId
@@ -255,77 +220,6 @@ const state = {
         }
         return this.findContainerConstructionAt(pos)
     },
-/*
-    findContainerConstructionNear : function (creep, range) {
-        if (!range) {
-            range = 0;
-        }
-        const pos = creep.pos;
-        const sites = creep.room.lookForAtArea(
-            LOOK_CONSTRUCTION_SITES,
-            pos.y-range,
-            pos.x-range,
-            pos.y+range,
-            pos.x+range,
-            true,
-        );
-        for (let i in sites) {
-            if (sites[i].constructionSite.structureType === STRUCTURE_CONTAINER) {
-                return sites[i].constructionSite
-            }
-        }
-        return undefined;
-    },
-*/
-
-    //getSourcePosts : function (sourceId) {
-    //    if (Game.flags[sourceId]) {
-    //        return Game.flags[sourceId].memory.harvesterPosts;
-    //    }
-    //},
-/*
-    getSourceLinkPos : function (sourceId) {
-        if (Game.flags[sourceId]) {
-            const l = gf.roomPosFromPos(Game.flags[sourceId].memory.linkPos);
-            if (l) {
-                return new RoomPosition(l.x, l.y, l.roomName);
-            }
-        }
-    },
-
-    getSourceContainerPos : function (sourceId) {
-        if (Game.flags[sourceId]) {
-            return Game.flags[sourceId].memory.containerPos;
-        }
-    },
-
-    getControllerPosts : function (controllerId) {
-        if (Game.flags[controllerId]) {
-            return Game.flags[controllerId].memory.upgraderPosts;
-        }
-    },
-
-    getMineralContainerPos : function(mineralId) {
-        if (Game.flags[mineralId]) {
-            return Game.flags[mineralId].memory.containerPos;
-        }
-    },
-
-    getMineralPosts : function(mineralId) {
-        if (Game.flags[mineralId]) {
-            return Game.flags[mineralId].memory.harvesterPosts;
-        }
-    },
-
-    getControllerLinkPos : function(controllerId) {
-        if (Game.flags[controllerId]) {
-            const l = Game.flags[controllerId].memory.linkPos;
-            if (l) {
-                return new RoomPosition(l.x, l.y, l.roomName);
-            }
-        }
-    },
-    */
 
     getObjAtPos(pos, type) {
         if (pos) {

@@ -14,12 +14,12 @@ function StateWorkerHarvest (creep) {
 }
 
 StateWorkerHarvest.prototype.enact = function () {
-    console.log(this.creep.name, "in STATE_WORKER_HARVEST creep pos",JSON.stringify(this.creep.pos));
+    //console.log(this.creep.name, "in STATE_WORKER_HARVEST creep pos",JSON.stringify(this.creep.pos));
     if (this.creep.store.getFreeCapacity() === 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
     const target = Game.getObjectById(this.creep.memory.targetId);
-    console.log(this.creep.name, "in STATE_WORKER_HARVEST target pos",JSON.stringify(target.pos),"target",JSON.stringify(target));
+    //console.log(this.creep.name, "in STATE_WORKER_HARVEST target pos",JSON.stringify(target.pos),"target",JSON.stringify(target));
     if (target.energy > 0) {
         const result = this.creep.harvest(target);
         switch (result) {

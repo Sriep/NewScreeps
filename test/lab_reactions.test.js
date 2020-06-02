@@ -150,10 +150,10 @@ describe("lab reactions", function() {
             };
             const map1 = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, store);
             assert.strictEqual( map1.length, 2);
-            console.log("map", JSON.stringify(map1), map1.length);
+            //console.log("map", JSON.stringify(map1), map1.length);
             const map2 = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, {});
             assert.strictEqual( map2.length, 2);
-            console.log("map", JSON.stringify(map2), map2.length)
+            //console.log("map", JSON.stringify(map2), map2.length)
         })
     });
     //const mapping = lr.mapReagentsToLabs(
@@ -170,16 +170,35 @@ describe("lab reactions", function() {
             store = {
                 [C.RESOURCE_GHODIUM] : 1000,
             };
-            const rMap = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, store);
-            const numLabs = 1;
-            //const centre = tile.CENTRE_6x6_3;
+            const numLabs = 9;
+            const centreTile = tile.CENTRE_6x6_3;
 
-            const mapping = lr.mapReagentsToLabs(
-                rMap,
+            const mapUH = lr.reagentMap(C.RESOURCE_UTRIUM_HYDRIDE, store);
+            console.log("reagentMap mapUH",JSON.stringify(mapUH));
+            //const mappingUH = lr.mapReagentsToLabs(
+            //    mapUH,
+            //    numLabs,
+            //    tile.getCopy(centreTile)
+            //);
+            //console.log("mapping mapUH", mappingUH);
+
+            const mapUH2O = lr.reagentMap(C.RESOURCE_UTRIUM_ACID, store);
+            console.log("reagentMap mapUH",JSON.stringify(mapUH2O));
+            const mappingUH2O = lr.mapReagentsToLabs(
+                mapUH2O,
                 numLabs,
-                tile.getCopy(tile.CENTRE_6x6_3)
+                tile.getCopy(centreTile)
             );
-            console.log("mapping", mapping);
+            console.log("mapping mapUH2O", mappingUH2O);
+
+            const mapXGHO2 = lr.reagentMap(C.RESOURCE_CATALYZED_GHODIUM_ALKALIDE, store);
+            console.log("reagentMapmap XGHO2 ",JSON.stringify(mapXGHO2));
+            const mappingXGHO2 = lr.mapReagentsToLabs(
+                mapXGHO2,
+                numLabs,
+                tile.getCopy(centreTile)
+            );
+            console.log("mapping XGHO2", mappingXGHO2);
         })
     })
 

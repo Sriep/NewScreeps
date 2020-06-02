@@ -7,7 +7,7 @@
 const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
-//const economy = require("economy");
+const gf = require("gf");
 const FlagRoom = require("flag_room");
 
 function StateWorkerIdle (creep) {
@@ -42,13 +42,6 @@ StateWorkerIdle.prototype.enact = function () {
 StateWorkerIdle.prototype.findNewRoom = function() {
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.m.colonies;
-    //if (colonies.length === 0) {
-    //    return false;
-    //}
-    //colonies = colonies.sort( (c1, c2)  => {
-    //    return Game.map.getRoomLinearDistance(c1, this.creep.room.name)
-    //        - Game.map.getRoomLinearDistance(c2, this.creep.room.name)
-    //});
     for (let i = 1 ; i < colonies.length ; i++) {
         if (this.workToDo(colonies[i])) {
             return colonies[i];
@@ -90,12 +83,11 @@ StateWorkerIdle.prototype.enactOld = function () {
         );
     }
 
-    const container = state.findCollectContainer(this.creep.room);
-    if (container &&
-        container.store.getUsedCapacity(RESOURCE_ENERGY)
-            > container.store.getCapacity(RESOURCE_ENERGY)//*gc.CONTAINER_EMPTY_THRESHOLD
-    ) {
+    const container = this.findCollectContainer(this.creep.room);
+    //console.log(this.creep.name, "STATE_WORKER_IDLE container", container);
+    if (container) {
         this.creep.memory.targetId = container.id;
+        console.log(this.creep.name,"move to container", container.id, "pos", container.pos)
         return state.switchToMovePos(
             this.creep,
             container.pos,
@@ -104,7 +96,8 @@ StateWorkerIdle.prototype.enactOld = function () {
         );
     }
 
-    const post = this.workerFindTargetSourcePos();
+    const post = this.findTargetSourcePos();
+    //console.log(this.creep.name, "STATE_WORKER_IDLE findTargetSourcePos", JSON.stringify(post));
     if (post) {
         this.creep.memory.targetId = post.id;
         return state.switchToMovePos(
@@ -116,6 +109,7 @@ StateWorkerIdle.prototype.enactOld = function () {
     }
 
     const colony = this.findNewRoom();
+    //console.log(this.creep.name, "STATE_WORKER_IDLE find new room colony", JSON.stringify(colony));
     if (colony) {
         return state.switchMoveToRoom(
             this.creep,
@@ -125,7 +119,7 @@ StateWorkerIdle.prototype.enactOld = function () {
     }
 };
 
-StateWorkerIdle.prototype.workerFindTargetSourcePos = function() {
+StateWorkerIdle.prototype.findTargetSourcePos = function() {
     const room = this.creep.room;
     let sources = room.find(FIND_SOURCES);
     if (sources.length === 0)  {
@@ -164,6 +158,40 @@ StateWorkerIdle.prototype.workerFindTargetSourcePos = function() {
         }
     }
     return undefined;
+};
+
+StateWorkerIdle.prototype.findCollectContainer = function(room) {
+    const containerPoses = this.getHarvestContainersPos(room);
+    //console.log("findCollectContainer containerPoses", JSON.stringify(containerPoses))
+    let containers = [];
+    for (let cPos of containerPoses) {
+        const container = state.findContainerAt(gf.roomPosFromPos(cPos));
+        if (container) {
+            containers.push(container);
+        }
+    }
+    //console.log("findCollectContainer containers", JSON.stringify(containers));
+    if (containers.length === 0) {
+        return undefined;
+    }
+    containers = containers.sort( (c1,c2) => {
+        return c2.store.getUsedCapacity() - c1.store.getUsedCapacity()
+    });
+    if (containers[0].store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+        return containers[0];
+    }
+};
+
+StateWorkerIdle.prototype.getHarvestContainersPos = function (room) {
+    const fRoom = new FlagRoom(room.name);
+    const containersPos = [];
+    for (let sourceId in fRoom.getSources()) {
+        const cPos = fRoom.getSourceContainerPos(sourceId);
+        if (cPos) {
+            containersPos.push(gf.roomPosFromPos(cPos));
+        }
+    }
+    return containersPos;
 };
 
 module.exports = StateWorkerIdle;
