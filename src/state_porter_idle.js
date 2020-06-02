@@ -22,6 +22,8 @@ function StatePorterIdle (creep) {
 StatePorterIdle.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_PORTER_IDLE");
     delete this.creep.memory.targetId;
+    this.checkFlags();
+
     if (this.creep.store.getUsedCapacity() > 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
@@ -34,7 +36,7 @@ StatePorterIdle.prototype.enact = function () {
         colonies, race.partCount(this.creep, CARRY)*CARRY_CAPACITY
     );
     //console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
-    if (info.pos) {
+    if (info && info.pos) {
         this.creep.memory.targetId = info.sourceId;
         //console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
         return state.switchToMovePos(
@@ -115,11 +117,13 @@ StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
             return info
         }
     }
+    containersInfo = containersInfo.sort((c1, c2) =>
+        c1.porters - c2.porters
+    );
+    return containersInfo[0];
 };
 
 StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
-    this.checkFlags();
-
     let porters = _.filter(Game.creeps, c => {
         return  c.memory.targetId && race.getRace(c) === gc.RACE_PORTER
     });

@@ -167,20 +167,21 @@ describe("lab reactions", function() {
     //mapReagentsToLabs : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs)
     describe("mapReagentsToLabs", function() {
         it("map resoures to labs", function() {
+/*
             store = {
                 [C.RESOURCE_GHODIUM] : 1000,
             };
-            const numLabs = 9;
+            const numLabs = 10;
             const centreTile = tile.CENTRE_6x6_3;
 
             const mapUH = lr.reagentMap(C.RESOURCE_UTRIUM_HYDRIDE, store);
             console.log("reagentMap mapUH",JSON.stringify(mapUH));
-            //const mappingUH = lr.mapReagentsToLabs(
-            //    mapUH,
-            //    numLabs,
-            //    tile.getCopy(centreTile)
-            //);
-            //console.log("mapping mapUH", mappingUH);
+            const mappingUH = lr.mapReagentsToLabs(
+                mapUH,
+                numLabs,
+                tile.getCopy(centreTile)
+            );
+            console.log("mapping mapUH", mappingUH);
 
             const mapUH2O = lr.reagentMap(C.RESOURCE_UTRIUM_ACID, store);
             console.log("reagentMap mapUH",JSON.stringify(mapUH2O));
@@ -199,6 +200,36 @@ describe("lab reactions", function() {
                 tile.getCopy(centreTile)
             );
             console.log("mapping XGHO2", mappingXGHO2);
+            */
+        });
+        it("map resoures to labs", function() {
+            store = {
+                [C.RESOURCE_GHODIUM] : 1000,
+            };
+            const numLabs = 10;
+            const centreTile = tile.CENTRE_6x6_3;
+            let count = 0;
+            for (let resource of gc.BOOSTS_RESOURCES) {
+                const map = lr.reagentMap(resource, store);
+                const mapping = lr.mapReagentsToLabs(
+                    map,
+                    numLabs,
+                    tile.getCopy(centreTile)
+                );
+                const mapObj = {};
+                for (let pair of mapping) {
+                    mapObj[Object.keys(pair)[0]] = pair[Object.keys(pair)[0]]
+                }
+                for (let resource in mapObj) {
+                    if (resource.length > 1) {
+                        const reagents = lr.reagents(resource);
+                        assert(centreTile.lab_map[mapObj[resource]].includes(mapObj[reagents[0]]));
+                        assert(centreTile.lab_map[mapObj[resource]].includes(mapObj[reagents[1]]));
+                        count++
+                    }
+                }
+            }
+            assert.strictEqual(count, 80)
         })
     })
 

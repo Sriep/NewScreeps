@@ -36,8 +36,8 @@ StateWorkerHarvest.prototype.enact = function () {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
-                //console.log(this.creep.name,"STATE_WORKER_HARVEST ERR_NOT_IN_RANGE m"
-                //    , JSON.stringify(this.creep.m), "memory", this.creep.memory);
+                console.log(this.creep.name,"STATE_WORKER_HARVEST ERR_NOT_IN_RANGE pos",this.creep.pos,"m"
+                    , JSON.stringify(this.m), "target", target.pos, JSON.stringify(target));
                 //return state.switchTo(this.creep, this.m, gc.STATE_WORKER_IDLE);
                 return gf.fatalError("ERR_NOT_IN_RANGE");
             case ERR_TIRED:        // The extractor or the deposit is still cooling down.

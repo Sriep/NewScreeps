@@ -103,11 +103,12 @@ const lr = {
             [],
             centerTile.lab_map,
             [...Array(centerTile.base_labs).keys()],
-        )
+        ).mapping
     },
 
     mapReagentsToLabsI : function (mappedSoFar, map, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
-        //console.log("mapReagentsToLabsI leftMap", JSON.stringify(map),"mapped so far", mappedSoFar, "rightStack", JSON.stringify(rightStack));
+        //console.log("mapReagentsToLabsI leftMap", JSON.stringify(map),"mapped so far", mappedSoFar,
+        //    "rightStack", JSON.stringify(rightStack),"labs in range", JSON.stringify(labsInRange),"labsLeft",JSON.stringify(labsLeft));
         if (labsInRange.length === 0 || labsLeft.length === 0) {
             console.log("returning",JSON.stringify({ ok:false }));
             return { ok:false }
@@ -118,23 +119,24 @@ const lr = {
                 map = [map]
             }
             for (let done of mappedSoFar) {
-                console.log("map",JSON.stringify(map), "done",JSON.stringify(done), "done[map[0]",JSON.stringify(done[map[0]]),
-                    "labsInRange",JSON.stringify(labsInRange), "includes", labsInRange.includes(done[map[0]]));
-                if (done[map[0]]>=0 && labsInRange.includes(done[map[0]])) {
-                    const result = this.mapReagentsToLabsIExpandRightStack(
-                        mappedSoFar,
-                        rightStack,
-                        labsLeft,
-                        labMap,
-                        leafLabs
-                    );
-                    if (result.ok) {
-                        return result;
+                //console.log("map",JSON.stringify(map), "done",JSON.stringify(done), "done[map[0]",JSON.stringify(done[map[0]]),
+                //    "labsInRange",JSON.stringify(labsInRange), "includes", labsInRange.includes(done[map[0]]));
+                if (done[map[0]]>=0) {
+                    if (labsInRange.includes(done[map[0]])) {
+                        return this.mapReagentsToLabsIExpandRightStack(
+                            mappedSoFar,
+                            JSON.parse(JSON.stringify(rightStack)),
+                            [...labsLeft],
+                            labMap,
+                            [...leafLabs]
+                        );
+                    } else {
+                        return { "ok" : false }
                     }
                 }
             }
 
-            const leafLabsOk = leafLabs.filter(v => labsInRange.includes(v));
+            const leafLabsOk = leafLabs.filter(l => labsInRange.includes(l) && labsLeft.includes(l));
             if (leafLabsOk.length < 1) {
                 return { "ok" : false }
             }
@@ -143,10 +145,10 @@ const lr = {
                 //console.log("map",JSON.stringify(map),"lab",lab,"mappedSoFar",JSON.stringify(mappedSoFar))
                 const result = this.mapReagentsToLabsIExpandRightStack(
                     this.addToMapping(mappedSoFar, map, lab),
-                    rightStack,
+                    JSON.parse(JSON.stringify(rightStack)),
                     labsLeft.filter(l => l !== lab),
                     labMap,
-                    leafLabs.filter(l => l !== lab),
+                    leafLabs,
                 );
                 if (result.ok) {
                     return result;
@@ -161,35 +163,36 @@ const lr = {
                 if (done[flatMap] && labsInRange.includes(done[flatMap])) {
                     const result = this.mapReagentsToLabsIExpandRightStack(
                         mappedSoFar,
-                        rightStack,
-                        labsLeft,
+                        JSON.parse(JSON.stringify(rightStack)),
+                        [...labsLeft],
                         labMap,
-                        leafLabs
+                        leafLabs,
                     );
                     if (result.ok) {
                         return result;
                     }
                 }
             }
-//(mappedSoFar, map, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
-            for ( let i = labsInRange.length-1 ; i >= 0 ; i-- ) {
+            const allowedLabs = labsInRange.filter(l => labsLeft.includes(l));
+            for ( let i = allowedLabs.length-1 ; i >= 0 ; i-- ) {
                 rightStack.push({
                     map: map[1],
-                    labsInRange: labMap[labsInRange[i]],
+                    labsInRange: labMap[allowedLabs[i]],
                 });
                 const left = this.mapReagentsToLabsI(
-                    this.addToMapping(mappedSoFar, map, i),
+                    this.addToMapping(mappedSoFar, map, allowedLabs[i]),
                     map[0],
-                    labMap[labsInRange[i]].filter(v => labsLeft.includes(v)),
-                    labsLeft.filter(l => l !== labsInRange[i]),
+                    labMap[allowedLabs[i]],
+                    labsLeft.filter(l => l !== allowedLabs[i]),
                     rightStack,
                     labMap,
-                    leafLabs.filter(l => l !== labsInRange[i]),
+                    leafLabs,
                 );
                 if (left.ok) {
                     //console.log("returning",JSON.stringify(left));
                     return left;
                 }
+                rightStack.pop();
             }
         } else {
             console.log("leftMap", JSON.stringify(map));
@@ -208,7 +211,7 @@ const lr = {
                 left.map,
                 left.labsInRange,
                 labsLeft,
-                rightStack,
+                JSON.parse(JSON.stringify(rightStack)),
                 labMap,
                 leafLabs
             );
@@ -220,13 +223,49 @@ const lr = {
     },
 
     addToMapping(mappedSoFar, node, labNum) {
-        //console.log("addToMapping node", JSON.stringify(node),"labNum", labNum, "mapped so far", JSON.stringify(mappedSoFar));
         let newMapping = [...mappedSoFar];
-        newMapping.push({[node.flat(10).sort().join("")]: labNum});
+        newMapping.push({ [this.flatToResource(node.flat(10).join(""))] : labNum});
         newMapping = [...new Set(newMapping)];
         return newMapping;
     },
 
+    flatToResource(flat) {
+        if (flat === "OH" || flat === "HO") {
+            return C.RESOURCE_HYDROXIDE;
+        }
+        let resource = "";
+        if (flat.includes(C.RESOURCE_CATALYST)) {
+            resource += C.RESOURCE_CATALYST
+        }
+        if (flat.includes(C.RESOURCE_GHODIUM)) {
+            resource += C.RESOURCE_GHODIUM
+        }
+        if (flat.includes(C.RESOURCE_ZYNTHIUM)) {
+            resource += C.RESOURCE_ZYNTHIUM
+        }
+        if (flat.includes(C.RESOURCE_UTRIUM)) {
+            resource += C.RESOURCE_UTRIUM
+        }
+        if (flat.includes(C.RESOURCE_LEMERGIUM)) {
+            resource += C.RESOURCE_LEMERGIUM
+        }
+        if (flat.includes(C.RESOURCE_KEANIUM)) {
+            resource += C.RESOURCE_KEANIUM
+        }
+        if (flat.includes(C.RESOURCE_HYDROGEN)) {
+            resource += C.RESOURCE_HYDROGEN
+        }
+        if (flat.split(C.RESOURCE_HYDROGEN).length-1 === 2) {
+            resource += 2
+        }
+        if (flat.includes(C.RESOURCE_OXYGEN)) {
+            resource += C.RESOURCE_OXYGEN
+        }
+        if (flat.split(C.RESOURCE_OXYGEN).length-1 === 2) {
+            resource += 2
+        }
+        return resource;
+    },
 
     expandReagentArray : function (reagents, storage) {
         let temp = [...reagents];

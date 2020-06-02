@@ -144,41 +144,16 @@ FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
     );
     const mapping = lr.mapReagentsToLabs(
         lr.reagentMap(boost, stores),
-        [...Array(labs.length).keys()],
-        [...Array(labs.length).keys()],
-        [],
-        this.m.lab_map,
-        this.m.base_labs
+        labs.length,
+        this.m["plan"],
     );
     this.colourLabFlags(mapping);
 };
 
-/*
-FlagOwnedRoom.prototype.reagentSplit = function(labs, boost, store) {
-    let reagents = [boost];
-    reagents = lr.expandReagentArray(reagents, store);
-    if (labs.length <= 4) {
-        return reagents
-    }
-
-    reagents = lr.expandReagentArray(reagents, store);
-    if (labs.length <= 6) {
-        return reagents
-    }
-
-    reagents = lr.expandReagentArray(reagents, store);
-    if (labs.length < 10 || this.m.plan.base_labs <= 4) {
-        return reagents
-    }
-
-    return lr.expandReagentArray(reagents, store);
-};
-*/
-
 FlagOwnedRoom.prototype.colourLabFlags = function(labs, mappings) {
-    for ( let i in mappings ) {
-        colours = gc.LAB_COLOURS[mappings[i]];
-        Game.flags[labs[i].id].setColor(
+    for ( let r in mappings ) {
+        colours = gc.LAB_COLOURS[r];
+        Game.flags[labs[mappings[r]].id].setColor(
             colours.color, colours.secondaryColor
         )
     }
