@@ -67,7 +67,7 @@ StateWorkerFullIdle.prototype.enact = function () {
 
     let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
     if (nextConstructionSite != null) {
-        console.log("nextConstructionSite", JSON.stringify(nextConstructionSite));
+        //console.log("nextConstructionSite", JSON.stringify(nextConstructionSite));
         this.creep.memory.targetId = nextConstructionSite.id;
         return state.switchToMovePos(
             this.creep,

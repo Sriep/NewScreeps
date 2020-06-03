@@ -28,42 +28,52 @@ PolicyColonialOffice.prototype.initilise = function () {
     this.m.freeRooms = {};
     this.m.invaderRooms = {};
     this.m.foreignRooms = {};
+    this.m.underConstruction = [];
     Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
     return true;
 };
 
 // runs once every tick
 PolicyColonialOffice.prototype.enact = function () {
-    //if (Game.time + this.id % 5 !== 0) { // todo
-    //    return
-    //}
-    //console.log("POLICY_COLONIAL_OFFICE");
+    this.lookForNewColonies();
+};
+
+PolicyColonialOffice.prototype.lookForNewColonies = function () {
     for (let flagName in Game.flags) {
-        if (!Game.rooms[flagName]) {
-            continue;
-        }
         if (gf.validateRoomName(flagName)) {
             if (!Game.flags[flagName].memory.owned
                 && !Game.flags[flagName].memory.spawnRoom) {
-               this.checkRoom(flagName);
+                this.checkRoom(flagName);
             }
+        }
+    }
+    if (!this.m.underConstruction) { // todo hack remove next time
+        this.m.underConstruction = [];
+    }
+    for (let i  = this.m.underConstruction.length ;  i >= 0 ; i--) {
+        if (Game.rooms[this.m.underConstruction[i]]) {
+            //const roomFlag = flag.getRoomFlag(this.m.underConstruction[i]);
+            console.log("POLICY_COLONIAL_OFFICE underContruction", this.m.underConstruction[i]);
+            //this.build(this.m.underConstruction[i], roomFlag.memory.spawnRoom, false)
+            this.build(this.m.underConstruction[i], "W7N7", false); // todo hack remove line
+            this.m.underConstruction.splice(i,1);
         }
     }
 };
 
 PolicyColonialOffice.prototype.checkRoom = function (roomName) {
     //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
-    const m = Game.flags[roomName].memory;
+    const m = flag.getRoomFlag(roomName).memory;// Game.flags[roomName].memory;
+    //console.log("POLICY_COLONIAL_OFFICE checkroom m", JSON.stringify(m), "again", JSON.stringify(Game.flags[roomName].memory));
+    //m.test = "testing piers";
+    //console.log("POLICY_COLONIAL_OFFICE checkroom testing",roomName, "m", JSON.stringify(m));
+
     if (m.spawnRoom) {
-        //console.log("room",roomName,"already has spawn room");
-        return;
-    }
-    if (!Game.rooms[roomName]) {
-        //console.log(roomName, "no room visablity");
+        //console.log("POLICY_COLONIAL_OFFICE checkRoom room",roomName,"already has spawn room");
         return;
     }
 
-    let profitableRooms = [];
+    let profitableSpawnRooms = [];
     for (let name in m.rooms) {
         const governor = policy.getGouvernerPolicy(name);
         //console.log("checkRoom name", name, "governor", JSON.stringify(governor));
@@ -71,9 +81,10 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
         const values = memory.values(roomName, name);
 
         if (governor.m[gc.ACTIVITY_RESERVED_COLONIES]) {
+            //console.log("POLICY_COLONIAL_OFFICE ACTIVITY_RESERVED_COLONIES");
             const profitParts = values["reserved"]["profit"]/values["reserved"]["parts"];
             if (profitParts > gc.COLONY_PROFIT_PART_MARGIN) {
-                profitableRooms.push({
+                profitableSpawnRooms.push({
                     "governor":governor,
                     "profitParts":profitParts,
                     "info":values["reserved"]
@@ -81,10 +92,10 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
             }
         } else if (governor.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
             const profitParts = values["neutral"]["profit"]/values["reserved"]["parts"];
-            //console.log("POLICY_COLONIAL_OFFICE m.rooms[name]", JSON.stringify(m.rooms[name]));
+            //console.log("POLICY_COLONIAL_OFFICE ACTIVITY_NEUTRAL_COLONIES");
             //console.log("POLICY_COLONIAL_OFFICE values[neutral]", JSON.stringify(values["neutral"]));
             if ( profitParts > gc.COLONY_PROFIT_PART_MARGIN) {
-                profitableRooms.push({
+                profitableSpawnRooms.push({
                     "governor":governor,
                     "profitParts":profitParts,
                     "info":values["neutral"]
@@ -92,20 +103,26 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
             }
         }
     }
-    console.log("POLICY_COLONIAL_OFFICE checkRoom profitableRooms",JSON.stringify(profitableRooms));
-    profitableRooms = profitableRooms.sort( (a,b) =>  {
+    //console.log("POLICY_COLONIAL_OFFICE checkRoom profitableRooms length",profitableSpawnRooms.length,"roomname")//,profitableSpawnRooms[0].governor.roomName);
+    profitableSpawnRooms = profitableSpawnRooms.sort( (a,b) =>  {
         return b["profitParts"] - a["profitParts"];
     });
-    for (let roomInfo of profitableRooms) {
+    for (let roomInfo of profitableSpawnRooms) {
+        //console.log("roomInfo.governor.roomName",roomInfo.governor.roomName);
+        //console.log("POLICY_COLONIAL_OFFICE about to addColoy profitParts", JSON.stringify(roomInfo.profitParts),"roomInfo.values", JSON.stringify(roomInfo.info));
         if (roomInfo.governor.addColony(
             roomName,
             roomInfo.info.profit,
             roomInfo.info.parts,
             roomInfo.info.startUpCost,
         )) {
-            console.log("checkRoom roomInfo", JSON.stringify(roomInfo));
             m.spawnRoom = roomInfo.governor.roomName;
-            this.build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
+            //console.log("POLICY_COLONIAL_OFFICE just added room",roomName,"as colony to",roomInfo.governor.roomName, "m.spawnRoom",JSON.stringify(m.spawnRoom));
+            if (Game.rooms[roomName]) {
+                this.build(Game.rooms[roomName], Game.rooms[m.spawnRoom], roomInfo.governor.m["reserved_colonies"]);
+            } else {
+                this.m.underConstruction.push(roomName)
+            }
             break;
         }
     }

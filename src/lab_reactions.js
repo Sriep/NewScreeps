@@ -36,62 +36,7 @@ const lr = {
         }
         return map;
     },
-/*
-    mapReagentsToLabs1: function (labs, resources, numBaseResources, numBaseLabs, labMap,) {
-        if (numBaseLabs < numBaseResources
-            || numBaseResources < 0
-            || labs.length < resources.length
-            || resources.length < 0) {
-            return {};
-        }
-        //const umLabs = [...Array(labs.length).keys()];
-        let umResoures = [...resources];
-        const mapping = {};
-        let mappedLabs = 0;
-        for (let i = numBaseLabs ; i < labs.length ; i ++ ) {
-            for (let j = resources.length ; j > numBaseResources ; j-- ) {
-                if (labs[i].mineralType === umResoures[j]) {
-                    mapping[i] = umResoures[j];
-                    mappedLabs++;
-                    umResoures = umResoures.slice(0,i).concat(umResoures.slice(i+1))
-                }
-            }
-        }
-        this.mapReagentsToLabs2(
-            labs.length - mappedLabs,
-            umResoures,
-            numBaseResources,
-            numBaseLabs,
-            labMap,
-        )
-    },
 
-    mapReagentsToLabs2: function (numLabs, resources, numBaseResources, numBaseLabs, labMap) {
-        let umResoures = [...resources];
-        //const mapping = {};
-        //let mappedLabs = 0;
-        for (let i = 0 ; i < numBaseLab ; i++ ) {
-            for (let j = numBaseResources-1 ; j >= 0 ; j-- ) {
-                let result;
-                if (numBaseResources > 1) {
-                    result = this.mapReagentsToLabs2(
-                        numLabs - 1,
-                        umResoures.slice(0,j).concat(umResoures.slice(j+1)),
-                        numBaseResources-1,
-                        numBaseLabs-1,
-                        labMap,
-                    )
-                } else {
-                    result = this.mapReagentsToLabs3(
-                        numLabs - 1,
-                        umResoures.slice(0,j).concat(umResoures.slice(j+1)),
-                        labMap,
-                    )
-                }
-            }
-        }
-    },
-*/
     mapReagentsToLabs : function(reagentMap, numLabs, centerTile) {
         //const leafLabs = centerTile.lab_map.slice(0,centerTile.base_labs);
         //console.log("leafLabs", JSON.stringify(leafLabs));

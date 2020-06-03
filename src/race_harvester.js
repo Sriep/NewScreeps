@@ -7,7 +7,12 @@ const gc = require("./gc");
 const C = require("./Constants");
 
 const race_harvester = {
-    bodyCounts: function (ec) {
+    COST_WWM : 2*C.BODYPART_COST[C.WORK] + C.BODYPART_COST[C.MOVE],
+    bodyCounts: function (ec, freeSize) {
+        if (freeSize) {
+            const size = Math.min(16, Math.floor((ec-C.BODYPART_COST[C.CARRY])/this.COST_WWM));
+            return {"work": 2*size, "carry": 1, "move" : size};
+        }
         if (ec < gc.MIN_HARVESTER_EC) {
             return undefined;
         }

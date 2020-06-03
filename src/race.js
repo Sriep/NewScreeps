@@ -4,8 +4,6 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
-//const flag = require("flag");
-//const gf = require("gf");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,
@@ -19,13 +17,13 @@ const race = {
         return creep.name.split("_")[0];
     },
 
-    getBodyCounts(race, ec) {
-        const raceModule = require("race_" + race);
-        return raceModule.bodyCounts(ec);
+    getBodyCounts(race, ec, param1) {
+        const raceModule = require("./race_" + race);
+        return raceModule.bodyCounts(ec, param1);
     },
 
-    getCost(race, ec) {
-        const bodyCounts = this.getBodyCounts(race, ec);
+    getCost(race, ec, param1) {
+        const bodyCounts = this.getBodyCounts(race, ec, param1);
         return this.getCostBody(bodyCounts);
     },
 

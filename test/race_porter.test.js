@@ -12,11 +12,18 @@ describe("race_porter", function() {
 
             for (let ec = 0 ; ec <= 3000 ; ec+=100 ) {
                 const body = race_porter.bodyCounts(ec);
+                const bodySlow = race_porter.bodyCounts(ec, true);
+                //console.log(ec,"fast", JSON.stringify(body), "slow", JSON.stringify(bodySlow));
                 assert.strictEqual(body["carry"], body["move"]);
+                if (ec >=200) {
+                    assert.strictEqual(bodySlow["carry"], 2*bodySlow["move"]);
+                }
                 if (ec >=2500) {
-                    assert.strictEqual(25, body["move"]);
+                    assert.strictEqual(25, body["carry"]);
+                    assert.strictEqual(32, bodySlow["carry"]);
+
                 } else {
-                    assert.strictEqual(ec/100, body["move"]);
+                    assert.strictEqual(ec/100, body["carry"]);
                 }
             }
 

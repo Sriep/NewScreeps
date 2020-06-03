@@ -24,7 +24,6 @@ const inserted = {
         //console.log("centre2", JSON.stringify(Memory.flags["W7N7"].plan))
         //console.log("centre3", JSON.stringify(Game.flags["W7N7"].Memory.plan))
 
-
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER
         });

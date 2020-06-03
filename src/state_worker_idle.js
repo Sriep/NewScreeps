@@ -101,7 +101,7 @@ StateWorkerIdle.prototype.enactOld = function () {
     //console.log(this.creep.name, "STATE_WORKER_IDLE container", container);
     if (container) {
         this.creep.memory.targetId = container.id;
-        console.log(this.creep.name,"move to container", container.id, "pos", container.pos);
+        //console.log(this.creep.name,"move to container", container.id, "pos", container.pos);
         return state.switchToMovePos(
             this.creep,
             container.pos,

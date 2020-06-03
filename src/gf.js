@@ -7,13 +7,43 @@
 const gc = require("./gc");
 
 const gf = {
-    fatalError: function (msg) {
-        console.log("Fatal error: ",msg);
+    fatalError: function (...messages) {
+        console.log("Fatal error: ", messages);
         console.log(Error().stack);
-        if (gc.DEBUG)
-            {
+        if (gc.DEBUG) {
                 throw(msg);
-            }
+        }
+    },
+
+    assert: function (a, ...msg) {
+        if (!a && gc.DEBUG) {
+            console.log("assert failed: ", JSON.stringify(a));
+            this.fatalError(msg)
+        }
+    },
+    assertEq: function (a, b, ...msg) {
+        if (a !== b && gc.DEBUG) {
+            console.log("assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
+            this.fatalError( msg)
+        }
+    },
+    assertNeq: function (a, b, ...msg) {
+        if (a === b && gc.DEBUG) {
+            console.log("assert failed: ", JSON.stringify(a), " === ", JSON.stringify(b));
+            this.fatalError( msg)
+        }
+    },
+    assertGt: function (a, b, ...msg) {
+        if (a < b && gc.DEBUG) {
+            console.log("assert failed: ", JSON.stringify(a), " < ", JSON.stringify(b));
+            this.fatalError( msg)
+        }
+    },
+    assertLt: function (a, b, ...msg) {
+        if (a > b && gc.DEBUG) {
+            console.log("assert failed: ", JSON.stringify(a), " > ", JSON.stringify(b));
+            this.fatalError(msg)
+        }
     },
 
     roomPosFromPos: function(pos, roomName) {

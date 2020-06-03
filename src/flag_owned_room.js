@@ -136,7 +136,7 @@ FlagOwnedRoom.prototype.sLinkPos = function(source) {
         }
     }
 };
-// mapReagentsToLabs : function (leftMap, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
+
 FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
     const labs = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES,
         { filter: s => { return s.structureType === C.STRUCTURE_LAB }
@@ -158,15 +158,7 @@ FlagOwnedRoom.prototype.colourLabFlags = function(labs, mappings) {
         )
     }
 };
-/*
-FlagOwnedRoom.prototype.colourLabFlags = function(labs, colours) {
-    for ( let i = 0 ; i< labs.length ; i++ ) {
-        Game.flags[labs[i].id].setColor(
-            colours[i].color, colours[i].secondaryColor
-        )
-    }
-};
-*/
+
 FlagOwnedRoom.prototype.buildStructure = function(type) {
     if (!this.m.plan[type] || this.m.plan[type].length === 0) {
         return false;

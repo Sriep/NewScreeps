@@ -261,7 +261,14 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
 
 PolicyPorters.prototype.localBudget = function() {
     const room = Game.rooms[this.home];
-    //console.log("pp localBudget localResources", JSON.stringify(this.m.localResoures));
+    const spawnCapacity = Game.rooms[this.home].find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
+    if (!this.m.localResoures) {
+        return {
+            "name" : this.home,
+            "spawnPartsLT" : spawnCapacity,
+        };
+    }
+
     const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
     const hPartCount = hbc[WORK] + hbc[MOVE] + hbc[CARRY];
     let parts = Math.ceil((this.m.localResoures.hW*11/5)/hPartCount) * hPartCount;
@@ -277,9 +284,7 @@ PolicyPorters.prototype.localBudget = function() {
     const ubc = race.getBodyCounts(gc.RACE_UPGRADER, room.energyCapacityAvailable);
     const uPartCount = ubc[WORK] + ubc[MOVE] + ubc[CARRY];
     parts += Math.ceil((this.m.localResoures.uW*2)/uPartCount) * uPartCount;
-
     parts += 4; // scouts.
-    const spawnCapacity = Game.rooms[this.home].find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
 
     const ecSources = Game.rooms[this.home].find(FIND_SOURCES).length * SOURCE_ENERGY_CAPACITY;
     const profit = ecSources * gc.SORCE_REGEN_LT - budget.convertPartsToEnergy(
@@ -289,12 +294,6 @@ PolicyPorters.prototype.localBudget = function() {
         this.m.localResoures.wW
     );
 
-    //console.log("POLICY_PORTERS localBudget parts", parts, "rtv", JSON.stringify({
-    //    "profit" : profit,
-    //    "parts" : parts,
-    //    "profitpart" : profit/parts,
-    //    "spawnPartsLT" : spawnCapacity,
-    //}));
     return {
         "name" : this.home,
         "profit" : profit,

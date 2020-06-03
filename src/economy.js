@@ -5,7 +5,6 @@
  */
 
 const gc = require("gc");
-//const role = require("role");
 
 const economy = {
 

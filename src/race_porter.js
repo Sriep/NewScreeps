@@ -8,10 +8,17 @@ const C = require("./Constants");
 
 const race_porter = {
     CM_COST: C.BODYPART_COST[C.CARRY] + C.BODYPART_COST[C.MOVE],
+    CCM_COST: 2*C.BODYPART_COST[C.CARRY] + C.BODYPART_COST[C.MOVE],
 
-    bodyCounts: function (ec) {
-        const size = Math.min(25, Math.floor(ec/this.CM_COST));
-        return {"work": 0, "carry": size, "move" : size}
+    bodyCounts: function (ec, slow) {
+        if (slow) {
+            const size = Math.min(16, Math.floor(ec/this.CCM_COST));
+            return {"work": 0, "carry": 2*size, "move" : size}
+        } else {
+            const size = Math.min(25, Math.floor(ec/this.CM_COST));
+            return {"work": 0, "carry": size, "move" : size}
+        }
+
     },
 
     boosts: [
