@@ -11,7 +11,7 @@ const gf = {
         console.log("Fatal error: ", messages);
         console.log(Error().stack);
         if (gc.DEBUG) {
-                throw(msg);
+                throw(messages);
         }
     },
 

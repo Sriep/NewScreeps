@@ -9,6 +9,7 @@ const race = require("race");
 const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
+const FlagRoom = require("flag_room");
 
 function PolicyExplore  (id, data) {
     this.id = id;
@@ -42,7 +43,12 @@ PolicyExplore.prototype.enact = function () {
     }
     //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
-           this.exploreRoom(creeps[i].room.name);
+        this.exploreRoom(creeps[i].room.name);
+        //const fRoom = new FlagRoom(creeps[i].room.name);
+        //gf.assert(fRoom.m.flagged);
+        //if (!fRoom.m.mapped) {
+        //    fRoom.mapRoom();
+        //}
     }
 };
 

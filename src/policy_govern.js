@@ -90,20 +90,31 @@ PolicyGovern.prototype.countParts = function() {
 };
 
 PolicyGovern.prototype.refreshColoniesInfo = function() {
+    //console.log("refreshColoniesInfo, this.m.colonies", JSON.stringify(this.m.colonies))
+    let temp = this.m.colonies.splice(1);
+    temp = temp.sort( function (a,b)  { // todo flaky
+        return b.profitpart - a.profitpart;
+    });
+    //console.log("refreshColoniesInfo, temp", JSON.stringify(temp));
+    let colonies0 = [{ "name" : this.roomName }];
     const economicPolicy = policy.getRoomEconomyPolicy(this.roomName);
     if (economicPolicy) {
         if (economicPolicy.localBudget) {
-            const localBudget = economicPolicy.localBudget();
-            if (localBudget) {
-                gf.assertEq(this.roomName, localBudget.name);
-                this.m.colonies[0].roomName = this.roomName;
-                this.m.colonies[0].profit = localBudget.profit;
-                this.m.colonies[0].parts = localBudget.parts;
-                this.m.colonies[0].profitpart = localBudget.profitpart;
-                this.m.colonies[0].spawnPartsLT = localBudget.spawnPartsLT;
-            }
+            colonies0 = [economicPolicy.localBudget()];
+            //const localBudget = economicPolicy.localBudget();
+            //if (localBudget) {
+            //    gf.assertEq(this.roomName, localBudget.name);
+            //    this.m.colonies[0].roomName = this.roomName;
+            //    this.m.colonies[0].profit = localBudget.profit;
+            //    this.m.colonies[0].parts = localBudget.parts;
+            //    this.m.colonies[0].profitpart = localBudget.profitpart;
+            //    this.m.colonies[0].spawnPartsLT = localBudget.spawnPartsLT;
+            //}
         }
     }
+    //console.log("refreshColoniesInfo, temp", JSON.stringify(temp));
+    this.m.colonies = colonies0.concat(temp);
+    //console.log("refreshColoniesInfo, this.m.colonies", JSON.stringify(this.m.colonies));
     this.countParts()
 };
 
@@ -164,10 +175,11 @@ PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost
     }
     this.m.colonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
 
-    this.m.colonies = this.m.colonies.sort( function (a,b)  { // todo flaky
-        return b.profitpart - a.profitpart;
-    });
-    this.countParts();
+    //this.m.colonies = this.m.colonies.sort( function (a,b)  { // todo flaky
+    //    return b.profitpart - a.profitpart;
+    //});
+    //this.countParts();
+    this.refreshColoniesInfo();
     console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
     return true;
 };

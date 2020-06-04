@@ -3,7 +3,7 @@
  * Created by piers on 24/04/2020
  * @author Piers Shepperson
  */
-
+const C = require("./Constants");
 const economy = require("economy");
 const construction = require("construction");
 const gc = require("gc");
@@ -14,16 +14,15 @@ const flag = {
     //},
 
     getRoom(roomName) {
-        this.flagRoom(roomName); //-------
+        this.flagRoom(roomName);
         const flagRoom = require("flag_room");
         return new flagRoom.FlagRooom(roomName);
     },
 
     getRoomFlag(roomName) {
         let roomFlag = Game.flags[roomName];
-        //console.log("getRoomFlag roomFlag",roomFlag);
         if (!roomFlag) {
-            this.flagRoom(roomName); //-----
+            this.flagRoom(roomName);
             roomFlag = Game.flags[roomName]
         }
         return roomFlag;
@@ -65,17 +64,17 @@ const flag = {
         //console.log("flagPermanents", room.name);
         const m = Game.flags[room.name].memory;
 
-        const keeperLairs = room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_KEEPER_LAIR }
+        const keeperLairs = room.find(C.FIND_STRUCTURES, {
+            filter: { structureType: C.STRUCTURE_KEEPER_LAIR }
         });
         m.keeperLairs = keeperLairs.length > 0;
 
-        const invaderCore = room.find(FIND_STRUCTURES, {
+        const invaderCore = room.find(C.FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_INVADER_CORE }
         });
         m.invaderCore = invaderCore.length > 0;
 
-        const sources = room.find(FIND_SOURCES);
+        const sources = room.find(C.FIND_SOURCES);
         //console.log("flag sources", sources);
         if (sources.length > 0) {
             m.sources = {};
@@ -93,7 +92,7 @@ const flag = {
             room.controller.pos.createFlag(room.controller.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
         }
 
-        const minerals = room.find(FIND_MINERALS);
+        const minerals = room.find(C.FIND_MINERALS);
         if (minerals.length > 0) {
             m.mineral = {
                 "id" : minerals[0].id,
@@ -152,7 +151,7 @@ const flag = {
     setMineralContainers : function(room) {
         //console.log("setMineralContainers", room.name);
         const m = Game.flags[room.name].memory;
-        const minerals = room.find(FIND_MINERALS);
+        const minerals = room.find(C.FIND_MINERALS);
         if ( minerals.length > 1) {
             console.log("room", room.name, "minerals", JSON.stringify(minerals));
             gf.fatalError("room with more than one mineral")
@@ -163,7 +162,7 @@ const flag = {
     setSourceContainers : function (room) {
         //console.log("setSourceContainers", room.name);
         const m = Game.flags[room.name].memory;
-        const sources = room.find(FIND_SOURCES);
+        const sources = room.find(C.FIND_SOURCES);
         for (let source of sources) {
             this.setContainerAndPosts(source, m.sources[source.id])
         }
