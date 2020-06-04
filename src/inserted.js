@@ -23,6 +23,28 @@ const inserted = {
         //console.log("centre1", JSON.stringify(Game.flags["W7N7"].Memory))
         //console.log("centre2", JSON.stringify(Memory.flags["W7N7"].plan))
         //console.log("centre3", JSON.stringify(Game.flags["W7N7"].Memory.plan))
+        //const governor = policy.getGouvernerPolicy("W7N7");
+        //console.log("m.colonies", JSON.stringify(governor.m.colonies));
+        //console.log("governor", JSON.stringify(governor));
+
+        //let room = Game.rooms["W7N7"];
+        //console.log("W7N7 owner", JSON.stringify(room.controller.owner), "reserver", JSON.stringify(room.controller.reservation));
+
+        //room = Game.rooms["W7N8"];
+        //if (room) {
+        //    console.log("W8N7 owner", JSON.stringify(room.controller.owner), "reserver", JSON.stringify(room.controller.reservation));
+        //}
+
+
+        //room = Game.rooms["W3N4"];
+        //console.log("w7n7 owner", room.controller.owner, "reserver", JSON.stringify(room.controller.reservation))
+
+        //room = Game.rooms["W7N7"];
+        //console.log("w7n7 owner", room.controller.owner, "reserver", JSON.stringify(room.controller.reservation))
+
+        //room = Game.rooms["W7N7"];
+        //console.log("w7n7 owner", room.controller.owner, "reserver", JSON.stringify(room.controller.reservation))
+
 
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER

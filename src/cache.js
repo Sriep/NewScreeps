@@ -14,7 +14,7 @@ const cache = {
         return global[name];
     },
 
-    path(from, toArray, name, range, useRoad, redo, cacheResult) {
+    path(from, toArray, name, range, useRoad) {
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
@@ -27,28 +27,27 @@ const cache = {
         if (!range) {
             range = 1
         }
-        let flag;
-
-        if (cacheResult) {
-            flag = Game.flags[from.id];
-            //console.log("path stored in", toArray[0].room.name)
-            if (!flag.memory[toArray[0].room.name]) {
-                flag.memory[toArray[0].room.name] ={};
-            }
-            if (!flag.memory[toArray[0].room.name][name]) {
-                flag.memory[toArray[0].room.name][name] ={};
-            }
-        }
-        const tag = useRoad ? "road" : "noroad";
-        if (cacheResult && !redo && flag.memory[toArray[0].room.name][name][tag]) {
-            const cachedPath =  flag.memory[toArray[0].room.name][name][tag];
-            return {
-                path: this.deserialisePath(cachedPath.path),
-                ops: cachedPath.ops,
-                cost: cachedPath.cost,
-                incomplete: cachedPath.incomplete,
-            }
-        }
+        //let flag;
+        //if (cacheResult) {
+        //    flag = Game.flags[from.id];
+        //    //console.log("path stored in", toArray[0].room.name)
+        //    if (!flag.memory[toArray[0].room.name]) {
+        //        flag.memory[toArray[0].room.name] ={};
+        //    }
+        //    if (!flag.memory[toArray[0].room.name][name]) {
+        //        flag.memory[toArray[0].room.name][name] ={};
+        //    }
+        //}
+        //const tag = useRoad ? "road" : "noroad";
+        //if (cacheResult && !redo && flag.memory[toArray[0].room.name][name][tag]) {
+        //    const cachedPath =  flag.memory[toArray[0].room.name][name][tag];
+        //    return {
+        //        path: this.deserialisePath(cachedPath.path),
+        //        ops: cachedPath.ops,
+        //        cost: cachedPath.cost,
+        //        incomplete: cachedPath.incomplete,
+        //    }
+        //}
 
         let goals = _.map(toArray, function(to) {
             return { pos: to.pos, range: range };
@@ -65,15 +64,21 @@ const cache = {
                 swampCost: 5,
             })
         }
-        if (cacheResult) {
-            flag.memory[toArray[0].room.name][name][tag] = {
-                path: this.serialisePath(pfPath.path),
-                ops: pfPath.ops,
-                cost: pfPath.cost,
-                incomplete: pfPath.incomplete,
-            }
+        //if (cacheResult) {
+        //    flag.memory[toArray[0].room.name][name][tag] = {
+        //        path: this.serialisePath(pfPath.path),
+        //        ops: pfPath.ops,
+        //        cost: pfPath.cost,
+        //        incomplete: pfPath.incomplete,
+        //    }
+        //}
+        return {
+            path: this.serialisePath(pfPath.path),
+            ops: pfPath.ops,
+            cost: pfPath.cost,
+            incomplete: pfPath.incomplete,
         }
-        return pfPath;
+        //return pfPath;
     },
 
     distance(from, toArray, name, range, useRoad, redo, cacheResult) {

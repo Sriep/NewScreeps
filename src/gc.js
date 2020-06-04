@@ -321,8 +321,10 @@ const gc = {
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
     // Msc
     ACTIVITY_FINISHED: "finished",
-    ACTIVITY_NEUTRAL_COLONIES: "neutral_colonies",
+    ACTIVITY_MINE_COLONIES: "mine_colonies",
     ACTIVITY_RESERVED_COLONIES: "reserved_colonies",
+    ACTIVITY_COLONY_ROADS: "colony_roads",
+    ACTIVITY_FLEXI_HARVESTERS: "flexi_harvesters",
     ACTIVITY_DISALLOWED: "disallowed",
     // policies
     POLICY_GOVERN: pgc.POLICY_GOVERN,
@@ -364,7 +366,7 @@ const gc = {
     QUEUE_INSUFFICIENT_RCL: -104,
     QUEUE_INSUFFICIENT_PRIORITY: -105,
 
-    MAX_HARVESTER_ROUTE_LENGTH: 300,
+    MAX_HARVESTER_ROUTE_LENGTH: 500,
 
     // Rates
     FLAG_UPDATE_RATE: 10,
@@ -393,6 +395,7 @@ const gc = {
     COLONY_PARTS_MARGIN: 80,
     REPLACEMENT_COLONY_PROFITPARTS: 50,
     PORTER_FUDGE_FACTOR: 1.5,
+    MAX_COLONY_DISTANCE: 4,
 
     // ownership
     ROOM_ENEMY: "enemy",
@@ -406,7 +409,8 @@ const gc = {
     // Game constants
     NOTIFY_INTERVAL: 10,
     DEBUG: true,
-
+    MAX_SIM_BATTLE_LENGTH: 10,
+    MAX_SIM_DEFENCE_LENGTH: 10,
     TICK_NUMBER: "tick number",
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],

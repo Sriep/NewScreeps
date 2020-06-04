@@ -5,7 +5,7 @@
  */
 const budget = require("budget");
 const race = require("race");
-//onst gf = require("gf");
+const gf = require("gf");
 const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
@@ -43,12 +43,12 @@ PolicyExplore.prototype.enact = function () {
     }
     //console.log("enact explore policy", creeps.length, "creeps exploring this", JSON.stringify(this));
     for (let i in creeps) {
-        this.exploreRoom(creeps[i].room.name);
-        //const fRoom = new FlagRoom(creeps[i].room.name);
-        //gf.assert(fRoom.m.flagged);
-        //if (!fRoom.m.mapped) {
-        //    fRoom.mapRoom();
-        //}
+        //this.exploreRoom(creeps[i].room.name);
+        const fRoom = new FlagRoom(creeps[i].room.name);
+        gf.assert(fRoom.m.flagged);
+        if (!fRoom.m.mapped) {
+            fRoom.mapRoom();
+        }
     }
 };
 

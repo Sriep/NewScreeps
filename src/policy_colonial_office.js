@@ -10,6 +10,7 @@ const policy = require("policy");
 const flag = require("flag");
 const memory = require("memory");
 const cache = require("cache");
+const FlagRoom = require("flag_room");
 
 // constructor
 function PolicyColonialOffice  (id, data) {
@@ -43,7 +44,8 @@ PolicyColonialOffice.prototype.lookForNewColonies = function () {
         if (gf.validateRoomName(flagName)) {
             if (!Game.flags[flagName].memory.owned
                 && !Game.flags[flagName].memory.spawnRoom) {
-                this.checkRoom(flagName);
+                //this.checkRoom(flagName);
+                this.checkRoom2(flagName);
             }
         }
     }
@@ -61,15 +63,47 @@ PolicyColonialOffice.prototype.lookForNewColonies = function () {
     }
 };
 
+PolicyColonialOffice.prototype.checkRoom2 = function(roomName) {
+    console.log("checkRoom2", roomName);
+    const fRoom = new FlagRoom(roomName);
+    let candidates = [];
+    for (let spawnRoom in fRoom.m.linkInfo) {
+        const valueTF = fRoom.value(spawnRoom,true, false);
+        const governor = policy.getGouvernerPolicy(spawnRoom);
+        if (valueTF.profitParts > governor.minColonyProfitParts() ||
+            valueTF.netParts < governor.minFreeColonyParts()) {
+            candidates.push({ "name": spawnRoom, "valueTF": valueTF, "governor": governor })
+        }
+    }
+    candidates = candidates.sort( (a,b) =>  {
+        return b.valueTF["profitParts"] - a.valueTF["profitParts"];
+    });
+    console.log("checkRoom2 candidates", candidates);
+    for (let candidate of candidates) {
+        const newColony = candidate.governor.requestAddColony(fRoom);
+        //console.log("checkRoom2 requestAddColony",newColony, newColony.added);
+        console.log("checkRoom2 requestAddColony",JSON.stringify(newColony));
+        if (newColony.added) {
+            fRoom.m.spawnRoom = candidate.governor.roomName;
+            if (Game.rooms[roomName]) {
+                this.build(
+                    Game.rooms[roomName],
+                    Game.rooms[fRoom.m.spawnRoom],
+                    newColony.useRoads,
+                );
+            } else {
+                this.m.underConstruction.push(roomName)
+            }
+            break;
+        }
+    }
+
+};
+
 PolicyColonialOffice.prototype.checkRoom = function (roomName) {
     //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = flag.getRoomFlag(roomName).memory;// Game.flags[roomName].memory;
-    //console.log("POLICY_COLONIAL_OFFICE checkroom m", JSON.stringify(m), "again", JSON.stringify(Game.flags[roomName].memory));
-    //m.test = "testing piers";
-    //console.log("POLICY_COLONIAL_OFFICE checkroom testing",roomName, "m", JSON.stringify(m));
-
     if (m.spawnRoom) {
-        //console.log("POLICY_COLONIAL_OFFICE checkRoom room",roomName,"already has spawn room");
         return;
     }
 
@@ -130,8 +164,13 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
 
 PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
     console.log("PolicyColonialOffice build colony", colony.name,"spawnRoom", spawnRoom.name, "userroads", useRoad );
+    if (!colony || !spawnRoom | !spawnRoom.controller) {
+        return;
+    }
+
     this.buildSourceSupport(colony, spawnRoom);
-    if (colony.controller.level >= 6) {
+
+    if (spawnRoom.controller.level >= 6) {
         this.buildExtractor(colony, spawnRoom)
     }
     if (useRoad) {
@@ -141,6 +180,9 @@ PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
 
 PolicyColonialOffice.prototype.buildSourceSupport = function(colony, spawnRoom) {
     console.log("buildSourceSupport colony", colony.name, "spawn room", spawnRoom.name);
+    if  (!flag.getRoomFlag(colony.name)) {
+        return
+    }
     const roomFlag = flag.getRoomFlag(colony.name).memory;
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {

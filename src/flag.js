@@ -4,14 +4,11 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
-const economy = require("economy");
-const construction = require("construction");
-const gc = require("gc");
+const economy = require("./economy");
+const construction = require("./construction");
+const gc = require("./gc");
 
 const flag = {
-    //flagRoom(roomName) {
-    //    this.flag(Game.rooms[roomName]);
-    //},
 
     getRoom(roomName) {
         this.flagRoom(roomName);

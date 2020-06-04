@@ -11,7 +11,8 @@ const budget = require("budget");
 const race = require("race");
 const flag = require("flag");
 const race_harvester = require("race_harvester");
-const memory = require("memory");
+//const memory = require("memory");
+const FlagRoom = require("flag_room");
 
 function PolicyPorters  (id, data) {
     this.id = id;
@@ -153,7 +154,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     }
 };
 
-PolicyPorters.prototype.calcResources = function (roomType1, roomType2) {
+PolicyPorters.prototype.calcResources = function () {
     let resources;
     let minHarvesters = 0;
     let maxHarvesters = 0;
@@ -202,26 +203,50 @@ PolicyPorters.prototype.calcResources = function (roomType1, roomType2) {
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        const valuesObj = memory.values(colonyObj.name, this.home);
-        let values;
-        if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
-            values = valuesObj[roomType1];
-            minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
-        } else {
-            values = valuesObj[roomType2];
-            minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
-        }
+        //const valuesObj = memory.values(colonyObj.name, this.home);
+        //let values;
+        //if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
+        //    values = valuesObj[roomType1];
+        //    minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
+        //} else {
+        //    values = valuesObj[roomType2];
+        //    minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
+        //}
+       /* FlagRoom.prototype.value = function (spawnRoom, roads, reserve, srEnergyCap) {
+            let totalValues = {
+                "parts": { "hW": 0, "pC": 0, "uW": 0},
+                "startUpCost": 0,
+                "runningCostRepair": 0,
+                "runningCostCreeps": 0,
+                "netEnergy": 0,
+                "netParts": 0,
+                "profitParts" : 0,
+            };*/
+
 
         //console.log("pp this.updateRoomResources values", JSON.stringify(values));
-        let hW=0, pC=0, uW=0;
-        for (let id in values["sources"]) {
-            minHarvesters++;
-            maxHarvesters += flag.getRoomFlag(colonyObj.name).memory.sources[id].ap;
-            hW += values["sources"][id].parts.hW;
-            pC += values["sources"][id].parts.pC;
-            uW += values["sources"][id].parts.uW
-        }
-        const colonyResources = this.updateRoomResources(colonyObj.name, hW, pC, uW);
+        //let hW=0, pC=0, uW=0;
+        //for (let id in values["sources"]) {
+        //    minHarvesters++;
+        //    maxHarvesters += flag.getRoomFlag(colonyObj.name).memory.sources[id].ap;
+        //    hW += values["sources"][id].parts.hW;
+        //    pC += values["sources"][id].parts.pC;
+        //    uW += values["sources"][id].parts.uW
+        //}
+
+        const governor = policy.getGouvernerPolicy(this.home);
+        const fRoom = new FlagRoom(colonyObj.name);
+        console.log("calcResources this.roomName",this.roomName,"colonyObj.name",colonyObj.name);
+        const values = fRoom.value(
+            this.roomName,
+            !!governor.m.ACTIVITY_COLONY_ROADS,
+            !!governor.m.ACTIVITY_RESERVED_COLONIES,
+            !!governor.m.ACTIVITY_FLEXI_HARVESTERS,
+        );
+        minHarvesters += fRoom.getSources().length;
+        const colonyResources = this.updateRoomResources(
+            colonyObj.name, values.parts.hW, values.parts.pC, values.parts.uW
+        );
         this.m.curProduction[colonyObj.name] = Object.assign({}, colonyResources);
         //console.log("pp this.updateRoomResources colony",colonyObj.name,JSON.stringify(colonyResources));
         resources.hW += colonyResources.hW;

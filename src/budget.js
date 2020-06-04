@@ -6,6 +6,7 @@
 const C = require("./Constants");
 const cache = require("./cache");
 const gc = require("./gc");
+const gf = require("./gf");
 const race = require("./race");
 //const raceHarvester = require("./race_harvester");
 
@@ -85,10 +86,6 @@ const budget = {
             energyLT: energyCapacity * C.CREEP_LIFE_TIME,
             creepPartsLT: Math.floor(C.CREEP_LIFE_TIME / C.CREEP_SPAWN_TIME)
         };
-    },
-
-    reserverParts(dControllerSpawn) {
-        return C.UPGRADE_CONTROLLER_POWER * C.CREEP_LIFE_TIME / (C.CREEP_CLAIM_LIFE_TIME - dControllerSpawn);
     },
 
     valueNeutralRoom: function (roomName, home) {
@@ -193,21 +190,6 @@ const budget = {
         values[gc.ROOM_OWNED]["profit"] += 600; // reduction in container repair
         values[gc.ROOM_OWNED_ROADS]["profit"] += 600; // reduction in container repair
         return values;
-    },
-
-    overheads: function(dSourceController, useRoads, swamps) {
-        let startUpCost, runningCostRepair;
-        if (useRoads) {
-            startUpCost = (dSourceController - swamps)*C.CONSTRUCTION_COST[C.STRUCTURE_ROAD]
-                + swamps *C.CONSTRUCTION_COST[C.STRUCTURE_ROAD]* C.CONSTRUCTION_COST_ROAD_SWAMP_RATIO
-                + C.CONSTRUCTION_COST[C.STRUCTURE_CONTAINER];
-            runningCostRepair = (dSourceController - swamps)*1.5 + swamps*7.5 + 750;
-        } else {
-            startUpCost = C.CONSTRUCTION_COST[C.STRUCTURE_CONTAINER];
-            runningCostRepair = C.CREEP_LIFE_TIME*C.CONTAINER_DECAY/
-                (C.CONTAINER_DECAY_TIME*C.REPAIR_POWER);
-        }
-        return {startUpCost: startUpCost, runningCostRepair: runningCostRepair};
     },
 
     valueSourceRoad: function (pathSpawn, pathController, energy, swamps) {
@@ -323,38 +305,69 @@ const budget = {
         energy,
         dSourceSpawn,
         dSourceController,
-        dControllerSpawn,
         useRoads,
         swamps,
-        reserveController,
         roomEc,
     ) {
         const hWs = this.harvesterWsSource(energy, dSourceSpawn);
         const pCs = this.porterCsSource(energy, dSourceSpawn, dSourceController);
-        const uWs = this.upgraderWsRoom(energy, 20, 3);
-        const  cRs = reserveController ? this.reserverParts(dSourceController) : 0;
+        const uWs = this.upgraderWsEnergy(energy, 20, 3);
         const energyLT = energy * (C.CREEP_LIFE_TIME / C.ENERGY_REGEN_TIME);
 
-        let parts = pCs  + uWs + cRs;
+        let netParts = pCs  + uWs;
         if (roomEc) {
             const bc = race.getBodyCounts(gc.RACE_HARVESTER, roomEc, true);
-            parts += bc[C.WORK] + bc[C.MOVE] + bc[C.CARRY];
+            netParts += bc[C.WORK] + bc[C.MOVE] + bc[C.CARRY];
         } else {
-            parts += hWs;
+            netParts += hWs;
         }
 
-        const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs,0, cRs, useRoads, roomEc);
+        const creepCosts = this.convertPartsToEnergy(hWs, pCs, uWs,0, 0, useRoads, roomEc);
         const overheads =  this.overheads(dSourceController, useRoads, swamps);
         const netEnergy = energyLT - overheads.runningCostRepair - creepCosts;
         return {
-            "parts": { "hW": hWs, "pC": pCs, "uW": uWs, "cRs": cRs },
+            "parts": { "hW": hWs, "pC": pCs, "uW": uWs},
             "startUpCost": overheads.startUpCost,
             "runningCostRepair": overheads.runningCostRepair,
             "runningCostCreeps": creepCosts,
             "netEnergy": netEnergy,
-            "netParts": parts,
-            "profitParts" : netEnergy/parts,
+            "netParts": netParts,
+            "profitParts" : netEnergy/netParts,
         };
+    },
+
+    addSourceValues: function(value1, value2) {
+        if (!value1 || gf.isEmpty(value1)) {
+            return value2;
+        }
+        return {
+            "parts": {
+                "hW": value1.parts.hW + value2.parts.hW,
+                "pC": value1.parts.pC + value2.parts.pC,
+                "uW": value1.parts.uW + value2.parts.uW,
+            },
+            "startUpCost": value1.startUpCost + value1.startUpCost,
+            "runningCostRepair": value1.runningCostRepair + value2.runningCostRepair,
+            "runningCostCreeps": value1.runningCostCreeps + value2.runningCostCreeps,
+            "netEnergy": value1.netEnergy + value2.netEnergy,
+            "netParts": value1.netParts + value2.netParts,
+            "profitParts" : (value1.netEnergy + value2.netEnergy)/(value1.netParts + value2.netParts),
+        };
+    },
+
+    overheads: function(dSourceController, useRoads, swamps) {
+        let startUpCost, runningCostRepair;
+        if (useRoads) {
+            startUpCost = (dSourceController - swamps)*C.CONSTRUCTION_COST[C.STRUCTURE_ROAD]
+                + swamps *C.CONSTRUCTION_COST[C.STRUCTURE_ROAD]* C.CONSTRUCTION_COST_ROAD_SWAMP_RATIO
+                + C.CONSTRUCTION_COST[C.STRUCTURE_CONTAINER];
+            runningCostRepair = (dSourceController - swamps)*1.5 + swamps*7.5 + 750;
+        } else {
+            startUpCost = C.CONSTRUCTION_COST[C.STRUCTURE_CONTAINER];
+            runningCostRepair = C.CREEP_LIFE_TIME*C.CONTAINER_DECAY/
+                (C.CONTAINER_DECAY_TIME*C.REPAIR_POWER);
+        }
+        return {startUpCost: startUpCost, runningCostRepair: runningCostRepair};
     },
 
     harvesterWsRoom : function (sourceRoom, homeRoom, useRoad) {
@@ -374,17 +387,21 @@ const budget = {
         return maxEnergy / energyCollectedPerWorkPart;
     },
 
-    upgraderWsRoom: function(energy, distance, maxDepth) {
-        return this.upgraderWsRoomI(0, energy, distance, maxDepth, 0)
+    reserverParts(dControllerSpawn) {
+        return C.UPGRADE_CONTROLLER_POWER * C.CREEP_LIFE_TIME / (C.CREEP_CLAIM_LIFE_TIME - dControllerSpawn);
     },
 
-    upgraderWsRoomI: function(uWs, energy, distance, maxDepth, currentDepth) {
+    upgraderWsEnergy: function(energy, distance, maxDepth) {
+        return this.upgraderWsEnergyI(0, energy, distance, maxDepth, 0)
+    },
+
+    upgraderWsEnergyI: function(uWs, energy, distance, maxDepth, currentDepth) {
         if (currentDepth >= maxDepth) {
             return uWs;
         }
         const newUWs = this.upgraderWsFromDistance2(energy, distance);
         energy -=  this.convertPartsToEnergy(0, 0, 0,newUWs-uWs, 0);
-        return this.upgraderWsRoomI(newUWs, energy, distance, maxDepth, currentDepth+1)
+        return this.upgraderWsEnergyI(newUWs, energy, distance, maxDepth, currentDepth+1)
     },
 
     upgraderWsFromDistance2: function(energy, distance) {

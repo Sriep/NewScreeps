@@ -34,13 +34,13 @@ const gf = {
         }
     },
     assertGt: function (a, b, ...msg) {
-        if (a < b && gc.DEBUG) {
+        if (a <= b && gc.DEBUG) {
             console.log("assert failed: ", JSON.stringify(a), " < ", JSON.stringify(b));
             this.fatalError( msg)
         }
     },
     assertLt: function (a, b, ...msg) {
-        if (a > b && gc.DEBUG) {
+        if (a >= b && gc.DEBUG) {
             console.log("assert failed: ", JSON.stringify(a), " > ", JSON.stringify(b));
             this.fatalError(msg)
         }
@@ -52,6 +52,15 @@ const gf = {
         } else {
             return new RoomPosition(pos.x, pos.y, pos.roomName)
         }
+    },
+
+    isEmpty : function(obj) {
+        for (let x in obj) {
+            if (obj.hasOwnProperty(x)) {
+                return false;
+            }
+        }
+        return true;
     },
 
     pointEqual: function(p1, p2) {

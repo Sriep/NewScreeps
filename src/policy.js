@@ -3,17 +3,17 @@
  * Created by piers on 25/04/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
-const gf = require("gf");
-const race = require("race");
-const flag = require("flag");
-const state = require("state");
-const construction = require("construction");
-const FlagRoom = require("flag_room");
+const gc = require("./gc");
+const gf = require("./gf");
+const race = require("./race");
+const flag = require("./flag");
+const state = require("./state");
+const construction = require("./construction");
+const FlagRoom = require("./flag_room");
 
 const policy = {
 
-    M : Memory.policies,
+    //M : Memory.policies,
 
     enactPolicies: function() {
         if (undefined === Memory.policies) {

@@ -3,12 +3,12 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
-const gf = require("gf");
+const gc = require("./gc");
+const gf = require("./gf");
 //const economy = require("economy");
-const race = require("race");
-const flag = require("flag");
-const FlagRoom = require("flag_room");
+const race = require("./race");
+const flag = require("./flag");
+const FlagRoom = require("./flag_room");
 
 const state = {
 

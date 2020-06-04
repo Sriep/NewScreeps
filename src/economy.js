@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 
-const gc = require("gc");
+const gc = require("./gc");
 
 const economy = {
 
