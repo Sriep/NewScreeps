@@ -66,7 +66,7 @@ const flag = {
         });
         m.keeperLairs = keeperLairs.length > 0;
 
-        const invaderCore = room.find(C.FIND_STRUCTURES, {
+        const invaderCore = room.find(C.FIND_HOSTILE_STRUCTURES, {
             filter: { structureType: STRUCTURE_INVADER_CORE }
         });
         m.invaderCore = invaderCore.length > 0;

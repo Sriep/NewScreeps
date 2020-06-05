@@ -12,6 +12,8 @@ const race_scientist = {
         return {"work": 0, "carry": carry, "move" : 1};
     },
 
+    isCivilian: function() {return true},
+
     boosts: [
         C.RESOURCE_CATALYZED_KEANIUM_ACID,
         C.RESOURCE_KEANIUM_ACID,

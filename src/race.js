@@ -17,6 +17,11 @@ const race = {
         return creep.name.split("_")[0];
     },
 
+    isCivilian: function(race) {
+        const raceModule = require("./race_" + race);
+        return raceModule.isCivilian();
+    },
+
     getBodyCounts(race, ec, param1) {
         const raceModule = require("./race_" + race);
         return raceModule.bodyCounts(ec, param1);

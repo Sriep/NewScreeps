@@ -17,6 +17,7 @@ function FlagOwnedRoom (name) {
     this.m = flag.getRoomFlag(name).memory;
 }
 
+// todo only need to store the tile and origin, calculate positions as required.
 FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
     let avoid = [];
     const sources = Game.rooms[this.name].find(FIND_SOURCES);

@@ -16,6 +16,8 @@ const race_worker = {
         return {[C.WORK]: size, [C.CARRY]: size, [C.MOVE] : size};
     },
 
+    isCivilian: function() {return true},
+
     boosts: [
         C.RESOURCE_CATALYZED_LEMERGIUM_ACID,
         C.RESOURCE_LEMERGIUM_ACID,

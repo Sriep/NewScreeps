@@ -72,6 +72,7 @@ describe("policy_govern", function() {
             PolicyGovern.prototype.checkPaybackByNextUpgrade = function() { return true };
             PolicyGovern.prototype.removeColony = function() { };
             const policyGovern = new PolicyGovern(1, data);
+            policyGovern.m[gc.ACTIVITY_MINE_COLONIES] = true;
 
             //console.log("policyGovern", JSON.stringify(policyGovern));
             const result0 = policyGovern.requestAddColony(flagRooms[0]);

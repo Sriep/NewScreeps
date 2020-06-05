@@ -8,7 +8,6 @@ const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
 const flag = require("flag");
-const memory = require("memory");
 const cache = require("cache");
 const FlagRoom = require("flag_room");
 
@@ -24,11 +23,6 @@ PolicyColonialOffice.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
-    this.m.myRooms = {};
-    this.m.colonies = {};
-    this.m.freeRooms = {};
-    this.m.invaderRooms = {};
-    this.m.foreignRooms = {};
     this.m.underConstruction = [];
     Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
     return true;
@@ -55,7 +49,7 @@ PolicyColonialOffice.prototype.lookForNewColonies = function () {
     for (let i  = this.m.underConstruction.length ;  i >= 0 ; i--) {
         if (Game.rooms[this.m.underConstruction[i]]) {
             //const roomFlag = flag.getRoomFlag(this.m.underConstruction[i]);
-            console.log("POLICY_COLONIAL_OFFICE underContruction", this.m.underConstruction[i]);
+            //console.log("POLICY_COLONIAL_OFFICE underContruction", this.m.underConstruction[i]);
             //this.build(this.m.underConstruction[i], roomFlag.memory.spawnRoom, false)
             this.build(this.m.underConstruction[i], "W7N7", false); // todo hack remove line
             this.m.underConstruction.splice(i,1);
@@ -64,7 +58,7 @@ PolicyColonialOffice.prototype.lookForNewColonies = function () {
 };
 
 PolicyColonialOffice.prototype.checkRoom2 = function(roomName) {
-    console.log("checkRoom2", roomName);
+    //console.log("checkRoom2", roomName);
     const fRoom = new FlagRoom(roomName);
     let candidates = [];
     for (let spawnRoom in fRoom.m.linkInfo) {
@@ -78,11 +72,11 @@ PolicyColonialOffice.prototype.checkRoom2 = function(roomName) {
     candidates = candidates.sort( (a,b) =>  {
         return b.valueTF["profitParts"] - a.valueTF["profitParts"];
     });
-    console.log("checkRoom2 candidates", candidates);
+    //console.log("checkRoom2 candidates", candidates);
     for (let candidate of candidates) {
         const newColony = candidate.governor.requestAddColony(fRoom);
         //console.log("checkRoom2 requestAddColony",newColony, newColony.added);
-        console.log("checkRoom2 requestAddColony",JSON.stringify(newColony));
+        //console.log("checkRoom2 requestAddColony",JSON.stringify(newColony));
         if (newColony.added) {
             fRoom.m.spawnRoom = candidate.governor.roomName;
             if (Game.rooms[roomName]) {
@@ -99,7 +93,7 @@ PolicyColonialOffice.prototype.checkRoom2 = function(roomName) {
     }
 
 };
-
+/*
 PolicyColonialOffice.prototype.checkRoom = function (roomName) {
     //console.log("POLICY_COLONIAL_OFFICE checkroom", roomName);
     const m = flag.getRoomFlag(roomName).memory;// Game.flags[roomName].memory;
@@ -161,7 +155,7 @@ PolicyColonialOffice.prototype.checkRoom = function (roomName) {
         }
     }
 };
-
+*/
 PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
     console.log("PolicyColonialOffice build colony", colony.name,"spawnRoom", spawnRoom.name, "userroads", useRoad );
     if (!colony || !spawnRoom | !spawnRoom.controller) {

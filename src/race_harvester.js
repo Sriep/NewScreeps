@@ -22,6 +22,8 @@ const race_harvester = {
         return gc.HARVESTER_BODY_COUNTS[Math.floor(ec/50) * 50];
     },
 
+    isCivilian: function() {return true},
+
     boosts: [
         C.RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
         C.RESOURCE_UTRIUM_ALKALIDE,

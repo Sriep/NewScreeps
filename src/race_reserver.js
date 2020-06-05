@@ -15,6 +15,8 @@ const race_reserver = {
         }
     },
 
+    isCivilian: function() {return true},
+
     boosts: [],
 };
 

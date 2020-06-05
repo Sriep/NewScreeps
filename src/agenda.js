@@ -8,141 +8,165 @@ const gf = require("./gf");
 const gc = require("./gc");
 const policy = require("./policy");
 
-
+// todo switch to using an agenda object.
 const agenda = {
+
+    enact: function (id, agenda, rcl, index) {
+        const item = agenda[rcl][index];
+        if (!this.agendaFns()[item.type].check(item.activity, id)) {
+            return index;
+        }
+        this.agendaFns()[item.type].enact(item.activity, id, item.params);
+        return index+1;
+    },
+
+    agendaFns: function() {
+        return {
+            [gc.Activity.Flag] : this.newActivity,
+            [gc.Activity.Policy] : this.newPolicy,
+            [gc.Activity.PolicyBlocker] : this.newBlockerPolicy,
+            [gc.Activity.PolicyReplacement] : his.newPolicyReplacment,
+            [gc.Activity.Control] : {
+                "enact": function(activity) { gf.assert(activity !== gc.ACTIVITY_DISALLOWED) },
+                "check": function(){ return false; },
+            },
+        }
+    },
+
     default_1: [
-        [ { "activity": gc.ACTIVITY_DISALLOWED} ], //0
+        [ { "activity": gc.ACTIVITY_DISALLOWED, type: gc.Activity.Control} ], //0
         [ //1
-            { "activity": gc.POLICY_PLAN_BUILDS},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_SPAWN} },
-            { "activity": gc.POLICY_RCL1},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.POLICY_PLAN_BUILDS, type: gc.Activity.PolicyBlocker},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_SPAWN} },
+            { "activity": gc.POLICY_RCL1, type: gc.Activity.PolicyReplacement},
+            { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //2
-            { "activity": gc.POLICY_PORTERS},
-            //{ "activity": gc.ACTIVITY_NEUTRAL_COLONIES},
-            //{ "activity": gc.POLICY_EXPLORE},
-            //{ "activity": gc.POLICY_COLONIAL_OFFICE},
-            { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS},
-            { "activity": gc.ACTIVITY_MINE_COLONIES},
-            { "activity": gc.POLICY_COLONIAL_OFFICE},
-            { "activity": gc.POLICY_EXPLORE},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.POLICY_PORTERS, type: gc.Activity.PolicyReplacement},
+            //{ "activity": gc.ACTIVITY_NEUTRAL_COLONIES, type: gc.Activity.Policy},
+            //{ "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
+            //{ "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
+            { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS, type: gc.Activity.PolicyBlocker},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS, type: gc.Activity.PolicyBlocker},
+            { "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Flag},
+            { "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
+            { "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //3
-            { "activity": gc.ACTIVITY_RESERVED_COLONIES},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_TOWER}},
-            //{ "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.ACTIVITY_RESERVED_COLONIES, type: gc.Activity.Flag},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_TOWER}},
+            //{ "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
             //        "fromFind" :C.FIND_SOURCES,
             //        "toFind" :C.FIND_MY_STRUCTURES,
             //        "toStruct" :C.STRUCTURE_EXTENSION,
             //    }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" : C.FIND_SOURCES,
                     "toFind" : C.FIND_MY_SPAWNS,
             }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" : C.FIND_SOURCES,
                     "toFind" : C.FIND_SOURCES,
             }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_STRUCTURES,
                     "toStruct" :C.STRUCTURE_CONTROLLER,
             }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_STRUCTURES,
                     "toStruct" :C.STRUCTURE_CONTROLLER,
             }},
-            //{ "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            //{ "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
             //        "fromFind" :C.FIND_SOURCES,
             //        "toFind" :C.FIND_STRUCTURES,
             //        "toStruct" :C.STRUCTURE_TOWER,
             //    }},
-            { "activity": gc.ACTIVITY_COLONY_ROADS},
-            { "activity": gc.ACTIVITY_FINISHED},
+            { "activity": gc.ACTIVITY_COLONY_ROADS, type: gc.Activity.Flag},
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control},
         ],
         [ //4
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_STORAGE}},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_STORAGE}},
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_MY_STRUCTURES,
                     "toStruct" :C.STRUCTURE_EXTENSION,
             }},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //5
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LINK}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_TOWER}},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_TOWER}},
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_MY_STRUCTURES,
                     "toStruct" :C.STRUCTURE_EXTENSION,
                 }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_STRUCTURES,
                     "toStruct" :C.STRUCTURE_TOWER,
             }},
-            { "activity": gc.ACTIVITY_FINISHED},
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control},
         ],
         [ //6
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_EXTRACTORS},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LINK}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LAB}},
-            { "activity": gc.POLICY_LABS},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_EXTRACTORS, type: gc.Activity.PolicyBlocker},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LAB}},
+            { "activity": gc.POLICY_LABS, type: gc.Activity.Policy},
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_MY_STRUCTURES,
                     "toStruct" :C.STRUCTURE_EXTENSION,
             }},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //7
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_SPAWN}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LINK}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LAB}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_TOWER}},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LAB}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_TOWER}},
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_MY_STRUCTURES,
                     "toStruct" :C.STRUCTURE_EXTENSION,
             }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_STRUCTURES,
                     "toStruct" :C.STRUCTURE_TOWER,
             }},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_TERMINAL}},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_TERMINAL}},
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //8
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_SPAWN}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LINK}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_LAB}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_TOWER}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_POWER_SPAWN}},
-            { "activity": gc.POLICY_BUILD_STRUCTURE, "params": {"structureType":C.STRUCTURE_OBSERVER}},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LAB}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_TOWER}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_POWER_SPAWN}},
+            { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_OBSERVER}},
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_MY_STRUCTURES,
                     "toStruct" :C.STRUCTURE_EXTENSION,
                 }},
-            { "activity": gc.POLICY_BUILD_ROADS, "params" : {
+            { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                     "fromFind" :C.FIND_SOURCES,
                     "toFind" :C.FIND_STRUCTURES,
                     "toStruct" :C.STRUCTURE_TOWER,
             }},
-            { "activity": gc.ACTIVITY_FINISHED}
+            { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
     ],
 
@@ -155,6 +179,7 @@ const agenda = {
         fc[gc.POLICY_EXPLORE] = newPolicy;
         fc[gc.POLICY_LABS] = newPolicy;
         fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
+        fc[gc.POLICY_FOREIGN_OFFICE] = newPolicy;
         fc[gc.POLICY_BUILD_EXTRACTORS] = newPolicy;
         fc[gc.POLICY_RCL1] = newPolicyReplacment;
         fc[gc.POLICY_WORKERS] = newPolicyReplacment;
@@ -220,7 +245,5 @@ const newBlockerPolicy = {
          return !policy.hasChildType(parnetId, activity);
     },
 };
-
-
 
 module.exports = agenda;

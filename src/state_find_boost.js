@@ -7,13 +7,13 @@
 const gc = require("gc");
 const state = require("state");
 
-function StateLorryIdle (creep) {
+function StateFindBoost (creep) {
     this.type = gc.STATE_FIND_BOOST;
     this.creep = creep;
     this.m = this.creep.memory;
 }
 
-StateLorryIdle.prototype.enact = function () {
+StateFindBoost.prototype.enact = function () {
     const raceModule = require("race_" + race.getRace(this.creep));
     const labs = this.creep.room.find(FIND_MY_STRUCTURES, {
         filter: lab => {
@@ -37,4 +37,4 @@ StateLorryIdle.prototype.enact = function () {
     state.switchTo(this.creep, this.creep.memory, race.getRace(this.creep) + "_idle")
 };
 
-module.exports = StateLorryIdle;
+module.exports = StateFindBoost;

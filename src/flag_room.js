@@ -9,6 +9,7 @@ const budget = require("./budget");
 const gf = require("./gf");
 const gc = require("./gc");
 const cache = require("./cache");
+const race = require("./race");
 
 function FlagRoom (name) {
     let roomFlag;
@@ -41,7 +42,8 @@ FlagRoom.prototype.RoomType = {
 };
 
 FlagRoom.prototype.mapRoom = function() {
-    if (this.roomType() === this.RoomType.Unknown) {
+    this.m.roomType = this.roomType();
+    if (this.m.roomType === this.RoomType.Unknown) {
         return false;
     }
     const room = Game.rooms[this.name];
@@ -64,13 +66,6 @@ FlagRoom.prototype.mapRoom = function() {
     if (!this.m.linkInfo) {
         this.m.linkInfo = {}
     }
-
-    //console.log("Flagroom before filter name",this.name);
-    //const tRooms = _.filter(Game.rooms, r => {
-    //    console.log("in filter r",r, JSON.stringify(r));
-    //    return r.controller.my && r.controller.level > 0
-    //});
-    //console.log("Flagroom mapRoom", JSON.stringify(tRooms));
 
     for (let room of _.filter(Game.rooms, r => {
         return r.controller && r.controller.my && r.controller.level > 0
@@ -130,7 +125,7 @@ FlagRoom.prototype.value = function (spawnRoom, roads, reserve, srEnergyCap) {
         "netParts": 0,
         "profitParts" : 0,
     };
-    console.log("FlagRoom value linkInfo", JSON.stringify(this.m));
+    //console.log("FlagRoom value linkInfo", JSON.stringify(this.m));
     for (let source of this.m.linkInfo[spawnRoom].sources) {
         totalValues = budget.addSourceValues(totalValues, budget.valueSource(
             reserve ? 2*source.energyCapacity : source.energyCapacity,
@@ -149,23 +144,38 @@ FlagRoom.prototype.value = function (spawnRoom, roads, reserve, srEnergyCap) {
 };
 
 FlagRoom.prototype.valueReserveCost = function (spawnRoom, value, reserve, roads) {
-    if (reserve) {
+    if (reserve && this.m.linkInfo[spawnRoom].controller) {
         const pathCost = roads ? this.m.linkInfo[spawnRoom].controller.pathSpawnRoad.cost
             : this.m.linkInfo[spawnRoom].controller.pathSpawn.cost;
         const cRs = budget.reserverParts(pathCost);
         const reserverCost = budget.convertPartsToEnergy(0, 0, 0,0, cRs, false);
         value.parts["cR"] = cRs;
-        value["runningCostCreeps"] = value["runningCostCreeps"] + reserverCost;
-        value["netEnergy"] = value["netEnergy"] - reserverCost;
-        value["netParts"] = value["netParts"] + cRs;
+        value["runningCostCreeps"] += reserverCost;
+        value["netEnergy"] -= reserverCost;
+        value["netParts"] += cRs;
         value["profitParts"] = value["netEnergy"]/value["netParts"];
+        if (this.m.roomType === this.RoomType.InvaderReserved)  {
+            let swordsmanCost = gc.MIN_SWORDSMAN_EC_INVADER_RESERVER;
+            const d = this.m.linkInfo[spawnRoom].controller.pathSpawn.cost;
+            swordsmanCost *= (C.CREEP_LIFE_TIME)/(C.CREEP_LIFE_TIME - d);
+            value["startUpCost"] += swordsmanCost;
+        }
     } else {
         value.parts["cR"] = 0;
     }
 };
 
 FlagRoom.prototype.valueDefenceCost = function (spawnRoom, value) {
-    
+    if (this.m.keeperLairs) {
+        let keeperBaneCost = race.getCost(gc.RACE_PALADIN, 10000,11);
+        const d = this.m.linkInfo[spawnRoom].sources[0].pathSpawn.cost;
+        keeperBaneCost *= (C.CREEP_LIFE_TIME)/(C.CREEP_LIFE_TIME - d);
+        value.parts["pH"] = 11;
+        value["runningCostCreeps"] = value["runningCostCreeps"] + keeperBaneCost;
+        value["netEnergy"] = value["netEnergy"] - keeperBaneCost;
+        value["netParts"] = value["netParts"] + 50;
+        value["profitParts"] = value["netEnergy"]/value["netParts"];
+    }
 };
 
 FlagRoom.prototype.roomType = function () {

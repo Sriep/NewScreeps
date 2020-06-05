@@ -21,6 +21,8 @@ const race_porter = {
 
     },
 
+    isCivilian: function() {return true},
+
     boosts: [
         C.RESOURCE_CATALYZED_KEANIUM_ACID,
         C.RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,

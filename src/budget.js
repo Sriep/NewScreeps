@@ -326,7 +326,7 @@ const budget = {
         const overheads =  this.overheads(dSourceController, useRoads, swamps);
         const netEnergy = energyLT - overheads.runningCostRepair - creepCosts;
         return {
-            "parts": { "hW": hWs, "pC": pCs, "uW": uWs},
+            "parts": { "hW": hWs, "pC": pCs, "uW": uWs, "cR": 0},
             "startUpCost": overheads.startUpCost,
             "runningCostRepair": overheads.runningCostRepair,
             "runningCostCreeps": creepCosts,

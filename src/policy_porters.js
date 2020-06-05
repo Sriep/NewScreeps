@@ -65,7 +65,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         "reservers",reservers,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,
         "cPorter",cPorter,"rReserver",rReserver);
     console.log("pp spawns energy",room.energyAvailable,"capacity",room.energyCapacityAvailable);
-
+    console.log("minHarvesters", resources.minHarvesters, "maxHarvesters", resources.maxHarvesters, "minReserves", resources.minReservers);
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
     if (cWorker < 2) {
@@ -81,16 +81,19 @@ PolicyPorters.prototype.spawns = function (room, resources) {
         }
     }
 
-    const canBuildHarvesters =  wHarvester < resources.hW && harvesters <= resources.maxHarvesters;
+    const canBuildHarvesters =  (wHarvester < resources.hW || harvesters < resources.minHarvesters) && harvesters <= resources.maxHarvesters;
     const canBuildWorkers = cWorker < resources.wW;
     const canBuildPorters = cPorter < resources.pC - 0.1;
     const canBuildUpgrader = wUpgrader < resources.uW - 0.2;
-    const canBuildReserver = rReserver < resources.rC - 0.2;
+    const canBuildReserver = rReserver < resources.cR - 0.2;
 
+    //console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
     if (canBuildHarvesters
         && (!canBuildWorkers || wHarvester <= cWorker
         && (!canBuildPorters || wHarvester <= cPorter))) {
-        if (race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable) <= room.energyAvailable) {
+        //console.log("pp spawns race.getCost",race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable),
+        //    "energyCapacityAvailable",room.energyCapacityAvailable,"energy",room.energyCapacityAvailable);
+        if (race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable) <= room.energyCapacityAvailable) {
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_HARVESTER,
@@ -158,24 +161,23 @@ PolicyPorters.prototype.calcResources = function () {
     let resources;
     let minHarvesters = 0;
     let maxHarvesters = 0;
-    let minReservers = 0;
     this.m.curProduction = {};
     const homeRoom = Game.rooms[this.home];
     //console.log("this.home", this.home);
     const ec = homeRoom.energyCapacityAvailable;
     const sourceEnergyLT = 30000;
     if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        //console.log("calcResources ec",ec,"race_harvester.bodyCounts(ec)",JSON.stringify(race_harvester.bodyCounts(ec)));
         const hWperBody = race_harvester.bodyCounts(ec)["work"];
         let maxWs = 0;
+        //console.log("pp homeRoom.find(FIND_SOURCES)",homeRoom.find(FIND_SOURCES))
         for (let source of homeRoom.find(FIND_SOURCES)) {
-            //console.log("flag.getRoomFlag(this.home)",JSON.stringify(flag.getRoomFlag(this.home)))
-            //console.log("flag.getRoomFlag(this.home).memory",JSON.stringify(flag.getRoomFlag(this.home).memory))
             const ap = flag.getRoomFlag(this.home).memory.sources[source.id].ap;
             maxWs += Math.min(5, ap*hWperBody);
-            minHarvesters++;
-            maxHarvesters += ap;
+            //minHarvesters++;
+            //maxHarvesters += ap;
+            //console.log("pp homeRoom.find(FIND_SOURCES)", source.id,"minHarvesters", minHarvesters,"maxHarvesters",maxHarvesters)
         }
+        //console.log("pp minHarvesters0", minHarvesters,"maxHarvesters",maxHarvesters);
         const budgetWs = budget.harvesterWsRoom(homeRoom, homeRoom, false);
         const ratio = maxWs/budgetWs;
         resources = this.updateRoomResources(
@@ -192,74 +194,48 @@ PolicyPorters.prototype.calcResources = function () {
             budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
         );
     }
-    //console.log("POLICY_PORTERS production vector1", JSON.stringify(this.m.curProduction))
     this.m.curProduction[this.home] = Object.assign({}, resources);
-    //console.log("POLICY_PORTERS production vector2", JSON.stringify(this.m.curProduction))
     this.m.localResoures = Object.assign({}, resources);
 
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
     for (let colonyObj of colonies) {
+        const fRoom = new FlagRoom(colonyObj.name);
+        const sources = fRoom.getSources();
+        for (let id in sources ) {
+            //console.log(id,"pp minHarvesters3", minHarvesters,"maxHarvesters",maxHarvesters);
+            minHarvesters++;
+            maxHarvesters += fRoom.getSourcePosts(id).length;
+        }
         if (colonyObj === this.home|| colonyObj.name === this.home) {
             continue;
         }
-        //const valuesObj = memory.values(colonyObj.name, this.home);
-        //let values;
-        //if(valuesObj[roomType1].profit > valuesObj[roomType2].profit) {
-        //    values = valuesObj[roomType1];
-        //    minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
-        //} else {
-        //    values = valuesObj[roomType2];
-        //    minReservers += roomType1 === gc.ROOM_RESERVED || gc.ROOM_RESERVED_ROADS ? 1 : 0
-        //}
-       /* FlagRoom.prototype.value = function (spawnRoom, roads, reserve, srEnergyCap) {
-            let totalValues = {
-                "parts": { "hW": 0, "pC": 0, "uW": 0},
-                "startUpCost": 0,
-                "runningCostRepair": 0,
-                "runningCostCreeps": 0,
-                "netEnergy": 0,
-                "netParts": 0,
-                "profitParts" : 0,
-            };*/
 
-
-        //console.log("pp this.updateRoomResources values", JSON.stringify(values));
-        //let hW=0, pC=0, uW=0;
-        //for (let id in values["sources"]) {
-        //    minHarvesters++;
-        //    maxHarvesters += flag.getRoomFlag(colonyObj.name).memory.sources[id].ap;
-        //    hW += values["sources"][id].parts.hW;
-        //    pC += values["sources"][id].parts.pC;
-        //    uW += values["sources"][id].parts.uW
-        //}
-
-        const governor = policy.getGouvernerPolicy(this.home);
-        const fRoom = new FlagRoom(colonyObj.name);
-        console.log("calcResources this.roomName",this.roomName,"colonyObj.name",colonyObj.name);
+        //const governor = policy.getGouvernerPolicy(this.home);
         const values = fRoom.value(
-            this.roomName,
+            this.home,
             !!governor.m.ACTIVITY_COLONY_ROADS,
             !!governor.m.ACTIVITY_RESERVED_COLONIES,
             !!governor.m.ACTIVITY_FLEXI_HARVESTERS,
         );
-        minHarvesters += fRoom.getSources().length;
+        //console.log("pp minHarvesters2", minHarvesters,"maxHarvesters",maxHarvesters);
         const colonyResources = this.updateRoomResources(
             colonyObj.name, values.parts.hW, values.parts.pC, values.parts.uW
         );
+
         this.m.curProduction[colonyObj.name] = Object.assign({}, colonyResources);
         //console.log("pp this.updateRoomResources colony",colonyObj.name,JSON.stringify(colonyResources));
         resources.hW += colonyResources.hW;
         resources.pC +=  colonyResources.pC;
         resources.wW +=  colonyResources.wW;
         resources.uW +=  colonyResources.uW;
-        resources.rC += values["rC"];
-        //console.log(colonyObj.name,"POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
+        resources.cR += values.parts["cR"];
+        //console.log("POLICY_PORTERS values.parts[cR]",values.parts["cR"], "resource.cR", resources.cR)
     }
-    //console.log("pp this.updateRoomResources", JSON.stringify(resources));
+    //console.log("pp minHarvesters1", minHarvesters,"maxHarvesters",maxHarvesters);
     resources.minHarvesters = minHarvesters;
     resources.maxHarvesters = maxHarvesters;
-    resources.minReservers = minReservers;
+    resources.minReservers = this.m[gc.ACTIVITY_RESERVED_COLONIES] ? colonies.length : 0;
     return resources
 };
 

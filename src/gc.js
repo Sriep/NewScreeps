@@ -76,7 +76,11 @@ const gc = {
     RACE_RESERVER: "reserver",
     RACE_LORRY: "lorry",
     RACE_SCIENTIST: "scientist",
+    RACE_PALADIN: "paladin",
+    RACE_SWORDSMAN: "swordsman",
 
+    MIN_SWORDSMAN_EC_INVADER_RESERVER: 720,
+    MIN_SWORDSMAN_PARTS_INVADER_RESERVER: 12,
     MIN_HARVESTER_EC: 300,
     MAX_HARVESTER_EC: 800,
     HARVESTER_BODY: {
@@ -130,6 +134,7 @@ const gc = {
     STATE_MOVE_TARGET: "move_target",
     STATE_BOOST_CREEP: "boost_creep",
     STATE_FIND_BOOST: "find_boost",
+    STATE_DEFENSIVE_RETREAT: "defensive_retreat",
     // states worker
     STATE_WORKER_IDLE: "worker_idle",
     STATE_WORKER_UPGRADE: "worker_upgrade",
@@ -295,6 +300,7 @@ const gc = {
     RANGE_RANGED_ATTACK: 3,
     RANGE_HEAL: 3,
     RANGE_REACTION: 2,
+    RANGE_RETREAT_RANGE: 4,
 
     // Sizes
     LINKING_BUILDER_SIZE: 5,
@@ -319,6 +325,14 @@ const gc = {
     BUILD_ROAD_SOURCE_SOURCE: pgc.BUILD_ROAD_SOURCE_SOURCE,
     BUILD_ROAD_SPAWN_CONTROLLER: pgc.BUILD_ROAD_SPAWN_CONTROLLER,
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
+
+    Activity : {
+        "Flag": "Flag",
+        "Policy" :"Policy",
+        "PolicyBlocker" : "PolicyBlocker",
+        "PolicyReplacement" : "PolicyReplacement",
+        "Control" : "Control",
+    },
     // Msc
     ACTIVITY_FINISHED: "finished",
     ACTIVITY_MINE_COLONIES: "mine_colonies",
@@ -343,6 +357,7 @@ const gc = {
     POLICY_BUILD_STORAGE: pgc.POLICY_BUILD_STORAGE,
     POLICY_BUILD_LINKS: pgc.POLICY_BUILD_LINKS,
     POLICY_COLONIAL_OFFICE: "colonial_office",
+    POLICY_FOREIGN_OFFICE: "foreign_office",
     POLICY_BUILD_EXTRACTORS: "build_extractors",
     POLICY_PLAN_BUILDS: "plan_builds",
     POLICY_BUILD_STRUCTURE: "build_structure",
@@ -376,6 +391,7 @@ const gc = {
     CALC_ROOM_RESOURCES_RATE: 20,
     FREE_HARVESTER_POST_CACHE_RATE: 10,
     COLONIAL_OFFICE_RATE: 1,
+    FOREIGN_OFFICE_RATE: 1,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -396,6 +412,9 @@ const gc = {
     REPLACEMENT_COLONY_PROFITPARTS: 50,
     PORTER_FUDGE_FACTOR: 1.5,
     MAX_COLONY_DISTANCE: 4,
+
+    // alerts
+    INSURGENCY_ALERT: "insurgency",
 
     // ownership
     ROOM_ENEMY: "enemy",
@@ -480,6 +499,43 @@ const gc = {
             "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } ],
             "-2" : [ { dx : -1, dy : -1 } ]
         }
+    },
+
+    OPPOSITE_DIRECTION: {
+        1 : [C.BOTTOM_LEFT, C.BOTTOM, C.BOTTOM_RIGHT],
+        2 : [C.LEFT, C.BOTTOM_LEFT, C.BOTTOM],
+        3 : [C.TOP_LEFT, C.LEFT, C.BOTTOM_LEFT],
+        4 : [C.LEFT, C.TOP_LEFT, C.TOP],
+        5 : [C.TOP_LEFT, C.TOP, C.TOP_RIGHT],
+        6 : [C.TOP, C.TOP_RIGHT, C.RIGHT],
+        7 : [C.TOP_RIGHT, C.RIGHT, C.BOTTOM_RIGHT],
+        8 : [C.RIGHT, C.BOTTOM_RIGHT, C.BOTTOM]
+    },
+
+    SIDEWAYS_DIRECTION: {
+        1 : [C.LEFT, C.BOTTOM],
+        2 : [C.TOP_LEFT, C.BOTTOM_RIGHT],
+        3 : [C.TOP, C.BOTTOM],
+        4 : [C.BOTTOM_LEFT, C.TOP_RIGHT],
+        5 : [C.LEFT, C.RIGHT],
+        6 : [C.TOP_LEFT, C.BOTTOM_RIGHT],
+        7 : [C.TOP, C.BOTTOM],
+        8 : [C.TOP_RIGHT, C.BOTTOM_LEFT]
+    },
+
+    //PLAIN: "plain",
+    //SWAMP: "swamp",
+    //WALL: "wall",
+
+    DELTA_DIRECTION: {
+        1 : {x:0, y:-1},
+        2 : {x:1, y:-1},
+        3 : {x:1, y:0 },
+        4 : {x:1, y:1 },
+        5 : {x:0, y:1 },
+        6 : {x:-1, y:1 },
+        7 : {x:-1, y:0 },
+        8 : {x:-1, y:-1 }
     },
 
     //creep body bases

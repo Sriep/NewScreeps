@@ -12,40 +12,31 @@ const cache = require("cache");
 
 function StateMovePos (creep) {
     this.type = gc.STATE_MOVE_POS;
-    this.creep = creep
+    this.creep = creep;
+    this.m = this.creep.memory
 }
 
 StateMovePos.prototype.enact = function () {
     //console.log(this.creep.name, "in STATE_MOVE_POS");
-    const targetPos = gf.roomPosFromPos(this.creep.memory.targetPos);
+    const targetPos = gf.roomPosFromPos(this.m.targetPos);
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        if (this.creep.memory.moveRange === 0) {
-            console.log(this.creep.name, "STATE_MOVE_POS creep at", JSON.stringify(this.creep.pos), "in range of target",
-                JSON.stringify(targetPos), "range", this.creep.memory.moveRange)
+        if (this.m.moveRange === 0) {
+            //console.log(this.creep.name, "STATE_MOVE_POS creep at",
+            //    JSON.stringify(this.creep.pos), "in range of target",
+            //    JSON.stringify(targetPos), "range", this.m.moveRange)
         }
-        return state.switchTo(this.creep, this.creep.memory, this.creep.memory.next_state)
+        return state.switchTo(this.creep, this.m, this.m.next_state)
     }
-    if (this.creep.memory.lastpositon) {
-        const lastPos =  cache.dPoint(this.creep.memory.lastpositon);
-        //console.log(this.creep.name,"pos", JSON.stringify(lastPos), "cached",this.creep.memory.lastpositon);
+    if (this.m.lastpositon) {
+        const lastPos =  cache.dPoint(this.m.lastpositon);
         if (this.creep.pos.x === lastPos.x && this.creep.pos.y === lastPos.y) {
-            delete this.creep.memory.lastpositon;
-            //console.log("STATE_MOVE_POS stuck");
+            delete this.m.lastpositon;
             return this.pathLost();
         }
     }
 
-    //console.log(this.creep.name, "about to call moveTo", JSON.stringify(targetPos), "{reusePath: 5} ");
     const result = this.creep.moveTo(targetPos, {reusePath: 5});
-    if (result === OK) {
-        //const mInfo = this.creep.memory._move;
-        //console.log(this.creep.name, "STATE_MOVE_POS current posiotion", JSON.stringify(this.creep.pos));
-        //console.log(this.creep.name, "STATE_MOVE_POS move info after move", JSON.stringify(mInfo));
-        //console.log(this.creep.name, "STATE_MOVE_POS path after move", JSON.stringify(Room.deserializePath(mInfo.path)));
-        //console.log("STATE_MOVE_POS result of move by",this.creep.name , "is", result);
-    }
-    //console.log("result of move bySTATE_MOVE_POS",this.creep.name , "is", result);
     switch (result) {
         case OK:                        // The operation has been scheduled successfully.
             break;
@@ -72,7 +63,7 @@ StateMovePos.prototype.enact = function () {
             console.log("creep memory", JSON.stringify(this.creep.memory));
             return gf.fatalError("moveByPath unrecognised return|", result,"|");
     }
-    this.creep.memory.lastpositon = cache.sPoint(this.creep.pos);
+    this.m.lastpositon = cache.sPoint(this.creep.pos);
     //this.creep.memory.lastroomName = cache.sPoint(this.creep.room.name);
 
 };
@@ -96,9 +87,9 @@ StateMovePos.prototype.pathLost = function () {
                         break;
                     }
                 }
-                this.creep.memory.targetId = sourceId;
-                this.creep.memory.targetPos = this.creep.pos;
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
+                this.m.targetId = sourceId;
+                this.m.targetPos = this.creep.pos;
+                return state.switchTo(this.creep, this.m, gc.STATE_HARVESTER_HARVEST);
             }
             return;
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
@@ -107,7 +98,7 @@ StateMovePos.prototype.pathLost = function () {
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
         case gc.RACE_PORTER:
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-                return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle")
+                return state.switchTo(this.creep, this.m, creepRace + "_idle")
             } else {
                 return;
                 /*
@@ -149,7 +140,7 @@ StateMovePos.prototype.pathLost = function () {
                 return state.switchTo(this.creep, this.creep.memory, creepRace + "_full_idle")*/
             }
         case gc.RACE_UPGRADER:
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_IDLE);
+            return state.switchTo(this.creep, this.m, gc.STATE_UPGRADER_IDLE);
         default:
             return;
             //return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);

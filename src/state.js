@@ -82,20 +82,33 @@ const state = {
         return state.enact(creep, creep.memory);
     },
 
-    switchTo: function (obj, memory, newState, targetId) {
+    switchTo: function (obj, m, newState, targetId) {
         //console.log("Switch state|", creep.name," |from| ",creep.memory.state, " |to| ", newState)
         if (!obj) {
             gf.fatalError(" no creep given when changing state to", newState, "targetId", targetId);
         }
         if (!newState || newState === "undefined_idle") {
-            gf.fatalError(" no state to change to, targetId ", targetId, "memory", JSON.stringify(memory));
+            gf.fatalError(" no state to change to, targetId ", targetId, "memory", JSON.stringify(m));
         }
         if (targetId) {
-            memory.targetId = targetId;
+            m.targetId = targetId;
         }
-        memory.state = newState;
+        m.state = newState;
         //creep.say(this.creepSay[newState]);
-        return state.enact(obj, memory);
+        return state.enact(obj, m);
+    },
+
+    switchBack: function (creep, m) {
+        if (creep.pos.isEqualTo(m.previous_pos.x, m.previous_pos.y)
+            || m.previous_state.startsWith("move_") ) {
+            this.switchTo(creep, m, m.previous_state)
+        }
+        if (m.targetPos && m.moveRange && m.next_state) {
+            gf.assert(m.targetPos.x === m.previous_pos.x && m.targetPos.y === m.previous_pos.y);
+            gf.assert(m.next_state === m.previous_state);
+            this.switchToMovePos(creep, m.targetPos, m.moveRange, m.next_state)
+        }
+        this.switchTo(creep, m, race.getRace(this.creep) + "_idle", m.targetId)
     },
 
     //--------------------- state switches end----------------------------------

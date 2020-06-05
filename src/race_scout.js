@@ -8,6 +8,9 @@ const race_scout = {
     bodyCounts: function () {
         return {"work": 0, "carry": 0, "move" : 1}
     },
+
+    isCivilian: function() {return false},
+
     boosts: []
 };
 

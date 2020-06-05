@@ -39,6 +39,8 @@ const race_upgrader = {
         return {"work": Ws, "carry": Cs, "move" : Ms};
     },
 
+    isCivilian: function() {return true},
+
     boosts: [
         C.RESOURCE_CATALYZED_GHODIUM_ACID,
         C.RESOURCE_GHODIUM_ACID,
