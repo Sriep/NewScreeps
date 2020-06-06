@@ -6,6 +6,7 @@
 const C = require("./Constants");
 const economy = require("./economy");
 const construction = require("./construction");
+const cache = require("./cache");
 //const gc = require("./gc");
 
 const flag = {
@@ -44,13 +45,15 @@ const flag = {
         if (!Game.flags[roomName]) {
             const room = Game.rooms[roomName];
             if (room) {
+                console.log("flagRoom start before create flag")
                 const centre = new RoomPosition(25, 25, room.name);
                 centre.createFlag(room.name);
 
                 this.flagPermanents(room);
-                this.setSourceContainers(room);
-                this.setControllerContainers(room);
-                this.setMineralContainers(room);
+                //this.setSourceContainers(room);
+                //this.setControllerContainers(room);
+                //this.setMineralContainers(room);
+                console.log("flagRoom finished", JSON.stringify(Game.flags[room.name].memory))
             }
         }
     },
@@ -74,15 +77,15 @@ const flag = {
             for ( let source of sources ) {
                 m.sources[source.id]= {
                     "ap" : economy.countAccessPoints(source.pos),
-                    "distance" : 15,//cache.distanceSourceSpawn(source, room, false) todo fix
+                    //"distance" : 15,//cache.distanceSourceSpawn(source, room, false) todo fix
                 };
-                //source.pos.createFlag(source.id);
             }
+            this.setSourceContainers(room, m)
         }
 
         if (room.controller) {
             m.controller = { "id" : room.controller.id };
-            //room.controller.pos.createFlag(room.controller.id);
+            this.setControllerContainers(room, m)
         }
 
         const minerals = room.find(C.FIND_MINERALS);
@@ -90,19 +93,20 @@ const flag = {
             m.mineral = {
                 "id" : minerals[0].id,
                 "type":minerals[0].type,
-                "distance" : 15,//.distanceSourceSpawn(minerals[0], room, false) todo fix
-            }
+                //"distance" : 15,//.distanceSourceSpawn(minerals[0], room, false) todo fix
+            };
+            this.setMineralContainers(room, m)
         }
-        m.flagged = true;
 
         // temporary store double while refactoring
         Game.flags[room.name].memory = m;
+        Game.flags[room.name].memory.flagged = true;
         Game.flags[room.name].memory.local = JSON.stringify(m);
     },
 
 
-    setMineralContainers : function(room) {
-        const m = Game.flags[room.name].memory;
+    setMineralContainers : function(room, m) {
+        //const m = Game.flags[room.name].memory;
         const minerals = room.find(C.FIND_MINERALS);
         if ( minerals.length > 1) {
             console.log("room", room.name, "minerals", JSON.stringify(minerals));
@@ -113,8 +117,8 @@ const flag = {
         m.mineral["containerPos"] = cache.sPoint(info["containerPos"]);
     },
 
-    setSourceContainers : function (room) {
-        const m = Game.flags[room.name].memory;
+    setSourceContainers : function (room, m) {
+        //const m = Game.flags[room.name].memory;
         const sources = room.find(C.FIND_SOURCES);
         for (let source of sources) {
             const info = this.setContainerAndPosts(source, m.sources[source.id]);
@@ -144,8 +148,8 @@ const flag = {
         return {"harvesterPosts": spots[0].neighbours, "containerPos" : spots[0].pos}
     },
 
-    setControllerContainers : function (room) {
-        const m = Game.flags[room.name].memory;
+    setControllerContainers : function (room, m) {
+        //const m = Game.flags[room.name].memory;
         const terrain = room.getTerrain();
         let spots = construction.coverArea(room.controller.pos, 3, terrain);
         if (spots.length === 0) {
@@ -157,11 +161,14 @@ const flag = {
             });
             spot["roomName"] = room.name;
         }
+        //console.log(spots.length, "setControllerContainers spots",JSON.stringify(spots))
         m.controller["containerPos"] = cache.serialisePath(spots);
-        m.controller["upgradePosts"] = [];
-        for (let cPos of m.controller["containerPos"]) {
-            m.controller["upgradePosts"].push(cache.serialisePath(spots.posts))
+        let uPosts = [];
+        for (let spot of spots) {
+            uPosts = uPosts.concat(spot.posts)
         }
+        m.controller["upgradePosts"] = cache.serialisePath(uPosts);
+        console.log("setControllerContainers uPosts", JSON.stringify(uPosts));
     },
 };
 

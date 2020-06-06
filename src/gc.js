@@ -187,7 +187,10 @@ const gc = {
 
     MAX_STATE_STACK: 5,
 
-
+    // tiles
+    TILE_CENTRE: "CENTRE_6x6_3",
+    TILE_TOWERS: "TOWER_3x3_2",
+    TILE_EXTENSIONS: "EXTENSION_10_4x4_2",
 
     ATOMIC_RESOURCES: [
         C.RESOURCE_HYDROGEN,

@@ -31,7 +31,7 @@ PolicyPlanBuilds.prototype.enact = function () {
     console.log("POLICY_PLAN_BUILDS enact");
     const fRoom = new FlagOwnedRoom(this.home);
     const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS);
-    fRoom.placeCentre("CENTRE_6x6_3",spawns.length > 0 ? spawns[0].pos : undefined);
+    fRoom.placeCentre(gc.TILE_CENTRE,spawns.length > 0 ? spawns[0].pos : undefined);
     this.m.finished = true;
 };
 

@@ -3,7 +3,7 @@
  * Created by piers on 25/05/2020
  * @author Piers Shepperson
  */
-
+const C = require("./Constants");
 const gc = require("./gc");
 const gf = require("./gf");
 const construction = require("./construction");
@@ -19,7 +19,7 @@ function FlagOwnedRoom (name) {
 
 // todo only need to store the tile and origin, calculate positions as required.
 FlagOwnedRoom.prototype.placeCentre = function (centreTile, start) {
-    const centre = tile.Centres[centreTile];
+    const centre = tile.centres[centreTile];
     let avoid = [];
     const sources = Game.rooms[this.name].find(FIND_SOURCES);
     for (let source of sources) {
@@ -85,11 +85,14 @@ FlagOwnedRoom.prototype.findLocationForCentre = function(centre, avoid) {
 
 FlagOwnedRoom.prototype.getExtensionPos = function(terrain, start, avoid) {
     const rtv = [];
-    for ( let i = 0 ; i < 12  ; i++ ) {
+    const extensionPlan = tile.extensions[gc.TILE_EXTENSIONS];
+    const numExtTiles = C.CONTROLLER_STRUCTURES[C.STRUCTURE_EXTENSION][8]/extensionPlan.extensions;
+    for ( let i = 0 ; i < numExtTiles  ; i++ ) {
+        const extensionTile = tile.getCopy(extensionPlan);
         const origin = construction.placeRectangle(
-            terrain, start, tile.EXTENSION_5_3x3.x_dim, tile.EXTENSION_5_3x3.y_dim, avoid
+            terrain, start, extensionTile.x_dim, extensionTile.y_dim, avoid
         );
-        for (let delta of tile.EXTENSION_5_3x3[STRUCTURE_EXTENSION]) {
+        for (let delta of extensionTile[STRUCTURE_EXTENSION]) {
             avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
             rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
         }
@@ -98,12 +101,13 @@ FlagOwnedRoom.prototype.getExtensionPos = function(terrain, start, avoid) {
 };
 
 FlagOwnedRoom.prototype.getTowerPos = function(terrain, start, avoid) {
+    const towerTile = tile.getCopy(tile.towers[gc.TILE_TOWERS]);
     const origin = construction.placeRectangle(
-        terrain, start, tile.TOWER_3x3.x_dim, tile.TOWER_3x3.y_dim, avoid
+        terrain, start, towerTile.x_dim, towerTile.y_dim, avoid
     );
     const rtv = [];
     this.m["plan"][STRUCTURE_TOWER] = [];
-    for (let delta of tile.TOWER_3x3[STRUCTURE_TOWER]) {
+    for (let delta of towerTile[STRUCTURE_TOWER]) {
         avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
         rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
     }
@@ -119,15 +123,19 @@ FlagOwnedRoom.prototype.setSourcesLinkPos = function() {
     return links;
 };
 
+// todo improve this logic
 FlagOwnedRoom.prototype.setControllerLinkPos = function() {
     const room = Game.rooms[this.name];
     const terrain = room.getTerrain();
     //console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
-    const posts = this.m.controller.upgraderPosts[0];
+    FlagRoom = require("flag_room");
+    const fRoom = new FlagRoom(this.name);
+    fRoom.getUpgradeContainerPos();
+    const posts = fRoom.getUpgradeContainerPos();
+    const post = posts[0];
     for (let delta of gc.ONE_MOVE) {
-        if (terrain.get(posts.x+delta.x, posts.y+delta.y) !== TERRAIN_MASK_WALL) {
-            //console.log("setControllerLinkPos x",posts.x+delta.x,"y",posts.y+delta.y,"name", room.name)
-            return new RoomPosition(posts.x+delta.x, posts.y+delta.y, room.name);
+        if (terrain.get(post.x+delta.x, post.y+delta.y) !== TERRAIN_MASK_WALL) {
+            return new RoomPosition(post.x+delta.x, post.y+delta.y, room.name);
         }
     }
 };
@@ -141,7 +149,11 @@ FlagOwnedRoom.prototype.controllerLinkPos = function(id) {
 };
 
 FlagOwnedRoom.prototype.sLinkPos = function(source) {
-    const containerPos = this.m.sources[source.id]["containerPos"];
+    FlagRoom = require("flag_room");
+    const fRoom = new FlagRoom(this.name);
+    const containerPos = fRoom.getUpgradeContainerPos()[0];
+    console.log("sLinkPos containerPos", JSON.stringify(fRoom.getUpgradeContainerPos()));
+    //const containerPos = this.m.sources[source.id]["containerPos"];
     const terrain = source.room.getTerrain();
     let adjacent = 0;
     let linkPos;
@@ -150,6 +162,7 @@ FlagOwnedRoom.prototype.sLinkPos = function(source) {
             if (adjacent === 0) {
                 adjacent++
             } else {
+
                 linkPos = new RoomPosition(containerPos.x+delta.x, containerPos.y+delta.y, source.room.name);
                 return linkPos;
             }

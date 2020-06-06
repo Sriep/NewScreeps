@@ -37,9 +37,9 @@ PolicyForeignOffice.prototype.checkInsurgencies = function () {
         if (!Game.flags[roomName]) {
             continue;
         }
-        if (Game.flags[roomName].keeperLairs) {
-            continue
-        }
+        //if (Game.flags[roomName].keeperLairs) {
+        //   continue
+        //}
         if (room.find(C.FIND_HOSTILE_STRUCTURES, {
             filter: { structureType: STRUCTURE_INVADER_CORE }}).length > 0) {
             continue;

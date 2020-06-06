@@ -116,12 +116,13 @@ FlagRoom.prototype.linkRoomInfo = function(owned) {
     return info;
 };
 
-FlagRoom.prototype.local= function(spawnRoom) {
-    return  cache.global(FlagRoom.prototype._local,this,[spawnRoom],this.name + ".local.");
+FlagRoom.prototype.local= function() {
+    return  cache.global(FlagRoom.prototype._local,this,[],this.name);
 };
 
-FlagRoom.prototype._local = function(spawnRoom) {
-    return JSON.parse(this.m.local[spawnRoom])
+FlagRoom.prototype._local = function() {
+    console.log("_local spawnRoom", JSON.stringify(this));
+    return JSON.parse(this.m.local)
 };
 
 FlagRoom.prototype.linkInfo= function(spawnRoom) {
@@ -192,7 +193,7 @@ FlagRoom.prototype.valueReserveCost = function (spawnRoom, value, reserve, roads
 };
 
 FlagRoom.prototype.valueDefenceCost = function (spawnRoom, value) {
-    if (this.m.keeperLairs) {
+    if (this.isKeeperLair()) {
         let keeperBaneCost = race.getCost(gc.RACE_PALADIN, 10000,11);
         const d = this.linkInfo(spawnRoom).sources[0].pathSpawn.cost;
         keeperBaneCost *= (C.CREEP_LIFE_TIME)/(C.CREEP_LIFE_TIME - d);
@@ -241,10 +242,11 @@ FlagRoom.prototype.getSources = function () {
 };
 
 FlagRoom.prototype._getSources = function () {
-    const sources = JSON.parse(this.local().sources);
-    for (let source of sources) {
-        source.harvestPosts = cache.deserialiseRoPath(source.harvestPosts, this.name);
-        source.containerPos = cache.dPos(source.containerPos, this.name);
+    const sources = this.local().sources;
+    console.log("sources", JSON.stringify(sources));
+    for (let id in sources) {
+        sources[id].harvestPosts = cache.deserialiseRoPath(sources[id].harvestPosts, this.name);
+        sources[id].containerPos = cache.dPos(sources[id].containerPos, this.name);
     }
     return sources;
 };
@@ -254,7 +256,7 @@ FlagRoom.prototype.getMineral = function () {
 };
 
 FlagRoom.prototype._getMineral = function () {
-    const mineral = JSON.parse(this.local().mineral);
+    const mineral = this.local().mineral;
     mineral.harvestPosts = cache.deserialiseRoPath(mineral.harvestPosts, this.name);
     mineral.containerPos = cache.dPos(mineral.containerPos, this.name);
     return mineral;
@@ -265,13 +267,9 @@ FlagRoom.prototype.getController = function () {
 };
 
 FlagRoom.prototype._getController = function () {
-    const controller = JSON.parse(this.local().mineral);
+    const controller = this.local().controller;
     controller.containerPos = cache.deserialiseRoPath(controller.containerPos, this.name);
-    const upgradePosts = [];
-    for (let i = 0 ; i < controller.containerPos.length ; i++ ) {
-        upgradePosts.push(cache.deserialiseRoPath(controller.upgradePosts[i], this.name));
-    }
-    controller.upgradePosts = upgradePosts;
+    controller.upgradePosts = cache.deserialiseRoPath(controller.upgradePosts, this.name);
     return controller;
 };
 
@@ -298,19 +296,43 @@ FlagRoom.prototype.getHarvestContainerPos = function (id) {
     if (this.local().mineral.id === id) {
         return this.getMineral().containerPos;
     }
-    return this.getSources()[sourceId].containerPos;
+    return this.getSources()[id].containerPos;
 };
 
 FlagRoom.prototype.getUpgradePosts = function () {
-    let upgradePosts = [];
-    for (let posts of this.getController().upgradePosts) {
-        upgradePosts = upgradePosts.concat(posts)
-    }
-    return upgradePosts;
+    return this.getController().upgradePosts;
 };
 
 FlagRoom.prototype.getUpgradeContainerPos = function () {
     return this.getController().containerPos;
 };
 
+FlagRoom.prototype.isKeeperLair = function () {
+    return this.local().keeperLairs
+};
+
 module.exports = FlagRoom;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
