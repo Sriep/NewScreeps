@@ -3,7 +3,7 @@
  * Created by piers on 03/05/2020
  * @author Piers Shepperson
  */
-const budget = require("budget");
+//const budget = require("budget");
 const race = require("race");
 const gf = require("gf");
 const gc = require("gc");
@@ -48,10 +48,14 @@ PolicyExplore.prototype.enact = function () {
         gf.assert(fRoom.m.flagged);
         if (!fRoom.m.mapped) {
             fRoom.mapRoom();
+            const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
+            if (colonialOffice) {
+                colonialOffice.checkRoom(creeps[i].room.name);
+            }
         }
     }
 };
-
+/*
 PolicyExplore.prototype.exploreRoom = function(newRoom) {
     const room = Game.rooms[newRoom];
     if (!room) {
@@ -116,7 +120,7 @@ PolicyExplore.prototype.exploreRoom = function(newRoom) {
     }
     //undefined.break;
 };
-
+*/
 PolicyExplore.prototype.sendExplorers = function(shortfall) {
     console.log("sendExplorers shortfall", shortfall,"this.m.direction",this.m.direction);
     for (let i = 0; i < shortfall; i++) {

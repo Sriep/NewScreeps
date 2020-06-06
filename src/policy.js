@@ -267,7 +267,7 @@ const policy = {
     buildSourceContainer : function (obj) {
         //console.log("buildSourceContainer objid",obj.id,"obj",JSON.stringify(obj));
         const fRoom = new FlagRoom(obj.room.name);
-        const cPos = fRoom.getContainerPos(obj.id);
+        const cPos = fRoom.getHarvestContainerPos(obj.id);
         if (state.findContainerOrConstructionAt(gf.roomPosFromPos(cPos))) {
             return;
         }

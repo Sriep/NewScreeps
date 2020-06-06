@@ -28,9 +28,9 @@ StateUpgraderIdle.prototype.enact = function () {
         return this.goUpgrade(UpgradePost);
     }
     const fRoom = new FlagRoom(this.homeId);
-    if (state.atUpgradingPost(this.creep.pos)) {
+    if (this.atUpgradingPost(this.creep.pos)) {
         //console.log("STATE_UPGRADER_IDLE at UpgradingPost", JSON.stringify(this.creep.pos))
-        const upgradeContainerPoses = fRoom.getControllerPosts();
+        const upgradeContainerPoses = fRoom.getUpgradePosts();
         for (let cPos of upgradeContainerPoses) {
             const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(cPos));
             if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
@@ -66,6 +66,17 @@ StateUpgraderIdle.prototype.goUpgrade = function (post) {
         0,
         gc.STATE_UPGRADER_UPGRADE
     );
+};
+
+StateUpgraderIdle.prototype.atUpgradingPost = function(pos) {
+    const fRoom = new FlagRoom(pos.roomName);
+    const posts = fRoom.getUpgradePosts();
+    for (let i in posts) {
+        if (pos.x === posts[i].x && pos.y === posts[i].y){
+            return true;
+        }
+    }
+    return false;
 };
 
 module.exports = StateUpgraderIdle;

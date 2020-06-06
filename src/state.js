@@ -184,17 +184,6 @@ const state = {
         });
     },
 
-    atUpgradingPost: function(pos) {
-        const fRoom = new FlagRoom(pos.roomName);
-        const posts = fRoom.getControllerPosts();
-        for (let i in posts) {
-            if (pos.x === posts[i].x && pos.y === posts[i].y){
-                return true;
-            }
-        }
-        return false;
-    },
-
     spaceForHarvest: function (creep) {
         const freeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
         if (freeCapacity === 0) {

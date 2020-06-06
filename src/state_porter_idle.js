@@ -144,7 +144,7 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
                     containerInfo.push({
                         "porters" : porters.filter( c => c.memory.targetId === sourceId).length,
                         "pos" : cPos,
-                        "distance" : colonyRoom.m.sources[sourceId].distance,
+                        //"distance" : sources[sourceId].distance,
                         "id" : sourceId,
                         "container" : state.findContainerAt(cPos)
                     })
@@ -159,7 +159,7 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
                 containerInfo.push({
                     "porters" : porters.filter( c => c.memory.targetId === colonyRoom.m.mineral.id).length,
                     "pos" : cPos,
-                    "distance" : colonyRoom.m.mineral.distance,
+                    //"distance" : colonyRoom.m.mineral.distance,
                     "id" : colonyRoom.m.mineral.id,
                     "container" : state.findContainerAt(cPos)
                 })

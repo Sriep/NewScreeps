@@ -15,7 +15,7 @@ const cache = {
         return global[name];
     },
 
-    path(from, toArray, name, range, useRoad) {
+    path(from, toArray, name, range, useRoad, cachePath) {
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
@@ -65,21 +65,20 @@ const cache = {
                 swampCost: 5,
             })
         }
-        //if (cacheResult) {
-        //    flag.memory[toArray[0].room.name][name][tag] = {
-        //        path: this.serialisePath(pfPath.path),
-        //        ops: pfPath.ops,
-        //        cost: pfPath.cost,
-        //        incomplete: pfPath.incomplete,
-        //    }
-        //}
+        if (cachePath) {
+            return {
+                path: this.serialisePath(pfPath.path),
+                ops: pfPath.ops,
+                cost: pfPath.cost,
+                incomplete: pfPath.incomplete,
+            }
+        }
         return {
-            path: pfPath.path,// this.serialisePath(pfPath.path),
+            path: pfPath.path,
             ops: pfPath.ops,
             cost: pfPath.cost,
             incomplete: pfPath.incomplete,
         }
-        //return pfPath;
     },
 
     distance(from, toArray, name, range, useRoad, redo, cacheResult) {
@@ -110,12 +109,12 @@ const cache = {
     },
 
     sPos: function (pos) {
-        return this.sPoint(pos) + pos.roomName;
+        return this.sPoint(pos);
     },
 
-    dPos: function (dPos) {
-        const point = dPoint(dPos);
-        return new RoomPosition(point.x, point.y, dPos.substring(1))
+    dPos: function (str, roomName) {
+        const point = this.dPoint(str);
+        return new RoomPosition(point.x, point.y, roomName)
     },
 
     sPoint: function (point) {

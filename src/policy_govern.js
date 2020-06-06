@@ -109,7 +109,6 @@ PolicyGovern.prototype.sortColonies = function()  {
 };
 
 PolicyGovern.prototype.refreshRoomInfo = function() {
-    //console.log("refreshRoomInfo this.m.colonies",this.m.colonies);
     const economicPolicy = policy.getRoomEconomyPolicy(this.roomName);
     if (economicPolicy) {
         if (economicPolicy.localBudget) {
@@ -118,18 +117,7 @@ PolicyGovern.prototype.refreshRoomInfo = function() {
     }
     this.sortColonies();
 };
-/*
-PolicyGovern.prototype.checkPaybackBeforeNextUpgrade = function(profit, startUpCost) {
-    const room = Game.rooms[this.roomName];
-    const energyLeft = room.controller.progressTotal - room.controller.progress;
-    const ltToNextLevel = energyLeft / (2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT); // todo something better
-    //console.log("checkPayback energyLeft",energyLeft,"ec",(2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT));
-    const ltToPayOff = startUpCost / profit;
-    //console.log("checkPayback startUpCost",startUpCost,"profit",profit)
-    //console.log("POLICY_GOVERN checkPayback ltToPayOff",ltToPayOff,"ltToNextLevel",ltToNextLevel);
-    return ltToPayOff < ltToNextLevel;
-};
-*/
+
 PolicyGovern.prototype.checkPaybackByNextUpgrade = function(value) {
     const room = Game.rooms[this.roomName];
     const energyLeft = room.controller.progressTotal - room.controller.progress;

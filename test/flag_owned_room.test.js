@@ -4,13 +4,13 @@
  * @author Piers Shepperson
  */
 
-const assert = require('assert');
-const C = require("../src/Constants");
+//const assert = require('assert');
+//const C = require("../src/Constants");
 const flag = require("../src/flag");
 //const gf = require("../src/gf");
 const FlagOwnedRoom = require("../src/flag_owned_room");
 
-describe("flag_room", function() {
+describe("flag_room_owned", function() {
     before(function() {
     });
 

@@ -14,18 +14,6 @@ const FlagRoom = require("../src/flag_room");
 describe("policy_govern", function() {
 
     let flagRooms = [];
-    //let Game = {};
-    //Game["rooms"] = {};
-    //Game.rooms["W7N7"] = {
-    //    controller: {
-    //        progressTotal : 450000,
-    //        progress: 100,
-    //    }
-    //};
-    //let Game = { "rooms" :  { "W7N7" : {} } };
-    //Game.rooms["W7N7"].prototype.find = function () {
-    //    return [0];
-    //};
     const distance = 50;
 
     before(function() {
@@ -33,6 +21,28 @@ describe("policy_govern", function() {
             const ec = sourceCount > 2 ? C.SOURCE_ENERGY_KEEPER_CAPACITY  : C.SOURCE_ENERGY_NEUTRAL_CAPACITY;
             const fRoom = new FlagRoom();
             fRoom.name = sourceCount.toString() + " source";
+
+            fRoom.m.linkInfo = {};
+            let linkInfoW7N7 = {
+                sources: [] ,
+                controller: {
+                    id: 10,
+                    pathSpawn: { cost: 1.1*distance},
+                    pathSpawnRoad: { cost: distance},
+                },
+            };
+            for (let source  = 1 ; source <= sourceCount ; source++ ) {
+                linkInfoW7N7.sources.push({
+                    id: source,
+                    energyCapacity: ec,
+                    pathSpawn: {cost: 1.1 * distance},
+                    pathSpawnRoad: {cost: distance},
+                    pathController: {cost: 1.1 * distance},
+                    pathControllerRoad: {cost: distance},
+                });
+            }
+            fRoom.m.linkInfo["W7N7"] = JSON.stringify(linkInfoW7N7);
+            /*
             fRoom.m.linkInfo = {};
             fRoom.m.linkInfo["W7N7"] = {
                 sources: [] ,
@@ -52,6 +62,8 @@ describe("policy_govern", function() {
                     pathControllerRoad: { cost: distance },
                 })
             }
+            */
+
             flagRooms.push(fRoom)
         }
     });
@@ -87,7 +99,7 @@ describe("policy_govern", function() {
             //console.log(flagRoomsInColonyListBefore.length, "m.colonies",flagRoomsInColonyListBefore);
             const result1 = policyGovern.requestAddColony(flagRooms[1]);
             //console.log(JSON.stringify(result1));
-            assert(!result1.added);
+            assert(result1.added);
             //console.log("flagRooms[1]", result2);
             const result2 = policyGovern.requestAddColony(flagRooms[2]);
             assert(result2.added);

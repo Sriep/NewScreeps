@@ -9,7 +9,7 @@ const FlagRoom = require("flag_room");
 const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done
         const fRoom = new FlagRoom(room.name);
-        const upgraderPosts = fRoom.getControllerPosts();
+        const upgraderPosts = fRoom.getUpgradePosts();
         let lowestUserCount = 9999;
         let bestPost;
         for ( let i = 0; i < upgraderPosts.length ; i++ ) {

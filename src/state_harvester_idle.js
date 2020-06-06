@@ -26,7 +26,6 @@ StateHarvesterIdle.prototype.enact = function () {
     const nextPost = this.nextFreeHarvesterPost(governor.getColonies());
     //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
     if (nextPost) {
-        //console.log(this.creep.name,"STATE_HARVESTER_IDLE nextPost",JSON.stringify(nextPost));
         this.m.targetId = nextPost.id;
         state.switchToMovePos(
             this.creep,
@@ -43,19 +42,19 @@ StateHarvesterIdle.prototype.nextFreeHarvesterPost = function (colonies) {
     let harvesters = _.filter(Game.creeps, c => {
         return  c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
     });
-    console.log("nextFreeHarvesterPost harvesters length", harvesters.length, "colonies", JSON.stringify(colonies));
+    //console.log("nextFreeHarvesterPost harvesters length", harvesters.length, "colonies", JSON.stringify(colonies));
     for (let colony of colonies) {
         const colonyInfo = new FlagRoom(colony.name);
-        console.log("nextFreeHarvesterPost colony", JSON.stringify(colony));
+        //console.log("nextFreeHarvesterPost colony", JSON.stringify(colony));
         for (let sourceId in colonyInfo.getSources()) {
-            const hAt = harvesters.filter(h => {
-                return h.memory.targetId === sourceId
-            });
-            console.log("nextFreeHarvesterPost sourceId", sourceId, "number", hAt.length, "objs", JSON.stringify(hAt));
+            //const hAt = harvesters.filter(h => {
+            //    return h.memory.targetId === sourceId
+            //});
+            //console.log("nextFreeHarvesterPost sourceId", sourceId, "number", hAt.length, "objs", JSON.stringify(hAt));
             if (harvesters.filter(h => {
                 return h.memory.targetId === sourceId
             }).length === 0) {
-                console.log("nextFreeHarvesterPost", sourceId, "lengthis0", hAt.length);
+                //console.log("nextFreeHarvesterPost", sourceId, "lengthis0", hAt.length);
                 const post = colonyInfo.getSourcePosts(sourceId)[0];
                 return {
                     //pos: gf.roomPosFromPos( colony.name),
@@ -64,7 +63,7 @@ StateHarvesterIdle.prototype.nextFreeHarvesterPost = function (colonies) {
                 }
             }
         }
-        console.log("looking for minerals");
+        //console.log("looking for minerals");
         for (let colony of colonies) {
             const room = Game.rooms[colony.name];
             if (!room) {
@@ -88,7 +87,7 @@ StateHarvesterIdle.prototype.nextFreeHarvesterPost = function (colonies) {
             }
         }
     }
-    console.log("looking for oldest harvester");
+    //console.log("looking for oldest harvester");
     harvesters = harvesters.sort((h1, h2) => {
         return h1.ticksToLive - h2.ticksToLive
     });    // todo factor in Game.flags[roomname?].memory.sources[harvester.memory.targetId].distance

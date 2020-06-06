@@ -19,7 +19,7 @@ describe("flag_room", function() {
             const fRoom = new FlagRoom();
             fRoom.name = sourceCount.toString() + " source";
             fRoom.m.linkInfo = {};
-            fRoom.m.linkInfo["spawnRoom"] = {
+            let linkInfoW7N7 = {
                 sources: [] ,
                 controller: {
                     id: 10,
@@ -28,15 +28,16 @@ describe("flag_room", function() {
                 },
             };
             for (let source  = 1 ; source <= sourceCount ; source++ ) {
-                fRoom.m.linkInfo["spawnRoom"].sources.push({
+                linkInfoW7N7.sources.push({
                     id: source,
                     energyCapacity: ec,
-                    pathSpawn: { cost: 1.1*distance },
-                    pathSpawnRoad: { cost: distance },
-                    pathController: { cost: 1.1*distance },
-                    pathControllerRoad: { cost: distance },
-                })
+                    pathSpawn: {cost: 1.1 * distance},
+                    pathSpawnRoad: {cost: distance},
+                    pathController: {cost: 1.1 * distance},
+                    pathControllerRoad: {cost: distance},
+                });
             }
+            fRoom.m.linkInfo["spawnRoom"] = JSON.stringify(linkInfoW7N7);
             flagRooms.push(fRoom)
         }
     });

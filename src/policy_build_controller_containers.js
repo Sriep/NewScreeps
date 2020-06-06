@@ -57,7 +57,7 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function() {
     Game.flags[room.controller.id].memory.upgraderPosts = spots;
 */
     const fRoom = new FlagRoom(this.home);
-    const posts = fRoom.getControllerPosts();
+    const posts = fRoom.getUpgradeContainerPos();
     for (let post of posts) {
         const pos = gf.roomPosFromPos(post);
         if (!state.findContainerOrConstructionAt(gf.roomPosFromPos(pos))) {
@@ -72,7 +72,7 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function() {
 
 PolicyBuildControllerContainers.prototype.areControllerContainerFinished = function () {
     const fRoom = new FlagRoom(this.home);
-    const posts = fRoom.getControllerPosts();
+    const posts = fRoom.getUpgradeContainerPos();
     if (!posts) {
         return false;
     }

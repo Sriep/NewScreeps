@@ -6,7 +6,7 @@
 const C = require("./Constants");
 const economy = require("./economy");
 const construction = require("./construction");
-const gc = require("./gc");
+//const gc = require("./gc");
 
 const flag = {
 
@@ -41,10 +41,8 @@ const flag = {
     },
 
     flagRoom: function (roomName) {
-        //console.log("flagRoom", roomName,"Game.flags[roomName]",Game.flags[roomName]);
         if (!Game.flags[roomName]) {
             const room = Game.rooms[roomName];
-            //console.log("flagRoom room", room.name);
             if (room) {
                 const centre = new RoomPosition(25, 25, room.name);
                 centre.createFlag(room.name);
@@ -58,8 +56,7 @@ const flag = {
     },
 
     flagPermanents: function (room) {
-        //console.log("flagPermanents", room.name);
-        const m = Game.flags[room.name].memory;
+        const m = {};
 
         const keeperLairs = room.find(C.FIND_STRUCTURES, {
             filter: { structureType: C.STRUCTURE_KEEPER_LAIR }
@@ -72,7 +69,6 @@ const flag = {
         m.invaderCore = invaderCore.length > 0;
 
         const sources = room.find(C.FIND_SOURCES);
-        //console.log("flag sources", sources);
         if (sources.length > 0) {
             m.sources = {};
             for ( let source of sources ) {
@@ -80,13 +76,13 @@ const flag = {
                     "ap" : economy.countAccessPoints(source.pos),
                     "distance" : 15,//cache.distanceSourceSpawn(source, room, false) todo fix
                 };
-                source.pos.createFlag(source.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
+                //source.pos.createFlag(source.id);
             }
         }
-        //console.log("flag controller", room.controller);
+
         if (room.controller) {
             m.controller = { "id" : room.controller.id };
-            room.controller.pos.createFlag(room.controller.id, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
+            //room.controller.pos.createFlag(room.controller.id);
         }
 
         const minerals = room.find(C.FIND_MINERALS);
@@ -97,76 +93,37 @@ const flag = {
                 "distance" : 15,//.distanceSourceSpawn(minerals[0], room, false) todo fix
             }
         }
-
         m.flagged = true;
-/*
-        const powerBank = room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_POWER_BANK }
-        });
-        m.powerBank = powerBank.length > 0;
 
-        for ( i in keeperLairs ) {
-            flagName = keeperLairs[i].id;
-            if (!Game.flags[flagName])
-                {
-                    keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
-                }
-            Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR;
-            Game.flags[flagName].memory.keeperLairRoom = true;
-        }
-
-        const walls = room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_WALL }
-        });
-        for ( i in walls ) {
-            flagName = walls[i].id;
-            if (!Game.flags[flagName])
-                walls[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_WALL_COLOUR);
-            Game.flags[flagName].memory.type = gc.FLAG_WALL;
-        }
-
-        const portals = room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_PORTAL }
-        });
-        for ( i in portals ) {
-            flagName = portals[i].id;
-            if (!Game.flags[flagName])
-                {
-                    portals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_PORTAL_COLOUR);
-                }
-            Game.flags[flagName].memory.type = gc.FLAG_PORTAL;
-            Game.flags[flagName].memory.destination = portals[i].destination;
-            if (portals[i].ticksToDecay)
-                {
-                    Game.flags[flagName].memory.decay = Game.time + portals[i].ticksToDecay;
-                }
-        }
-*/
+        // temporary store double while refactoring
+        Game.flags[room.name].memory = m;
+        Game.flags[room.name].memory.local = JSON.stringify(m);
     },
 
 
     setMineralContainers : function(room) {
-        //console.log("setMineralContainers", room.name);
         const m = Game.flags[room.name].memory;
         const minerals = room.find(C.FIND_MINERALS);
         if ( minerals.length > 1) {
             console.log("room", room.name, "minerals", JSON.stringify(minerals));
             gf.fatalError("room with more than one mineral")
         }
-        this.setContainerAndPosts(minerals[0], m.mineral)
+        const info = this.setContainerAndPosts(minerals[0], m.mineral);
+        m.mineral["harvestPosts"] = cache.serialisePath(info["harvesterPosts"]);
+        m.mineral["containerPos"] = cache.sPoint(info["containerPos"]);
     },
 
     setSourceContainers : function (room) {
-        //console.log("setSourceContainers", room.name);
         const m = Game.flags[room.name].memory;
         const sources = room.find(C.FIND_SOURCES);
         for (let source of sources) {
-            this.setContainerAndPosts(source, m.sources[source.id])
+            const info = this.setContainerAndPosts(source, m.sources[source.id]);
+            m.sources[source.id]["harvestPosts"] = cache.serialisePath(info["harvesterPosts"]);
+            m.sources[source.id]["containerPos"] = cache.sPoint(info["containerPos"]);
         }
     },
 
-    setContainerAndPosts : function(obj, memoryObj) {
-        //console.log("setContainerAndPosts", obj);
+    setContainerAndPosts : function(obj) {
         let spots = economy.findMostFreeNeighbours(
             obj.room, obj.pos, 1
         );
@@ -175,7 +132,6 @@ const flag = {
         }
 
         let containerIndex;
-        //console.log("setContainerAndPosts neighbours before", JSON.stringify(spots[0].neighbours));
         for (let i in spots[0].neighbours) {
             if (spots[0].neighbours[i].x === spots[0].pos.x
                 && spots[0].neighbours[i].y === spots[0].pos.y) {
@@ -184,18 +140,11 @@ const flag = {
             spots[0].neighbours[i]["roomName"] = obj.room.name;
         }
         spots[0].neighbours.unshift(spots[0].neighbours.splice(containerIndex, 1)[0]);
-        //console.log("setContainerAndPosts neighbours after", JSON.stringify(spots[0].neighbours));
-        //console.log("setContainerAndPosts memoryObj", JSON.stringify(memoryObj));
-        memoryObj["harvesterPosts"] =  spots[0].neighbours;
-        //console.log("setContainerAndPosts harvesterPosts", JSON.stringify(harvesterPosts));
         spots[0].pos.roomName = obj.room.name;
-        //console.log("setContainerAndPosts containerPos", JSON.stringify(containerPos));
-        memoryObj["containerPos"] = spots[0].pos;
-        //console.log("setContainerAndPosts finish");
+        return {"harvesterPosts": spots[0].neighbours, "containerPos" : spots[0].pos}
     },
 
     setControllerContainers : function (room) {
-        //console.log("setControllerContainers", room.name);
         const m = Game.flags[room.name].memory;
         const terrain = room.getTerrain();
         let spots = construction.coverArea(room.controller.pos, 3, terrain);
@@ -208,7 +157,11 @@ const flag = {
             });
             spot["roomName"] = room.name;
         }
-        m.controller["upgraderPosts"] = spots;
+        m.controller["containerPos"] = cache.serialisePath(spots);
+        m.controller["upgradePosts"] = [];
+        for (let cPos of m.controller["containerPos"]) {
+            m.controller["upgradePosts"].push(cache.serialisePath(spots.posts))
+        }
     },
 };
 
