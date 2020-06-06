@@ -4,21 +4,22 @@
  * @author Piers Shepperson
  */
 
-const gc = require("gc");
-const gf = require("gf");
-const construction = require("construction");
-const tile = require("tile");
-const flag = require("flag");
-const lr = require("lab_reactions");
+const gc = require("./gc");
+const gf = require("./gf");
+const construction = require("./construction");
+const tile = require("./tile");
+const flag = require("./flag");
+const lr = require("./lab_reactions");
+const cache = require("./cache");
 
 function FlagOwnedRoom (name) {
     this.name = name;
-    //console.log("FlagOwnedRoom name", name);
     this.m = flag.getRoomFlag(name).memory;
 }
 
 // todo only need to store the tile and origin, calculate positions as required.
-FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
+FlagOwnedRoom.prototype.placeCentre = function (centreTile, start) {
+    const centre = tile.Centres[centreTile];
     let avoid = [];
     const sources = Game.rooms[this.name].find(FIND_SOURCES);
     for (let source of sources) {
@@ -41,12 +42,30 @@ FlagOwnedRoom.prototype.placeCentre = function (centre, start) {
             })
         }
     }
+
     const terrain = new Room.Terrain(this.name);
     this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
     this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
 
     this.m["plan"][STRUCTURE_LINK].push(this.setControllerLinkPos());
-    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos())
+    this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos());
+
+    this.m["plan"]["centre"] = centreTile
+};
+
+FlagOwnedRoom.prototype.plan = function () {
+    return  cache.global(
+        FlagOwnedRoom.prototype._plan,
+        this,
+        [],
+        "FlagOwnedRoom.plan",
+    );
+};
+
+FlagOwnedRoom.prototype._plan = function () {
+    const centre = tile.getCopy(tile.centres[this.m["plan"]["centre"]]);
+    tile.shiftToOrigin(this.m["plan"]["origin"]);
+    return centre;
 };
 
 FlagOwnedRoom.prototype.findLocationForCentre = function(centre, avoid) {
@@ -146,7 +165,7 @@ FlagOwnedRoom.prototype.flagLabs = function(boost, stores) {
     const mapping = lr.mapReagentsToLabs(
         lr.reagentMap(boost, stores),
         labs.length,
-        this.m["plan"],
+        this.m["plan"], // this.plan(),
     );
     this.colourLabFlags(mapping);
 };

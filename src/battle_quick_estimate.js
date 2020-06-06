@@ -8,12 +8,12 @@ const gc = require("./gc");
 
 const Battle_quick_estimate = {
 
-    quickCombat: function ( enemyCreeps, friendlyCreeps, maxTurns ) {
-        console.log("quickCombat start",JSON.stringify(enemyCreeps), JSON.stringify(friendlyCreeps));
+    quickCombat: function ( enemyCreeps, friendlyCreeps, maxTurns, log ) {
+        //console.log("quickCombat start",JSON.stringify(enemyCreeps), JSON.stringify(friendlyCreeps));
         const enemies = this.convert(enemyCreeps);
         const friends = this.convert(friendlyCreeps);
-        console.log("quickCombat converts",enemies,friends);
-        return this.quickCombatInternal(enemies, friends, maxTurns);
+        //console.log("quickCombat converts",enemies,friends);
+        return this.quickCombatInternal(enemies, friends, maxTurns, log);
     },
 
     quickCombatBodies: function( enemyBodies, friendlyBodies) {
@@ -23,19 +23,23 @@ const Battle_quick_estimate = {
         return this.quickCombatInternal(enemies, friends);
     },
 
-    quickCombatInternal: function(enemies, friends, maxTurns) {
-        let range = 3;
-        let turns = maxTurns ? maxTurns : 0;
+    quickCombatInternal: function(enemies, friends, maxTurns, log) {
+        let range = gc.RANGE_RANGED_ATTACK;
+        maxTurns = maxTurns ? maxTurns : gc.MAX_SIM_BATTLE_LENGTH;
+        //let turns = maxTurns ? maxTurns : 0;
+        let turns = 0;
         //console.log("quickCombatInternal",JSON.stringify(enemies),"friends", JSON.stringify(friends));
         while (enemies.length > 0 && friends.length > 0
-                && turns < gc.MAX_SIM_BATTLE_LENGTH ) {
-            //console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
+                && turns < maxTurns ) {
+            //if (log) {
+                //console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
+            //}
             let damagedEnemies, damagedFriends;
             damagedFriends = this.applyRangedDamage(enemies, friends, range);
             damagedEnemies = this.applyRangedDamage(friends, enemies, range);
             this.removeDead(damagedFriends);
             this.removeDead(damagedEnemies);
-            //console.log("afrter ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
+            //console.log("after ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
             if (range <= 1) {
                 damagedFriends = this.applyDamage(enemies, damagedFriends);
                 damagedEnemies = this.applyDamage(friends, damagedEnemies);
@@ -49,7 +53,10 @@ const Battle_quick_estimate = {
             if (range > 1) {
                 range--;
             }
-            turns++
+            turns++;
+            if (log) {
+                console.log(turns,"\tturn enemies\t",JSON.stringify(friends),"\tfriends\t",JSON.stringify(enemies));
+            }
             //console.log("after quickCombatInternal while end enemies", JSON.stringify(enemies));
             //console.log("after quickCombatInternal while end friends", JSON.stringify(friends));
         }

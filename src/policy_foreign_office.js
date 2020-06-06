@@ -4,9 +4,11 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const C = require("./Constants");
+const race = require("race");
 
 // constructor
-function PolicyColonialOffice  (id, data) {
+function PolicyForeignOffice  (id, data) {
     this.type = gc.POLICY_FOREIGN_OFFICE;
     this.id = id;
     this.m = data.m;
@@ -14,7 +16,7 @@ function PolicyColonialOffice  (id, data) {
 }
 
 // runs first time policy is created only
-PolicyColonialOffice.prototype.initilise = function () {
+PolicyForeignOffice.prototype.initilise = function () {
     if (!this.m) {
         this.m = {}
     }
@@ -24,14 +26,17 @@ PolicyColonialOffice.prototype.initilise = function () {
 };
 
 // runs once every tick
-PolicyColonialOffice.prototype.enact = function () {
+PolicyForeignOffice.prototype.enact = function () {
     this.checkInsurgencies()
 };
 
-PolicyColonialOffice.prototype.checkInsurgencies = function () {
+PolicyForeignOffice.prototype.checkInsurgencies = function () {
     this.m.insurgency = [];
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
+        if (!Game.flags[roomName]) {
+            continue;
+        }
         if (Game.flags[roomName].keeperLairs) {
             continue
         }
@@ -52,7 +57,7 @@ PolicyColonialOffice.prototype.checkInsurgencies = function () {
     }
 };
 
-PolicyColonialOffice.prototype.sendInsurgentAlert = function (roomName) {
+PolicyForeignOffice.prototype.sendInsurgentAlert = function (roomName) {
     for (let creep of _.filter(Game.creeps, c => {
         return c.room.name === roomName && race.isCivilian(c)
     })) {
@@ -62,11 +67,11 @@ PolicyColonialOffice.prototype.sendInsurgentAlert = function (roomName) {
     }
 };
 
-PolicyColonialOffice.prototype.draftReplacment = function() {
+PolicyForeignOffice.prototype.draftReplacment = function() {
     return this
 };
 
-module.exports = PolicyColonialOffice;
+module.exports = PolicyForeignOffice;
 
 
 

@@ -17,8 +17,8 @@ const race = {
         return creep.name.split("_")[0];
     },
 
-    isCivilian: function(race) {
-        const raceModule = require("./race_" + race);
+    isCivilian: function(creep) {
+        const raceModule = require("./race_" + race.getRace(creep));
         return raceModule.isCivilian();
     },
 
@@ -63,6 +63,21 @@ const race = {
     },
 
     body: function (race, ec) {
+        const bodyCounts = this.getBodyCounts(race, ec);
+        if (!bodyCounts) {
+            return undefined;
+        }
+        const body = [];
+        for (let part in bodyCounts) {
+            for (let i = 0 ; i < bodyCounts[part]; i++) {
+                body.push(part)
+            }
+        }
+        return body
+    },
+
+//   return {"work": Ws, "carry": Cs, "move" : Ms};
+    bodyOld: function (race, ec) {
         const bodyCounts = this.getBodyCounts(race,ec);
         if (!bodyCounts){
             return undefined;
@@ -160,6 +175,31 @@ const race = {
             }
         }
         return Ws;
+    },
+
+    bodyFromBodyCount(bodyCounts) {
+        const body = [];
+        for (let part in bodyCounts) {
+            for (let i = 0 ; i < bodyCounts[part]; i++) {
+                body.push({
+                    type: part,
+                    hits: 100,
+                })
+            }
+        }
+        return body
+
+    },
+
+    bodyFromArray(array) {
+        const body = []
+        for (let part of array) {
+            body.push({
+                type: part,
+                hits: 100,
+            })
+        }
+        return body;
     },
 
     repairPower: function(creep) {

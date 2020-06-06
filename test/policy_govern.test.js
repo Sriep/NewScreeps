@@ -86,8 +86,8 @@ describe("policy_govern", function() {
             assert.strictEqual(flagRoomsInColonyListBefore.length, 0);
             //console.log(flagRoomsInColonyListBefore.length, "m.colonies",flagRoomsInColonyListBefore);
             const result1 = policyGovern.requestAddColony(flagRooms[1]);
-            console.log(JSON.stringify(result1));
-            //assert(result1.added);
+            //console.log(JSON.stringify(result1));
+            assert(!result1.added);
             //console.log("flagRooms[1]", result2);
             const result2 = policyGovern.requestAddColony(flagRooms[2]);
             assert(result2.added);

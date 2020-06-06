@@ -11,8 +11,9 @@ describe("tile operations\"", function() {
     describe("shiftToOrigin", function() {
         it("should shift tile by origin", function() {
             const shift = 20;
-            const centre = tile.getCopy(tile.CENTRE_6x6_1);
-            const control = tile.getCopy(tile.CENTRE_6x6_1);
+            const centreTile = tile.centres["CENTRE_6x6_1"];
+            const centre = tile.getCopy(centreTile);
+            const control = tile.getCopy(centreTile);
             centre["origin"] = {x:shift,y:shift};
             tile.shiftToOrigin(centre);
             let countValues = 0;
@@ -30,7 +31,8 @@ describe("tile operations\"", function() {
     });
     describe("lab_map", function() {
         it("lab map should correctly show labs withing two moves", function() {
-            const centre = tile.getCopy(tile.CENTRE_6x6_3);
+            const centreTile = tile.centres["CENTRE_6x6_3"];
+            const centre = tile.getCopy(centreTile);
             let count = 0;
             for (let i = 0 ; i < 10 ; i++) {
                 for (let j of centre.lab_map[i]) {

@@ -94,6 +94,26 @@ const gf = {
         return room.EW + room.x.toString() + room.NS + room.y.toString();
     },
 
+    exitDirection: function(from, to) {
+        const fSplit = this.splitRoomName(from);
+        const tSplit = this.splitRoomName(to);
+        if (fSplit.EW === tSplit.EW && fSplit.NS === tSplit.NS) {
+            if (fSplit.x === tSplit.x) {
+                if (fSplit.y > tSplit.y) {
+                    return C.FIND_EXIT_BOTTOM
+                } else {
+                    return C.FIND_EXIT_TOP
+                }
+            } else {
+                if (fSplit.x > tSplit.x) {
+                    return C.FIND_EXIT_RIGHT
+                } else {
+                    return C.FIND_EXIT_LEFT
+                }
+            }
+        }
+    },
+
     roomDirectionToDelta: function(direction, EW, NS) {
         const delta = this.directionToDelta(direction);
         if (EW === "E") {

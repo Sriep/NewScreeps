@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("./gc");
+const gf = require("./gf");
 
 const cache = {
 
@@ -73,7 +74,7 @@ const cache = {
         //    }
         //}
         return {
-            path: this.serialisePath(pfPath.path),
+            path: pfPath.path,// this.serialisePath(pfPath.path),
             ops: pfPath.ops,
             cost: pfPath.cost,
             incomplete: pfPath.incomplete,
@@ -134,7 +135,7 @@ const cache = {
 
 
     serialisePath: function (path) {
-        let sPath = [];
+        const sPath = [];
         for ( let i in path) {
             sPath.push(path[i].x + 50 * path[i].y);
         }
@@ -142,13 +143,80 @@ const cache = {
     },
 
     deserialisePath: function (uString) {
-        let path = [];
-        for (let i in uString.length) {
-            code = uString.charCodeAt(i);
+        const path = [];
+        for (let i in uString) {
+            const code = uString.charCodeAt(i);
             path.push({"x": code % 50, "y": Math.floor(code / 50)});
         }
         return path;
     },
+
+    deserialiseRoPath: function (uString, startRoom) {
+        const path = [];
+        let lastX, lastY;
+        let rSplit = gf.splitRoomName(startRoom);
+        for (let i in uString) {
+            const code = uString.charCodeAt(i);
+            const x = code % 50;
+            const y = Math.floor(code / 50);
+            if (lastX !== undefined && lastY !== undefined) {
+                if (lastX > x+1) {
+                    rSplit.x += rSplit.EW === "W" ? -1 : 1;
+                } else if (lastX < x-1) {
+                    rSplit.x += rSplit.EW === "W" ? 1 : -1;
+                } else if (lastY > y+1) {
+                    rSplit.y += rSplit.NS === "N" ? -1 : 1;
+                } else if (lastY < y-1) {
+                    rSplit.y += rSplit.NS === "N" ? 1 : -1;
+                }
+                if (rSplit.x < 0) {
+                    rSplit.EW = rSplit.EW === "W" ? "E" : "W";
+                }
+                if (rSplit.y < 0) {
+                    rSplit.NS = rSplit.NS === "N" ? "S" : "N";
+                }
+            }
+            path.push(new RoomPosition(x, y, gf.roomNameFromSplit(rSplit)));
+            //path.push({x:x, y:y, roomName:gf.roomNameFromSplit(rSplit)});
+            lastX = x;
+            lastY = y;
+        }
+        return path;
+    },
+
+    deserialiseRnPath: function (uString, startRoom) {
+        const path = [];
+        let lastX, lastY;
+        let rSplit = gf.splitRoomName(startRoom);
+        for (let i in uString) {
+            const code = uString.charCodeAt(i);
+            const x = code % 50;
+            const y = Math.floor(code / 50);
+            if (lastX !== undefined && lastY !== undefined) {
+                if (lastX > x+1) {
+                    rSplit.x += rSplit.EW === "W" ? -1 : 1;
+                } else if (lastX < x-1) {
+                    rSplit.x += rSplit.EW === "W" ? 1 : -1;
+                } else if (lastY > y+1) {
+                    rSplit.y += rSplit.NS === "N" ? -1 : 1;
+                } else if (lastY < y-1) {
+                    rSplit.y += rSplit.NS === "N" ? 1 : -1;
+                }
+                if (rSplit.x < 0) {
+                    rSplit.EW = rSplit.EW === "W" ? "E" : "W";
+                }
+                if (rSplit.y < 0) {
+                    rSplit.NS = rSplit.NS === "N" ? "S" : "N";
+                }
+            }
+            //path.push(new RoomPosition(x, y, gf.roomNameFromSplit(rSplit)));
+            path.push({x:x, y:y, roomName:gf.roomNameFromSplit(rSplit)});
+            lastX = x;
+            lastY = y;
+        }
+        return path;
+    },
+
 };
 
 module.exports = cache;

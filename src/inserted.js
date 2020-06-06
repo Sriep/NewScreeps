@@ -15,6 +15,10 @@ const race = require("race");
 
 const inserted = {
     top: function () {
+        //const fw7n7 = Game.flags["W7N7"];
+        //console.log("W7N7", JSON.stringify(fw7n7.memory))
+        //const fw8n7 = Game.flags["W8N7"];
+        //console.log("W8N7", JSON.stringify(fw8n7.memory))
 
     },
 

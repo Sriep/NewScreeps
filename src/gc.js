@@ -132,6 +132,7 @@ const gc = {
     // states common
     STATE_MOVE_POS: "move_pos",
     STATE_MOVE_TARGET: "move_target",
+    STATE_MOVE_PATH: "move_path",
     STATE_BOOST_CREEP: "boost_creep",
     STATE_FIND_BOOST: "find_boost",
     STATE_DEFENSIVE_RETREAT: "defensive_retreat",
@@ -428,7 +429,7 @@ const gc = {
     // Game constants
     NOTIFY_INTERVAL: 10,
     DEBUG: true,
-    MAX_SIM_BATTLE_LENGTH: 10,
+    MAX_SIM_BATTLE_LENGTH: 100,
     MAX_SIM_DEFENCE_LENGTH: 10,
     TICK_NUMBER: "tick number",
 

@@ -39,11 +39,11 @@ const agenda = {
             { "activity": gc.POLICY_PLAN_BUILDS, type: gc.Activity.PolicyBlocker},
             { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_SPAWN} },
             { "activity": gc.POLICY_RCL1, type: gc.Activity.PolicyReplacement},
-            { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
             { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
         ],
         [ //2
             { "activity": gc.POLICY_PORTERS, type: gc.Activity.PolicyReplacement},
+            { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
             //{ "activity": gc.ACTIVITY_NEUTRAL_COLONIES, type: gc.Activity.Policy},
             //{ "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
             //{ "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},

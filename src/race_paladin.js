@@ -13,18 +13,18 @@ const race_paladin = {
 
     // 250h+80a+50c <= ec; h+a=c; h(ratio) = a;
     bodyCounts: function (ec, maxHeal) {
-        gf.assert(0< maxHeal && maxHeal < 25, "paladin must have both heal and attack parts");
         if (ec < this.MIN_EC) {
             return {"work": 0, "carry": 0, "move" : 0};
         }
         maxHeal = maxHeal ? maxHeal : this.DEFAULT_MAX_HEAL;
+        gf.assert(0< maxHeal && maxHeal < 25, "paladin must have both heal and attack parts");
         const ratio = maxHeal/(25-maxHeal);
         const heal = Math.min( maxHeal,  Math.floor(ec/(300+ratio*130)));
         const attack = Math.min(25-maxHeal, Math.floor( ec*ratio/(300 + ratio*130)));
         const move = heal + attack;
-        const tough = Math.floor( (ec - heal*250+attack*80+move*50)/60);
-
-        return { [C.TOUGH]: tough, [C.MOVE] : move+tough,  [C.HEAL]: heal, [C.ATTACK]: attack};
+        return { [C.MOVE] : move,  [C.HEAL]: heal, [C.ATTACK]: attack};
+        //const tough = Math.floor( (ec - heal*250+attack*80+move*50)/60);
+        //return { [C.TOUGH]: tough, [C.MOVE] : move+tough,  [C.HEAL]: heal, [C.ATTACK]: attack};
     },
 
     isCivilian: function() {return false},

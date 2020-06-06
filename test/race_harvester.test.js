@@ -26,16 +26,18 @@ describe("race_harvester", function() {
             const counts2000 = race_harvester.bodyCounts(2000);
             assert.strictEqual(counts800, counts2000);
 
-            for (let ec = 0 ; ec <= 3000 ; ec+=100 ) {
+            //for (let ec = 300 ; ec <= 3000 ; ec+=100 ) {
                 //const body = race_harvester.bodyCounts(ec);
-                //console.log("ec",ec,"body", JSON.stringify(body));
-                //assert.strictEqual(body["carry"], body["move"]);
+                //const body2 = race_harvester.bodyCounts(ec, true);
+                //console.log(ec,"\tbody\t","static\t", JSON.stringify(body));
+                //console.log(ec,"\tbody\t","flexi\t", JSON.stringify(body2));
+                //asconsole.log("ec",ec,"body", JSON.stringify(body));sert.strictEqual(body["carry"], body["move"]);
                 //if (ec >=2500) {
                     //assert.strictEqual(25, body["move"]);
                 //} else {
                     //assert.strictEqual(ec/100, body["move"]);
                 //}
-            }
+            //}
         });
     });
 });

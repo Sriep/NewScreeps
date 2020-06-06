@@ -107,7 +107,7 @@ describe("budgeting functions", function() {
 
             }
         });
-        it.skip("estimate the value of mining a source", function() {
+       /* it.skip("estimate the value of mining a source", function() {
             const roomEc = 5000;
             const maxd = 351;
             for (let d = 50 ; d < maxd ; d += 50) {
@@ -161,7 +161,7 @@ describe("budgeting functions", function() {
                 console.log(d,"valueSource reserved roads",roadsReserved.netEnergy,roadsReserved.profitParts,
                     "24",roads24Reserved.netEnergy, roads24Reserved.profitParts );
             }
-            /*
+            ///*
             50 valueSource noRoads 4367.254279736018 205.375168627218 24 736.8346993164378 10.893091596122925
 
             100 valueSource noRoads 2725.954403142024 72.50500319550063 24 -882.8691262697403 -10.530477052166427
@@ -189,7 +189,9 @@ describe("budgeting functions", function() {
             250 valueSource reserved roads 3935.732335695813 31.25727018911625 24 3935.732335695813 31.25727018911625
             300 valueSource reserved roads 1580.7323356958132 10.138479565544575 24 1580.7323356958132 10.138479565544575
             350 valueSource reserved roads -969.9198382172326 -5.144840030118113 24 -969.9198382172326 -5.144840030118113
-            */
+            //
+
         });
+    */
     });
 });

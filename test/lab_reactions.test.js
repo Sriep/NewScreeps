@@ -207,7 +207,8 @@ describe("lab reactions", function() {
                 [C.RESOURCE_GHODIUM] : 1000,
             };
             const numLabs = 10;
-            const centreTile = tile.CENTRE_6x6_3;
+            //const centreTile = tile.CENTRE_6x6_3;
+            const centreTile = tile.centres["CENTRE_6x6_3"];
             let count = 0;
             for (let resource of gc.BOOSTS_RESOURCES) {
                 const map = lr.reagentMap(resource, store);
