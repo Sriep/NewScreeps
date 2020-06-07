@@ -141,6 +141,15 @@ const cache = {
         return String.fromCharCode(...sPath);
     },
 
+    deserialiseRoArray: function(uString, roomName) {
+        const path = [];
+        for (let i in uString) {
+            const code = uString.charCodeAt(i);
+            path.push(new RoomPosition(code % 50, Math.floor(code / 50), roomName));
+        }
+        return path;
+    },
+
     deserialisePath: function (uString) {
         const path = [];
         for (let i in uString) {

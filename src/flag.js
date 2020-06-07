@@ -45,7 +45,7 @@ const flag = {
         if (!Game.flags[roomName]) {
             const room = Game.rooms[roomName];
             if (room) {
-                console.log("flagRoom start before create flag")
+                console.log("flagRoom start before create flag");
                 const centre = new RoomPosition(25, 25, room.name);
                 centre.createFlag(room.name);
 
@@ -77,7 +77,7 @@ const flag = {
             for ( let source of sources ) {
                 m.sources[source.id]= {
                     "ap" : economy.countAccessPoints(source.pos),
-                    //"distance" : 15,//cache.distanceSourceSpawn(source, room, false) todo fix
+                    "energyCapacity" : source.energyCapacity,
                 };
             }
             this.setSourceContainers(room, m)
@@ -92,14 +92,14 @@ const flag = {
         if (minerals.length > 0) {
             m.mineral = {
                 "id" : minerals[0].id,
+                "density" : minerals[0].density,
                 "type":minerals[0].type,
-                //"distance" : 15,//.distanceSourceSpawn(minerals[0], room, false) todo fix
             };
             this.setMineralContainers(room, m)
         }
 
         // temporary store double while refactoring
-        Game.flags[room.name].memory = m;
+        //Game.flags[room.name].memory = m;
         Game.flags[room.name].memory.flagged = true;
         Game.flags[room.name].memory.local = JSON.stringify(m);
     },

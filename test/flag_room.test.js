@@ -5,45 +5,16 @@
  */
 
 const assert = require('assert');
-const C = require("../src/Constants");
-//const gf = require("../src/gf");
-const FlagRoom = require("../src/flag_room");
+//const C = require("../src/Constants");
+//const FlagRoom = require("../src/flag_room");
+const MockFlagRoom = require("./mocks/flag_room");
 
 describe("flag_room", function() {
-    let flagRooms = [];
-    const distance = 50;
-
-    before(function() {
-        for ( let sourceCount = 0; sourceCount <= 3 ; sourceCount++ ) {
-            const ec = sourceCount > 2 ? C.SOURCE_ENERGY_KEEPER_CAPACITY  : C.SOURCE_ENERGY_NEUTRAL_CAPACITY;
-            const fRoom = new FlagRoom();
-            fRoom.name = sourceCount.toString() + " source";
-            fRoom.m.linkInfo = {};
-            let linkInfoW7N7 = {
-                sources: [] ,
-                controller: {
-                    id: 10,
-                    pathSpawn: { cost: 1.1*distance},
-                    pathSpawnRoad: { cost: distance},
-                },
-            };
-            for (let source  = 1 ; source <= sourceCount ; source++ ) {
-                linkInfoW7N7.sources.push({
-                    id: source,
-                    energyCapacity: ec,
-                    pathSpawn: {cost: 1.1 * distance},
-                    pathSpawnRoad: {cost: distance},
-                    pathController: {cost: 1.1 * distance},
-                    pathControllerRoad: {cost: distance},
-                });
-            }
-            fRoom.m.linkInfo["spawnRoom"] = JSON.stringify(linkInfoW7N7);
-            flagRooms.push(fRoom)
-        }
-    });
-
     describe("value", function() {
+
         it("should value a room", function() {
+            const flagRooms = MockFlagRoom.createMock0123();
+            //console.log("flagRooms[0]", JSON.stringify(flagRooms[0],"","\t"))
             for (let i = 0 ; i < flagRooms.length ; i++) {
                 const value1 = flagRooms[i].value("spawnRoom");
                 const value2 = flagRooms[i].value("spawnRoom", false, false, 5000);
@@ -79,5 +50,6 @@ describe("flag_room", function() {
                 }
             }
         });
+
     });
 });

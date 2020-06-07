@@ -58,8 +58,10 @@ PolicyBuildControllerContainers.prototype.setContainerSites = function() {
 */
     const fRoom = new FlagRoom(this.home);
     const posts = fRoom.getUpgradeContainerPos();
+    console.log("setContainerSites posts", JSON.stringify(posts));
     for (let post of posts) {
         const pos = gf.roomPosFromPos(post);
+        //console.log("setContainerSites pos", JSON.stringify(pos));
         if (!state.findContainerOrConstructionAt(gf.roomPosFromPos(pos))) {
             const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
             if (result !== OK) {

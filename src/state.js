@@ -194,7 +194,6 @@ const state = {
     },
 
     findContainerAt : function (pos) {
-        //console.log("findContainerAt", JSON.stringify(pos))
         if (!pos) {
             return undefined;
         }

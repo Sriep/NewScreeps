@@ -20,11 +20,9 @@ function StateHarvesterIdle (creep) {
 
 StateHarvesterIdle.prototype.enact = function () {
     console.log(this.creep.name, "STATE_HARVESTER_IDLE");
-    //const home = Game.rooms[this.homeId];
 
     const governor = policy.getGouvernerPolicy(this.homeId);
     const nextPost = this.nextFreeHarvesterPost(governor.getColonies());
-    //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
     if (nextPost) {
         this.m.targetId = nextPost.id;
         state.switchToMovePos(

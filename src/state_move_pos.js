@@ -21,11 +21,6 @@ StateMovePos.prototype.enact = function () {
     const targetPos = gf.roomPosFromPos(this.m.targetPos);
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-        if (this.m.moveRange === 0) {
-            //console.log(this.creep.name, "STATE_MOVE_POS creep at",
-            //    JSON.stringify(this.creep.pos), "in range of target",
-            //    JSON.stringify(targetPos), "range", this.m.moveRange)
-        }
         return state.switchTo(this.creep, this.m, this.m.next_state)
     }
     if (this.m.lastpositon) {
@@ -38,34 +33,29 @@ StateMovePos.prototype.enact = function () {
 
     const result = this.creep.moveTo(targetPos, {reusePath: 5});
     switch (result) {
-        case OK:                        // The operation has been scheduled successfully.
+        case OK:
             break;
-        case  ERR_NOT_OWNER:            // You are not the owner of this spawn.
+        case  ERR_NOT_OWNER:
             return gf.fatalError("ERR_NOT_OWNER");
         case ERR_NO_PATH:
             this.pathLost();
-            //console.log(this.creep.name, "move ERR_NO_PATH to", JSON.stringify(this.creep.memory.targetPos))
             return this.creep.moveTo(targetPos, {reusePath: 0});
-        case ERR_BUSY:                  // The creep is still being spawned.
-            //console.log("moveTo returns  ERR_BUSY error) // thinks means spawning
+        case ERR_BUSY:
             return ERR_BUSY;
-        case ERR_NOT_FOUND:     // The specified path doesn't match the creep's location.
+        case ERR_NOT_FOUND:
             return gf.fatalError("ERR_NOT_FOUND");
-            //return ERR_NOT_ENOUGH_ENERGY//
-        case ERR_INVALID_ARGS:          // path is not a valid path array.
-            //return gf.fatalError("ERR_INVALID_ARGS");
-        case ERR_TIRED:        // The fatigue indicator of the creep is non-zero.
+        case ERR_INVALID_ARGS:
+            return gf.fatalError("ERR_INVALID_ARGS");
+        case ERR_TIRED:
             return ERR_TIRED;
-        case ERR_NO_BODYPART:        // There are no MOVE body parts in this creep’s body.
-            return ERR_RCL_NOT_ENOUGH;
+        case ERR_NO_BODYPART:
+            return ERR_NO_BODYPART;
         default:
             console.log(this.creep.name, "targetSTATE_MOVE_POS", JSON.stringify(this.creep.memory.targetPos));
             console.log("creep memory", JSON.stringify(this.creep.memory));
             return gf.fatalError("moveByPath unrecognised return|", result,"|");
     }
     this.m.lastpositon = cache.sPoint(this.creep.pos);
-    //this.creep.memory.lastroomName = cache.sPoint(this.creep.room.name);
-
 };
 
 StateMovePos.prototype.pathLost = function () {
