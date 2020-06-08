@@ -110,9 +110,12 @@ PolicyGovern.prototype.sortColonies = function()  {
 
 PolicyGovern.prototype.refreshRoomInfo = function() {
     const economicPolicy = policy.getRoomEconomyPolicy(this.roomName);
+    //console.log("refreshRoomInfo economicPolicy", JSON.stringify(economicPolicy));
     if (economicPolicy) {
-        if (economicPolicy.localBudget) {
-            this.m.colonies[0] = economicPolicy.localBudget();
+        const budget =  economicPolicy.localBudget();
+        //console.log("refreshRoomInfo budget", JSON.stringify(budget));
+        if (budget) {
+            this.m.colonies[0] = budget;
         }
     }
     this.sortColonies();
@@ -127,7 +130,9 @@ PolicyGovern.prototype.checkPaybackByNextUpgrade = function(value) {
 };
 
 PolicyGovern.prototype.requestAddColony = function(fRoom) {
+    //console.log("POLICY_GOVERN requestAddColony ", fRoom.name,"fRoom", JSON.stringify(fRoom));
     if (!this.m[gc.ACTIVITY_MINE_COLONIES] || this.roomName === fRoom.name) {
+        console.log("this.m[gc.ACTIVITY_MINE_COLONIES]",this.m[gc.ACTIVITY_MINE_COLONIES]);
         return {added: false}
     }
     const value = fRoom.value(
@@ -138,6 +143,8 @@ PolicyGovern.prototype.requestAddColony = function(fRoom) {
     );
     if (value.profitParts < gc.COLONY_PROFIT_PART_MARGIN
         || !this.checkPaybackByNextUpgrade(value)) {
+        //console.log("POLICY_GOVERN this.checkPaybackByNextUpgrade(value)]",this.checkPaybackByNextUpgrade(value),
+        //    "value.profitParts",value.profitParts,"gc.COLONY_PROFIT_PART_MARGIN",gc.COLONY_PROFIT_PART_MARGIN)
         return {added: false}
     }
 
@@ -163,6 +170,7 @@ PolicyGovern.prototype.requestAddColony = function(fRoom) {
         "profitpart" : value.profitParts
     });
     this.sortColonies();
+    //console.log("POLICY_GOVERN requestAddColony success m.colonies", JSON.stringify(m.colonies));
     return {
         added: true,
         useRoads: !!this.m[gc.ACTIVITY_COLONY_ROADS],
@@ -170,62 +178,7 @@ PolicyGovern.prototype.requestAddColony = function(fRoom) {
         flexiH: !!this.m[gc.ACTIVITY_FLEXI_HARVESTERS],
     };
 };
-/*
-PolicyGovern.prototype.addColony = function(roomName, profit, parts, startUpCost) {
-    //console.log("POLICY_GOVERN addColony roomName",roomName,"profit", profit, "parts", parts, "startup", startUpCost);
-    if (roomName === this.roomName) {
-        //console.log("addColony roomName", roomName, "cannot be a colony of itself");
-        gf.fatalError("cannot be a colony of itself");
-        return false
-    }
-    if (!this.m[gc.ACTIVITY_NEUTRAL_COLONIES]) {
-        //console.log("POLICY_GOVERN addColony failed !this.m[gc.ACTIVITY_NEUTRAL_COLONIES]");
-        return false;
-    }
-    if (profit/parts < gc.COLONY_PROFIT_PART_MARGIN) {
-        //console.log("POLICY_GOVERN addColony failed profit", profit, "parts", parts, "p/p", profit / parts, "margin", gc.COLONY_PROFIT_MARGIN);
-        return false;
-    }
-    for (let colony of this.m.colonies) {
-        if (colony.name === roomName) {
-            //console.log("POLICY_GOVERN addColony failed already added");
-            return false;
-        }
-    }
-    if (!this.checkPaybackBeforeNextUpgrade(profit, startUpCost)) {
-        //console.log("POLICY_GOVERN addColony failed checkPaybackBeforeNextUpgrade");
-        return false;
-    }
 
-    const newColonyProfitParts = profit/parts;
-    let coloniesDropped = 0;
-    let partsDropped = 0;
-    while (this.m.parts - partsDropped + parts + gc.COLONY_PARTS_MARGIN > this.partsSurppliedLT()) {
-        if (newColonyProfitParts <= this.m.colonies[this.m.colonies.length-coloniesDropped-1].profitpart
-                                    +gc.REPLACEMENT_COLONY_PROFITPARTS) {
-            console.log("POLICY_GOVERN addColony failed at spawn room part limit");
-            return false;
-        }
-        partsDropped += this.m.colonies[this.m.colonies.length-coloniesDropped-1].parts;
-        gf.assertGt(partsDropped, 0, "Invalid parts for colony");
-        coloniesDropped++
-    }
-    gf.assertNeq(coloniesDropped, this.m.colonies.length,"new colony displacing the home room!");
-
-    for (let i = 0 ; i < coloniesDropped ; i++) {
-        this.removeColony(this.m.colonies.pop());
-    }
-    this.m.colonies.push({"name" : roomName, "profit" : profit, "parts": parts, "profitpart" : profit/parts });
-
-    //this.m.colonies = this.m.colonies.sort( function (a,b)  { // todo flaky
-    //    return b.profitpart - a.profitpart;
-    //});
-    //this.countParts();
-    this.refreshColoniesInfo();
-    //console.log("POLICY_GOVERN addColony success parts", this.m.parts,"colonies", JSON.stringify(this.m.colonies));
-    return true;
-};
-*/
 PolicyGovern.prototype.removeColony = function(colony) {
     //console.log("POLICY_GOVERN removeColony as spawnRoom", colony.name);
     gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.roomName,

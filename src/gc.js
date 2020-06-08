@@ -130,6 +130,7 @@ const gc = {
 
     // states
     // states common
+    PATH_MIN_SEARCH_LENGTH: 10,
     STATE_MOVE_POS: "move_pos",
     STATE_MOVE_TARGET: "move_target",
     STATE_MOVE_PATH: "move_path",
@@ -416,6 +417,8 @@ const gc = {
     REPLACEMENT_COLONY_PROFITPARTS: 50,
     PORTER_FUDGE_FACTOR: 1.5,
     MAX_COLONY_DISTANCE: 4,
+    USE_PROFILER: true,
+    UPGRADERS_RECURSE_LEVEL: 4,
 
     // alerts
     INSURGENCY_ALERT: "insurgency",

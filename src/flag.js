@@ -11,13 +11,12 @@ const cache = require("./cache");
 
 const flag = {
 
-    getRoom(roomName) {
-        this.flagRoom(roomName);
-        const flagRoom = require("flag_room");
-        return new flagRoom.FlagRooom(roomName);
+    getRoom: function(roomName) {
+        const FlagRoom = require("flag_room");
+        return new FlagRoom(roomName);
     },
 
-    getRoomFlag(roomName) {
+    getRoomFlag: function(roomName) {
         let roomFlag = Game.flags[roomName];
         if (!roomFlag) {
             this.flagRoom(roomName);
@@ -26,7 +25,7 @@ const flag = {
         return roomFlag;
     },
 
-    getFlag(obj) {
+    getFlag: function(obj) {
         let objFlag = Game.flags[obj.id];
         if (!objFlag) {
             obj.pos.createFlag(obj.id);
@@ -36,7 +35,8 @@ const flag = {
         return objFlag;
     },
 
-    getSpawnQueue(roomName) {
+
+    getSpawnQueue: function(roomName) {
         const QueueSpawn = require("queue_spawn");
         return new QueueSpawn(roomName);
     },

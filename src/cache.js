@@ -5,6 +5,7 @@
  */
 const gc = require("./gc");
 const gf = require("./gf");
+const profiler = require('screeps-profiler');
 
 const cache = {
 
@@ -16,6 +17,7 @@ const cache = {
     },
 
     path(from, toArray, name, range, useRoad, cachePath) {
+        console.log("cache path from", from, "name", name);
         //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
         //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
@@ -82,7 +84,7 @@ const cache = {
     },
 
     distance(from, toArray, name, range, useRoad, redo, cacheResult) {
-        const p = this.path(from, toArray, name, range, useRoad, redo, cacheResult);
+        const p = this.path(from, toArray, "distance" + name, range, useRoad, redo, cacheResult);
         if (!p) {
             //console.log("cache distance from", from.id, "toArraylength", toArray.length, "name", name,
             //    "range", range, "userRoad", useRoad, "redo", redo, "cacheR", cacheResult)
@@ -96,16 +98,16 @@ const cache = {
 
     distanceSourceSpawn: function(source, spawnRoom, useRoad, redo) {
         const spawns = spawnRoom.find(FIND_MY_SPAWNS);
-        return this.distance(source, spawns, "spawn", 1, useRoad, redo);
+        return this.distance(source, spawns, "distanceSourceSpawn spawn11", 1, useRoad, redo);
     },
 
     distanceSourceController: function (source, room, useRoad, redo) {
-        return this.distance(source, [room.controller], "controller", 1, useRoad, redo);
+        return this.distance(source, [room.controller], "distanceSourceController controller", 1, useRoad, redo);
     },
 
     distanceUpgraderSpawn: function (fromRoom, spawnRoom, useRoad, redo) {
         const spawns = spawnRoom.find(FIND_MY_SPAWNS);
-        return this.distance(fromRoom.controller, spawns, "spawns", 1, useRoad, redo);
+        return this.distance(fromRoom.controller, spawns, "distanceUpgraderSpawn spawns", 1, useRoad, redo);
     },
 
     sPos: function (pos) {
@@ -128,7 +130,6 @@ const cache = {
 
     dRoomPos: function(str, roomName) {
         const code = str.charCodeAt(0);
-        //console.log("dRoomPos code", code,"x",code % 50,"y",Math.floor(code / 50),"room",roomName);
         return new RoomPosition(code % 50, Math.floor(code / 50), roomName)
     },
 
@@ -139,6 +140,20 @@ const cache = {
             sPath.push(path[i].x + 50 * path[i].y);
         }
         return String.fromCharCode(...sPath);
+    },
+
+    deserialiseRoArrayN: function(uString, roomName, N) {
+        const path = [];
+        let n=0;
+        for (let i in uString) {
+            const code = uString.charCodeAt(i);
+            path.push(new RoomPosition(code % 50, Math.floor(code / 50), roomName));
+            n++;
+            if (n >= N) {
+                return path;
+            }
+        }
+        return path;
     },
 
     deserialiseRoArray: function(uString, roomName) {
@@ -226,5 +241,7 @@ const cache = {
     },
 
 };
+
+profiler.registerObject(cache, 'cache');
 
 module.exports = cache;

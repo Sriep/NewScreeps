@@ -86,6 +86,9 @@ PolicyWorkers.prototype.equilibriumWorkers = function()  {
     return economy.totalSourceAccessPointsRoom(Game.rooms[this.home])+1;
 };
 
+PolicyWorkers.prototype.localBudget = function() {
+};
+
 PolicyWorkers.prototype.budget = function() {
     const netEnergy = budget.workerRoom(Game.rooms[this.home], this.equilibriumWorkers());
     return { "profit" : netEnergy, "parts" :  this.equilibriumWorkers()*3 };

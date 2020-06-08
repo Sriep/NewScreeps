@@ -10,6 +10,7 @@ const gf = require("./gf");
 const gc = require("./gc");
 const cache = require("./cache");
 const race = require("./race");
+const profiler = require('screeps-profiler');
 
 function FlagRoom (name) {
     let roomFlag;
@@ -30,6 +31,9 @@ function FlagRoom (name) {
     }
 }
 
+//profiler.registerObject(FlagRoom, 'FlagRoom');
+profiler.registerClass(FlagRoom, 'FlagRoom');
+
 FlagRoom.prototype.RoomType = {
     "MyOwned": "MyOwned",
     "MyReserved" : "MyReserved",
@@ -43,17 +47,11 @@ FlagRoom.prototype.RoomType = {
     "Unknown" : "Unknown",
 };
 
-FlagRoom.prototype.PathType = {
-    "SourceSpawn" : "SourceSpawn",
-    "SourceSpawnRoad" : "SourceSpawnRoad",
-    "SourceController" : "SourceController",
-    "SourceControllerRoad" : "SourceControllerRoad",
-    "MineralSpawn" : "MineralSpawn",
-    "MineralSpawnRoad" : "MineralSpawnRoad",
-    "MineralController" : "MineralController",
-    "MineralControllerRoad" : "MineralControllerRoad", 
-    "ControllerSpawn" : "Controller",
-    "ControllerSpawnRoad" : "ControllerSpawnRoad",
+FlagRoom.prototype.PathTo = {
+    "Spawn" : "Spawn",
+    "SpawnRoad" : "SpawnRoad",
+    "Controller" : "Controller",
+    "ControllerRoad" : "ControllerRoad",
 };
 
 FlagRoom.prototype.mapRoom = function() {
@@ -83,11 +81,12 @@ FlagRoom.prototype.mapRoom = function() {
         return r.controller && r.controller.my && r.controller.level > 0
        })) {
        if (Game.map.getRoomLinearDistance(room.name, this.name) <= gc.MAX_COLONY_DISTANCE) {
-            //this.m.linkInfo[room.name] = this.linkRoomInfo(room)
+           console.log("FlagRoom mapRoom _setPaths", room.name);
            paths[room.name] = JSON.stringify(this._setPaths(room));
        }
     }
     this.m.paths = paths;
+    this.m.mapped = true;
 };
 
 FlagRoom.prototype.resetPaths = function(spawnRoom) {
@@ -99,26 +98,25 @@ FlagRoom.prototype._setPaths = function(spawnRoom) {
     const paths = {};
     const sources = home.find(C.FIND_SOURCES);
     const spawns = spawnRoom.find(C.FIND_MY_SPAWNS);
-    paths["SourceSpawn"] = {};
-    paths["SourceSpawnRoad"] = {};
-    paths["SourceController"] = {};
-    paths["SourceControllerRoad"] = {};
     for (let source of sources) {
-        paths["SourceSpawn"][source.id] = cache.path(source, spawns, "spawn", 1, false, true);
-        paths["SourceSpawnRoad"][source.id] = cache.path(source, spawns, "spawn", 1, true, true);
-        paths["SourceController"][source.id] = cache.path(source, [spawnRoom.controller], "spawn", 1, true, true);
-        paths["SourceControllerRoad"][source.id] = cache.path(source, [spawnRoom.controller], "spawn", 1, true, true);
+        paths[source.id] = {};
+        paths[source.id][this.PathTo.Spawn] = cache.path(source, spawns, spawnRoom+" spawn7", 1, false, true);
+        paths[source.id][this.PathTo.SpawnRoad] = cache.path(source, spawns, spawnRoom+" spawn8", 1, true, true);
+        paths[source.id][this.PathTo.Controller]= cache.path(source, [spawnRoom.controller], spawnRoom+" spawn9", 1, true, true);
+        paths[source.id][this.PathTo.ControllerRoad] = cache.path(source, [spawnRoom.controller], spawnRoom+" spawn10", 1, true, true);
     }
     const minerals = home.find(C.FIND_MINERALS);
     if (minerals.length > 0) {
-        paths["MineralSpawn"] = cache.path(minerals[0], spawns, "spawn", 1, false, true);
-        paths["MineralSpawnRoad"] = cache.path(minerals[0], spawns, "spawn", 1, true, true);
-        paths["MineralController"] = cache.path(minerals[0], [spawnRoom.controller], "spawn", 1, false, true);
-        paths["MineralControllerRoadSpawn"] = cache.path(minerals[0], [spawnRoom.controller], "spawn", 1, true, true)
+        paths[minerals[0].id] = {};
+        paths[minerals[0].id][this.PathTo.Spawn] = cache.path(minerals[0], spawns, spawnRoom+" spawn11", 1, false, true);
+        paths[minerals[0].id][this.PathTo.SpawnRoad] = cache.path(minerals[0], spawns, spawnRoom+" spawn12", 1, true, true);
+        paths[minerals[0].id][this.PathTo.Controller] = cache.path(minerals[0], [spawnRoom.controller], spawnRoom+" spawn13", 1, false, true);
+        paths[minerals[0].id][this.PathTo.ControllerRoad] = cache.path(minerals[0], [spawnRoom.controller], spawnRoom+" spawn14", 1, true, true)
     }
     if (home.controller) {
-        paths["ControllerSpawn"] = cache.path(home.controller, spawns, "spawn", 1, false, true);
-        paths["ControllerSpawnRoad"] = cache.path(home.controller, spawns, "spawn", 1, true, true)
+        paths[home.controller.id] = {};
+        paths[home.controller.id][this.PathTo.Spawn] = cache.path(home.controller, spawns, spawnRoom+" spawn15", 1, false, true);
+        paths[home.controller.id][this.PathTo.SpawnRoad] = cache.path(home.controller, spawns, spawnRoom+" spawn16", 1, true, true)
     }
     return paths;
 };
@@ -132,7 +130,7 @@ FlagRoom.prototype._local = function() {
     return JSON.parse(this.m.local)
 };
 
-FlagRoom.prototype.paths= function(spawnRoom) {
+FlagRoom.prototype.paths = function(spawnRoom) {
     return  cache.global(FlagRoom.prototype._paths,this,[spawnRoom],this.name + ".paths.");
 };
 
@@ -162,13 +160,14 @@ FlagRoom.prototype._value = function (spawnRoom, roads, reserve, srEnergyCap) {
     const paths = this.paths(spawnRoom);
     const local = this.local();
     const sources = local.sources;
+    //console.log("this.PathTo", this.PathTo,"this.PathTo.Spawn",this.PathTo.Spawn);
     for (let id in sources) {
         totalValues = budget.addSourceValues(totalValues, budget.valueSource(
             reserve ? 2*sources[id].energyCapacity : sources[id].energyCapacity,
-            roads ? paths.SourceSpawnRoad[id].cost : paths.SourceSpawn[id].cost,
-            roads ? paths.SourceControllerRoad[id].cost : paths.SourceController[id].cost,
+            roads ? paths[id][this.PathTo.SpawnRoad].cost : paths[id][this.PathTo.Spawn].cost,
+            roads ? paths[id][this.PathTo.ControllerRoad].cost : paths[id][this.PathTo.Controller].cost,
             roads,
-            (paths.SourceController[id].cost - paths.SourceControllerRoad[id].cost)/4,
+            (paths[id][this.PathTo.Spawn].cost - paths[id][this.PathTo.SpawnRoad].cost)/4,
             srEnergyCap,
         ))
     }
@@ -182,7 +181,8 @@ FlagRoom.prototype._value = function (spawnRoom, roads, reserve, srEnergyCap) {
 FlagRoom.prototype._valueReserveCost = function (spawnRoom, value, reserve, roads) {
     const paths = this.paths(spawnRoom);
     if (reserve && this.local().controller) {
-        const pathCost = roads ? paths.ControllerSpawnRoad.cost : paths.ControllerSpawn.cost;
+        const local = this.local();
+        const pathCost = roads ? paths[local.controller.id][this.PathTo.SpawnRoad].cost : paths[local.controller.id][this.PathTo.Spawn].cost;
         const cRs = budget.reserverParts(pathCost);
         const reserverCost = budget.convertPartsToEnergy(0, 0, 0,0, cRs, false);
         value.parts["cR"] = cRs;
@@ -203,9 +203,9 @@ FlagRoom.prototype._valueReserveCost = function (spawnRoom, value, reserve, road
 
 FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
     if (this.isKeeperLair()) {
-        const keys = (Object.keys(this.paths(spawnRoom).SourceSpawn));
+        const keys = (Object.keys(this.local().sources));
         let keeperBaneCost = race.getCost(gc.RACE_PALADIN, 10000,11);
-        const d = this.paths(spawnRoom).SourceSpawn[keys[0]].cost;
+        const d = this.paths(spawnRoom)[keys[0]][this.PathTo.Spawn].cost;
         keeperBaneCost *= (C.CREEP_LIFE_TIME)/(C.CREEP_LIFE_TIME - d);
         value.parts["pH"] = 11;
         value["runningCostCreeps"] = value["runningCostCreeps"] + keeperBaneCost;
@@ -215,11 +215,8 @@ FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
     }
 };
 
-FlagRoom.prototype.getPath = function (pathName, roomName, id) {
-    if (id) {
-        return this.paths(roomName)[pathName][id]
-    }
-    return this.paths(roomName)[pathName]
+FlagRoom.prototype.getSPath = function (roomName, id, pathTo, reverse) {
+    return reverse ? this.paths(roomName)[id][pathTo].path.split("").reverse().join("") : this.paths()[id][pathTo].path;
 };
 
 FlagRoom.prototype.roomType = function () {
@@ -260,7 +257,6 @@ FlagRoom.prototype.getSources = function () {
 
 FlagRoom.prototype._getSources = function () {
     const sources = this.local().sources;
-    //console.log("sources", JSON.stringify(sources));
     for (let id in sources) {
         sources[id].harvestPosts = cache.deserialiseRoArray(sources[id].harvestPosts, this.name);
         sources[id].containerPos = cache.dPos(sources[id].containerPos, this.name);
@@ -321,12 +317,15 @@ FlagRoom.prototype.getUpgradePosts = function () {
 };
 
 FlagRoom.prototype.getUpgradeContainerPos = function () {
-    //console.log("flagroom containerPos", JSON.stringify(this.getController().containerPos));
     return this.getController().containerPos;
 };
 
 FlagRoom.prototype.isKeeperLair = function () {
     return this.local().keeperLairs
+};
+
+FlagRoom.prototype.accessPoints = function (id) {
+    return this.local().sources[id].ap
 };
 
 module.exports = FlagRoom;

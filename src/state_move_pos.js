@@ -21,6 +21,15 @@ StateMovePos.prototype.enact = function () {
     const targetPos = gf.roomPosFromPos(this.m.targetPos);
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
+        if (this.m.next_state === gc.STATE_MOVE_PATH) {
+            state.switchToMoveByPath(
+                this.creep,
+                this.m.path,
+                this.m.pathTargetPos,
+                this.m.pathRange,
+                this.m.pathNextState,
+            )
+        }
         return state.switchTo(this.creep, this.m, this.m.next_state)
     }
     if (this.m.lastpositon) {

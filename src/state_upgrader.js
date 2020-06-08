@@ -10,31 +10,12 @@ const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done
         const fRoom = new FlagRoom(room.name);
         const upgraderPosts = fRoom.getUpgradePosts();
-        let lowestUserCount = 9999;
-        let bestPost;
-        for ( let i = 0; i < upgraderPosts.length ; i++ ) {
-            let users = 0;
-            let freePost = undefined;
-            for (let post of upgraderPosts[i].posts) {
-                //console.log("findFreeUpgraderPost post", JSON.stringify(post));
-                if (this.isUpgraderPostFree(post, room.name)) {
-                    if (!freePost) {
-                        freePost = post;
-                    }
-                    //console.log("post is free", JSON.stringify(freePost));
-                } else {
-                    users++;
-                    //console.log("findFreeUpgraderPost post is not free", users);
-                }
-            }
-            if (users < lowestUserCount && users < upgraderPosts[i].posts.length) {
-                lowestUserCount = users;
-                bestPost = freePost;
-                //console.log("found lowestUserCount",lowestUserCount,"bestPost",JSON.stringify(freePost));
+        for ( let i = 0 ; i < upgraderPosts.length; i++ ) {
+            const index = i % 2 === 0 ? i/2 : upgraderPosts.length - (i+1)/2;
+            if (this.isUpgraderPostFree(upgraderPosts[index], room.name)) {
+                return upgraderPosts[index]
             }
         }
-        //console.log("findFreeUpgraderPost bestSoFar", lowestUserCount, "returning bestPost", JSON.stringify(bestPost));
-        return bestPost;
     },
 
     isUpgraderPostFree: function (pos, roomName) { // done

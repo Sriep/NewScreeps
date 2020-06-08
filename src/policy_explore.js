@@ -47,6 +47,7 @@ PolicyExplore.prototype.enact = function () {
         const fRoom = new FlagRoom(creeps[i].room.name);
         gf.assert(fRoom.m.flagged);
         if (!fRoom.m.mapped) {
+            console.log("POLICY_EXPLORE map room", creeps[i].room.name);
             fRoom.mapRoom();
             const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
             if (colonialOffice) {

@@ -7,7 +7,7 @@
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
-const race = require("race");
+//const race = require("race");
 const cache = require("cache");
 
 function StateMovePath (creep) {
@@ -17,12 +17,28 @@ function StateMovePath (creep) {
 }
 
 StateMovePath.prototype.enact = function () {
+    console.log(this.creep.name, "STATE_MOVE_PATH");
     const targetPos = gf.roomPosFromPos(this.m.targetPos);
-    if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
+    if (this.creep.pos.inRangeTo(targetPos, this.m.moveRange)) {
         return state.switchTo(this.creep, this.m, this.m.next_state)
     }
 
-    const path = this.getPath();
+    const path = cache.deserialiseRoPath(this.m.path.substring(0,3) , this.creep.pos.roomName);
+    console.log(JSON.stringify(this.creep.pos), "<creep.pos STATE_MOVE_PATH path", JSON.stringify(path));
+    if (this.creep.pos.isEqualTo(path[1])) {
+        this.m.path = this.m.path.substr(1);
+        path.shift()
+    } else if (!this.creep.pos.isEqualTo(path[0])) {
+        this.creep.say("lost");
+        state.switchToMoveToPath(
+            this.creep,
+            this.m.path,
+            this.m.targetPos,
+            this.m.moveRange,
+            this.m.next_state,
+        )
+    }
+
     const result = this.creep.moveByPath(path);
     switch (result) {
         case OK:
@@ -49,9 +65,6 @@ StateMovePath.prototype.getPath = function () {
     //return cache.global(StateMovePath.prototype._getPath, this,[],this.creep.name + ".getPath.",);
 };
 
-//StateMovePath.prototype._getPath = function() {
-    //const path = cache.deserialiseRoPath(this.m.path, this.creep.room.name)
-//};
 
 
 

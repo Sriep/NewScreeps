@@ -28,8 +28,10 @@ PolicyColonialOffice.prototype.initilise = function () {
     return true;
 };
 
-// runs once every tick
 PolicyColonialOffice.prototype.enact = function () {
+    if ((Game.time + this.id) % 100 !== 0) {
+        return;
+    }
     this.lookForNewColonies();
 };
 
@@ -55,12 +57,12 @@ PolicyColonialOffice.prototype.lookForNewColonies = function () {
         }
     }
 };
-
+//FlagRoom.prototype.value = function (spawnRoom, roads, reserve, srEnergyCap)
 PolicyColonialOffice.prototype.checkRoom = function(roomName) {
     //console.log("checkRoom", roomName);
     const fRoom = new FlagRoom(roomName);
     let candidates = [];
-    for (let spawnRoom in fRoom.m.linkInfo) {
+    for (let spawnRoom in fRoom.m.paths) {
         const valueTF = fRoom.value(spawnRoom,true, false);
         const governor = policy.getGouvernerPolicy(spawnRoom);
         if (valueTF.profitParts > governor.minColonyProfitParts() ||
@@ -75,7 +77,7 @@ PolicyColonialOffice.prototype.checkRoom = function(roomName) {
     for (let candidate of candidates) {
         const newColony = candidate.governor.requestAddColony(fRoom);
         //console.log("checkRoom requestAddColony",newColony, newColony.added);
-        //console.log("checkRoom requestAddColony",JSON.stringify(newColony));
+        console.log("checkRoom requestAddColony",JSON.stringify(newColony));
         if (newColony.added) {
             fRoom.m.spawnRoom = candidate.governor.roomName;
             if (Game.rooms[roomName]) {
@@ -124,11 +126,11 @@ PolicyColonialOffice.prototype.buildSourceSupport = function(colony, spawnRoom) 
 
 PolicyColonialOffice.prototype.buildExtractor = function(colony, spawnRoom) {
     console.log("buildExtractor colony", colony.name, "spawn room", spawnRoom.name);
-    const roomFlag = flag.getRoomFlag(colony.name).memory;
+    //const roomFlag = flag.getRoomFlag(colony.name).memory;
     const minerals = colony.find(FIND_MINERALS);
     for (let mineral of minerals) {
         policy.buildSourceContainer(mineral);
-        roomFlag.mineral["distance"] = cache.distanceSourceController(mineral, spawnRoom);
+        //roomFlag.mineral["distance"] = cache.distanceSourceController(mineral, spawnRoom);
         const structs = mineral.pos.lookFor(LOOK_STRUCTURES);
         let found = false;
         for (let struct of structs) {
@@ -146,7 +148,7 @@ PolicyColonialOffice.prototype.buildRoads = function(colony, spawnRoom) {
     const spawns = spawnRoom.find(FIND_MY_SPAWNS);
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {
-        const pathInfo = cache.path(souce, spawns, "spawn", 1, true);
+        const pathInfo = cache.path(source, spawns, colony.name + "PCObuildRoads", 1, true);
         for (let pathPos of pathInfo) {
             const pos = gf.roomPosFromPos(pathPos);
             pos.createConstructionSite(STRUCTURE_ROAD)

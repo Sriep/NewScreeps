@@ -3,32 +3,48 @@
  * Created by piers on 24/04/2020
  * @autohor Piers Shepperson
  */
-
+const gc = require("gc");
 const inserted = require("inserted");
 const state = require("state");
 const policy = require("policy");
 const flag = require("flag");
 const records = require("records");
+const FlagRoom = require("flag_room");
+const profiler = require('screeps-profiler');
+
+if (gc.USE_PROFILER) {
+    // Any modules that you use that modify the game's prototypes should be require'd
+    // before you require the profiler.
+
+    // This line monkey patches the global prototypes.
+    profiler.enable();
+
+    //module.exports.loop = function() {
+    //    profiler.wrap(function() {
+        // Main.js logic should go here.
+    //    });
+    //};
+}
+
 
 module.exports.loop = function () {
-    console.log("************************ Start ", Game.time," *********************************");
-    inserted.top();
-    if (!Memory.started) {
-        startup();
-        records.startup()
-    }
-
-    freeCreeps();
-    enactPolicies();
-    buildingAct();
-    moveCreeps();
-    spawnCreeps();
-
-    inserted.bottom();
-    console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
-    console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
-    console.log("************************ End ",  Game.time, " *********************************");
-
+    profiler.wrap(function() {
+        console.log("************************ Start ", Game.time," *********************************");
+        inserted.top();
+        if (!Memory.started) {
+            startup();
+            records.startup()
+        }
+        freeCreeps();
+        enactPolicies();
+        buildingAct();
+        moveCreeps();
+        spawnCreeps();
+        inserted.bottom();
+        console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
+        console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
+        console.log("************************ End ",  Game.time, " *********************************");
+    });
 };
 
 function startup() {

@@ -33,14 +33,11 @@ StateHarvesterBuild.prototype.enact = function () {
     if (!site) {
         const ok = scPos.createConstructionSite(STRUCTURE_CONTAINER);
         if (!ok) {
-            gf.fatalError("cant create container", JSON.stringify(scPos), "result", ok)
+            return;
         }
         site = state.findContainerConstructionAt(scPos);
         if (!site) {
-           // console.log("targetId", this.creep.memory.targetId, "memory", JSON.stringify(Game.flags[this.creep.memory.targetId].memory))
-            //console.log("creep", this.creep.name, "flag", Game.flags[this.creep.memory.targetId])
             return;
-            //gf.fatalError("cant find construction at|", JSON.stringify(scPos),"|");
         }
     }
 

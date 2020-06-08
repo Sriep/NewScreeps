@@ -157,80 +157,112 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     }
 };
 
+PolicyPorters.prototype.portersCsRoom= function(useRoad) {
+    useRoad = !!useRoad;
+    //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.portersCsRoom,this.m.portersCsRoom[useRoad], "&&",this.m.portersCsRoom  && this.m.portersCsRoom[useRoad])
+    if (this.m.portersCsRoom  && this.m.portersCsRoom[useRoad]) {
+        //console.log(!!useRoad,"|",useRoad,"pp portersCsRoom exists");
+        return this.m.portersCsRoom[useRoad]
+    } else {
+        //console.log(useRoad,"pp portersCsRoom does not exist before", JSON.stringify(this.m.portersCsRoom));
+        this.m.portersCsRoom = {};
+        this.m.portersCsRoom[true] = budget.portersCsRoom(Game.rooms[this.home], true);
+        this.m.portersCsRoom[false] = budget.portersCsRoom(Game.rooms[this.home], false);
+        //console.log(useRoad,"pp portersCsRoom after", JSON.stringify(this.m.portersCsRoom));
+    }
+};
+
+PolicyPorters.prototype.harvesterWsRoom= function(useRoad) {
+    useRoad = !!useRoad;
+    //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.harvesterWsRoom,this.m.harvesterWsRoom[useRoad], "&&",this.m.harvesterWsRoom  && this.m.harvesterWsRoom[useRoad])
+    if (this.m.harvesterWsRoom && this.m.harvesterWsRoom[useRoad]) {
+        return this.m.harvesterWsRoom[useRoad]
+    } else {
+        //console.log("pp harvesterWsRoom does not exist before", JSON.stringify(this.m.harvesterWsRoom));
+        this.m.harvesterWsRoom = {};
+        this.m.harvesterWsRoom[true] = budget.harvesterWsRoom(Game.rooms[this.home], true);
+        this.m.harvesterWsRoom[false] = budget.harvesterWsRoom(Game.rooms[this.home], false);
+        //console.log("pp harvesterWsRoom does not exist after", JSON.stringify(this.m.harvesterWsRoom));
+    }
+};
+
+PolicyPorters.prototype.upgradersWsRoom= function(useRoad) {
+    useRoad = !!useRoad;
+    //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.upgradersWsRoom,this.m.upgradersWsRoom[useRoad], "&&",this.m.upgradersWsRoom  && this.m.upgradersWsRoom[useRoad])
+    if (this.m.upgradersWsRoom && this.m.upgradersWsRoom[useRoad]) {
+        return this.m.upgradersWsRoom[useRoad]
+    } else {
+        //console.log("pp upgradersWsRoomRoom does not exist before", JSON.stringify(this.m.upgradersWsRoom));
+        const room = Game.rooms[this.home];
+        this.m.upgradersWsRoom = {};
+        this.m.upgradersWsRoom[true] = budget.upgradersWsRoom(room, room.energyCapacityAvailable, true);
+        this.m.upgradersWsRoom[false] = budget.upgradersWsRoom(room, room.energyCapacityAvailable, false)
+        //console.log("pp upgradersWsRoomRoom does not exist after", JSON.stringify(this.m.upgradersWsRoom));
+    }
+};
+
 PolicyPorters.prototype.calcResources = function () {
-    let resources;
+    let resources = { hW :0, pC:0, wW:0, uW:0, cR:0 };
     let minHarvesters = 0;
     let maxHarvesters = 0;
     this.m.curProduction = {};
-    const homeRoom = Game.rooms[this.home];
-    //console.log("this.home", this.home);
-    const ec = homeRoom.energyCapacityAvailable;
-    const sourceEnergyLT = 30000;
-    if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
-        const hWperBody = race_harvester.bodyCounts(ec)["work"];
-        let maxWs = 0;
-        //console.log("pp homeRoom.find(FIND_SOURCES)",homeRoom.find(FIND_SOURCES))
-        for (let source of homeRoom.find(FIND_SOURCES)) {
-            const ap = flag.getRoomFlag(this.home).memory.sources[source.id].ap;
-            maxWs += Math.min(5, ap*hWperBody);
-            //minHarvesters++;
-            //maxHarvesters += ap;
-            //console.log("pp homeRoom.find(FIND_SOURCES)", source.id,"minHarvesters", minHarvesters,"maxHarvesters",maxHarvesters)
-        }
-        //console.log("pp minHarvesters0", minHarvesters,"maxHarvesters",maxHarvesters);
-        const budgetWs = budget.harvesterWsRoom(homeRoom, homeRoom, false);
-        const ratio = maxWs/budgetWs;
-        resources = this.updateRoomResources(
-            this.home,
-            maxWs,
-            ratio * budget.portersCsRoom(homeRoom, homeRoom, false),
-            ratio * budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
-        );
-     } else {
-        resources = this.updateRoomResources(
-            this.home,
-            budget.harvesterWsRoom(homeRoom, homeRoom, false),
-            budget.portersCsRoom(homeRoom, homeRoom, false),
-            budget.upgradersWsRoom(homeRoom, sourceEnergyLT)
-        );
-    }
-    this.m.curProduction[this.home] = Object.assign({}, resources);
-    this.m.localResoures = Object.assign({}, resources);
-
     const governor = policy.getGouvernerPolicy(this.home);
     const colonies = governor.getColonies();
     for (let colonyObj of colonies) {
+        let colonyResources;
         const fRoom = new FlagRoom(colonyObj.name);
         const sources = fRoom.getSources();
         for (let id in sources ) {
-            //console.log(id,"pp minHarvesters3", minHarvesters,"maxHarvesters",maxHarvesters);
             minHarvesters++;
-            maxHarvesters += fRoom.getSourcePosts(id).length;
+            maxHarvesters += fRoom.accessPoints(id);
         }
         if (colonyObj === this.home|| colonyObj.name === this.home) {
-            continue;
+            const homeRoom = Game.rooms[this.home];
+            const ec = homeRoom.energyCapacityAvailable;
+            const sourceEnergyLT = 30000;
+            if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
+                const hWperBody = race_harvester.bodyCounts(ec)["work"];
+                let maxWs = 0;
+                for (let source of homeRoom.find(FIND_SOURCES)) {
+                    maxWs += Math.min(5, fRoom.accessPoints(source.id)*hWperBody);
+                }
+                const budgetWs = this.harvesterWsRoom(homeRoom, false);
+                const ratio = maxWs/budgetWs;
+                colonyResources = this.updateRoomResources(
+                    this.home,
+                    maxWs,
+                    ratio * this.portersCsRoom(homeRoom, false),
+                    ratio * this.upgradersWsRoom(homeRoom, sourceEnergyLT)
+                );
+            } else {
+                colonyResources = this.updateRoomResources(
+                    this.home,
+                    this.harvesterWsRoom(homeRoom, false),
+                    this.portersCsRoom(homeRoom, false),
+                    this.upgradersWsRoom(homeRoom, sourceEnergyLT)
+                );
+            }
+            colonyResources["cR"] = 0;
+            this.m.localResoures = Object.assign({}, colonyResources);
+        } else {
+            const values = fRoom.value(
+                this.home,
+                !!governor.m.ACTIVITY_COLONY_ROADS,
+                !!governor.m.ACTIVITY_RESERVED_COLONIES,
+                !!governor.m.ACTIVITY_FLEXI_HARVESTERS,
+            );
+            colonyResources = this.updateRoomResources(
+                colonyObj.name, values.parts.hW, values.parts.pC, values.parts.uW
+            );
+            colonyResources["cR"] = values.parts["cR"];
         }
 
-        //const governor = policy.getGouvernerPolicy(this.home);
-        const values = fRoom.value(
-            this.home,
-            !!governor.m.ACTIVITY_COLONY_ROADS,
-            !!governor.m.ACTIVITY_RESERVED_COLONIES,
-            !!governor.m.ACTIVITY_FLEXI_HARVESTERS,
-        );
-        //console.log("pp minHarvesters2", minHarvesters,"maxHarvesters",maxHarvesters);
-        const colonyResources = this.updateRoomResources(
-            colonyObj.name, values.parts.hW, values.parts.pC, values.parts.uW
-        );
-
         this.m.curProduction[colonyObj.name] = Object.assign({}, colonyResources);
-        //console.log("pp this.updateRoomResources colony",colonyObj.name,JSON.stringify(colonyResources));
         resources.hW += colonyResources.hW;
         resources.pC +=  colonyResources.pC;
         resources.wW +=  colonyResources.wW;
         resources.uW +=  colonyResources.uW;
-        resources.cR += values.parts["cR"];
-        //console.log("POLICY_PORTERS values.parts[cR]",values.parts["cR"], "resource.cR", resources.cR)
+        resources.cR += colonyResources.cR
     }
     //console.log("pp minHarvesters1", minHarvesters,"maxHarvesters",maxHarvesters);
     resources.minHarvesters = minHarvesters;
@@ -294,7 +326,6 @@ PolicyPorters.prototype.localBudget = function() {
         this.m.localResoures.uW,
         this.m.localResoures.wW
     );
-
     return {
         "name" : this.home,
         "profit" : profit,

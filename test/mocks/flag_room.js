@@ -13,6 +13,12 @@ const flagRooms = {
         let flagRooms = [];
         const sourceCapacity = [0,C.SOURCE_ENERGY_NEUTRAL_CAPACITY,C.SOURCE_ENERGY_NEUTRAL_CAPACITY,C.SOURCE_ENERGY_KEEPER_CAPACITY];
         const roomType = [RoomType.None, RoomType.Neutral, RoomType.Neutral, RoomType.SourceKeeper];
+        //FlagRoom.prototype.PathTo = {
+        //    "Spawn" : "Spawn",
+        //    "SpawnRoad" : "SpawnRoad",
+        //    "Controller" : "Controller",
+        //    "ControllerRoad" : "ControllerRoad",
+        //};
         for ( let sourceCount = 0; sourceCount <= 3 ; sourceCount++ ) {
             const fRoom = new FlagRoom();
             fRoom.name = sourceCount.toString() + " source";
@@ -25,22 +31,19 @@ const flagRooms = {
                     id: 10,
                 },
             };
-            let paths = {
-                ControllerSpawn: { cost: 1.1*distance},
-                ControllerSpawnRoad: { cost: distance},
-            };
-            paths["SourceSpawn"] = {};
-            paths["SourceSpawnRoad"] = {};
-            paths["SourceController"] = {};
-            paths["SourceControllerRoad"] = {};
+            let paths = {};
+            paths[local.controller.id] = {};
+            paths[local.controller.id][fRoom.PathTo.Spawn] = { cost: 1.1*distance};
+            paths[local.controller.id][fRoom.PathTo.SpawnRoad] = { cost: distance};
             for (let id  = 1 ; id <= sourceCount ; id++ ) {
                 local.sources[id] = {
                     energyCapacity: sourceCapacity[sourceCount],
                 };
-                paths["SourceSpawn"][id] = {cost: 1.1 * distance};
-                paths["SourceSpawnRoad"][id] = {cost: distance};
-                paths["SourceController"][id] = {cost: 1.1 * distance};
-                paths["SourceControllerRoad"][id] = {cost: distance};
+                paths[id] = {};
+                paths[id][fRoom.PathTo.Spawn] = {cost: 1.1 * distance};
+                paths[id][fRoom.PathTo.SpawnRoad] = {cost: distance};
+                paths[id][fRoom.PathTo.Controller] = {cost: 1.1 * distance};
+                paths[id][fRoom.PathTo.ControllerRoad] = {cost: distance};
             }
             fRoom.m.local = JSON.stringify(local);
             fRoom.m.paths = {};

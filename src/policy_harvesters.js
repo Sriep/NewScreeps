@@ -52,8 +52,7 @@ PolicyHarvesters.prototype.enact = function () {
 
     const wHarvesterLife = race.ticksLeftByPart(this.parentId, gc.RACE_HARVESTER, WORK);
     console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife);
-    const budgetHarvesterWsLt = budget.harvesterWsRoom(room, room, false)*CREEP_LIFE_TIME;
-    //const budgetCsLt = budget.portersCsRoom(room, room, false)*CREEP_LIFE_TIME;
+    const budgetHarvesterWsLt = budget.harvesterWsRoom(room, false)*CREEP_LIFE_TIME;
     const rationHtoW = budget.workersRoomRationHtoW(room, room,false);
 
     //const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
@@ -84,8 +83,12 @@ PolicyHarvesters.prototype.enact = function () {
     }
 };
 
+PolicyHarvesters.prototype.localBudget = function() {
+    //return budget.harvesterRoom(Game.rooms[this.home]);
+};
+
 PolicyHarvesters.prototype.budget = function() {
-    return budget.harvesterRoom(Game.rooms[this.home]);
+    //return budget.harvesterRoom(Game.rooms[this.home]);
 };
 
 PolicyHarvesters.prototype.draftReplacment = function() {

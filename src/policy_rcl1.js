@@ -43,6 +43,10 @@ PolicyRcl1.prototype.enact = function () {
     }
 };
 
+PolicyRcl1.prototype.localBudget = function() {
+    //return budget.harvesterRoom(Game.rooms[this.home]);
+};
+
 PolicyRcl1.prototype.budget = function() {
     return { "net energy" : 0, "parts" : 0 };
 };

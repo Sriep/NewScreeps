@@ -5,7 +5,7 @@
  */
 const gc = require("./gc");
 const gf = require("./gf");
-//const economy = require("economy");
+const cache = require("./cache");
 const race = require("./race");
 const flag = require("./flag");
 const FlagRoom = require("./flag_room");
@@ -45,20 +45,57 @@ const state = {
 
     //--------------------- state switches -------------------------------------
 
-    switchMoveToRoom(creep, roomName, nextState) {
-        state.switchToMoveFlag( creep, Game.flags[roomName],24, nextState,);
+    switchMoveToRoom: function(creep, roomName, nextState) {
+        this.switchToMoveFlag( creep, Game.flags[roomName],24, nextState,);
     },
 
-    switchToMoveFlag(creep, flag, range, nextState) {
+    switchToMoveFlag: function(creep, flag, range, nextState) {
         //console.log(creep.name,"switchToMoveFlag flag",flag.name,"range", range,"nextstate", nextState);
         creep.memory.state = gc.STATE_MOVE_TARGET;
         creep.memory.targetName = flag.name;
         creep.memory.moveRange = range;
         creep.memory.next_state = nextState;
-        return state.enact(creep, creep.memory);
+        return this.enact(creep, creep.memory);
     },
 
-    switchToMovePos(creep, targetPos, range, nextState) {
+    switchToMoveToPath: function(creep, path, targetPos, range, nextState) {
+        let startIndex = this.findIndexPos(creep.pos, path, 0, false);
+        const onPath = !!startIndex;
+        if (!startIndex) {
+            startIndex = this.indexClosestApproachToPath(creep.pos, path);
+        }
+        const endIndex = this.findIndexPos(gf.roomPosFromPos(targetPos), path, range, true);
+        if (!startIndex || !endIndex) {
+            return this.switchToMovePos(creep, targetPos, range, nextState)
+        }
+        path = path.substr(startIndex, endIndex-startIndex);
+
+        if (onPath) {
+            this.switchToMoveByPath(creep, path, targetPos, range, nextState)
+        } else {
+            creep.memory.path = path;
+            creep.memory.pathTargetPos = targetPos;
+            creep.memory.pathRange = range;
+            creep.memory.pathNextState = nextState;
+            this.switchToMovePos(
+                creep,
+                cache.dPos(path.charAt(0)),
+                0,
+                gc.STATE_MOVE_PATH
+            )
+        }
+    },
+
+    switchToMoveByPath: function(creep, path, targetPos, range, nextState) {
+        creep.memory.path = path;
+        creep.memory.targetPos = targetPos;
+        creep.memory.state = gc.STATE_MOVE_PATH;
+        creep.memory.moveRange = range;
+        creep.memory.next_state = nextState;
+        return this.enact(creep, creep.memory);
+    },
+
+    switchToMovePos: function(creep, targetPos, range, nextState) {
         if (range !== 0 && !range) {
             console.log("switchToMovePos", creep.name,"pos",targetPos,"range", range,"next",nextState);
             gf.fatalError(creep.name + " move to position with no range selected."
@@ -79,7 +116,7 @@ const state = {
         creep.memory.next_state = nextState;
         //creep.say("go " + nextState)
         //console.log(creep.name,"switchToMovePos memory",JSON.stringify(creep.memory));
-        return state.enact(creep, creep.memory);
+        return this.enact(creep, creep.memory);
     },
 
     switchTo: function (obj, m, newState, targetId) {
@@ -95,7 +132,7 @@ const state = {
         }
         m.state = newState;
         //creep.say(this.creepSay[newState]);
-        return state.enact(obj, m);
+        return this.enact(obj, m);
     },
 
     switchBack: function (creep, m) {
@@ -112,6 +149,41 @@ const state = {
     },
 
     //--------------------- state switches end----------------------------------
+
+    indexClosestApproachToPath: function(pos, path) {
+        let lastX, lastY;
+        const ranges = [];
+        for ( let i = 0 ; i < path.length ; i++ ) {
+            const pt = cache.dPoint(path.charAt(i));
+            if (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2) {
+                break;
+            }
+            const range = pos.getRangeTo(pt.x, pt.y);
+            lastX = pt.x;
+            lastY = pt.y;
+            ranges.push({range: range, index: i})
+        }
+        ranges.sort( (r1, r2) => { return r1.range-r2.range });
+        return ranges[0].index;
+    },
+
+    findIndexPos: function(pos, path, range, reverse) {
+        const start = reverse ? path.length-1 : 0;
+        const end = reverse ? 0 : path.length;
+        const delta = reverse ? -1 : 1;
+        let lastX, lastY;
+        for ( let i = start ; i*delta < end*delta ; i+=delta ) {
+            const pt  = cache.dPoint(path.charAt(i));
+            if (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2) {
+                break;
+            }
+            if (pos.getRangeTo(pt.x, pt.y) === range) {
+                return i;
+            }
+            lastX = pt.x;
+            lastY = pt.y;
+        }
+    },
 
     countHarvesterPosts: function(room) {
         const fRoom = new FlagRoom(room.name);

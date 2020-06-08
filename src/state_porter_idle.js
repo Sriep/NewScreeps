@@ -20,7 +20,7 @@ function StatePorterIdle (creep) {
 
 
 StatePorterIdle.prototype.enact = function () {
-    //console.log(this.creep.name,"STATE_PORTER_IDLE");
+    console.log(this.creep.name,"STATE_PORTER_IDLE");
     delete this.creep.memory.targetId;
     this.checkFlags();
 
@@ -28,17 +28,25 @@ StatePorterIdle.prototype.enact = function () {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
 
-    //const room = Game.rooms[this.homeId];
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
-    //{"pos" : cPos, "distance" : distance, "sourceId" : sourceId}
     const info = this.nextHarvestContainer(
         colonies, race.partCount(this.creep, CARRY)*CARRY_CAPACITY
     );
-    //console.log(this.creep.name, "STATE_PORTER_IDLE pos", JSON.stringify(info));
     if (info && info.pos) {
-        this.creep.memory.targetId = info.sourceId;
-        //console.log(this.creep.name, "STATE_PORTER_IDLE targetId",this.creep.memory.targetId);
+        this.creep.memory.targetId = info.id;
+        if (info.pos.roomName !== this.homeId && this.creep.pos.roomName === this.homeId) {
+            const fRoom = new FlagRoom(nextPost.pos.roomName);
+            const path = fRoom.getSPath(this.homeId, info.id, fRoom.PathTo.Spawn, true);
+            console.log(this.creep.name,"STATE_PORTER_IDLE path", path);
+            state.switchToMoveToPath(
+                this.creep,
+                path,
+                info.pos,
+                gc.RANGE_TRANSFER,
+                gc.STATE_PORTER_WITHDRAW,
+            )
+        }
         return state.switchToMovePos(
             this.creep,
             info.pos,
@@ -86,7 +94,6 @@ module.exports = StatePorterIdle;
 
 StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
     let containersInfo = this.listHarvestContainers(colonies);
-    //console.log("nextHarvestContainer containersInfo", JSON.stringify(containersInfo))
     containersInfo = containersInfo.sort((c1, c2) =>
         c2.container.store.getUsedCapacity() - c1.container.store.getUsedCapacity()
     );
@@ -144,7 +151,6 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
                     containerInfo.push({
                         "porters" : porters.filter( c => c.memory.targetId === sourceId).length,
                         "pos" : cPos,
-                        //"distance" : sources[sourceId].distance,
                         "id" : sourceId,
                         "container" : state.findContainerAt(cPos)
                     })
@@ -159,7 +165,6 @@ StatePorterIdle.prototype.listHarvestContainers = function (colonies) {
                 containerInfo.push({
                     "porters" : porters.filter( c => c.memory.targetId === colonyRoom.m.mineral.id).length,
                     "pos" : cPos,
-                    //"distance" : colonyRoom.m.mineral.distance,
                     "id" : colonyRoom.m.mineral.id,
                     "container" : state.findContainerAt(cPos)
                 })
