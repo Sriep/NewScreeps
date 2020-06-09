@@ -22,6 +22,7 @@ StatePorterFullIdle.prototype.enact = function () {
     }
 
     if (this.creep.room.name !== this.homeId) {
+        
         return state.switchMoveToRoom(
             this.creep,
             this.homeId,

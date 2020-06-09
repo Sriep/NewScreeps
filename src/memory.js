@@ -6,19 +6,8 @@
 //const cache = require("cache");
 
 const memory = {
-/*
-    values(awayRoomName, spawnRoomName) {
-        return  cache.global(
-            values,
-            "values" + awayRoomName + spawnRoomName,
-            [awayRoomName, spawnRoomName],
-            true
-        );
-    },
-    */
-    values : function(awayRoomName, spawnRoomName) {
-        return JSON.parse(Game.flags[awayRoomName].memory.rooms[spawnRoomName]["values"]);
-    }
+
+
 };
 
 module.exports = memory;

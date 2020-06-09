@@ -107,7 +107,8 @@ PolicyColonialOffice.prototype.build = function(colony, spawnRoom, useRoad) {
         this.buildExtractor(colony, spawnRoom)
     }
     if (useRoad) {
-        this.buildRoads(colony, spawnRoom)
+        // todo
+        //this.buildRoads(colony, spawnRoom)
     }
 };
 
@@ -116,46 +117,75 @@ PolicyColonialOffice.prototype.buildSourceSupport = function(colony, spawnRoom) 
     if  (!flag.getRoomFlag(colony.name)) {
         return
     }
-    const roomFlag = flag.getRoomFlag(colony.name).memory;
+    //const roomFlag = flag.getRoomFlag(colony.name).memory;
     const sources = colony.find(FIND_SOURCES);
     for (let source of sources) {
         policy.buildSourceContainer(source);
-        roomFlag.sources[source.id]["distance"] = cache.distanceSourceController(source, spawnRoom);
     }
 };
 
 PolicyColonialOffice.prototype.buildExtractor = function(colony, spawnRoom) {
     console.log("buildExtractor colony", colony.name, "spawn room", spawnRoom.name);
-    //const roomFlag = flag.getRoomFlag(colony.name).memory;
-    const minerals = colony.find(FIND_MINERALS);
+    const minerals = colony.find(C.FIND_MINERALS);
     for (let mineral of minerals) {
         policy.buildSourceContainer(mineral);
-        //roomFlag.mineral["distance"] = cache.distanceSourceController(mineral, spawnRoom);
-        const structs = mineral.pos.lookFor(LOOK_STRUCTURES);
+        const structs = mineral.pos.lookFor(C.LOOK_STRUCTURES);
         let found = false;
         for (let struct of structs) {
-            if (struct.structureType === STRUCTURE_EXTRACTOR) {
+            if (struct.structureType === C.STRUCTURE_EXTRACTOR) {
                 found = true;
             }
         }
         if  (!found) {
-            mineral.pos.createConstructionSite(STRUCTURE_EXTRACTOR);
+            mineral.pos.createConstructionSite(C.STRUCTURE_EXTRACTOR);
         }
     }
 };
 
 PolicyColonialOffice.prototype.buildRoads = function(colony, spawnRoom) {
-    const spawns = spawnRoom.find(FIND_MY_SPAWNS);
+    const fColony = flag.getRoom(colony.name);
+    //const spawns = spawnRoom.find(FIND_MY_SPAWNS);
     const sources = colony.find(FIND_SOURCES);
+    let finished = false;
     for (let source of sources) {
-        const pathInfo = cache.path(source, spawns, colony.name + "PCObuildRoads", 1, true);
-        for (let pathPos of pathInfo) {
-            const pos = gf.roomPosFromPos(pathPos);
-            pos.createConstructionSite(STRUCTURE_ROAD)
+        const sPath = fColony.getSPath(colony.name, source.id, fColony.PathTo.SpawnRoad, false);
+        const path = cache.deserialiseRoPath(sPath, colony.room);
+        const lastRoom = colony.name;
+        for (let pos of path) {
+            // todo need code to handle multiple rooms that might not be being mined
+            if (pos.roomName !== lastRoom) {
+                if (!Game.rooms[pos.roomName]) {
+                    finished = false;
+                    break;
+                }
+                finished = false;
+                break;
+            }
+            if (!this.findRoadAt(pos)) {
+                if (Object.keys(Game.constructionSites).length > C.MAX_CONSTRUCTION_SITES/0.5) {
+                    finished = C.OK === pos.createConstructionSite(C.STRUCTURE_ROAD) && finished;
+                }
+            }
         }
     }
 };
 
+PolicyColonialOffice.prototype.myConstructionSites = function() {
+    Object.keys(Game.constructionSites).length
+
+};
+
+PolicyColonialOffice.prototype.findRoadAt = function (pos) {
+    const structAt = pos.lookFor(C.LOOK_STRUCTURES);
+    if (structAt.length > 0 && struct[0].structureType === C.STRUCTURE_ROAD) {
+        return structAt[0];
+    }
+    const constructionAt = pos.lookFor(C.LOOK_CONSTRUCTION_SITES);
+    if (constructionAt.length > 0 && constructionAt[0].structureType === c.STRUCTURE_ROAD) {
+        return constructionAt[0];
+    }
+    return false;
+};
 
 PolicyColonialOffice.prototype.draftReplacment = function() {
     return this

@@ -3,7 +3,8 @@
  * Created by piers on 01/06/2020
  * @author Piers Shepperson
  */
-
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require('assert');
 const C = require("../src/Constants");
 const budget = require("../src/budget");
@@ -103,7 +104,8 @@ describe("budgeting functions", function() {
                 assert(d <= 150 ? noRoadsReserved.netEnergy > 0 : noRoadsReserved.netEnergy < 0);       //2
                 assert(d <= 100 ? noRoads24Reserved.netEnergy > 0 : noRoads24Reserved.netEnergy < 0);   //2
                 assert(d <= 300 ? roadsReserved.netEnergy > 0 : roadsReserved.netEnergy < 0);           //4
-                assert(d <= 200 ? roads24Reserved.netEnergy > 0 : roads24Reserved.netEnergy < 0);       //3
+                console.log(d,"roads24Reserved",roads24Reserved.netEnergy,"roads24Reserved",roads24Reserved.netEnergy);
+                assert(d <= 250 ? roads24Reserved.netEnergy > 0 : roads24Reserved.netEnergy < 0);       //3
 
             }
         });

@@ -53,8 +53,7 @@ StateHarvesterBuild.prototype.enact = function () {
             //console.log(this.creep.name,"details",JSON.stringify(this.creep.store))
             //console.log("pos", JSON.stringify(site.pos), "site", JSON.stringify(site));
             //console.log("store", JSON.stringify(this.creep.store))
-            //console.log("space for harvest", state.spaceForHarvest(this.creep))
-            return;
+             return;
             //return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
             // assume target is invalid because its built.
@@ -63,8 +62,7 @@ StateHarvesterBuild.prototype.enact = function () {
             //console.log("site", JSON.stringify(site));
             //console.log("pos", JSON.stringify(site.pos));
             //console.log("store", JSON.stringify(this.creep.store))
-            //console.log("space for harvest", state.spaceForHarvest(this.creep))
-            //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
+             //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
             gf.fatalError("STATE_HARVESTER_BUILD returned ERR_INVALID_TARGET");
             state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
             break;

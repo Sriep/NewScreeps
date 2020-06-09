@@ -188,6 +188,9 @@ const gc = {
 
     MAX_STATE_STACK: 5,
 
+    // agenda
+    AGENDA_DEFAULT: "default_1",
+
     // tiles
     TILE_CENTRE: "CENTRE_6x6_3",
     TILE_TOWERS: "TOWER_3x3_2",
@@ -417,7 +420,6 @@ const gc = {
     REPLACEMENT_COLONY_PROFITPARTS: 50,
     PORTER_FUDGE_FACTOR: 1.5,
     MAX_COLONY_DISTANCE: 4,
-    USE_PROFILER: true,
     UPGRADERS_RECURSE_LEVEL: 4,
 
     // alerts
@@ -438,6 +440,8 @@ const gc = {
     MAX_SIM_BATTLE_LENGTH: 100,
     MAX_SIM_DEFENCE_LENGTH: 10,
     TICK_NUMBER: "tick number",
+    USE_PROFILER: false,
+    UNIT_TEST: false,
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
 

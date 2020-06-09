@@ -3,12 +3,14 @@
  * Created by piers on 04/06/2020
  * @author Piers Shepperson
  */
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require("assert");
 const C = require("../src/Constants");
 const BattleQuickEstimate = require("../src/Battle_quick_estimate");
 const bodies = require("./mocks/bodies");
 const race = require("../src/race");
-const gc = require("../src/gc");
+
 
 describe("Battle_quick_estimate", function() {
     describe("quickCombat", function() {

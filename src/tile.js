@@ -4,7 +4,26 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
+
 const tile = {
+
+    p: {
+        Origin: "origin",
+        XDim:  "x_dim",
+        YDim: "y_dim",
+        Scientist: "scientist",
+        LabMap: "lab_map",
+        BaseLabs: "base_labs",
+        [C.STRUCTURE_TOWER]: C.STRUCTURE_TOWER,
+        [C.STRUCTURE_EXTENSION]: C.STRUCTURE_EXTENSION,
+        [C.STRUCTURE_LAB]: C.STRUCTURE_LAB,
+        [C.STRUCTURE_TERMINAL]: C.STRUCTURE_TERMINAL,
+        [C.STRUCTURE_SPAWN]: C.STRUCTURE_SPAWN,
+        [C.STRUCTURE_POWER_SPAWN]: C.STRUCTURE_POWER_SPAWN,
+        [C.STRUCTURE_ROAD]: C.STRUCTURE_ROAD,
+        [C.STRUCTURE_OBSERVER]: C.STRUCTURE_OBSERVER,
+        [C.STRUCTURE_LINK]: C.STRUCTURE_LINK,
+    },
 
     towers: {
         TOWER_3x3 : {
@@ -75,7 +94,7 @@ const tile = {
             [C.STRUCTURE_LINK] : [{"x":3,"y":5}],
             [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":3,"y":0},{"x":4,"y":0}],
             [C.STRUCTURE_POWER_SPAWN] : [{"x":1,"y":0}],
-            "cog" : [{"x":3,"y":4}],
+            "scientist" : [{"x":3,"y":4}],
             [C.STRUCTURE_ROAD] : [
                 {"x":0,"y":5},{"x":0,"y":4},{"x":0,"y":3},{"x":0,"y":2},{"x":0,"y":1},{"x":0,"y":0},
                 {"x":1,"y":1},{"x":2,"y":1},{"x":3,"y":1},{"x":4,"y":1},{"x":5,"y":1},
@@ -100,7 +119,7 @@ const tile = {
             [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
             [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":1,"y":1},{"x":5,"y":0}],
             [C.STRUCTURE_POWER_SPAWN] : [{"x":0,"y":2}],
-            "cog" : [{"x":3,"y":3},{"x":4,"y":2}],
+            "scientist" : [{"x":3,"y":3},{"x":4,"y":2}],
             [C.STRUCTURE_OBSERVER]:  [{"x":0,"y":5}]
         },
 

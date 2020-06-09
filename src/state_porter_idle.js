@@ -20,14 +20,14 @@ function StatePorterIdle (creep) {
 
 
 StatePorterIdle.prototype.enact = function () {
-    console.log(this.creep.name,"STATE_PORTER_IDLE");
+
     delete this.creep.memory.targetId;
     this.checkFlags();
 
     if (this.creep.store.getUsedCapacity() > 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
-
+    console.log(this.creep.name,"STATE_PORTER_IDLE", this.creep.pos);
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
     const info = this.nextHarvestContainer(
@@ -36,10 +36,10 @@ StatePorterIdle.prototype.enact = function () {
     if (info && info.pos) {
         this.creep.memory.targetId = info.id;
         if (info.pos.roomName !== this.homeId && this.creep.pos.roomName === this.homeId) {
-            const fRoom = new FlagRoom(nextPost.pos.roomName);
+            const fRoom = new FlagRoom(info.pos.roomName);
             const path = fRoom.getSPath(this.homeId, info.id, fRoom.PathTo.Spawn, true);
             console.log(this.creep.name,"STATE_PORTER_IDLE path", path);
-            state.switchToMoveToPath(
+            return state.switchToMoveToPath(
                 this.creep,
                 path,
                 info.pos,
@@ -71,7 +71,7 @@ StatePorterIdle.prototype.enact = function () {
     const policyId = this.creep.policyId;
     let creeps = _.filter(Game.creeps, function (c) {
         return c.memory.policyId === policyId
-            && state.isHarvestingHarvester(c)
+            && this.isHarvestingHarvester(c)
     });
     if (creeps.length > 0) {
         creeps = creeps.sort( function (a,b)  {
@@ -91,6 +91,16 @@ StatePorterIdle.prototype.enact = function () {
 };
 
 module.exports = StatePorterIdle;
+
+StatePorterIdle.prototype.isHarvestingHarvester = function(creep) {
+    return  race.getRace(creep) === gc.RACE_HARVESTER
+        && (creep.memory.state === gc.STATE_HARVESTER_BUILD
+            || creep.memory.state === gc.STATE_HARVESTER_REPAIR
+            || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
+            || creep.memory.state === gc.STATE_HARVESTER_HARVEST
+            || ( creep.memory.state === gc.STATE_MOVE_POS
+                && creep.memory.next_state === gc.STATE_HARVESTER_HARVEST))
+};
 
 StatePorterIdle.prototype.nextHarvestContainer = function(colonies, capacity) {
     let containersInfo = this.listHarvestContainers(colonies);

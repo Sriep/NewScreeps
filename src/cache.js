@@ -5,7 +5,11 @@
  */
 const gc = require("./gc");
 const gf = require("./gf");
-const profiler = require('screeps-profiler');
+//console.log("in cache gc.USE_PROFILER",gc.USE_PROFILER,"!gc.UNIT_TEST",!gc.UNIT_TEST);
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    //console.log("inside gc.USE_PROFILER && !gc.UNIT_TEST",gc.USE_PROFILER && !gc.UNIT_TEST);
+    const profiler = require('screeps-profiler');
+}
 
 const cache = {
 
@@ -59,12 +63,16 @@ const cache = {
         if (useRoad) {
             pfPath = PathFinder.search(from.pos, goals, {
                 maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
+                plainCost: 1,
                 swampCost: 1,
+                roomCallback: this.getCostMatrixRoad,
             })
         } else {
             pfPath = PathFinder.search(from.pos, goals, {
                 maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
-                swampCost: 5,
+                plainCost: 2,
+                swampCost: 10,
+                roomCallback: this.getCostMatrix,
             })
         }
         if (cachePath) {
@@ -83,7 +91,69 @@ const cache = {
         }
     },
 
-    distance(from, toArray, name, range, useRoad, redo, cacheResult) {
+    costMatrix: {},
+
+    costMatrixRoad: {},
+
+    getCostMatrixRoad: function(roomName) {
+        if(this.costMatrixRoad[roomName]) {
+            return this.costMatrix[roomName]
+        }
+        if (!Game.rooms[roomName]) {
+            return;
+        }
+        let costs = new PathFinder.CostMatrix;
+        Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES).forEach(function (site) {
+             if (site.structureType === STRUCTURE_ROAD
+                && site.structureType !== STRUCTURE_CONTAINER
+                && (site.structureType !== STRUCTURE_RAMPART ||  !site.my)) {
+                costs.set(site.pos.x, site.pos.y, 0xff);
+            }
+        });
+
+        Game.rooms[roomName].find(FIND_STRUCTURES).forEach(function(struct) {
+            if (struct.structureType === STRUCTURE_ROAD
+                && struct.structureType !== STRUCTURE_CONTAINER
+                && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                costs.set(struct.pos.x, struct.pos.y, 0xff);
+            }
+        });
+
+        this.costMatrixRoad[roomName] = costs;
+        return costs;
+    },
+
+    getCostMatrix: function(roomName) {
+        if(this.costMatrix[roomName]) {
+            return this.costMatrix[roomName]
+        }
+        if (!Game.rooms[roomName]) {
+            return;
+        }
+        let costs = new PathFinder.CostMatrix;
+        Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES).forEach(function (site) {
+            if (site.structureType === STRUCTURE_ROAD) {
+                costs.set(site.pos.x, site.pos.y, 1);
+            } else if (site.structureType !== STRUCTURE_CONTAINER
+                    && (site.structureType !== STRUCTURE_RAMPART || !site.my)) {
+                costs.set(site.pos.x, site.pos.y, 0xff);
+            }
+        });
+
+        Game.rooms[roomName].find(FIND_STRUCTURES).forEach(function(struct) {
+            if (struct.structureType === STRUCTURE_ROAD) {
+                costs.set(struct.pos.x, struct.pos.y, 1);
+            } else if (struct.structureType !== STRUCTURE_CONTAINER
+                    && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                costs.set(struct.pos.x, struct.pos.y, 0xff);
+            }
+        });
+
+        this.costMatrix[roomName] = costs;
+        return costs;
+    },
+
+    distance: function(from, toArray, name, range, useRoad, redo, cacheResult) {
         const p = this.path(from, toArray, "distance" + name, range, useRoad, redo, cacheResult);
         if (!p) {
             //console.log("cache distance from", from.id, "toArraylength", toArray.length, "name", name,
@@ -116,6 +186,7 @@ const cache = {
 
     dPos: function (str, roomName) {
         const point = this.dPoint(str);
+        //console.log("dPos str|", JSON.stringify(str), "|roomName", roomName, "point", JSON.stringify(point))
         return new RoomPosition(point.x, point.y, roomName)
     },
 
@@ -125,6 +196,7 @@ const cache = {
 
     dPoint: function(str) {
         const code = str.charCodeAt(0);
+        //console.log("dPoint code",code);
         return {"x": code % 50, "y": Math.floor(code / 50)};
     },
 
@@ -154,6 +226,16 @@ const cache = {
             }
         }
         return path;
+    },
+
+    deserialisePosAt: function (uString, index, roomName) {
+        const code = uString.charCodeAt(index);
+        return new RoomPosition(code % 50, Math.floor(code / 50), roomName)
+    },
+
+    deserialisePtAt: function (uString, index) {
+        const code = uString.charCodeAt(index);
+        return { x:code % 50, y:Math.floor(code / 50)}
     },
 
     deserialiseRoArray: function(uString, roomName) {
@@ -242,6 +324,7 @@ const cache = {
 
 };
 
-profiler.registerObject(cache, 'cache');
-
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    profiler.registerObject(cache, 'cache');
+}
 module.exports = cache;

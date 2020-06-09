@@ -3,8 +3,9 @@
  * Created by piers on 27/05/2020
  * @author Piers Shepperson
  */
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require('assert');
-const gc = require('../src/gc');
 const tile = require("../src/tile");
 
 describe("tile operations\"", function() {

@@ -3,7 +3,8 @@
  * Created by piers on 10/05/2020
  * @author Piers Shepperson
  */
-
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require('assert');
 const construction = require("../src/construction");
 const Terrain = require("./mocks/terrain");

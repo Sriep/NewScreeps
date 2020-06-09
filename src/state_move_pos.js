@@ -9,11 +9,14 @@ const gc = require("gc");
 const state = require("state");
 const race = require("race");
 const cache = require("cache");
+const move = require("state_move");
 
 function StateMovePos (creep) {
     this.type = gc.STATE_MOVE_POS;
     this.creep = creep;
-    this.m = this.creep.memory
+    this.m = this.creep.memory;
+    this.policyId = creep.memory.policyId;
+    this.homeId = Memory.policies[this.policyId].roomName;
 }
 
 StateMovePos.prototype.enact = function () {
@@ -22,7 +25,7 @@ StateMovePos.prototype.enact = function () {
 
     if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
         if (this.m.next_state === gc.STATE_MOVE_PATH) {
-            state.switchToMoveByPath(
+            return state.switchToMoveByPath(
                 this.creep,
                 this.m.path,
                 this.m.pathTargetPos,
@@ -39,14 +42,19 @@ StateMovePos.prototype.enact = function () {
             return this.pathLost();
         }
     }
-
-    const result = this.creep.moveTo(targetPos, {reusePath: 5});
+    let reuse = 5;
+    if (targetPos.roomName === this.creep.pos.roomName) {
+        const range = this.creep.pos.getRangeTo(targetPos);
+        reuse = range < 5 ? 1 : 5;
+    }
+    const result = this.creep.moveTo(targetPos, {reusePath: reuse});
     switch (result) {
         case OK:
             break;
         case  ERR_NOT_OWNER:
             return gf.fatalError("ERR_NOT_OWNER");
         case ERR_NO_PATH:
+            console.log("STATE_MOVE_POS ERR_NO_PATH", this.creep.pos, "target", targetPos);
             this.pathLost();
             return this.creep.moveTo(targetPos, {reusePath: 0});
         case ERR_BUSY:
@@ -68,37 +76,60 @@ StateMovePos.prototype.enact = function () {
 };
 
 StateMovePos.prototype.pathLost = function () {
+    if (this.m.next_state === gc.STATE_MOVE_PATH) {
+        if (this.creep.pos.isNearTo(this.m.targetPos.x, this.m.targetPos.y)) {
+            //console.log(this.creep.name, "STATE_MOVE_PATH targetpos", JSON.stringify(this.m.targetPos), "room",
+            //    this.creep.pos.roomName,"len", this.m.path.length,"path",this.m.path);
+            if (move.pathBlocked(gf.roomPosFromPos(this.m.targetPos))) {
+                const path = move.recalculatePath(this.creep);
+                if (path) {
+                    return state.switchToMoveToPath(
+                        this.creep,
+                        path,
+                        this.m.targetPos,
+                        this.m.moveRange,
+                        this.m.next_state,
+                    )
+                } else {
+                    return state.switchToMovePos(
+                        this.creep, this.m.pathTargetPos, this.m.pathRange, this.m.pathNextState,
+                    )
+                }
+            }
+        }
+    }
+
     const creepRace = race.getRace(this.creep);
     //console.log(this.creep.name, "STATE_MOVE_POS creep race", creepRace);
     //console.log(this.creep.name,"STATE_MOVE_POS path lost", JSON.stringify(this.creep.memory.targetPos));
     switch(creepRace) {
         case gc.RACE_HARVESTER:
             const sourceId = state.atHarvestingPost(this.creep.pos);
-            //console.log(this.creep.name, "STATE_MOVE_POS atHarvestingPost", sourceId);
-            if (sourceId) {
-                console.log(this.creep.name,"STATE_MOVE_POS at harvesting pos", sourceId);
-                const harvesters = state.getHarvestingHarvesters(this.creep.policyId);
+             if (sourceId) {
+                //console.log(this.creep.name,"STATE_MOVE_POS at harvesting pos", sourceId);
+                const harvesters = this.getHarvestingHarvesters(this.creep.policyId);
                 for (let harvester of harvesters) {
                     if (harvester.memory.targetPos.x === this.creep.x
                         && harvester.memory.targetPos.y === this.creep.y) {
                         delete harvester.memory.targetPos;
-                        state.switchTo(harvester, gc.STATE_HARVESTER_IDLE);
-                        break;
+                        return state.switchTo(harvester, gc.STATE_HARVESTER_IDLE);
                     }
                 }
                 this.m.targetId = sourceId;
                 this.m.targetPos = this.creep.pos;
                 return state.switchTo(this.creep, this.m, gc.STATE_HARVESTER_HARVEST);
             }
-            return;
+            return this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
+
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
-        case gc.RACE_WORKER:
-            return;
+        //case gc.RACE_WORKER:
+            //return;
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
         case gc.RACE_PORTER:
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 return state.switchTo(this.creep, this.m, creepRace + "_idle")
             } else {
+                this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
                 return;
                 /*
                 // porter hack approaching crowed upgrade container
@@ -141,12 +172,23 @@ StateMovePos.prototype.pathLost = function () {
         case gc.RACE_UPGRADER:
             return state.switchTo(this.creep, this.m, gc.STATE_UPGRADER_IDLE);
         default:
+            this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
             return;
             //return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);
     }
 };
 
 
+StateMovePos.prototype.getHarvestingHarvesters = function(policyId) {
+    return _.filter(Game.creeps, function (c) {
+        return c.memory.policyId === policyId
+            && (c.memory.state === gc.STATE_HARVESTER_BUILD
+                || c.memory.state === gc.STATE_HARVESTER_REPAIR
+                || c.memory.state === gc.STATE_HARVESTER_TRANSFER
+                || c.memory.state === gc.STATE_HARVESTER_HARVEST
+                || c.memory.next_state === gc.STATE_HARVESTER_HARVEST)
+    });
+};
 
 
 

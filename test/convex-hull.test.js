@@ -3,6 +3,8 @@
  * Created by piers on 28/05/2020
  * @author Piers Shepperson
  */
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 //const assert = require('assert');
 const convexHullTest = require("../src/convex-hull");
 //const tile = require("../src/tile");

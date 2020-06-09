@@ -12,6 +12,28 @@ const FlagRoom = require("./flag_room");
 
 const state = {
 
+    mem: {
+        State: "state",
+        PolicyId: "policyId",
+        TargetPos: "targetPos",
+        TargetId: "targetId",
+        TargetName: "targetName",
+        MoveRange: "moveRange",
+        NextState: "next_state",
+        Path: "path",
+        PathTargetPos: "pathTargetPos",
+        PathRange: "pathRange",
+        PathNextState: "pathNextState",
+    },
+
+    getM(creep, field) {
+        return creep.Memory[field]
+    },
+
+    setM(creep, field, value) {
+        creep.Memory[field] = value;
+    },
+
     stackDepth: 0,
 
     enactBuilding : function(building) {
@@ -59,27 +81,34 @@ const state = {
     },
 
     switchToMoveToPath: function(creep, path, targetPos, range, nextState) {
+        console.log(creep.name,"switchToMoveToPath pos", creep.pos ,"targetPos",JSON.stringify(targetPos),
+            "range", range,"next state", nextState, "path",path);
         let startIndex = this.findIndexPos(creep.pos, path, 0, false);
         const onPath = !!startIndex;
-        if (!startIndex) {
+        if (startIndex === undefined) {
             startIndex = this.indexClosestApproachToPath(creep.pos, path);
         }
         const endIndex = this.findIndexPos(gf.roomPosFromPos(targetPos), path, range, true);
-        if (!startIndex || !endIndex) {
+        console.log("onPath", onPath,"startIndex", startIndex, "endIndex", endIndex,
+            "path",JSON.stringify(cache.deserialisePath(path)));
+        if (startIndex === undefined || endIndex === undefined) {
+            console.log("switchToMoveToPath switchToMovePos startIndex", startIndex,"endIndex", endIndex);
             return this.switchToMovePos(creep, targetPos, range, nextState)
         }
         path = path.substr(startIndex, endIndex-startIndex);
 
         if (onPath) {
+            console.log("switchToMoveToPath onPath switchToMoveByPath", onPath);
             this.switchToMoveByPath(creep, path, targetPos, range, nextState)
         } else {
             creep.memory.path = path;
             creep.memory.pathTargetPos = targetPos;
             creep.memory.pathRange = range;
             creep.memory.pathNextState = nextState;
+            console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.roomName)) ,"switchToMovePos", JSON.stringify(creep.memory));
             this.switchToMovePos(
                 creep,
-                cache.dPos(path.charAt(0)),
+                cache.dPos(path.charAt(0), creep.pos.roomName),
                 0,
                 gc.STATE_MOVE_PATH
             )
@@ -87,6 +116,8 @@ const state = {
     },
 
     switchToMoveByPath: function(creep, path, targetPos, range, nextState) {
+        console.log("switchToMoveByPath", creep.name ,"targetPos",JSON.stringify(targetPos),
+            "range", range,"next state", nextState, "path",path);
         creep.memory.path = path;
         creep.memory.targetPos = targetPos;
         creep.memory.state = gc.STATE_MOVE_PATH;
@@ -168,6 +199,13 @@ const state = {
     },
 
     findIndexPos: function(pos, path, range, reverse) {
+        if (reverse) {
+            const endPt  = cache.dPoint(path.charAt(path.length-1));
+            if (pos.inRangeTo(endPt.x, endPt.y, 4)) {
+                return path.length;
+            }
+        }
+
         const start = reverse ? path.length-1 : 0;
         const end = reverse ? 0 : path.length;
         const delta = reverse ? -1 : 1;
@@ -185,36 +223,7 @@ const state = {
         }
     },
 
-    countHarvesterPosts: function(room) {
-        const fRoom = new FlagRoom(room.name);
-        let posts = 0;
-        for (let sourceId in fRoom.getSources()) {
-            if (fRoom.getSourcePosts(sourceId)) {
-                posts += fRoom.getSourcePosts(sourceId).length;
-            }
-        }
-        return posts;
-    },
-
-    isHarvestingHarvester: function(creep) {
-        return  race.getRace(creep) === gc.RACE_HARVESTER
-            && (creep.memory.state === gc.STATE_HARVESTER_BUILD
-                || creep.memory.state === gc.STATE_HARVESTER_REPAIR
-                || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
-                || creep.memory.state === gc.STATE_HARVESTER_HARVEST
-                || ( creep.memory.state === gc.STATE_MOVE_POS
-                    && creep.memory.next_state === gc.STATE_HARVESTER_HARVEST))
-    },
-
-    getCreepAt: function(x,y,roomname) {
-        for (let j in Game.creeps) {
-            const creep = Game.creeps[j].pos;
-            if (creep.pos.x === x && creep.pos.y === y && creep.pos.roomName === roomname) {
-                return Game.creeps[j]
-            }
-        }
-        return undefined;
-    },
+    // ------------------------------------- assorted functions --------------
 
     atHarvestingPost: function(pos) {
         const fRoom = new FlagRoom(pos.roomName);
@@ -227,33 +236,6 @@ const state = {
             }
         }
         return false;
-    },
-
-    numHarvestersHarvesting: function(policyId) { //done
-        return _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId === policyId
-                && this.isHarvestingHarvester(creep)
-        }).length;
-    },
-
-    wsHarvesting: function(policyId) {
-        const harvesters = this.getHarvestingHarvesters(policyId);
-        let ws = 0;
-        for (let i in harvesters) {
-            ws += race.workParts(harvesters[i]);
-        }
-        return ws;
-    },
-
-    getHarvestingHarvesters: function(policyId) {
-        return _.filter(Game.creeps, function (c) {
-            return c.memory.policyId === policyId
-                && (c.memory.state === gc.STATE_HARVESTER_BUILD
-                    || c.memory.state === gc.STATE_HARVESTER_REPAIR
-                    || c.memory.state === gc.STATE_HARVESTER_TRANSFER
-                    || c.memory.state === gc.STATE_HARVESTER_HARVEST
-                    || c.memory.next_state === gc.STATE_HARVESTER_HARVEST)
-        });
     },
 
     spaceForHarvest: function (creep) {
@@ -306,4 +288,4 @@ const state = {
 
 };
 
-module.exports = state;
+    module.exports = state;

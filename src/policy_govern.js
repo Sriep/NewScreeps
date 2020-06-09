@@ -13,6 +13,8 @@ function PolicyGovern  (id, data) {
     this.type = gc.POLICY_GOVERN;
     this.roomName = data.roomName;
     this.m = data.m;
+    this.m.agendaName = gc.AGENDA_DEFAULT; // todo temporary delete this
+    this.agenda = agenda.agendas[this.m.agendaName];
 }
 
 PolicyGovern.prototype.initilise = function () {
@@ -23,11 +25,9 @@ PolicyGovern.prototype.initilise = function () {
     this.m.agendaIndex = -1;
     this.m.childTypes = [];
     this.m.colonies = [{ "name" : this.roomName }];
-    //console.log("initilise this.m.colonies1", JSON.stringify(this.m.colonies));
-    this.m.agenda = agenda.default_1;
+    this.m.agendaName = gc.AGENDA_DEFAULT;
     this.m[gc.ACTIVITY_MINE_COLONIES] = false;
     this.m.parts = 0;
-    //console.log("initilise this.m.colonies2", JSON.stringify(this.m.colonies));
     return true;
 };
 
@@ -47,15 +47,15 @@ PolicyGovern.prototype.enact = function () {
 };
 
 PolicyGovern.prototype.governNew = function () {
-    this.m.agendaIndex = agenda.enact(this.id, this.m.agenda, this.m.rcl, this.m.agendaIndex)
+    this.m.agendaIndex = agenda.enact(this.id, this.agenda, this.m.rcl, this.m.agendaIndex)
 };
 
 PolicyGovern.prototype.govern = function () {
     //console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.roomName].controller.level)
-    if (this.m.agendaIndex >= this.m.agenda[this.m.rcl].length) {
+    if (this.m.agendaIndex >= this.agenda[this.m.rcl].length) {
         return;
     }
-    const lastAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
+    const lastAgendaItem = this.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
     console.log("govern lastAgendaItem", JSON.stringify(lastAgendaItem));
     if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem.activity].check(
         lastAgendaItem.activity,
@@ -65,7 +65,7 @@ PolicyGovern.prototype.govern = function () {
             Memory.records.agenda.push(lastAgendaItem + " checked " + Game.time.toString());
             console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
         }
-        const nextAgendaItem = this.m.agenda[this.m.rcl][this.m.agendaIndex+1];
+        const nextAgendaItem = this.agenda[this.m.rcl][this.m.agendaIndex+1];
         console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
         agenda.items()[nextAgendaItem.activity].enact(
             nextAgendaItem.activity,

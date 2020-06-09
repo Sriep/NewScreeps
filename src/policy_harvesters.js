@@ -7,7 +7,7 @@ const gc = require("gc");
 const policy = require("policy");
 const budget = require("budget");
 const race = require("race");
-const state = require("state");
+//const state = require("state");
 const flag = require("flag");
 
 
@@ -71,7 +71,7 @@ PolicyHarvesters.prototype.enact = function () {
     //console.log("ph wHarvesterLife",wHarvesterLife,"budgetHarvesterWsLt",budgetHarvesterWsLt);
     if (wHarvesterLife < budgetHarvesterWsLt) {
         const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
-        if (harvesters < state.countHarvesterPosts(room)) {
+        if (harvesters < this.countHarvesterPosts(room)) {
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_HARVESTER,
@@ -81,6 +81,17 @@ PolicyHarvesters.prototype.enact = function () {
             );
         }
     }
+};
+
+PolicyHarvesters.prototype.countHarvesterPosts = function(room) {
+    const fRoom = new FlagRoom(room.name);
+    let posts = 0;
+    for (let sourceId in fRoom.getSources()) {
+        if (fRoom.getSourcePosts(sourceId)) {
+            posts += fRoom.getSourcePosts(sourceId).length;
+        }
+    }
+    return posts;
 };
 
 PolicyHarvesters.prototype.localBudget = function() {

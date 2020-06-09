@@ -10,7 +10,9 @@ const gf = require("./gf");
 const gc = require("./gc");
 const cache = require("./cache");
 const race = require("./race");
-const profiler = require('screeps-profiler');
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+}
 
 function FlagRoom (name) {
     let roomFlag;
@@ -31,8 +33,9 @@ function FlagRoom (name) {
     }
 }
 
-//profiler.registerObject(FlagRoom, 'FlagRoom');
-profiler.registerClass(FlagRoom, 'FlagRoom');
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    profiler.registerClass(FlagRoom, 'FlagRoom');
+}
 
 FlagRoom.prototype.RoomType = {
     "MyOwned": "MyOwned",
@@ -90,10 +93,16 @@ FlagRoom.prototype.mapRoom = function() {
 };
 
 FlagRoom.prototype.resetPaths = function(spawnRoom) {
-    this.m.paths[spawnRoom] = this._setPaths(spawnRoom)
+    console.log("resetPaths", Game.rooms[this.name], "spawn room",Game.rooms[spawnRoom]);
+    if (Game.rooms[this.name] && Game.rooms[spawnRoom]) {
+        this.m.paths[spawnRoom] = this._setPaths(Game.rooms[spawnRoom]);
+        return true;
+    }
+    return false;
 };
 
 FlagRoom.prototype._setPaths = function(spawnRoom) {
+    console.log(this.name,"spawnRoom",spawnRoom,"_setPaths Game.rooms[this.name]",Game.rooms[this.name]);
     const home = Game.rooms[this.name];
     const paths = {};
     const sources = home.find(C.FIND_SOURCES);
@@ -216,7 +225,12 @@ FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
 };
 
 FlagRoom.prototype.getSPath = function (roomName, id, pathTo, reverse) {
-    return reverse ? this.paths(roomName)[id][pathTo].path.split("").reverse().join("") : this.paths()[id][pathTo].path;
+    return reverse ? this.paths(roomName)[id][pathTo].path.split("").reverse().join("")
+                    : this.paths()[id][pathTo].path;
+};
+
+FlagRoom.prototype.recalculatePath = function (roomName, id) {
+
 };
 
 FlagRoom.prototype.roomType = function () {

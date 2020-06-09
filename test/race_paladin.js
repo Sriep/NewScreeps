@@ -3,10 +3,11 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const C = require("../src/Constants");
 const assert = require("assert");
 const race = require("../src/race");
-const gc = require("../src/gc");
 const race_paladin = require("../src/race_paladin");
 
 describe("race_porter", function() {

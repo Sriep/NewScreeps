@@ -3,6 +3,8 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require('assert');
 const race_harvester = require("../src/race_harvester");
 
@@ -10,7 +12,7 @@ describe("race_harvester", function() {
     describe("bodyCounts", function() {
         it("should show body counts for energy", function() {
             const counts200 = race_harvester.bodyCounts(200);
-            assert.strictEqual(counts200, undefined, "ec = 200");
+            assert.strictEqual(counts200["work"], 0, "ec = 200");
             const counts300 = race_harvester.bodyCounts(300);
             assert.strictEqual(counts300["work"], 2);
             assert.strictEqual(counts300["carry"], 1);

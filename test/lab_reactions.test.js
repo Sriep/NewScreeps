@@ -3,10 +3,10 @@
  * Created by piers on 10/05/2020
  * @author Piers Shepperson
  */
-
+const gc = require("../src/gc");
+gc.UNIT_TEST = true;
 const assert = require('assert');
 const C = require("../src/Constants");
-const gc = require("../src/gc");
 //const gf = require("../src/gf");
 const lr = require("../src/lab_reactions");
 const tile = require("../src/tile");

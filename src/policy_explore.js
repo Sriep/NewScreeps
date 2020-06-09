@@ -47,7 +47,7 @@ PolicyExplore.prototype.enact = function () {
         const fRoom = new FlagRoom(creeps[i].room.name);
         gf.assert(fRoom.m.flagged);
         if (!fRoom.m.mapped) {
-            console.log("POLICY_EXPLORE map room", creeps[i].room.name);
+            //console.log("POLICY_EXPLORE map room", creeps[i].room.name);
             fRoom.mapRoom();
             const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
             if (colonialOffice) {
@@ -123,7 +123,7 @@ PolicyExplore.prototype.exploreRoom = function(newRoom) {
 };
 */
 PolicyExplore.prototype.sendExplorers = function(shortfall) {
-    console.log("sendExplorers shortfall", shortfall,"this.m.direction",this.m.direction);
+    //console.log("sendExplorers shortfall", shortfall,"this.m.direction",this.m.direction);
     for (let i = 0; i < shortfall; i++) {
         const data = {
             "body": race.body(gc.RACE_SCOUT, BODYPART_COST[MOVE]),
@@ -133,7 +133,7 @@ PolicyExplore.prototype.sendExplorers = function(shortfall) {
             }},
             "name": gc.RACE_SCOUT + "_50",
         };
-        console.log("sendExplorers data",JSON.stringify(data));
+        //console.log("sendExplorers data",JSON.stringify(data));
         flag.getSpawnQueue(this.home).addSpawn(
             data,
             gc.SPAWN_PRIORITY_MISC,

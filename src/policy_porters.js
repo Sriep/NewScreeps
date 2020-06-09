@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 //const gf = require("gf");
+const C = require("./Constants");
 const gc = require("gc");
 const policy = require("policy");
 const economy = require("economy");
@@ -69,7 +70,7 @@ PolicyPorters.prototype.spawns = function (room, resources) {
     flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
     if (cWorker < 2) {
-        if (cWorker < CREEP_LIFE_TIME/10 || (harvesters === 0 && cPorter === 0 )) {
+        if (cWorker < C.CREEP_LIFE_TIME/10 || (harvesters === 0 && cPorter === 0 )) {
             policy.sendOrderToQueue(
                 room,
                 gc.RACE_WORKER,
@@ -223,7 +224,7 @@ PolicyPorters.prototype.calcResources = function () {
             if (ec <= gc.MAX_EC_4WORK_HARVESTER) {
                 const hWperBody = race_harvester.bodyCounts(ec)["work"];
                 let maxWs = 0;
-                for (let source of homeRoom.find(FIND_SOURCES)) {
+                for (let source of homeRoom.find(C.FIND_SOURCES)) {
                     maxWs += Math.min(5, fRoom.accessPoints(source.id)*hWperBody);
                 }
                 const budgetWs = this.harvesterWsRoom(homeRoom, false);
@@ -294,7 +295,8 @@ PolicyPorters.prototype.updateRoomResources = function (roomName, hW, pC, uW) {
 
 PolicyPorters.prototype.localBudget = function() {
     const room = Game.rooms[this.home];
-    const spawnCapacity = Game.rooms[this.home].find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME / CREEP_SPAWN_TIME;
+    const spawnCapacity = Game.rooms[this.home].find(C.FIND_MY_SPAWNS).length
+        * C.CREEP_LIFE_TIME / C.CREEP_SPAWN_TIME;
     if (!this.m.localResoures) {
         return {
             "name" : this.home,
@@ -303,23 +305,23 @@ PolicyPorters.prototype.localBudget = function() {
     }
 
     const hbc = race.getBodyCounts(gc.RACE_HARVESTER, room.energyCapacityAvailable);
-    const hPartCount = hbc[WORK] + hbc[MOVE] + hbc[CARRY];
+    const hPartCount = hbc[C.WORK] + hbc[C.MOVE] + hbc[C.CARRY];
     let parts = Math.ceil((this.m.localResoures.hW*11/5)/hPartCount) * hPartCount;
 
     const pbc = race.getBodyCounts(gc.RACE_PORTER, room.energyCapacityAvailable);
-    const pPartCount = pbc[WORK] + pbc[MOVE] + pbc[CARRY];
+    const pPartCount = pbc[C.WORK] + pbc[C.MOVE] + pbc[C.CARRY];
     parts += Math.ceil((this.m.localResoures.pC*3)/pPartCount) * pPartCount;
 
     const wbc = race.getBodyCounts(gc.RACE_WORKER, room.energyCapacityAvailable);
-    const wPartCount = wbc[WORK] + wbc[MOVE] + wbc[CARRY];
+    const wPartCount = wbc[C.WORK] + wbc[C.MOVE] + wbc[C.CARRY];
     parts += Math.ceil((this.m.localResoures.wW*3)/wPartCount) * wPartCount;
 
     const ubc = race.getBodyCounts(gc.RACE_UPGRADER, room.energyCapacityAvailable);
-    const uPartCount = ubc[WORK] + ubc[MOVE] + ubc[CARRY];
+    const uPartCount = ubc[C.WORK] + ubc[C.MOVE] + ubc[C.CARRY];
     parts += Math.ceil((this.m.localResoures.uW*2)/uPartCount) * uPartCount;
     parts += 4; // scouts.
 
-    const ecSources = Game.rooms[this.home].find(FIND_SOURCES).length * SOURCE_ENERGY_CAPACITY;
+    const ecSources = Game.rooms[this.home].find(C.FIND_SOURCES).length * C.SOURCE_ENERGY_CAPACITY;
     const profit = ecSources * gc.SORCE_REGEN_LT - budget.convertPartsToEnergy(
         this.m.localResoures.hW,
         this.m.localResoures.pC,

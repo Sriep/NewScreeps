@@ -53,19 +53,61 @@ FlagOwnedRoom.prototype.placeCentre = function (centreTile, start) {
     this.m["plan"]["centre"] = centreTile
 };
 
-FlagOwnedRoom.prototype.plan = function () {
+FlagOwnedRoom.prototype.plan= function(objType) {
+    return cache.global(
+        FlagOwnedRoom.prototype._planObj,
+        this,
+        [objType],
+        "FLO." + this.name + ".plan" + objType
+    )
+};
+
+FlagOwnedRoom.prototype.centre = function () {
     return  cache.global(
-        FlagOwnedRoom.prototype._plan,
+        FlagOwnedRoom.prototype._centre,
         this,
         [],
-        "FlagOwnedRoom.plan",
+        "FLO." +this.name + ".centre",
     );
 };
 
-FlagOwnedRoom.prototype._plan = function () {
+FlagOwnedRoom.prototype._centre = function () {
     const centre = tile.getCopy(tile.centres[this.m["plan"]["centre"]]);
-    tile.shiftToOrigin(this.m["plan"]["origin"]);
+    tile.shiftToOrigin(centre);
     return centre;
+};
+
+FlagOwnedRoom.prototype._plan = function (obj) {
+    switch (obj) {
+        case tile.p.XDim:
+            return tile.centres[this.m["plan"]["centre"]][tile.p.XDim];
+        case tile.p.YDim:
+            return tile.centres[this.m["plan"]["centre"]][tile.p.YDim];
+        case tile.p.Origin:
+            return this.centre()[tile.p.Origin];
+        case tile.p.BaseLabs:
+            return tile.centres[this.m["plan"]["centre"]][tile.p.BaseLabs];
+        case tile.p.LabMap:
+            return JSON.parse(tile.centres[this.m["plan"]["centre"]][tile.p.LabMap]);
+        case tile:
+            return centre["base_labs"];
+        case C.STRUCTURE_LINK:
+        case C.STRUCTURE_TOWER:
+        case C.STRUCTURE_EXTENSION:
+            return cache.deserialiseRoArray(this.m["plan"][obj]);
+        case C.STRUCTURE_LAB:
+        case C.STRUCTURE_TERMINAL:
+        case C.STRUCTURE_SPAWN:
+        case C.STRUCTURE_POWER_SPAWN:
+        case C.STRUCTURE_ROAD:
+        case C.STRUCTURE_OBSERVER:
+        case tile.p.Scientist:
+            return cache.deserialiseRoArray(this.centre()[obj]);
+        case undefined:
+            return this.centre();
+        default:
+            gf.fatalError("unknown room plan obj", obj, "room", this.room.name)
+    }
 };
 
 FlagOwnedRoom.prototype.findLocationForCentre = function(centre, avoid) {

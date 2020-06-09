@@ -19,18 +19,19 @@ function StateHarvesterIdle (creep) {
 }
 
 StateHarvesterIdle.prototype.enact = function () {
-    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE");
 
-    //const governor = policy.getGouvernerPolicy(this.homeId);
     const colonies =  policy.getGouvernerPolicy(this.homeId).getColonies();
     const nextPost = this.nextFreeHarvesterPost(colonies);
-
+    //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
     if (nextPost) {
+        this.m.targetId = nextPost.id;
         if (nextPost.pos.roomName !== this.homeId  && this.creep.pos.roomName === this.homeId) {
+            //console.log("STATE_HARVESTER_IDLE nextPost next room", JSON.stringify(nextPost));
             const fRoom = new FlagRoom(nextPost.pos.roomName);
             const path = fRoom.getSPath(this.homeId, nextPost.id, fRoom.PathTo.Spawn, true);
-            console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
-            state.switchToMoveToPath(
+            //console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
+            return state.switchToMoveToPath(
                 this.creep,
                 path,
                 nextPost.pos,
@@ -38,8 +39,7 @@ StateHarvesterIdle.prototype.enact = function () {
                 gc.STATE_HARVESTER_HARVEST,
             )
         }
-
-        this.m.targetId = nextPost.id;
+        //console.log(this.creep.name, "STATE_HARVESTER_IDLE switchToMovePos");
         state.switchToMovePos(
             this.creep,
             nextPost.pos,

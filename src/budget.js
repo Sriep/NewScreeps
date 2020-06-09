@@ -8,6 +8,7 @@ const cache = require("./cache");
 const gc = require("./gc");
 const gf = require("./gf");
 const race = require("./race");
+//const flag = require("./flag");
 //const raceHarvester = require("./race_harvester");
 
 const budget = {
@@ -233,8 +234,12 @@ const budget = {
         };
     },
 
-    workersRoomRationHtoW : function (room, spawnRoom, useRoad) {
-        //console.log("b workersRoomRationHtoW room", room.name,"spawnRoom", spawnRoom.name, "useroad", useRoad);
+    workersRoomRationHtoW : function () {//(room, spawnRoom, useRoad) {
+        // todo decide whether this is worth it
+        return 1.1;
+        /*
+        console.log("b workersRoomRationHtoW room", room.name,"spawnRoom", spawnRoom.name, "useroad", useRoad);
+        //fRoom = flag.getRoom(room.name);
         const sources = room.find(C.FIND_SOURCES);
         if (sources.length === 0) {
             return 1;
@@ -242,7 +247,6 @@ const budget = {
         let avDistance = 0;
         let count = 0;
         for (let source of sources) {
-            // todo expensive, maybe better caching
             const sites = room.find(C.FIND_MY_CONSTRUCTION_SITES, {
                 filter: obj => { return obj.structureType !== C.STRUCTURE_WALL
                     && obj.structureType !== C.STRUCTURE_RAMPART;
@@ -274,7 +278,9 @@ const budget = {
         const energyPerHlt = workLt * 2;
         //console.log("room",room.name,"avDistance",avDistance,"sources", sources.length, "count", count);
         //console.log("workersRoomRationHtoW energyPerWLt",energyPerWLt,"tripsLt",tripsLt,"tripTime",tripTime,"workLt",workLt)
+        console.log("workersRoomRationHtoW room", room.name, "result", energyPerHlt / energyPerWLt);
         return energyPerHlt / energyPerWLt;
+        */
     },
 
     convertPartsToEnergy(hWs, pCs, uWs, wWCs, cRs, roads, roomEc) { // harvester, porter, upgrader and worker sizes

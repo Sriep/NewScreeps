@@ -6,14 +6,17 @@
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
+//const cache = require("cache");
 
 function StateHarvesterHarvest (creep) {
     this.type = gc.STATE_HARVESTER_HARVEST;
-    this.creep = creep
+    this.creep = creep;
+    this.m = this.creep.memory;
 }
 
 StateHarvesterHarvest.prototype.enact = function () {
-    //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store))
+    //console.log(this.creep.name, "STATE_HARVESTER_HARVEST dPath", JSON.stringify(cache.deserialisePath(this.m.path)));
+    //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store));
     if (!state.spaceForHarvest(this.creep)) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
     }
@@ -33,6 +36,7 @@ StateHarvesterHarvest.prototype.enact = function () {
             return ERR_NOT_ENOUGH_RESOURCES;
             //return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
         case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
+            console.log(this.creep.name,"pos", this.creep.pos,"target id", this.creep.memory.targetId,"target", source);
             return gf.fatalError(this.creep.name,"ERR_INVALID_TARGET");
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             console.log(this.creep.name,"STATE_HARVESTER_HARVEST pos",

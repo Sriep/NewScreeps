@@ -3,9 +3,9 @@
  * Created by piers on 01/06/2020
  * @author Piers Shepperson
  */
-
-const assert = require('assert');
 const gc = require("../src/gc");
+gc.UNIT_TEST = true;
+const assert = require('assert');
 const PolicyGovern = require("../src/policy_govern");
 const MockFlagRoom = require("./mocks/flag_room");
 

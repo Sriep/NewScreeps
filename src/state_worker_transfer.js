@@ -50,6 +50,7 @@ StateWorkerTransfer.prototype.enact = function () {
             console.log("STATE_WORKER_TRANSFER result", result);
             return gf.fatalError("transfer ERR_INVALID_TARGET");
         case ERR_FULL:        // The extractor or the deposit is still cooling down.
+            console.log(this.creep.name, "creeps store", this.creep.store, "target store", JSON.stringify(target.store));
             console.log("STATE_WORKER_TRANSFER result", result);
             return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
         case ERR_NOT_IN_RANGE:          // The target is too far away.
