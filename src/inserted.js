@@ -49,7 +49,7 @@ const inserted = {
         //room = Game.rooms["W7N7"];
         //console.log("w7n7 owner", room.controller.owner, "reserver", JSON.stringify(room.controller.reservation))
 
-
+/*
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER
         });
@@ -86,6 +86,7 @@ const inserted = {
             }
             Memory.routes[porter.memory.targetId]["porters"].push(porter.name)
         }
+        */
         //console.log("routes", JSON.stringify(Memory.routes));
 
     }

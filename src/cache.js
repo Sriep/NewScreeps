@@ -96,8 +96,11 @@ const cache = {
     costMatrixRoad: {},
 
     getCostMatrixRoad: function(roomName) {
+        if (!this.costMatrixRoad) {
+            this.costMatrixRoad = {}
+        }
         if(this.costMatrixRoad[roomName]) {
-            return this.costMatrix[roomName]
+            return this.costMatrixRoad[roomName]
         }
         if (!Game.rooms[roomName]) {
             return;
@@ -124,6 +127,10 @@ const cache = {
     },
 
     getCostMatrix: function(roomName) {
+        if (!this.costMatrix) {
+            this.costMatrix = {}
+        }
+
         if(this.costMatrix[roomName]) {
             return this.costMatrix[roomName]
         }

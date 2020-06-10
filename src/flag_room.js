@@ -95,7 +95,7 @@ FlagRoom.prototype.mapRoom = function() {
 FlagRoom.prototype.resetPaths = function(spawnRoom) {
     console.log("resetPaths", Game.rooms[this.name], "spawn room",Game.rooms[spawnRoom]);
     if (Game.rooms[this.name] && Game.rooms[spawnRoom]) {
-        this.m.paths[spawnRoom] = this._setPaths(Game.rooms[spawnRoom]);
+        this.m.paths[spawnRoom] = JSON.stringify(this._setPaths(Game.rooms[spawnRoom]));
         return true;
     }
     return false;
@@ -144,6 +144,7 @@ FlagRoom.prototype.paths = function(spawnRoom) {
 };
 
 FlagRoom.prototype._paths = function(spawnRoom) {
+    //console.log(this.name,"_paths spawnRoom", spawnRoom, "this.m.paths", this.m.paths);
     return JSON.parse(this.m.paths[spawnRoom])
 };
 

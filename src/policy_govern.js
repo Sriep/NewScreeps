@@ -13,8 +13,9 @@ function PolicyGovern  (id, data) {
     this.type = gc.POLICY_GOVERN;
     this.roomName = data.roomName;
     this.m = data.m;
-    this.m.agendaName = gc.AGENDA_DEFAULT; // todo temporary delete this
-    this.agenda = agenda.agendas[this.m.agendaName];
+    if (this.m && this.m.agendaName) {
+        this.agenda = agenda.agendas[this.m.agendaName];
+    }
 }
 
 PolicyGovern.prototype.initilise = function () {

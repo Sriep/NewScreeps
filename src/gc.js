@@ -309,6 +309,7 @@ const gc = {
     RANGE_HEAL: 3,
     RANGE_REACTION: 2,
     RANGE_RETREAT_RANGE: 4,
+    RANGE_MOVE_TO_ROOM: 50,
 
     // Sizes
     LINKING_BUILDER_SIZE: 5,
@@ -441,7 +442,7 @@ const gc = {
     MAX_SIM_DEFENCE_LENGTH: 10,
     TICK_NUMBER: "tick number",
     USE_PROFILER: false,
-    UNIT_TEST: false,
+    UNIT_TEST: true,
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
 

@@ -19,7 +19,7 @@ function StateHarvesterIdle (creep) {
 }
 
 StateHarvesterIdle.prototype.enact = function () {
-    //console.log(this.creep.name, "STATE_HARVESTER_IDLE");
+    console.log(this.creep.name, "STATE_HARVESTER_IDLE");
 
     const colonies =  policy.getGouvernerPolicy(this.homeId).getColonies();
     const nextPost = this.nextFreeHarvesterPost(colonies);

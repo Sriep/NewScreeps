@@ -12,7 +12,7 @@ const FlagRoom = require("./flag_room");
 
 const state = {
 
-    mem: {
+    M: {
         State: "state",
         PolicyId: "policyId",
         TargetPos: "targetPos",
@@ -21,17 +21,18 @@ const state = {
         MoveRange: "moveRange",
         NextState: "next_state",
         Path: "path",
+        PathName: "pathName",
         PathTargetPos: "pathTargetPos",
         PathRange: "pathRange",
         PathNextState: "pathNextState",
     },
 
-    getM(creep, field) {
-        return creep.Memory[field]
+    getM(field) {
+        return this.creep.memory[field]
     },
 
-    setM(creep, field, value) {
-        creep.Memory[field] = value;
+    setM(field, value) {
+        this.creep.memory[field] = value;
     },
 
     stackDepth: 0,
@@ -59,9 +60,16 @@ const state = {
             console.log("memory", JSON.stringify(memory));
             return gf.fatalError("error! creep" +JSON.stringify(obj) + "with no state " + JSON.stringify(memory));
         }
-        const requireString = "state_" + memory.state;
-        const stateConstructor = require(requireString);
-        const objState = new stateConstructor(obj);
+        let requireString = "state_" + memory.state;
+        if (gc.UNIT_TEST) {
+            requireString = "./" + requireString;
+        }
+        const StateConstructor = require(requireString);
+        //StateConstructor.prototype = this;
+        //StateConstructor.prototype.constructor  = StateConstructor;
+        //const objState = Object.create(this);
+        //objState.prototype = StateConstructor.prototype;
+        const objState = new StateConstructor(obj);
         objState.enact()
     },
 
@@ -81,16 +89,16 @@ const state = {
     },
 
     switchToMoveToPath: function(creep, path, targetPos, range, nextState) {
-        console.log(creep.name,"switchToMoveToPath pos", creep.pos ,"targetPos",JSON.stringify(targetPos),
-            "range", range,"next state", nextState, "path",path);
+        //console.log(creep.name,"switchToMoveToPath pos", creep.pos ,"targetPos",JSON.stringify(targetPos),
+        //    "range", range,"next state", nextState, "path",path);
         let startIndex = this.findIndexPos(creep.pos, path, 0, false);
         const onPath = !!startIndex;
         if (startIndex === undefined) {
             startIndex = this.indexClosestApproachToPath(creep.pos, path);
         }
         const endIndex = this.findIndexPos(gf.roomPosFromPos(targetPos), path, range, true);
-        console.log("onPath", onPath,"startIndex", startIndex, "endIndex", endIndex,
-            "path",JSON.stringify(cache.deserialisePath(path)));
+        //console.log("onPath", onPath,"startIndex", startIndex, "endIndex", endIndex,
+        //    "path",JSON.stringify(cache.deserialisePath(path)));
         if (startIndex === undefined || endIndex === undefined) {
             console.log("switchToMoveToPath switchToMovePos startIndex", startIndex,"endIndex", endIndex);
             return this.switchToMovePos(creep, targetPos, range, nextState)
@@ -98,14 +106,14 @@ const state = {
         path = path.substr(startIndex, endIndex-startIndex);
 
         if (onPath) {
-            console.log("switchToMoveToPath onPath switchToMoveByPath", onPath);
+        //    console.log("switchToMoveToPath onPath switchToMoveByPath", onPath);
             this.switchToMoveByPath(creep, path, targetPos, range, nextState)
         } else {
             creep.memory.path = path;
             creep.memory.pathTargetPos = targetPos;
             creep.memory.pathRange = range;
             creep.memory.pathNextState = nextState;
-            console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.roomName)) ,"switchToMovePos", JSON.stringify(creep.memory));
+            //console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.roomName)) ,"switchToMovePos", JSON.stringify(creep.memory));
             this.switchToMovePos(
                 creep,
                 cache.dPos(path.charAt(0), creep.pos.roomName),
@@ -116,8 +124,8 @@ const state = {
     },
 
     switchToMoveByPath: function(creep, path, targetPos, range, nextState) {
-        console.log("switchToMoveByPath", creep.name ,"targetPos",JSON.stringify(targetPos),
-            "range", range,"next state", nextState, "path",path);
+        //console.log("switchToMoveByPath", creep.name ,"targetPos",JSON.stringify(targetPos),
+        //    "range", range,"next state", nextState, "path",path);
         creep.memory.path = path;
         creep.memory.targetPos = targetPos;
         creep.memory.state = gc.STATE_MOVE_PATH;

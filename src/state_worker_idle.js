@@ -7,6 +7,7 @@
 const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
+const economy = require("economy");
 const gf = require("gf");
 const FlagRoom = require("flag_room");
 
@@ -21,11 +22,12 @@ function StateWorkerIdle (creep) {
 
 StateWorkerIdle.prototype.enact = function () {
     //console.log(this.creep.name,"STATE_WORKER_IDLE");
+    const room = Game.rooms[this.homeId];
     if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
     }
 
-    if (this.creep.room.controller.level === 1 && this.creep.room.controller.my) {
+    if (room.controller.level === 1 && room.controller.my) {
         const sourceInfo = this.findSourceRcl1();
         if (sourceInfo) {
             this.creep.memory.targetId = sourceInfo.id;
@@ -38,9 +40,10 @@ StateWorkerIdle.prototype.enact = function () {
         }
     }
 
-    if (this.workToDo(this.homeId)) {
+    if (economy.constructionRepairLeft(room, false) > 0) {
         return this.enactOld();
     }
+
     const colony = this.findNewRoom();
     if (colony) {
         return state.switchMoveToRoom(
@@ -56,28 +59,13 @@ StateWorkerIdle.prototype.findNewRoom = function() {
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.m.colonies;
     for (let i = 1 ; i < colonies.length ; i++) {
-        if (this.workToDo(colonies[i].name)) {
-            return colonies[i].name;
+        if (Game.rooms[colonies[i].name]) {
+            if (economy.constructionRepairLeft(Game.rooms[colonies[i].name], false)>0) {
+                return colonies[i].name;
+            }
         }
     }
     return false;
-};
-
-StateWorkerIdle.prototype.workToDo = function(colonyName) {
-    //console.log("workToDo colonyName", JSON.stringify(colonyName))
-    const colony = Game.rooms[colonyName];
-    if (!colony) {
-        return true;
-    }
-    let nextConstructionSite = colony.find(FIND_MY_CONSTRUCTION_SITES);
-    if (nextConstructionSite) {
-        return true;
-    }
-    return !!colony.find(FIND_STRUCTURES, {
-        filter: function(s)  {
-            return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
-        }
-    });
 };
 
 StateWorkerIdle.prototype.enactOld = function () {

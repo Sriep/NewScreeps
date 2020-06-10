@@ -17,11 +17,13 @@ describe("flag_room_owned", function() {
 
     describe("value", function() {
         it("should value a room", function() {
-            const roomFlag = {
-                memory: {}
-            };
-            flag.getRoomFlag = function() { return roomFlag };
-            const fRoom = new FlagOwnedRoom("test room");
+
+
+            //const roomFlag = {
+            //    memory: {}
+            //};
+            //flag.getRoomFlag = function() { return roomFlag };
+            //const fRoom = new FlagOwnedRoom("test room");
             //console.log("fRoom", JSON.stringify(fRoom));
         });
     });

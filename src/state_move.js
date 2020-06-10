@@ -7,6 +7,7 @@ const gf = require("gf");
 const C = require("./Constants");
 const flag = require("flag");
 const policy = require("policy");
+const race = require("race");
 
 // todo implement central moving
 const move = {

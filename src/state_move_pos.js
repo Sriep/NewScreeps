@@ -81,20 +81,21 @@ StateMovePos.prototype.pathLost = function () {
             //console.log(this.creep.name, "STATE_MOVE_PATH targetpos", JSON.stringify(this.m.targetPos), "room",
             //    this.creep.pos.roomName,"len", this.m.path.length,"path",this.m.path);
             if (move.pathBlocked(gf.roomPosFromPos(this.m.targetPos))) {
-                const path = move.recalculatePath(this.creep);
-                if (path) {
-                    return state.switchToMoveToPath(
-                        this.creep,
-                        path,
-                        this.m.targetPos,
-                        this.m.moveRange,
-                        this.m.next_state,
-                    )
-                } else {
+                move.recalculatePath(this.creep);
+                // const path = move.recalculatePath(this.creep);
+                //if (path) {
+                //    return state.switchToMoveToPath(
+                //        this.creep,
+                //        path,
+                //        this.m.targetPos,
+                //        this.m.moveRange,
+                //        this.m.next_state,
+                //    )
+                //} else {
                     return state.switchToMovePos(
                         this.creep, this.m.pathTargetPos, this.m.pathRange, this.m.pathNextState,
                     )
-                }
+                //}
             }
         }
     }

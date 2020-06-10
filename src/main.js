@@ -4,7 +4,7 @@
  * @autohor Piers Shepperson
  */
 const gc = require("gc");
-const inserted = require("inserted");
+//const inserted = require("inserted");
 const state = require("state");
 const policy = require("policy");
 const flag = require("flag");
@@ -30,7 +30,7 @@ if (gc.USE_PROFILER) {
 module.exports.loop = function () {
     profiler.wrap(function() {
         console.log("************************ Start ", Game.time," *********************************");
-        inserted.top();
+        //inserted.top();
         if (!Memory.started) {
             startup();
             records.startup()
@@ -40,7 +40,7 @@ module.exports.loop = function () {
         buildingAct();
         moveCreeps();
         spawnCreeps();
-        inserted.bottom();
+        //inserted.bottom();
         console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
         console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
         console.log("************************ End ",  Game.time, " *********************************");

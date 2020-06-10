@@ -18,16 +18,16 @@ function StatePorterIdle (creep) {
     this.homeId = Memory.policies[this.policyId].roomName;
 }
 
-
+//StatePorterIdle.prototype = state;
 StatePorterIdle.prototype.enact = function () {
-
+    //console.log(this.creep.name,"STATE_PORTER_IDLE", this.creep.pos);
     delete this.creep.memory.targetId;
     this.checkFlags();
 
     if (this.creep.store.getUsedCapacity() > 0) {
         return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
     }
-    console.log(this.creep.name,"STATE_PORTER_IDLE", this.creep.pos);
+
     const governor = policy.getGouvernerPolicy(this.homeId);
     let colonies = governor.getColonies();
     const info = this.nextHarvestContainer(
@@ -38,7 +38,10 @@ StatePorterIdle.prototype.enact = function () {
         if (info.pos.roomName !== this.homeId && this.creep.pos.roomName === this.homeId) {
             const fRoom = new FlagRoom(info.pos.roomName);
             const path = fRoom.getSPath(this.homeId, info.id, fRoom.PathTo.Spawn, true);
-            console.log(this.creep.name,"STATE_PORTER_IDLE path", path);
+            //this.setM(this.M.PathName, fRoom.PathTo.Spawn);
+            this.creep.memory.pathName = fRoom.PathTo.Spawn;
+            this.creep.memory.pathId = info.id;
+            //console.log(this.creep.name,"STATE_PORTER_IDLE path", path,"pathName",this.creep.memory.pathName);
             return state.switchToMoveToPath(
                 this.creep,
                 path,
@@ -86,8 +89,6 @@ StatePorterIdle.prototype.enact = function () {
             gc.STATE_PORTER_RECEIVE
         )
     }
-
-    undefined.break;
 };
 
 module.exports = StatePorterIdle;

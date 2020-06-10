@@ -95,15 +95,23 @@ const economy = {
         return { count: count, neighbours: neighbours};
     },
 
-    constructionRepairLeft: function (room) {
-        const sites = room.find(FIND_CONSTRUCTION_SITES);
-        let construction = 0;
-        for (let i in sites) {
-            construction += sites[i].progressTotal - sites[i].progress
-        }
+    constructionRepairLeft: function (room, excludeContainers) {
+        let construction = 0
+        room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function (site) {
+            if (!excludeContainers || (excludeContainers && site.structureType !== STRUCTURE_CONTAINER)
+                && site.structureType !== STRUCTURE_WALL
+                && site.structureType !== STRUCTURE_RAMPART) {
+                construction += site.progressTotal - site.progress
+            }
+        });
+
         const damaged = room.find(FIND_STRUCTURES, {
             filter: function(s)  {
-                return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
+                if (!excludeContainers || (excludeContainers && s.structureType !== STRUCTURE_CONTAINER)
+                    && s.structureType !== STRUCTURE_WALL
+                    && s.structureType !== STRUCTURE_RAMPART) {
+                    return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
+                }
             }
         });
         for (let obj of damaged) {

@@ -13,6 +13,16 @@ const RoomPosition = require("./mocks/room_position");
 const paths = require("./mocks/paths");
 
 describe("state", function() {
+    describe("piers", function() {
+        it("piers", function() {
+            const creep = { memory : {
+                state: gc.STATE_SCOUT_IDLE
+            }};
+            state.enactCreep(creep, creep.memory);
+            cosole.log("creep", JSON.stringify(creep));
+
+        });
+    });
 
     describe("findTargetOnPath", function() {
         it("should find the closets point on path", function() {
@@ -35,7 +45,6 @@ describe("state", function() {
     });
 
     describe("findTargetOnPath", function() {
-
         it("should find the index of point", function() {
 
             const pos3314 = new RoomPosition(33,14,"W8N7");

@@ -7,8 +7,10 @@
 const gc = require("gc");
 const state = require("state");
 const statePorter = require("state_porter");
+const flag = require("flag")
 
 function StatePorterFullIdle (creep) {
+    //this.__proto__ .__proto__ = state;
     this.type = gc.STATE_PORTER_FULL_IDLE;
     this.creep = creep;
     this.policyId = creep.memory.policyId;
@@ -22,7 +24,25 @@ StatePorterFullIdle.prototype.enact = function () {
     }
 
     if (this.creep.room.name !== this.homeId) {
-        
+        if (this.creep.memory.pathName && this.creep.memory.pathId) {
+            console.log("STATE_PORTER_FULL_IDLE pathId",this.creep.memory.pathId,"pathName",this.creep.memory.pathName);
+            const obj = Game.getObjectById(this.creep.memory.pathId);
+            console.log("STATE_PORTER_FULL_IDLE obj", obj);
+            if (obj && obj.pos.getRangeTo(this.creep.pos) < 5) {
+                const pathName = this.creep.memory.pathName;
+                const pathId = this.creep.memory.pathId;
+                const fRoom = flag.getRoom(this.creep.pos.roomName);
+                //const fRoom = new FlagRoom(info.pos.roomName);
+                const path = fRoom.getSPath(this.homeId, pathId, pathName, true);
+                return state.switchToMoveToPath(
+                    this.creep,
+                    path,
+                    new RoomPosition(25,25, this.homeId),
+                    gc.RANGE_MOVE_TO_ROOM,
+                    gc.STATE_PORTER_FULL_IDLE,
+                );
+            }
+        }
         return state.switchMoveToRoom(
             this.creep,
             this.homeId,
@@ -73,6 +93,11 @@ StatePorterFullIdle.prototype.transportEnergy = function () {
             gc.STATE_PORTER_TRANSFER
         );
     }
+
+    if (this.creep.store.getFreeCapacity() > 0) {
+        return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
+    }
+    //console.log(this.creep.name, "StatePorterFullIdle fall thought");
 };
 
 StatePorterFullIdle.prototype.transportMineral = function (resource) {
