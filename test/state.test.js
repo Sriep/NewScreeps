@@ -13,13 +13,13 @@ const RoomPosition = require("./mocks/room_position");
 const paths = require("./mocks/paths");
 
 describe("state", function() {
-    describe("piers", function() {
+    describe.skip("piers", function() {
         it("piers", function() {
             const creep = { memory : {
                 state: gc.STATE_SCOUT_IDLE
             }};
             state.enactCreep(creep, creep.memory);
-            cosole.log("creep", JSON.stringify(creep));
+            console.log("creep", JSON.stringify(creep));
 
         });
     });

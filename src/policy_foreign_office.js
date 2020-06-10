@@ -27,7 +27,8 @@ PolicyForeignOffice.prototype.initilise = function () {
 
 // runs once every tick
 PolicyForeignOffice.prototype.enact = function () {
-    this.checkInsurgencies()
+    this.checkInsurgencies();
+    this.checkPatrols();
 };
 
 PolicyForeignOffice.prototype.checkInsurgencies = function () {
@@ -37,9 +38,6 @@ PolicyForeignOffice.prototype.checkInsurgencies = function () {
         if (!Game.flags[roomName]) {
             continue;
         }
-        //if (Game.flags[roomName].keeperLairs) {
-        //   continue
-        //}
         if (room.find(C.FIND_HOSTILE_STRUCTURES, {
             filter: { structureType: STRUCTURE_INVADER_CORE }}).length > 0) {
             continue;
@@ -52,9 +50,11 @@ PolicyForeignOffice.prototype.checkInsurgencies = function () {
         });
         if (insurgents.length > 0) {
             this.insurgents[roomName] = insurgents;
-            this.sendInsurgentAlert(roomName);
+            this.sendInsurgentAlert(roomName, insurgents);
         }
+        this.sendPatrol(roomName)
     }
+
 };
 
 PolicyForeignOffice.prototype.sendInsurgentAlert = function (roomName) {
@@ -65,6 +65,20 @@ PolicyForeignOffice.prototype.sendInsurgentAlert = function (roomName) {
         creep.memory["previous_pos"] = creep.pos;
         creep.memory.state = gc.STATE_DEFENSIVE_RETREAT;
     }
+};
+
+PolicyForeignOffice.prototype.sendPatrol = function(roomName, insurgants) {
+    const patrols = _.filter(Game.creeps, c => {
+        return c.memory.state === gc.STATE_PATROL_COLONIES
+    })
+
+};
+
+PolicyForeignOffice.prototype.checkPatrols= function() {
+    const patrols = _.filter(Game.creeps, c => {
+        return c.memory.state === gc.STATE_PATROL_COLONIES
+    })
+
 };
 
 PolicyForeignOffice.prototype.draftReplacment = function() {

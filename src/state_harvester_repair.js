@@ -44,7 +44,9 @@ StateHarvesterRepair.prototype.enact = function () {
         case ERR_NOT_IN_RANGE:          // The target is too far away.
             return gf.fatalError("ERR_NOT_IN_RANGE");
         case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
-            return gf.fatalError("ERR_NO_BODYPART");
+            console.log(this.creep.name,"in combat body", this.creep.body)
+            return ERR_NO_BODYPART
+            //return gf.fatalError("ERR_NO_BODYPART");
         default:
             return gf.fatalError("no valid result");
     }

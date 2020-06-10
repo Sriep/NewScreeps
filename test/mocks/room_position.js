@@ -42,4 +42,21 @@ Room_position.prototype.getRangeTo= function(xOrtarget, y) {
     return Math.max( Math.abs(this.x-x), Math.abs(this.y-y));
 };
 
+Room_position.prototype.inRangeTo= function(xOrtarget, yOrRange, range) {
+    let x,y;
+    if (range) {
+        x = xOrtarget;
+        y = yOrRange;
+    } else {
+        range = yOrRange;
+        if (xOrtarget.x && xOrtarget.y) {
+            x = xOrtarget.x;
+            y = xOrtarget.y
+        } else {
+            x = xOrtarget.pos.x;
+            y = xOrtarget.pos.y
+        }
+    }
+    return Math.max( Math.abs(this.x-x), Math.abs(this.y-y)) <= range;
+};
 module.exports = Room_position;

@@ -7,7 +7,7 @@ const gc = require("./gc");
 const gf = require("./gf");
 const race = require("./race");
 const flag = require("./flag");
-const state = require("./state");
+//const state = require("./state");
 const construction = require("./construction");
 const FlagRoom = require("./flag_room");
 

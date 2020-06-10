@@ -37,7 +37,7 @@ if (gc.USE_PROFILER && !gc.UNIT_TEST) {
     profiler.registerClass(FlagRoom, 'FlagRoom');
 }
 
-FlagRoom.prototype.RoomType = {
+FlagRoom.prototype.RoomType = Object.freeze({
     "MyOwned": "MyOwned",
     "MyReserved" : "MyReserved",
     "UserOwned" :"UserOwned",
@@ -48,14 +48,14 @@ FlagRoom.prototype.RoomType = {
     "Neutral" : "Neutral",
     "None" : "None",
     "Unknown" : "Unknown",
-};
+});
 
-FlagRoom.prototype.PathTo = {
+FlagRoom.prototype.PathTo = Object.freeze({
     "Spawn" : "Spawn",
     "SpawnRoad" : "SpawnRoad",
     "Controller" : "Controller",
     "ControllerRoad" : "ControllerRoad",
-};
+});
 
 FlagRoom.prototype.mapRoom = function() {
     this.m.roomType = this.roomType();
@@ -223,6 +223,13 @@ FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
         value["netParts"] = value["netParts"] + 50;
         value["profitParts"] = value["netEnergy"]/value["netParts"];
     }
+    const militaryEcSupport = gc.COLONY_PATROL_EC_SUPPORT[spawnRoom.contoller.level];
+    const militaryPartSupport = gc.COLONY_PATROL_PART_SUPPORT[spawnRoom.contoller.level];
+    value["runningCostCreeps"] = value["runningCostCreeps"] + militaryEcSupport;
+    value["netEnergy"] = value["netEnergy"] - militaryEcSupport;
+    value["netParts"] = value["netParts"] + militaryPartSupport;
+    value["profitParts"] = value["netEnergy"]/value["netParts"];
+
 };
 
 FlagRoom.prototype.getSPath = function (roomName, id, pathTo, reverse) {

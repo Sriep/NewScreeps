@@ -12,11 +12,43 @@ const bodies = require("./mocks/bodies");
 const race = require("../src/race");
 
 
-describe("Battle_quick_estimate", function() {
-    describe("quickCombat", function() {
-        it("simulate source keep combat", function() {
+describe("quickCombat", function() {
+    describe("combat invader rcl<4", function() {
+        it("simulate sorwdsman vrs invader", function() {
+            const invader = bodies.meleeRcl3.body;
+
+            let defender300 = race.bodyFromBodyCount(
+                race.getBodyCounts(gc.RACE_SWORDSMAN, 300)
+            );
+            //console.log("defender", JSON.stringify(race.getBodyCounts(gc.RACE_SWORDSMAN, ec)));
+            let result300 = BattleQuickEstimate.quickCombat(
+                [defender300],
+                [invader],
+                gc.MAX_SIM_BATTLE_LENGTH,
+                false
+            );
+            //console.log("simulate combat result", result300);
+            assert.strictEqual(result300.friends.length, 0);
+
+
+            defender500 = race.bodyFromBodyCount(
+                race.getBodyCounts(gc.RACE_SWORDSMAN, 500)
+            );
+            //console.log("defender", JSON.stringify(race.getBodyCounts(gc.RACE_SWORDSMAN, ec)));
+            result500 = BattleQuickEstimate.quickCombat(
+                [defender500],
+                [invader],
+                gc.MAX_SIM_BATTLE_LENGTH,
+                false
+            );
+            //console.log("simulate combat result", result500);
+            assert.strictEqual(result500.enemies.length, 0);
+        });
+    });
+
+    describe("source Keeper", function() {
+        it.skip("simulate source keeper vrs keeper's bane", function() {
             //console.log("sourceKeeper", JSON.stringify(sourceKeeper));
-            /*
             const baneBody = race.bodyFromBodyCount(
                 race.getBodyCounts(gc.RACE_PALADIN, 10000, 11)
             );
@@ -34,8 +66,6 @@ describe("Battle_quick_estimate", function() {
             );
             console.log("simulate combat result", JSON.stringify(result));
             assert(result.enemies === []);
-
-             */
         });
 
        // it("simulate combat", function() {
@@ -45,6 +75,5 @@ describe("Battle_quick_estimate", function() {
        //     );
        //     //console.log("simulate combat result", JSON.stringify(result));
        //     assert(result.enemies === []);
-       // });
     });
 });

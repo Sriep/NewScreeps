@@ -8,184 +8,255 @@ const gc = require("./gc");
 
 const Battle_quick_estimate = {
 
-    quickCombat: function ( enemyCreeps, friendlyCreeps, maxTurns, log ) {
-        //console.log("quickCombat start",JSON.stringify(enemyCreeps), JSON.stringify(friendlyCreeps));
-        const enemies = this.convert(enemyCreeps);
-        const friends = this.convert(friendlyCreeps);
-        //console.log("quickCombat converts",enemies,friends);
-        return this.quickCombatInternal(enemies, friends, maxTurns, log);
-    },
-
-    quickCombatBodies: function( enemyBodies, friendlyBodies) {
-        const enemies = this.convertBodies(enemyBodies);
-        const friends = this.convertBodies(friendlyBodies);
-       // console.log("quickCombatBodies, enemies", enemies,"and firends",friends);
-        return this.quickCombatInternal(enemies, friends);
-    },
-
-    quickCombatInternal: function(enemies, friends, maxTurns, log) {
+     //body [{ boost: RESOURCE_UTRIUM_ACID, type: C.ATTACK, hits : 100}]
+    quickCombat: function(friends, enemies, maxTurns, log) {
         let range = gc.RANGE_RANGED_ATTACK;
         maxTurns = maxTurns ? maxTurns : gc.MAX_SIM_BATTLE_LENGTH;
-        //let turns = maxTurns ? maxTurns : 0;
-        let turns = 0;
-        //console.log("quickCombatInternal",JSON.stringify(enemies),"friends", JSON.stringify(friends));
-        while (enemies.length > 0 && friends.length > 0
-                && turns < maxTurns ) {
-            //if (log) {
-                //console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
-            //}
-            let damagedEnemies, damagedFriends;
-            damagedFriends = this.applyRangedDamage(enemies, friends, range);
-            damagedEnemies = this.applyRangedDamage(friends, enemies, range);
-            this.removeDead(damagedFriends);
-            this.removeDead(damagedEnemies);
-            //console.log("after ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
-            if (range <= 1) {
-                damagedFriends = this.applyDamage(enemies, damagedFriends);
-                damagedEnemies = this.applyDamage(friends, damagedEnemies);
-            }
-            //console.log("after attack damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
-            this.removeDead(damagedFriends);
-            this.removeDead(damagedEnemies);
-
-            enemies = damagedEnemies;
-            friends = damagedFriends;
+        let turn = 0;
+        enemies = this.cleanupCombatants(enemies);
+        friends = this.cleanupCombatants(friends);
+        while (friends.length > 0 && enemies.length > 0 && turn < maxTurns) {
+            let friendsPower, enemyPower;
             if (range > 1) {
-                range--;
-            }
-            turns++;
-            if (log) {
-                console.log(turns,"\tturn enemies\t",JSON.stringify(friends),"\tfriends\t",JSON.stringify(enemies));
-            }
-            //console.log("after quickCombatInternal while end enemies", JSON.stringify(enemies));
-            //console.log("after quickCombatInternal while end friends", JSON.stringify(friends));
-        }
-        return { "friends" : friends, "enemies" : enemies , "turns" : turns };
-    },
-
-    removeDead: function(injured) {
-        if (!injured) {
-            return injured;
-        }
-        for ( let i = 0 ; i < injured.length ; i++ ) {
-            if ( injured[i].parts <= 0)
-                {
-                    injured.splice(i);
-                }
-        }
-    },
-
-    convert: function (creeps) {
-        const formattedCreeps = [];
-        //console.log("convert",JSON.stringify(creeps));
-        for ( let i = 0 ; i < creeps.length  ; i++ ) {
-            const numParts = creeps[i].hits/100;
-            const attackParts = race.partsFromBody2(creeps[i].body, C.ATTACK);
-            const rangedParts = race.partsFromBody2(creeps[i].body, C.RANGED_ATTACK);
-            formattedCreeps.push({
-                parts : numParts,
-                attackParts : attackParts,
-                rangedParts : rangedParts
-            });
-        }
-        formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
-        //console.log("convert formattedCreeps",formattedCreeps);
-        return formattedCreeps;
-    },
-
-    convertBodies: function (bodies) {
-        const formattedCreeps = [];
-     //   console.log("convert bodies bodies",JSON.stringify(bodies));
-        for ( let i = 0 ; i < bodies.length ; i++ ) {
-            const numParts = bodies[i].length;
-            const attackParts = race.partsFromBody2(bodies[i], C.ATTACK);
-            const rangedParts = race.partsFromBody2(bodies[i], C.RANGED_ATTACK);
-            formattedCreeps.push( {  parts : numParts, attackParts : attackParts, rangedParts : rangedParts} );
-         //   console.log(i,"convertBodies",numParts,"attackParts",attackParts,"RangedParts",rangedParts);
-        }
-        formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
-        return formattedCreeps;
-    },
-
-    applyDamage: function (attackers, defenders) {
-        //console.log("applyDamage start");
-        const damagedDefenders = JSON.parse(JSON.stringify(defenders));
-        for (let i = 0 ; i < attackers.length ; i++ ){
-            this.damageWeakest(damagedDefenders, attackers[i].attackParts*C.ATTACK_POWER);
-        }
-      //  console.log("applyDamage end");
-        return damagedDefenders;
-    },
-
-    applyRangedDamage: function(attackers, defenders, range) {
-        if (!attackers) {
-            return defenders;
-        }
-
-        const damagedDefenders = JSON.parse(JSON.stringify(defenders));
-       // console.log("applyRangedDamage", attackers);
-        if (3 === range) {
-            for (let i = 0 ; i < attackers.length ; i++ ){
-                this.damageWeakest(damagedDefenders, attackers[i].rangedParts*C.RANGED_ATTACK_POWER);
-            }
-        } else if (2 === range) {
-            for ( let i = 0 ; i < attackers.length ; i++ ){
-                this.damageWeakest(damagedDefenders, attackers[i].rangedParts*C.RANGED_ATTACK_POWER);
-            }
-        } else if (1 <= range) {
-            for ( let i = 0 ; i < attackers.length ; i++ ){
-                this.damageAll(damagedDefenders, attackers[i].rangedParts*C.RANGED_ATTACK_POWER);
-            }
-        }
-        return damagedDefenders;
-    },
-
-    damageWeakest: function(defenders, damage) {
-        //console.log("damageWeakest before damage", damage,"defenders", JSON.stringify(defenders));
-        for ( let i = 0 ; i < defenders.length ; i++ ) {
-            if (damage < defenders[i].hits) {
-                if (0 === i) {
-                    this.damageCreep(defenders[0], damage);
-                } else {
-                    this.damageCreep(defenders[i-1], damage);
-                }
-                return;
-            }
-        }
-        this.damageCreep(defenders[defenders.length - 1], damage);
-       // console.log("damageWeakest after damage", damage,"defenders", JSON.stringify(defenders));
-    },
-
-    damageAll: function (defenders, damage) {
-        for ( let i = 0 ; i < defenders.length ; i++ ) {
-            this.damageCreep(defenders[i], damage);
-        }
-    },
-
-    damageCreep: function (creepInfo, damage) {
-       // console.log("before damageCreep  creepinfo", JSON.stringify(creepInfo), "damage",damage);
-        creepInfo.parts = creepInfo.parts - damage / 100;
-        let damagedAttackParts = Math.floor( creepInfo.attackParts + creepInfo.rangedParts -  creepInfo.parts );
-        if (damagedAttackParts > 0){
-            if (creepInfo.attackParts <= Math.floor(damagedAttackParts/2) ) {
-                damagedAttackParts -= creepInfo.attackParts;
-                creepInfo.attackParts = 0;
+                friendsPower = this.getRangedPower(friends, range);
+                enemyPower = this.getRangedPower(enemies, range);
             } else {
-                creepInfo.attackParts -= Math.floor(damagedAttackParts/2);
-                damagedAttackParts -= Math.floor(damagedAttackParts/2);
+                friendsPower = this.getMeleePower(friends);
+                enemyPower = this.getMeleePower(enemies);
             }
+            this.resolveDamage(enemies, friendsPower);
+            this.resolveDamage(friends, enemyPower);
+            if (log) {
+                console.log("turn:",turn,"friends hits left:", this.hitsAll(friends),
+                    "enemies hits left:", this.hitsAll(enemies))
+            }
+            enemies = this.cleanupCombatants(enemies);
+            friends = this.cleanupCombatants(friends);
+            turn++;
+            range = range > 1 ? range-1 : range;
+        }
+        if (log) {
+            console.log("turn:",turn,"friends hits left:", this.hitsAll(friends),
+                "enemies hits left:", this.hitsAll(enemies))
+        }
+        return {turns: turn, friends: friends, enemies: enemies};
+    },
 
-            creepInfo.rangedParts -= Math.floor(damagedAttackParts);
-            if (creepInfo.rangedParts < 0) {
-                creepInfo.rangedParts = 0;
+    getRangedPower: function(attackers, range) {
+        if (!attackers) {
+            return {damage:0, heal:0};
+        }
+        let totalDamage = 0;
+        let totalHeal = 0;
+        for (let attacker of attackers) {
+            const damage = this.rangedDamage(attacker, range);
+            const healing = this.healingPower(attacker, range);
+            totalDamage += damage;
+            totalHeal += healing;
+        }
+        return {damage: totalDamage, heal: totalHeal}
+    },
+
+    getMeleePower: function(attackers) {
+        if (!attackers) {
+            return {damage:0, heal:0};
+        }
+        let totalDamage = 0;
+        let totalHeal = 0;
+        for (let attacker of attackers) {
+            const damage = this.meleeDamage(attacker);
+            const healing = this.healingPower(attacker, 0);
+            if (damage > healing) {
+                totalDamage += damage;
+            } else {
+                totalHeal += healing;
             }
         }
-        //console.log("after damageCreep  creepinfo", JSON.stringify(creepInfo));
-        return creepInfo;
+        return {damage: totalDamage, heal: totalHeal}
+    },
+
+    rangedAttackDamage : [C.RANGED_ATTACK_POWER, C.RANGED_ATTACK_POWER, 4, 1, 0], //10
+
+    healDamage : [ // 12 and 4
+        C.HEAL_POWER,
+        C.HEAL_POWER,
+        C.RANGED_HEAL_POWER,
+        C.RANGED_HEAL_POWER,
+        C.RANGED_HEAL_POWER,
+    ],
+
+    healingPower: function(healer, range) {
+        let healing = 0;
+        for ( let part of healer.filter(p => {
+            return p.type === C.HEAL && p.hits > 0
+        })) {
+            switch (part.boost) {
+                case C.RESOURCE_LEMERGIUM_OXIDE:
+                    healing += this.healDamage[range]*2;
+                    break;
+                case C.RESOURCE_LEMERGIUM_ALKALIDE:
+                    healing += this.healDamage[range]*3;
+                    break;
+                case C.RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE:
+                    healing += this.healDamage[range]*4;
+                    break;
+                case undefined:
+                    healing += this.healDamage[range];
+                    break;
+
+            }
+        }
+        return healing;
+    },
+
+    meleeDamage : function(attacker) {
+        let damage = 0;
+        for ( let part of attacker.filter(p => {
+            return p.type === C.ATTACK && p.hits > 0
+        })) {
+            switch (part.boost) {
+                case C.RESOURCE_UTRIUM_HYDRIDE:
+                    damage += C.ATTACK_POWER*2;
+                    break;
+                case C.RESOURCE_UTRIUM_ACID:
+                    damage += C.ATTACK_POWER*3;
+                    break;
+                case C.RESOURCE_CATALYZED_UTRIUM_ACID:
+                    damage += C.ATTACK_POWER*4;
+                    break;
+                case undefined:
+                    damage += C.ATTACK_POWER;
+                    break;
+
+            }
+        }
+        return damage;
+    },
+
+    rangedDamage : function(attacker, range) {
+        let damage = 0;
+        for ( let part of attacker.filter(p => {
+            return p.type === C.RANGED_ATTACK && p.hits > 0
+        })) {
+            switch (part.boost) {
+                case C.RESOURCE_KEANIUM_OXIDE:
+                    damage += this.rangedAttackDamage[range]*2;
+                    break;
+                case C.RESOURCE_KEANIUM_ALKALIDE:
+                    damage += this.rangedAttackDamage[range]*3;
+                    break;
+                case C.RESOURCE_CATALYZED_KEANIUM_ALKALIDE:
+                    damage += this.rangedAttackDamage[range]*4;
+                    break;
+                case undefined:
+                    damage += this.rangedAttackDamage[range];
+                    break;
+
+            }
+        }
+        return damage;
+    },
+
+    resolveDamage : function(defenders, damage) {
+        for (let i = defenders.length-1 ; (i>=0 && damage.heal>0) ; i--) {
+            for ( let part of defenders[i].filter(p => { p.hits <= 100 })) {
+                const healing = Math.min(damage.heal, 100-part.hits);
+                part.hits += healing;
+                damage.heal -= healing;
+                if (damage.heal <= 0) {
+                    break;
+                }
+            }
+        }
+        for (let defender of defenders) {
+            for (let part of defender.filter(p => { return p.hits > 0})) {
+                const partDamage = Math.min(damage.damage, part.hits);
+                part.hits -= partDamage;
+                damage.damage -= partDamage;
+                if ( damage.damage <= 0) {
+                    break;
+                }
+            }
+        }
+        return damage;
+    },
+
+    cleanupCombatants : function(combatants, target) {
+        let remainingInfo = [];
+        for (let combatant of combatants) {
+            //let hits = 0;
+            let healHits = 0;
+            let attackHits = 0;
+            let toughHits = 0;
+            let lastLotOtherParts = 0;
+            for (let part of combatant) {
+                switch (part.type) {
+                    case C.HEAL:
+                        healHits += part.hits;
+                        toughHits += lastLotOtherParts;
+                        break;
+                    case C.ATTACK:
+                    case C.RANGED_ATTACK:
+                        attackHits += part.hits;
+                        toughHits += lastLotOtherParts;
+                        lastLotOtherParts = 0;
+                        break;
+                    case C.TOUGH:
+                        switch(part.boost) {
+                            case undefined:
+                                lastLotOtherParts += part.hits;
+                                break;
+                            case RESOURCE_GHODIUM_OXIDE:
+                                lastLotOtherParts += part.hits/0.7;
+                                break;
+                            case RESOURCE_GHODIUM_ALKALIDE:
+                                lastLotOtherParts += part.hits/0.5;
+                                break;
+                            case RESOURCE_CATALYZED_GHODIUM_ALKALIDE:
+                                lastLotOtherParts += part.hits/0.3;
+                                break;
+                        }
+                        break;
+                    default:
+                        lastLotOtherParts += part.hits;
+                }
+            }
+
+            const attackPower = (attackHits/100)*C.ATTACK_POWER;
+            const healPower = (healHits/100)*C.HEAL_POWER;
+            toughHits += attackPower > healPower ? attackHits : healHits;
+            if (healHits + attackHits > 0) {
+                remainingInfo.push({
+                    combatant:combatant,
+                    toughHits:toughHits,
+                })
+            }
+        }
+        remainingInfo.sort((c1, c2) =>
+            c1.toughHits - c2.toughHits
+        );
+        const newCombatants = [];
+        for (let info of remainingInfo) {
+            newCombatants.push(info.combatant)
+        }
+        return newCombatants
+    },
+
+    hitsAll : function(combatants) {
+        let hits = 0;
+        for (let combatant of combatants) {
+            hits += this.hitsCombatant(combatant)
+        }
+        return hits;
+    },
+
+    hitsCombatant : function (combatant) {
+        let hits = 0;
+        for (let part of combatant) {
+            hits += part.hits
+        }
+        return hits;
     }
-
-
-
 };
 
 module.exports = Battle_quick_estimate;

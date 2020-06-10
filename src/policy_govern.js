@@ -7,6 +7,8 @@ const gc = require("./gc");
 const agenda = require("./agenda");
 const policy = require("./policy");
 const gf = require("./gf");
+const flag = require("./flag");
+const FlagRoom = require("./flag_room");
 
 function PolicyGovern  (id, data) {
     this.id = id;
@@ -162,7 +164,7 @@ PolicyGovern.prototype.requestAddColony = function(fRoom) {
         coloniesDropped++
     }
     for (let i = 0 ; i < coloniesDropped ; i++) {
-        this.removeColony(this.m.colonies.pop());
+        this.removeColony(this.m.colonies.length-1);
     }
     this.m.colonies.push({
         "name" : fRoom.name,
@@ -180,10 +182,42 @@ PolicyGovern.prototype.requestAddColony = function(fRoom) {
     };
 };
 
-PolicyGovern.prototype.removeColony = function(colony) {
+PolicyGovern.prototype.updateColonies = function() {
+    this.refreshRoomInfo();
+    const removed = [];
+    for (let i in this.m.colonies) {
+        const fRoom = flag.getRoom(colonies[i].name);
+        const roomType = fRoom.roomType();
+        switch (roomType) {
+            case FlagRoom.RoomType.MyOwned:
+            case FlagRoom.RoomType.MyReserved:
+            case FlagRoom.RoomType.Neutral:
+            case FlagRoom.RoomType.None:
+            case FlagRoom.RoomType.Unknown:
+            case FlagRoom.RoomType.SourceKeeper:
+                break;
+            case FlagRoom.RoomType.UserOwned:
+            case FlagRoom.RoomType.UserReserved:
+                this.removeColony(i);
+                break;
+            case FlagRoom.RoomType.InvaderReserved:
+                break;
+            default:
+        }
+        if (Game.rooms[colonies[i].name]
+            && Game.rooms[colonies[i].name] .find(C.FIND_STRUCTURES, {
+            filter: { structureType: C.STRUCTURE_INVADER_CORE }
+        })) {
+            this.removeColony(i);
+        }
+    }
+};
+
+PolicyGovern.prototype.removeColony = function(index) {
     //console.log("POLICY_GOVERN removeColony as spawnRoom", colony.name);
     gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.roomName,
         "Invalid spawn room setting", JSON.stringify(Game.flags[colony.name].memory));
+    this.m.colonies.splice(index, 0);
     delete Game.flags[colony.name].memory.spawnRoom;
 };
 

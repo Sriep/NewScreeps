@@ -78,6 +78,7 @@ const gc = {
     RACE_SCIENTIST: "scientist",
     RACE_PALADIN: "paladin",
     RACE_SWORDSMAN: "swordsman",
+    RACE_HEALER: "healer",
 
     MIN_SWORDSMAN_EC_INVADER_RESERVER: 720,
     MIN_SWORDSMAN_PARTS_INVADER_RESERVER: 12,
@@ -115,6 +116,9 @@ const gc = {
     MAX_EC_3WORK_HARVESTER: 500,
     MAX_EC_4WORK_HARVESTER: 600,
     ASSIGN_HARVESTER_BUFFER: 33,
+    //                          250 500 800  1800
+    COLONY_PATROL_EC_SUPPORT: [ 0, 0,  0,  800, 1200, 1500, 1800, 1800, 1800 ],
+    COLONY_PATROL_PART_SUPPORT: [ 0, 0,  0,  12, 18, 24, 27, 27, 27 ],
 
     // flags
     FLAG_SOURCE: "source",
@@ -185,6 +189,8 @@ const gc = {
     STATE_SCIENTIST_IDLE: "scientist_idle",
     STATE_SCIENTIST_WITHDRAW:  "scientist_withdraw",
     STATE_SCIENTIST_TRANSFER:  "scientist_transfer",
+    // military
+    STATE_PATROL_COLONIES: "patrol_colonies",
 
     MAX_STATE_STACK: 5,
 

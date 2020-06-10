@@ -18,14 +18,13 @@ function StateScoutIdle (creep) {
     //console.log("constructor STATE_SCOUT_IDLE m", JSON.stringify(this.m));
 }
 
-//StateScoutIdle.prototype = state;
+StateScoutIdle.prototype = Object.create(state);
+StateScoutIdle.prototype.constructor = StateScoutIdle;
+
 StateScoutIdle.prototype.enact = function () {
-    //const nextRoom = this.m.nextRoom;
-    //console.log("STATE_SCOUT_IDLE enact this.m.nextRoom", this.m.nextRoom,"direction",this.m.direction)
-    //let dir = this.m.direction;
     //console.log("STATE_SCOUT_IDLE this", JSON.stringify(this));
-    //console.log("STATE_SCOUT_IDLE this.type", this.type);
-    //console.log("STATE_SCOUT_IDLE state", this.getM(this.M.State));
+    console.log("STATE_SCOUT_IDLE this.type", this.type);
+    console.log("STATE_SCOUT_IDLE getM state", this.getM(this.M.State));
     //console.log("this",JSON.stringify(this));
     if (!this.m.direction) {
         this.m.direction = TOP;

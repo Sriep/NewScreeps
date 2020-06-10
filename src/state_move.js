@@ -3,6 +3,7 @@
  * Created by piers on 11/05/2020
  * @author Piers Shepperson
  */
+const gc = require("gc");
 const gf = require("gf");
 const C = require("./Constants");
 const flag = require("flag");

@@ -41,16 +41,16 @@ const state = {
         const bFlag = flag.getFlag(building);
         this.stackDepth = 0;
         //console.log(building.structureType,"enactBuilding",JSON.stringify(bFlag.memory));
-        this.enact(building, bFlag.memory)
+        this.enactObj(building, bFlag.memory)
     },
 
     enactCreep : function(creep) {
         this.stackDepth = 0;
         //console.log(creep.name,"enactCreep",JSON.stringify(creep.memory));
-        this.enact(creep, creep.memory)
+        this.enactObj(creep, creep.memory)
     },
 
-    enact : function(obj, memory) {
+    enactObj : function(obj, memory) {
         //console.log("state eneact", obj, "type", obj.structureType, "memory", JSON.stringify(memory));
         if (this.stackDepth > gc.MAX_STATE_STACK) {
             return;
@@ -180,11 +180,12 @@ const state = {
             this.switchTo(creep, m, m.previous_state)
         }
         if (m.targetPos && m.moveRange && m.next_state) {
+            console.log(creep.name,"m.targetPos",m.targetPos,"m.moveRange",m.moveRange,"m.next_state",m.next_state,"m",JSON.stringify(m));
             gf.assert(m.targetPos.x === m.previous_pos.x && m.targetPos.y === m.previous_pos.y);
             gf.assert(m.next_state === m.previous_state);
             this.switchToMovePos(creep, m.targetPos, m.moveRange, m.next_state)
         }
-        this.switchTo(creep, m, race.getRace(this.creep) + "_idle", m.targetId)
+        this.switchTo(creep, m, race.getRace(creep) + "_idle", m.targetId)
     },
 
     //--------------------- state switches end----------------------------------

@@ -7,7 +7,6 @@
 //const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
-//const state = require("state");
 
 function PolicyBuildSourceContainers  (id, data) {
     this.id = id;

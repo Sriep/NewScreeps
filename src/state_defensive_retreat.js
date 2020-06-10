@@ -9,13 +9,13 @@ const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
 
-function StateHarvesterHarvest (creep) {
-    this.type = gc.STATE_HARVESTER_HARVEST;
+function StateDefensiveRetreat (creep) {
+    this.type = gc.STATE_DEFENSIVE_RETREAT;
     this.creep = creep;
-    this.m = this.creep.memroy
+    this.m = this.creep.memory
 }
 
-StateHarvesterHarvest.prototype.enact = function () {
+StateDefensiveRetreat.prototype.enact = function () {
     const foreignOffice = policy.getPolicyByType(gc.POLICY_FOREIGN_OFFICE);
     const insurgents = foreignOffice.insurgents[this.creep.room.name];
     let direction;
@@ -28,7 +28,7 @@ StateHarvesterHarvest.prototype.enact = function () {
         }
     }
     if (!direction) {
-        state.switchBack(this.creep, this.m )
+        return state.switchBack(this.creep, this.m )
     }
 
     let moveDirection, bestTerrain;
@@ -84,4 +84,4 @@ StateHarvesterHarvest.prototype.enact = function () {
     }
 };
 
-module.exports = StateHarvesterHarvest;
+module.exports = StateDefensiveRetreat;
