@@ -9,6 +9,7 @@ const C = require("./Constants");
 const flag = require("flag");
 const policy = require("policy");
 const race = require("race");
+const StateCreep = require("./state_creep");
 
 // todo implement central moving
 const move = {

@@ -5,6 +5,7 @@
  */
 const gc = require("gc");
 const FlagRoom = require("flag_room");
+const StateCreep = require("./state_creep");
 
 const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done

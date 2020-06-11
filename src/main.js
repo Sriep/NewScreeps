@@ -39,6 +39,7 @@ module.exports.loop = function () {
         enactPolicies();
         buildingAct();
         moveCreeps();
+        console.log("about to spawn creeps");
         spawnCreeps();
         //inserted.bottom();
         console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
@@ -87,7 +88,9 @@ function buildingAct() {
 
 function moveCreeps() {
     for (let name in Game.creeps) {
+        //console.log("before move creep", name);
         state.enactCreep(Game.creeps[name]);
+       // console.log("after move creep", name)
     }
 }
 

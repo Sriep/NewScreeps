@@ -10,28 +10,24 @@ const policy = require("policy");
 const economy = require("economy");
 const gf = require("gf");
 const FlagRoom = require("flag_room");
+const StateCreep = require("./state_creep");
 
-class StateWorkerIdle {
+class StateWorkerIdle extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_WORKER_IDLE;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
-        this.m = creep.memory;
-        // console.log("STATE_WORKER_IDLE this", JSON.stringify(this));
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name,"STATE_WORKER_IDLE");
-        const room = Game.rooms[this.homeId];
+        const room = Game.rooms[this.home];
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+            state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
         }
 
         if (room.controller.level === 1 && room.controller.my) {
             const sourceInfo = this.findSourceRcl1();
             if (sourceInfo) {
-                this.creep.memory.targetId = sourceInfo.id;
+                this.targetId = sourceInfo.id;
                 return state.switchToMovePos(
                     this.creep,
                     sourceInfo.pos,
@@ -57,7 +53,7 @@ class StateWorkerIdle {
     };
 
     findNewRoom() {
-        const governor = policy.getGouvernerPolicy(this.homeId);
+        const governor = policy.getGouvernerPolicy(this.home);
         let colonies = governor.m.colonies;
         for (let i = 1 ; i < colonies.length ; i++) {
             if (Game.rooms[colonies[i].name]) {
@@ -71,7 +67,7 @@ class StateWorkerIdle {
 
     enactOld() {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
         }
 
         const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -89,7 +85,7 @@ class StateWorkerIdle {
         const container = this.findCollectContainer(this.creep.room);
         //console.log(this.creep.name, "STATE_WORKER_IDLE container", container);
         if (container) {
-            this.creep.memory.targetId = container.id;
+            this.targetId = container.id;
             //console.log(this.creep.name,"move to container", container.id, "pos", container.pos);
             return state.switchToMovePos(
                 this.creep,
@@ -102,7 +98,7 @@ class StateWorkerIdle {
         const sourcePos = this.findTargetSourcePos();
         //console.log(this.creep.name, "STATE_WORKER_IDLE findTargetSourcePos", JSON.stringify(post));
         if (sourcePos) {
-            this.creep.memory.targetId = sourcePos.id;
+            this.targetId = sourcePos.id;
             return state.switchToMovePos(
                 this.creep,
                 sourcePos.pos,

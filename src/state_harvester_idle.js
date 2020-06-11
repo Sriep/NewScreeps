@@ -3,33 +3,29 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
 const race = require("race");
 const FlagRoom = require("flag_room");
+const StateCreep = require("./state_creep");
 
-class StateHarvesterIdle {
+class StateHarvesterIdle extends StateCreep {
     constructor(creep) {
-        this.creep = creep;
-        this.state = gc.STATE_HARVESTER_IDLE;
-        this.policyId = creep.memory.policyId;
-        this.m = this.creep.memory;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
         console.log(this.creep.name, "STATE_HARVESTER_IDLE");
-        const colonies =  policy.getGouvernerPolicy(this.homeId).getColonies();
+        const colonies =  policy.getGouvernerPolicy(this.home).getColonies();
         const nextPost = this.nextFreeHarvesterPost(colonies);
         //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
         if (nextPost) {
-            this.m.targetId = nextPost.id;
-            if (nextPost.pos.roomName !== this.homeId  && this.creep.pos.roomName === this.homeId) {
+            this.targetId = nextPost.id;
+            if (nextPost.pos.roomName !== this.home  && this.creep.pos.roomName === this.home) {
                 //console.log("STATE_HARVESTER_IDLE nextPost next room", JSON.stringify(nextPost));
                 const fRoom = new FlagRoom(nextPost.pos.roomName);
-                const path = fRoom.getSPath(this.homeId, nextPost.id, fRoom.PathTo.Spawn, true);
+                const path = fRoom.getSPath(this.home, nextPost.id, fRoom.PathTo.Spawn, true);
                 //console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
                 return state.switchToMoveToPath(
                     this.creep,
@@ -51,7 +47,7 @@ class StateHarvesterIdle {
 
     nextFreeHarvesterPost(colonies) {
         let harvesters = _.filter(Game.creeps, c => {
-            return  c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
+            return  c.targetId && race.getRace(c) === gc.RACE_HARVESTER
         });
         //console.log("nextFreeHarvesterPost harvesters length", harvesters.length, "colonies", JSON.stringify(colonies));
         for (let colony of colonies) {
@@ -121,7 +117,6 @@ class StateHarvesterIdle {
     };
 
     findFreePostIfPossible(creeps, posts) {
-        //console.log("findFreePostIfPossable creep lenght", creeps.length, "posts", JSON.stringify(posts))
         for (let post of posts) {
             let taken = false;
             for (let creep of creeps) {

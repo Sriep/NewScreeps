@@ -7,21 +7,21 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const StateCreep = require("./state_creep");
 
-class StateWorkerReceive {
+class StateWorkerReceive extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_WORKER_RECEIVE;
-        this.creep = creep
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name, "in STATE_WORKER_RECEIVE")
-        const harvester = Game.creeps[this.creep.memory.targetId];
+        const harvester = Game.creeps[this.targetId];
         if (!harvester || harvester.store.getUsedCapacity() === 0) {
             if (this.creep.store.getUsedCapacity() > 0) {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
             } else {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
             }
         }
 
@@ -38,15 +38,15 @@ class StateWorkerReceive {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE); // todo improve
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE); // todo improve
             case ERR_NOT_IN_RANGE:          // The target is too far away.
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE); // todo improve
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE); // todo improve
             case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
                 return gf.fatalError("transfer ERR_INVALID_ARGS");
             default:
                 return gf.fatalError("harvest unrecognised return value");
         }
-        state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+        state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
     };
 }
 

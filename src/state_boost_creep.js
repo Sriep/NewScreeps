@@ -3,15 +3,13 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
 const state = require("state");
+const StateCreep = require("./state_creep");
 
-class StateBoostCreep{
+class StateBoostCreep extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_FIND_BOOST;
-        this.creep = creep;
-        this.m = this.creep.memory;
+        super(creep)
     }
 
     enact() {
@@ -32,7 +30,7 @@ class StateBoostCreep{
                 }
             }
         }
-        state.switchTo(this.creep, this.creep.memory, race.getRace(this.creep) + "_idle")
+        state.switchTo(this.creep, this.memory, race.getRace(this.creep) + "_idle")
     };
 }
 

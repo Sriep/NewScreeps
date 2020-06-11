@@ -6,28 +6,25 @@
 
 const gc = require("gc");
 const flag = require("flag");
+const StateCreep = require("./state_creep");
 
-class StateReserverIdle {
+class StateReserverIdle extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_RESERVER_IDLE;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.m = this.creep.memory;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
-        delete this.m.targetId;
+        delete this.targetId;
         const reservers = _.filter(Game.creeps, c => {
             return c.memory.policyId === this.policyId
                 && race.getRace(creep) === gc.RACE_RESERVER
                 && c.memory.targetId
         });
 
-        const colonies = policy.getGouvernerPolicy(this.homeId).getColonies();
+        const colonies = policy.getGouvernerPolicy(this.home).getColonies();
         let coloniesById = {};
         for (let colony of colonies) {
-            if (colony.name !== this.homeId) {
+            if (colony.name !== this.home) {
                 colony[flag.getRoom(colony.name).getController().id] = {
                     name : colony.name,
                     ticks : 0
@@ -49,9 +46,9 @@ class StateReserverIdle {
             }
         }
 
-        this.m.targetId = minId;
+        this.targetId = minId;
         const fRoom = flag.getRoom(coloniesById[minId].name);
-        const path = fRoom.getSPath(this.homeId, minId, fRoom.PathTo.Spawn, true);
+        const path = fRoom.getSPath(this.home, minId, fRoom.PathTo.Spawn, true);
         console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
         state.switchToMoveToPath(
             this.creep,

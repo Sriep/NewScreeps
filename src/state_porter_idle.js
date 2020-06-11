@@ -10,39 +10,37 @@ const policy = require("policy");
 const race = require("race");
 const FlagRoom= require("flag_room");
 const FlagOwnedRoom = require("flag_owned_room");
+const StateCreep = require("./state_creep");
 
-class StatePorterIdle {
+class StatePorterIdle extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_PORTER_IDLE;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
 //StatePorterIdle.prototype = state;
     enact() {
         //console.log(this.creep.name,"STATE_PORTER_IDLE", this.creep.pos);
-        delete this.creep.memory.targetId;
+        delete this.targetId;
         this.checkFlags();
 
         if (this.creep.store.getUsedCapacity() > 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_FULL_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
         }
 
-        const governor = policy.getGouvernerPolicy(this.homeId);
+        const governor = policy.getGouvernerPolicy(this.home);
         let colonies = governor.getColonies();
         const info = this.nextHarvestContainer(
             colonies, race.partCount(this.creep, CARRY)*CARRY_CAPACITY
         );
         if (info && info.pos) {
-            this.creep.memory.targetId = info.id;
-            if (info.pos.roomName !== this.homeId && this.creep.pos.roomName === this.homeId) {
+            this.targetId = info.id;
+            if (info.pos.roomName !== this.home && this.creep.pos.roomName === this.home) {
                 const fRoom = new FlagRoom(info.pos.roomName);
-                const path = fRoom.getSPath(this.homeId, info.id, fRoom.PathTo.Spawn, true);
+                const path = fRoom.getSPath(this.home, info.id, fRoom.PathTo.Spawn, true);
                 //this.setM(this.M.PathName, fRoom.PathTo.Spawn);
-                this.creep.memory.pathName = fRoom.PathTo.Spawn;
-                this.creep.memory.pathId = info.id;
-                //console.log(this.creep.name,"STATE_PORTER_IDLE path", path,"pathName",this.creep.memory.pathName);
+                this.pathName = fRoom.PathTo.Spawn;
+                this.memory.pathId = info.id;
+                //console.log(this.creep.name,"STATE_PORTER_IDLE path", path,"pathName",this.pathName);
                 return state.switchToMoveToPath(
                     this.creep,
                     path,
@@ -72,9 +70,8 @@ class StatePorterIdle {
             );
         }
 
-        const policyId = this.creep.policyId;
         let creeps = _.filter(Game.creeps, c => {
-            return c.memory.policyId === policyId
+            return c.memory.policyId === this.policyId
                 && this.isHarvestingHarvester(c)
         });
         if (creeps.length > 0) {
@@ -82,7 +79,7 @@ class StatePorterIdle {
                 return b.store.getUsedCapacity(RESOURCE_ENERGY)
                     - a.store.getUsedCapacity(RESOURCE_ENERGY);
             } );
-            this.creep.memory.targetId = creeps[0].name;
+            this.targetId = creeps[0].name;
             return state.switchToMovePos(
                 this.creep,
                 creeps[0].pos,

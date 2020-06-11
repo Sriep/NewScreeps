@@ -8,26 +8,26 @@ const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
 const RoomFlag = require("flag_room");
+const StateCreep = require("./state_creep");
 
-class StateHarvesterRepair {
+class StateHarvesterRepair extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_HARVESTER_REPAIR;
-        this.creep = creep
+        super(creep);
     }
 
     enact() {
         if (state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST)
         }
-        const fRoom = new RoomFlag(this.creep.memory.targetPos.roomName);
-        const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.creep.memory.targetId));
+        const fRoom = new RoomFlag(this.targetPos.roomName);
+        const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         const container = state.findContainerAt(scPos);
         if (!container) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_BUILD)
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_BUILD)
         }
 
         if (container.hits === container.hitsMax) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER)
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER)
         }
 
         const result = this.creep.repair(container);

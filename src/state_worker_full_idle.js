@@ -7,21 +7,19 @@ const gc = require("gc");
 //const gf = require("gf");
 const state = require("state");
 const statePorter = require("state_porter");
+const StateCreep = require("./state_creep");
 
-class StateWorkerFullIdle  {
+class StateWorkerFullIdle  extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_WORKER_FULL_IDLE;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
-        const home = Game.rooms[this.homeId];
+        const home = Game.rooms[this.home];
         if (home.controller.ticksToDowngrade
             < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
-            this.creep.memory.targetId = home.controller.id;
+            this.targetId = home.controller.id;
             return state.switchToMovePos(
                 this.creep,
                 home.controller.pos,
@@ -31,7 +29,7 @@ class StateWorkerFullIdle  {
         }
 
         if (home.controller.level < 2) {
-            this.creep.memory.targetId = home.controller.id;
+            this.targetId = home.controller.id;
             return state.switchToMovePos(
                 this.creep,
                 home.controller.pos,
@@ -42,7 +40,7 @@ class StateWorkerFullIdle  {
 
         const nextSourceContainer = statePorter.findNextEnergyContainer(this.creep);
         if (nextSourceContainer) {
-            this.creep.memory.targetId = nextSourceContainer.id;
+            this.targetId = nextSourceContainer.id;
             return state.switchToMovePos(
                 this.creep,
                 nextSourceContainer.pos,
@@ -57,7 +55,7 @@ class StateWorkerFullIdle  {
             }
         });
         if (damagedStructure != null) {
-            this.creep.memory.targetId = damagedStructure.id;
+            this.targetId = damagedStructure.id;
             return state.switchToMovePos(
                 this.creep,
                 damagedStructure.pos,
@@ -69,7 +67,7 @@ class StateWorkerFullIdle  {
         let nextConstructionSite = this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
         if (nextConstructionSite != null) {
             //console.log("nextConstructionSite", JSON.stringify(nextConstructionSite));
-            this.creep.memory.targetId = nextConstructionSite.id;
+            this.targetId = nextConstructionSite.id;
             return state.switchToMovePos(
                 this.creep,
                 nextConstructionSite.pos,
@@ -78,7 +76,7 @@ class StateWorkerFullIdle  {
             );
         }
 
-        this.creep.memory.targetId = home.controller.id;
+        this.targetId = home.controller.id;
         return state.switchToMovePos(
             this.creep,
             home.controller.pos,

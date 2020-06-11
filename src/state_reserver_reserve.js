@@ -3,18 +3,16 @@
  * Created by piers on 20/05/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
+const StateCreep = require("./state_creep");
 
-class StateReserverReserve {
+class StateReserverReserve extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_RESERVER_RESERVE;
-        this.creep = creep;
-        this.m = this.creep.memory;
+        super(creep);
     }
 
     enact() {
-        const contoller = Game.getObjectById(this.m.targetId);
+        const contoller = Game.getObjectById(this.targetId);
         const result = this.creep.reserveController(contoller);
         switch (result) {
             case OK:

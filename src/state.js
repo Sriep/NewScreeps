@@ -12,46 +12,20 @@ const FlagRoom = require("./flag_room");
 
 const state = {
 
-    M: {
-        State: "state",
-        PolicyId: "policyId",
-        TargetPos: "targetPos",
-        TargetId: "targetId",
-        TargetName: "targetName",
-        MoveRange: "moveRange",
-        NextState: "next_state",
-        Path: "path",
-        PathName: "pathName",
-        PathTargetPos: "pathTargetPos",
-        PathRange: "pathRange",
-        PathNextState: "pathNextState",
-    },
-
-    getM(field) {
-        return this.creep.memory[field]
-    },
-
-    setM(field, value) {
-        this.creep.memory[field] = value;
-    },
-
     stackDepth: 0,
 
     enactBuilding : function(building) {
         const bFlag = flag.getFlag(building);
         this.stackDepth = 0;
-        //console.log(building.structureType,"enactBuilding",JSON.stringify(bFlag.memory));
         this.enactObj(building, bFlag.memory)
     },
 
     enactCreep : function(creep) {
         this.stackDepth = 0;
-        //console.log(creep.name,"enactCreep",JSON.stringify(creep.memory));
         this.enactObj(creep, creep.memory)
     },
 
     enactObj : function(obj, memory) {
-        //console.log("state eneact", obj, "type", obj.structureType, "memory", JSON.stringify(memory));
         if (this.stackDepth > gc.MAX_STATE_STACK) {
             return;
         }
@@ -60,6 +34,7 @@ const state = {
             console.log("memory", JSON.stringify(memory));
             return gf.fatalError("error! creep" +JSON.stringify(obj) + "with no state " + JSON.stringify(memory));
         }
+
         let requireString = "state_" + memory.state;
         requireString = "./" + requireString;
         const StateConstructor = require(requireString);

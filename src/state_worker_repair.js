@@ -6,25 +6,24 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const StateCreep = require("./state_creep");
 
-class StateWorkerRepair  {
+class StateWorkerRepair  extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_WORKER_REPAIR;
-        this.creep = creep
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name,"STATE_WORKER_REPAIR")
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
         }
-        const target = Game.getObjectById(this.creep.memory.targetId);
+        const target = Game.getObjectById(this.targetId);
         if (!target) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
         }
         if (target.hits === target.hitsMax) {
-            //this.creep.say("fixed")
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
         }
 
         const result = this.creep.repair(target);
@@ -40,7 +39,7 @@ class StateWorkerRepair  {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
             // return gf.fatalError("ERR_NOT_IN_RANGE");
             case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
                 return gf.fatalError("ERR_NO_BODYPART");
@@ -48,8 +47,7 @@ class StateWorkerRepair  {
                 return gf.fatalError("no valid result");
         }
         if (target.hits === target.hitsMax) {
-            //this.creep.say("fixed")
-            return state.switchToFullIdle(this.creep);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE)
         }
     };
 }

@@ -3,36 +3,36 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
-const gf = require("gf");
-const state = require("state");
-const RoomFlag = require("flag_room");
+const gc = require("./gc");
+const gf = require("./gf");
+const state = require("./state");
+const RoomFlag = require("./flag_room");
+const StateCreep = require("./state_creep");
 
-class StateHarvesterTransfer  {
+class StateHarvesterTransfer extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_HARVESTER_TRANSFER;
-        this.creep = creep
+        super(creep);
     }
 
     enact() {
-        //console.log("STATE_HARVESTER_TRANSFER");
+        console.log("STATE_HARVESTER_TRANSFER2", this.targetId);
+        //console.log("STATE_HARVESTER_TRANSFER1", this.getM(this.M.TargetId));
+       // if (this.spaceForHarvest(this.creep)) {
+        //    return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
+        //}
 
-        if (state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
+        if (!this.targetId) {
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_IDLE);
         }
-
-        if (!this.creep.memory.targetId) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_IDLE);
-        }
-        const fRoom = new RoomFlag(this.creep.memory.targetPos.roomName);
-        const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.creep.memory.targetId));
+        const fRoom = new RoomFlag(this.targetPos.roomName);
+        const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         const container = state.findContainerAt(scPos);
         if (!container) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_BUILD)
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_BUILD)
         }
 
         if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_REPAIR)
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_REPAIR)
         }
 
         const result = this.creep.transfer(container, RESOURCE_ENERGY);
@@ -44,7 +44,8 @@ class StateHarvesterTransfer  {
             case ERR_BUSY:                  // The creep is still being spawned.
                 return gf.fatalError("transfer ERR_BUSY");
             case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
-                return gf.fatalError("transfer ERR_NOT_ENOUGH_RESOURCES");
+                return ERR_NOT_ENOUGH_RESOURCES;
+                //return gf.fatalError("transfer ERR_NOT_ENOUGH_RESOURCES");
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
@@ -56,8 +57,7 @@ class StateHarvesterTransfer  {
             default:
                 return gf.fatalError("harvest unrecognised return value");
         }
-        state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
-
+        state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
     };
 
 }

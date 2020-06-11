@@ -3,15 +3,13 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
 const state = require("state");
+const StateCreep = require("./state_creep");
 
-class StateFindBoost  {
+class StateFindBoost  extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_FIND_BOOST;
-        this.creep = creep;
-        this.m = this.creep.memory;
+        super(creep)
     }
 
     enact() {

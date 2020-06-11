@@ -4,12 +4,11 @@
  * @author Piers Shepperson
  */
 const FlagOwnedRoom = require("flag_owned_room");
+const StateCreep = require("./state_creep");
 
-class StateScientistIdle {
+class StateScientistIdle extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_SCIENTIST_IDLE;
-        this.creep = creep;
-        this.m = this.creep.memory
+        super(creep);
     }
 
     enact() {

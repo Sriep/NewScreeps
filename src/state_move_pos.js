@@ -3,43 +3,46 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 const race = require("race");
 const cache = require("cache");
 const move = require("state_move");
+const StateCreep = require("./state_creep");
 
-class StateMovePos {
+class StateMovePos extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_MOVE_POS;
-        this.creep = creep;
-        this.m = this.creep.memory;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
+    }
+
+    get lastPosition() {
+        return this.memory.lastPosition
+    }
+    set lastPosition(v) {
+        this.memory.lastPosition = v;
     }
 
     enact() {
         //console.log(this.creep.name, "in STATE_MOVE_POS");
-        const targetPos = gf.roomPosFromPos(this.m.targetPos);
+        const targetPos = gf.roomPosFromPos(this.targetPos);
 
-        if (this.creep.pos.inRangeTo(targetPos, this.creep.memory.moveRange)) {
-            if (this.m.next_state === gc.STATE_MOVE_PATH) {
+        if (this.creep.pos.inRangeTo(targetPos, this.moveRange)) {
+            if (this.nextState === gc.STATE_MOVE_PATH) {
                 return state.switchToMoveByPath(
                     this.creep,
-                    this.m.path,
-                    this.m.pathTargetPos,
-                    this.m.pathRange,
-                    this.m.pathNextState,
+                    this.path,
+                    this.pathTargetPos,
+                    this.pathRange,
+                    this.pathNextState,
                 )
             }
-            return state.switchTo(this.creep, this.m, this.m.next_state)
+            return state.switchTo(this.creep, this.memory, this.nextState)
         }
-        if (this.m.lastpositon) {
-            const lastPos =  cache.dPoint(this.m.lastpositon);
+        if (this.lastPosition) {
+            const lastPos =  cache.dPoint(this.lastPosition);
             if (this.creep.pos.x === lastPos.x && this.creep.pos.y === lastPos.y) {
-                delete this.m.lastpositon;
+                delete this.lastPosition;
                 return this.pathLost();
             }
         }
@@ -73,28 +76,28 @@ class StateMovePos {
                 console.log("creep memory", JSON.stringify(this.creep.memory));
                 return gf.fatalError("moveByPath unrecognised return|", result,"|");
         }
-        this.m.lastpositon = cache.sPoint(this.creep.pos);
+        this.lastPosition = cache.sPoint(this.creep.pos);
     };
 
     pathLost() {
-        if (this.m.next_state === gc.STATE_MOVE_PATH) {
-            if (this.creep.pos.isNearTo(this.m.targetPos.x, this.m.targetPos.y)) {
-                //console.log(this.creep.name, "STATE_MOVE_PATH targetpos", JSON.stringify(this.m.targetPos), "room",
-                //    this.creep.pos.roomName,"len", this.m.path.length,"path",this.m.path);
-                if (move.pathBlocked(gf.roomPosFromPos(this.m.targetPos))) {
+        if (this.nextState === gc.STATE_MOVE_PATH) {
+            if (this.creep.pos.isNearTo(this.targetPos.x, this.targetPos.y)) {
+                //console.log(this.creep.name, "STATE_MOVE_PATH targetpos", JSON.stringify(this.targetPos), "room",
+                //    this.creep.pos.roomName,"len", this.path.length,"path",this.path);
+                if (move.pathBlocked(gf.roomPosFromPos(this.targetPos))) {
                     move.recalculatePath(this.creep);
                     // const path = move.recalculatePath(this.creep);
                     //if (path) {
                     //    return state.switchToMoveToPath(
                     //        this.creep,
                     //        path,
-                    //        this.m.targetPos,
-                    //        this.m.moveRange,
-                    //        this.m.next_state,
+                    //        this.targetPos,
+                    //        this.moveRange,
+                    //        this.nextState,
                     //    )
                     //} else {
                     return state.switchToMovePos(
-                        this.creep, this.m.pathTargetPos, this.m.pathRange, this.m.pathNextState,
+                        this.creep, this.pathTargetPos, this.pathRange, this.pathNextState,
                     )
                     //}
                 }
@@ -117,11 +120,11 @@ class StateMovePos {
                             return state.switchTo(harvester, gc.STATE_HARVESTER_IDLE);
                         }
                     }
-                    this.m.targetId = sourceId;
-                    this.m.targetPos = this.creep.pos;
-                    return state.switchTo(this.creep, this.m, gc.STATE_HARVESTER_HARVEST);
+                    this.targetId = sourceId;
+                    this.targetPos = this.creep.pos;
+                    return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
                 }
-                return this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
+                return this.creep.moveTo(gf.roomPosFromPos(this.targetPos), {reusePath: 1});
 
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
             //case gc.RACE_WORKER:
@@ -129,9 +132,9 @@ class StateMovePos {
             //return state.switchTo(this.creep, this.creep.memory, creepRace + "_idle");
             case gc.RACE_PORTER:
                 if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-                    return state.switchTo(this.creep, this.m, creepRace + "_idle")
+                    return state.switchTo(this.creep, this.memory, creepRace + "_idle")
                 } else {
-                    this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
+                    this.creep.moveTo(gf.roomPosFromPos(this.targetPos), {reusePath: 1});
                     return;
                     /*
                     // porter hack approaching crowed upgrade container
@@ -172,9 +175,9 @@ class StateMovePos {
                     return state.switchTo(this.creep, this.creep.memory, creepRace + "_full_idle")*/
                 }
             case gc.RACE_UPGRADER:
-                return state.switchTo(this.creep, this.m, gc.STATE_UPGRADER_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_IDLE);
             default:
-                this.creep.moveTo(gf.roomPosFromPos(this.m.targetPos), {reusePath: 1});
+                this.creep.moveTo(gf.roomPosFromPos(this.targetPos), {reusePath: 1});
                 return;
             //return gf.fatalError("STATE_MOVE_POS pathLost unrecognised race", creepRace);
         }

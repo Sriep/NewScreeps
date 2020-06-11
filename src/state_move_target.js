@@ -8,34 +8,33 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 const race = require("race");
+const StateCreep = require("./state_creep");
 
-//depreciated, use STATE_MOVE_POSITION instead
-class StateMoveTarget  {
+class StateMoveTarget  extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_MOVE_TARGET;
-        this.creep = creep
+        super(creep)
     }
 
     enact() {
         let target;
         //console.log(this.creep.name, "STATE_MOVE_TARGET targetName", this.creep.memory.targetName,
         //    "target id", this.creep.memory.targetId);
-        if (this.creep.memory.targetName) {
-            target = Game.flags[this.creep.memory.targetName];
+        if (this.targetName) {
+            target = Game.flags[this.targetName];
             //console.log(this.creep.name, "STATE_MOVE_TARGET inside targetname", target, "target name", this.creep.memory.targetName)
         }
         if (!target) {
-            target = Game.getObjectById(this.creep.memory.targetId);
+            target = Game.getObjectById(this.targetId);
         }
         if (!target) {
             //console.log(this.creep.name, "STATE_MOVE_TARGET no target", target);
-            return state.switchTo(this.creep, this.creep.memory, race.getRace(this.creep) + "_idle");
+            return state.switchTo(this.creep, this.memory, race.getRace(this.creep) + "_idle");
         }
         //console.log(this.creep.name, "STATE_MOVE_TARGET, flag pos", JSON.stringify(target.pos), "flag name", target.name);
 
-        if (this.creep.pos.inRangeTo(target.pos, this.creep.memory.moveRange)) {
+        if (this.creep.pos.inRangeTo(target.pos, this.moveRange)) {
             //console.log(this.creep.name,"STATE_MOVE_TARGET creep", JSON.stringify(this.creep.pos), "cloes to", JSON.stringify(target.pos))
-            return state.switchTo(this.creep, this.creep.memory, this.creep.memory.next_state)
+            return state.switchTo(this.creep, this.memory, this.nextState)
         }
         const result = this.creep.moveTo(target, {reusePath: 5});
         //console.log(this.creep.name,"STATE_MOVE_TARGET move result", result);

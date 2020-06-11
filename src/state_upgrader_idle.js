@@ -9,18 +9,15 @@ const gf = require("gf");
 const state = require("state");
 const stateUpgrader = require("state_upgrader");
 const FlagRoom = require("flag_room");
+const StateCreep = require("./state_creep");
 
-class StateUpgraderIdle {
+class StateUpgraderIdle extends StateCreep {
     constructor(creep) {
-        this.creep = creep;
-        this.state = gc.STATE_UPGRADER_IDLE;
-        this.policyId = creep.memory.policyId;
-        this.m = this.creep.memory;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
-        const home = Game.rooms[this.homeId];
+        const home = Game.rooms[this.home];
         //console.log(this.creep.name, "STATE_UPGRADER_IDLE");
 
         const UpgradePost = stateUpgrader.findFreeUpgraderPost(home);
@@ -28,7 +25,7 @@ class StateUpgraderIdle {
         if (UpgradePost) {
             return this.goUpgrade(UpgradePost);
         }
-        const fRoom = new FlagRoom(this.homeId);
+        const fRoom = new FlagRoom(this.home);
         if (this.atUpgradingPost(this.creep.pos)) {
             //console.log("STATE_UPGRADER_IDLE at UpgradingPost", JSON.stringify(this.creep.pos))
             const upgradeContainerPoses = fRoom.getUpgradePosts();
@@ -43,23 +40,23 @@ class StateUpgraderIdle {
                             state.switchTo(upgraders, upgraders.memory, gc.STATE_UPGRADER_IDLE);
                         }
                     }
-                    this.creep.memory.targetId = home.controller.id;
-                    this.creep.memory.targetPos = this.creep.pos;
-                    return state.switchTo(this.creep, this.creep.memory, gc.STATE_UPGRADER_UPGRADE);
+                    this.targetId = home.controller.id;
+                    this.targetPos = this.creep.pos;
+                    return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_UPGRADE);
                 }
             }
         }
     };
 
     goUpgrade(post) {
-        const home = Game.rooms[this.homeId];
+        const home = Game.rooms[this.home];
         if (!post) {
             post =  stateUpgrader.findFreeUpgraderPost(home);
         }
         if (!post) {
             return;
         }
-        this.creep.targetId = home.controller.id;
+        this.targetId = home.controller.id;
         const newPos = gf.roomPosFromPos({x: post.x, y:post.y, roomName: home.name});
         return state.switchToMovePos(
             this.creep,

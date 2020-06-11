@@ -6,22 +6,20 @@
 const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
-//const cache = require("cache");
+const StateCreep = require("./state_creep");
 
-class StateHarvesterHarvest  {
+class StateHarvesterHarvest extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_HARVESTER_HARVEST;
-        this.creep = creep;
-        this.m = this.creep.memory;
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST dPath", JSON.stringify(cache.deserialisePath(this.m.path)));
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store));
         if (!state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
+            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER);
         }
-        const source = Game.getObjectById(this.creep.memory.targetId);
+        const source = Game.getObjectById(this.targetId);
 
         const result = this.creep.harvest(source);
         switch (result) {

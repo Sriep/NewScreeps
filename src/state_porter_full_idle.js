@@ -8,36 +8,34 @@ const gc = require("gc");
 const state = require("state");
 const statePorter = require("state_porter");
 const flag = require("flag");
+const StateCreep = require("./state_creep");
 
-class StatePorterFullIdle {
+class StatePorterFullIdle extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_PORTER_FULL_IDLE;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
         }
 
-        if (this.creep.room.name !== this.homeId) {
-            if (this.creep.memory.pathName && this.creep.memory.pathId) {
-                console.log("STATE_PORTER_FULL_IDLE pathId",this.creep.memory.pathId,"pathName",this.creep.memory.pathName);
-                const obj = Game.getObjectById(this.creep.memory.pathId);
+        if (this.creep.room.name !== this.home) {
+            if (this.pathName && this.pathId) {
+                console.log("STATE_PORTER_FULL_IDLE pathId",this.pathId,"pathName",this.pathName);
+                const obj = Game.getObjectById(this.pathId);
                 console.log("STATE_PORTER_FULL_IDLE obj", obj);
                 if (obj && obj.pos.getRangeTo(this.creep.pos) < 5) {
-                    const pathName = this.creep.memory.pathName;
-                    const pathId = this.creep.memory.pathId;
+                    const pathName = this.pathName;
+                    const pathId = this.pathId;
                     const fRoom = flag.getRoom(this.creep.pos.roomName);
                     //const fRoom = new FlagRoom(info.pos.roomName);
-                    const path = fRoom.getSPath(this.homeId, pathId, pathName, true);
+                    const path = fRoom.getSPath(this.home, pathId, pathName, true);
                     return state.switchToMoveToPath(
                         this.creep,
                         path,
-                        new RoomPosition(25,25, this.homeId),
+                        new RoomPosition(25,25, this.home),
                         gc.RANGE_MOVE_TO_ROOM,
                         gc.STATE_PORTER_FULL_IDLE,
                     );
@@ -45,7 +43,7 @@ class StatePorterFullIdle {
             }
             return state.switchMoveToRoom(
                 this.creep,
-                this.homeId,
+                this.home,
                 gc.STATE_PORTER_FULL_IDLE,
             );
         }
@@ -61,7 +59,7 @@ class StatePorterFullIdle {
         const nextDelivery = statePorter.findNextEnergyContainer(this.creep);
         //console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
         if (nextDelivery) {
-            this.creep.memory.targetId = nextDelivery.id;
+            this.targetId = nextDelivery.id;
             return state.switchToMovePos(
                 this.creep,
                 nextDelivery.pos,
@@ -70,10 +68,10 @@ class StatePorterFullIdle {
             );
         }
 
-        const container = statePorter.findUpgradeContainerToFill(Game.rooms[this.homeId]);
+        const container = statePorter.findUpgradeContainerToFill(Game.rooms[this.home]);
         //console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container));
         if (container) {
-            this.creep.memory.targetId = container.id;
+            this.targetId = container.id;
             return state.switchToMovePos(
                 this.creep,
                 container.pos,
@@ -85,7 +83,7 @@ class StatePorterFullIdle {
         const nextEnergyStorage = statePorter.findNextEnergyStorage(this.creep);
         //console.log("STATE_PORTER_FULL_IDLE nextEnergyStorage",JSON.stringify(nextEnergyStorage));
         if (nextEnergyStorage) {
-            this.creep.memory.targetId = nextEnergyStorage.id;
+            this.targetId = nextEnergyStorage.id;
             return state.switchToMovePos(
                 this.creep,
                 nextEnergyStorage.pos,
@@ -95,7 +93,7 @@ class StatePorterFullIdle {
         }
 
         if (this.creep.store.getFreeCapacity() > 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_PORTER_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
         }
         //console.log(this.creep.name, "StatePorterFullIdle fall thought");
     };
@@ -104,7 +102,7 @@ class StatePorterFullIdle {
         const nextMineralStorage = this.findNextMineralStorage(resource);
         //console.log("STATE_PORTER_FULL_IDLE nextEnergyStorage",JSON.stringify(nextEnergyStorage));
         if (nextMineralStorage) {
-            this.creep.memory.targetId = nextMineralStorage.id;
+            this.targetId = nextMineralStorage.id;
             return state.switchToMovePos(
                 this.creep,
                 nextMineralStorage.pos,

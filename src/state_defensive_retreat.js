@@ -8,12 +8,11 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 const policy = require("policy");
+const StateCreep = require("./state_creep");
 
-class StateDefensiveRetreat {
+class StateDefensiveRetreat extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_DEFENSIVE_RETREAT;
-        this.creep = creep;
-        this.m = this.creep.memory
+        super(creep);
     }
 
     enact() {
@@ -29,7 +28,7 @@ class StateDefensiveRetreat {
             }
         }
         if (!direction) {
-            return state.switchBack(this.creep, this.m )
+            return state.switchBack(this.creep, this.memory )
         }
 
         let moveDirection, bestTerrain;

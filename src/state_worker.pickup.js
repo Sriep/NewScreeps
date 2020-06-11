@@ -6,26 +6,23 @@
 const gc = require("gc");
 const gf = require("gf");
 const state = require("state");
+const StateCreep = require("./state_creep");
 
-class StateWorkerPickup {
+class StateWorkerPickup extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_WORKER_PICKUP;
-        this.creep = creep;
-        this.policyId = creep.memory.policyId;
-        this.homeId = Memory.policies[this.policyId].roomName;
+        super(creep);
     }
 
     enact() {
-        const home = Game.rooms[this.homeId];
-        const drop = home.findClosestByRange(FIND_STRUCTURES, {
+        const drop = Game.rooms[this.home].findClosestByRange(FIND_STRUCTURES, {
             filter: { structureType: FIND_DROPPED_RESOURCES }
         });
 
         if (!drop) {
             if (this.creep.store.getUsedCapacity()>0) {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
             } else {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
+                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
             }
         }
 
@@ -51,9 +48,9 @@ class StateWorkerPickup {
                 return gf.fatalError("harvest unrecognised return value");
         }
         if (creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_IDLE);
+            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
         }
-        state.switchTo(this.creep, this.creep.memory, gc.STATE_WORKER_FULL_IDLE);
+        state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
     };
 
 }

@@ -7,23 +7,23 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 const FlagOwnedRoom = require("flag_owned_room");
+const StateCreep = require("./state_creep");
 
-class StateHarvesterLink {
+class StateHarvesterLink extends StateCreep {
     constructor(creep) {
-        this.type = gc.STATE_HARVESTER_LINK;
-        this.creep = creep
+        super(creep);
     }
 
     enact() {
         //console.log(this.creep.name, "STATE_HARVESTER_LINK");
         const fRoom = new FlagOwnedRoom(this.creep.room.name);
-        const sourceLink = state.getObjAtPos(fRoom.sourceLinkPos(this.creep.memory.targetId), STRUCTURE_LINK);
+        const sourceLink = state.getObjAtPos(fRoom.sourceLinkPos(this.targetId), STRUCTURE_LINK);
         const controllerLink = state.getObjAtPos(fRoom.controllerLinkPos(), STRUCTURE_LINK);
         if (!sourceLink || !controllerLink) {
             if (state.spaceForHarvest(this.creep)) {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST);
+                return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
             } else {
-                return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_TRANSFER);
+                return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER);
             }
         }
 
