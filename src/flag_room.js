@@ -223,13 +223,13 @@ FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
         value["netParts"] = value["netParts"] + 50;
         value["profitParts"] = value["netEnergy"]/value["netParts"];
     }
-    const militaryEcSupport = gc.COLONY_PATROL_EC_SUPPORT[spawnRoom.contoller.level];
-    const militaryPartSupport = gc.COLONY_PATROL_PART_SUPPORT[spawnRoom.contoller.level];
+    const rcl = Game.rooms[spawnRoom].controller.level;
+    const militaryEcSupport = gc.COLONY_PATROL_EC_SUPPORT[rcl];
+    const militaryPartSupport = gc.COLONY_PATROL_PART_SUPPORT[rcl];
     value["runningCostCreeps"] = value["runningCostCreeps"] + militaryEcSupport;
     value["netEnergy"] = value["netEnergy"] - militaryEcSupport;
     value["netParts"] = value["netParts"] + militaryPartSupport;
     value["profitParts"] = value["netEnergy"]/value["netParts"];
-
 };
 
 FlagRoom.prototype.getSPath = function (roomName, id, pathTo, reverse) {

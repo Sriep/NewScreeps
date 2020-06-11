@@ -6,13 +6,15 @@
 //const C = require("./Constants");
 const gc = require("gc");
 
-function StateTowerIdle (structure) {
-    this.type = gc.STATE_TERMINAL_IDLE;
-    this.lab = structure;
+class StateTowerIdle {
+    constructor(structure) {
+        this.type = gc.STATE_TERMINAL_IDLE;
+        this.lab = structure;
+    }
+
+    enac() {
+
+    };
 }
-
-StateTowerIdle.prototype.enact = function () {
-
-};
 
 module.exports = StateTowerIdle;

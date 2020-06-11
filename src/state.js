@@ -61,16 +61,10 @@ const state = {
             return gf.fatalError("error! creep" +JSON.stringify(obj) + "with no state " + JSON.stringify(memory));
         }
         let requireString = "state_" + memory.state;
-        if (gc.UNIT_TEST) {
-            requireString = "./" + requireString;
-        }
+        requireString = "./" + requireString;
         const StateConstructor = require(requireString);
-        //StateConstructor.prototype = this;
-        //StateConstructor.prototype.constructor  = StateConstructor;
-        //const objState = Object.create(this);
-        //objState.prototype = StateConstructor.prototype;
         const objState = new StateConstructor(obj);
-        objState.enact()
+        objState.enact();
     },
 
     //--------------------- state switches -------------------------------------
@@ -85,7 +79,7 @@ const state = {
         creep.memory.targetName = flag.name;
         creep.memory.moveRange = range;
         creep.memory.next_state = nextState;
-        return this.enact(creep, creep.memory);
+        return this.enactObj(creep, creep.memory);
     },
 
     switchToMoveToPath: function(creep, path, targetPos, range, nextState) {
@@ -131,7 +125,7 @@ const state = {
         creep.memory.state = gc.STATE_MOVE_PATH;
         creep.memory.moveRange = range;
         creep.memory.next_state = nextState;
-        return this.enact(creep, creep.memory);
+        return this.enactObj(creep, creep.memory);
     },
 
     switchToMovePos: function(creep, targetPos, range, nextState) {
@@ -155,7 +149,7 @@ const state = {
         creep.memory.next_state = nextState;
         //creep.say("go " + nextState)
         //console.log(creep.name,"switchToMovePos memory",JSON.stringify(creep.memory));
-        return this.enact(creep, creep.memory);
+        return this.enactObj(creep, creep.memory);
     },
 
     switchTo: function (obj, m, newState, targetId) {
@@ -171,7 +165,7 @@ const state = {
         }
         m.state = newState;
         //creep.say(this.creepSay[newState]);
-        return this.enact(obj, m);
+        return this.enactObj(obj, m);
     },
 
     switchBack: function (creep, m) {
@@ -195,7 +189,8 @@ const state = {
         const ranges = [];
         for ( let i = 0 ; i < path.length ; i++ ) {
             const pt = cache.dPoint(path.charAt(i));
-            if (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2) {
+            if (lastX !== undefined && lastY !== undefined
+                && (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2)) {
                 break;
             }
             const range = pos.getRangeTo(pt.x, pt.y);
@@ -221,7 +216,8 @@ const state = {
         let lastX, lastY;
         for ( let i = start ; i*delta < end*delta ; i+=delta ) {
             const pt  = cache.dPoint(path.charAt(i));
-            if (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2) {
+            if  (lastX !== undefined && lastY !== undefined
+                && (Math.abs(lastX-pt.x) > 2 || Math.abs(lastY-pt.y) > 2)) {
                 break;
             }
             if (pos.getRangeTo(pt.x, pt.y) === range) {

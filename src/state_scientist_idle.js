@@ -5,21 +5,25 @@
  */
 const FlagOwnedRoom = require("flag_owned_room");
 
-function StateScientistIdle (creep) {
-    this.type = gc.STATE_SCIENTIST_IDLE;
-    this.creep = creep;
-    this.m = this.creep.memory
+class StateScientistIdle {
+    constructor(creep) {
+        this.type = gc.STATE_SCIENTIST_IDLE;
+        this.creep = creep;
+        this.m = this.creep.memory
+    }
+
+    enact() {
+        const fRoom = new FlagOwnedRoom(this.home);
+        const pos = gf.roomPosFromPos(fRoom.m.plan["scientist"][0], this.creep.room.name);
+        return state.switchToMovePos(
+            this.creep,
+            pos,
+            gc.RANGE_TRANSFER,
+            gc.STATE_SCIENTIST_WITHDRAW,
+        );
+    };
 }
 
-StateScientistIdle.prototype.enact = function () {
-    const fRoom = new FlagOwnedRoom(this.home);
-    const pos = gf.roomPosFromPos(fRoom.m.plan["scientist"][0], this.creep.room.name);
-    return state.switchToMovePos(
-        this.creep,
-        pos,
-        gc.RANGE_TRANSFER,
-        gc.STATE_SCIENTIST_WITHDRAW,
-    );
-};
+
 
 module.exports = StateScientistIdle;
