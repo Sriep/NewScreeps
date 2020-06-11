@@ -116,8 +116,6 @@ class StateLabAuto {
 
 }
 
-
-
 module.exports = StateLabAuto;
 
 
