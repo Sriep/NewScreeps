@@ -5,7 +5,6 @@
  */
 //const gf = require("gf");
 const gc = require("gc");
-const state = require("state");
 const statePorter = require("state_porter");
 const flag = require("flag");
 const StateCreep = require("./state_creep");
@@ -18,7 +17,7 @@ class StatePorterFullIdle extends StateCreep {
     enact() {
         //console.log(this.creep.name,"STATE_PORTER_FULL_IDLE");
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
+            return this.switchTo( gc.STATE_PORTER_IDLE);
         }
 
         if (this.creep.room.name !== this.home) {
@@ -32,8 +31,7 @@ class StatePorterFullIdle extends StateCreep {
                     const fRoom = flag.getRoom(this.creep.pos.roomName);
                     //const fRoom = new FlagRoom(info.pos.roomName);
                     const path = fRoom.getSPath(this.home, pathId, pathName, true);
-                    return state.switchToMoveToPath(
-                        this.creep,
+                    return this.switchToMoveToPath(
                         path,
                         new RoomPosition(25,25, this.home),
                         gc.RANGE_MOVE_TO_ROOM,
@@ -41,8 +39,7 @@ class StatePorterFullIdle extends StateCreep {
                     );
                 }
             }
-            return state.switchMoveToRoom(
-                this.creep,
+            return this.switchMoveToRoom(
                 this.home,
                 gc.STATE_PORTER_FULL_IDLE,
             );
@@ -60,8 +57,7 @@ class StatePorterFullIdle extends StateCreep {
         //console.log("STATE_PORTER_FULL_IDLE nextDelivery",JSON.stringify(nextDelivery));
         if (nextDelivery) {
             this.targetId = nextDelivery.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 nextDelivery.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_TRANSFER
@@ -72,8 +68,7 @@ class StatePorterFullIdle extends StateCreep {
         //console.log("STATE_PORTER_FULL_IDLE container",JSON.stringify(container));
         if (container) {
             this.targetId = container.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 container.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_TRANSFER
@@ -84,8 +79,7 @@ class StatePorterFullIdle extends StateCreep {
         //console.log("STATE_PORTER_FULL_IDLE nextEnergyStorage",JSON.stringify(nextEnergyStorage));
         if (nextEnergyStorage) {
             this.targetId = nextEnergyStorage.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 nextEnergyStorage.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_TRANSFER
@@ -93,7 +87,7 @@ class StatePorterFullIdle extends StateCreep {
         }
 
         if (this.creep.store.getFreeCapacity() > 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
+            return this.switchTo( gc.STATE_PORTER_IDLE);
         }
         //console.log(this.creep.name, "StatePorterFullIdle fall thought");
     };
@@ -103,8 +97,7 @@ class StatePorterFullIdle extends StateCreep {
         //console.log("STATE_PORTER_FULL_IDLE nextEnergyStorage",JSON.stringify(nextEnergyStorage));
         if (nextMineralStorage) {
             this.targetId = nextMineralStorage.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 nextMineralStorage.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_TRANSFER

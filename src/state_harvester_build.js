@@ -18,14 +18,14 @@ class StateHarvesterBuild extends StateCreep {
         //console.log(this.creep.namne, "in", "STATE_HARVESTER_BUILD")
         if (state.spaceForHarvest(this.creep)) {
             //console.log("switch to STATE_HARVESTER_HARVEST", this.creep.store.getFreeCapacity(RESOURCE_ENERGY))
-            state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
+            this.switchTo( gc.STATE_HARVESTER_HARVEST);
         }
         const fRoom = new RoomFlag(this.targetPos.roomName);
         const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         //console.log("scPos of contienr", JSON.stringify(scPos) )
         const container = state.findContainerAt(scPos);
         if (container) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER)
+            return this.switchTo( gc.STATE_HARVESTER_TRANSFER)
         }
 
         let site = state.findContainerConstructionAt(gf.roomPosFromPos(scPos, this.creep.room.name));
@@ -64,7 +64,7 @@ class StateHarvesterBuild extends StateCreep {
                 //console.log("store", JSON.stringify(this.creep.store))
                 //console.log("STATE_HARVESTER_BUILD build returned ERR_INVALID_TARGET");
                 gf.fatalError("STATE_HARVESTER_BUILD returned ERR_INVALID_TARGET");
-                state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER);
+                this.switchTo(gc.STATE_HARVESTER_TRANSFER);
                 break;
             //return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.

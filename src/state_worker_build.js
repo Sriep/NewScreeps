@@ -6,7 +6,6 @@
 
 const gc = require("gc");
 const gf = require("gf");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateWorkerBuild extends StateCreep {
@@ -17,13 +16,12 @@ class StateWorkerBuild extends StateCreep {
     enact() {
         //console.log(this.creep.name, "in STATE_WORKER_BUILD");
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+            return this.switchTo( gc.STATE_WORKER_IDLE);
         }
         const target = Game.getObjectById(this.targetId);
         //console.log("STATE_WORKER_BUILD target",target,"target",JSON.stringify(target));
         if (!target) {
-            //console.log("STATE_WORKER_BUILD no target id", this.creep.memory.targetId);
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+            return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
         }
         const result = this.creep.build(target);
         //console.log("STATE_WORKER_BUILD result", result);
@@ -41,9 +39,9 @@ class StateWorkerBuild extends StateCreep {
                 //console.log(this.creep.name,"STATE_WORKER_BUILD ERR_INVALID_TARGET")
                 target.remove();
                 delete this.targetId;
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             case ERR_NOT_IN_RANGE:
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             case ERR_NO_BODYPART:
                 return gf.fatalError("ERR_NO_BODYPART");
             default:

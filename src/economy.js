@@ -5,6 +5,7 @@
  */
 
 const gc = require("./gc");
+const CreepMemory = require("./creep_memory");
 
 const economy = {
 
@@ -96,7 +97,7 @@ const economy = {
     },
 
     constructionRepairLeft: function (room, excludeContainers) {
-        let construction = 0
+        let construction = 0;
         room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function (site) {
             if (!excludeContainers || (excludeContainers && site.structureType !== STRUCTURE_CONTAINER)
                 && site.structureType !== STRUCTURE_WALL
@@ -151,7 +152,7 @@ const economy = {
 
     existingPorterParts: function (policy) {
         const porters = _.filter(Game.creeps, function (creep) {
-            return (creep.memory.policyId === policy.id);
+            return (CreepMemory.M(creep).policyId === policy.id);
         });
         let parts = 0;
         for (let i in porters) {

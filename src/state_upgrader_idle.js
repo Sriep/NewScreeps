@@ -34,15 +34,15 @@ class StateUpgraderIdle extends StateCreep {
                 if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
                     const upgraders = policy.getCreeps(this.policyId, gc.RACE_UPGRADER);
                     for (let i in upgraders) {
-                        if (upgraders.memory.targetPos.x === this.creep.x
-                            && upgraders.memory.targetPos.y === this.creep.y) {
-                            delete upgraders.memory.targetPos;
-                            state.switchTo(upgraders, upgraders.memory, gc.STATE_UPGRADER_IDLE);
+                        const m = CreepMemory.M(upgraders);
+                        if (m.targetPos.x === this.creep.x && m.targetPos.y === this.creep.y) {
+                            m.targetPos = undefined;
+                            m.state = gc.STATE_UPGRADER_IDLE;
                         }
                     }
                     this.targetId = home.controller.id;
                     this.targetPos = this.creep.pos;
-                    return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_UPGRADE);
+                    return this.switchTo( gc.STATE_UPGRADER_UPGRADE);
                 }
             }
         }
@@ -58,9 +58,8 @@ class StateUpgraderIdle extends StateCreep {
         }
         this.targetId = home.controller.id;
         const newPos = gf.roomPosFromPos({x: post.x, y:post.y, roomName: home.name});
-        return state.switchToMovePos(
-            this.creep,
-            newPos,
+        return this.switchToMovePos(
+             newPos,
             0,
             gc.STATE_UPGRADER_UPGRADE
         );

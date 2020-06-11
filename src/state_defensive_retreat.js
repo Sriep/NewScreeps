@@ -6,7 +6,6 @@
 const C = require("./Constants");
 const gf = require("gf");
 const gc = require("gc");
-const state = require("state");
 const policy = require("policy");
 const StateCreep = require("./state_creep");
 
@@ -28,7 +27,7 @@ class StateDefensiveRetreat extends StateCreep {
             }
         }
         if (!direction) {
-            return state.switchBack(this.creep, this.memory )
+            return this.switchBack()
         }
 
         let moveDirection, bestTerrain;
@@ -78,8 +77,8 @@ class StateDefensiveRetreat extends StateCreep {
             case ERR_NO_BODYPART:        // There are no MOVE body parts in this creep’s body.
                 return gf.fatalError("ERR_NO_BODYPART");
             default:
-                console.log(this.creep.name, "targetSTATE_MOVE_POS", JSON.stringify(this.creep.memory.targetPos));
-                console.log("creep memory", JSON.stringify(this.creep.memory));
+                console.log(this.creep.name, "targetSTATE_MOVE_POS", JSON.stringify(this.targetPos));
+                console.log("creep memory", JSON.stringify(this.memory));
                 return gf.fatalError("moveByPath unrecognised return|", result,"|");
         }
     };

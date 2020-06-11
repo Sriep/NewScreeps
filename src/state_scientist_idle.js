@@ -14,8 +14,7 @@ class StateScientistIdle extends StateCreep {
     enact() {
         const fRoom = new FlagOwnedRoom(this.home);
         const pos = gf.roomPosFromPos(fRoom.m.plan["scientist"][0], this.creep.room.name);
-        return state.switchToMovePos(
-            this.creep,
+        return this.switchToMovePos(
             pos,
             gc.RANGE_TRANSFER,
             gc.STATE_SCIENTIST_WITHDRAW,

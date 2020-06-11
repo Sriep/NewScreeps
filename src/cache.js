@@ -187,11 +187,47 @@ const cache = {
         return this.distance(fromRoom.controller, spawns, "distanceUpgraderSpawn spawns", 1, useRoad, redo);
     },
 
+    sRoomName: function(roomName) {
+        if (!roomName) {
+            return
+        }
+        const split = gf.splitRoomName(roomName);
+        const ns = String.fromCharCode(split.NS === "N" ? 1 : 0 + split.y);
+        const ew = String.fromCharCode(split.EW === "E" ? 1 : 0+ split.x);
+        return ns+ew;
+    },
+
+    dRoomName: function(str) {
+        const nsCode = str.charCodeAt(0);
+        const ns = nsCode % 2 === 1 ? "N" : "S" ;
+        const y = Math.floor(nsCode / 2);
+        const ewCode = str.charCodeAt(1);
+        const ew = ewCode % 2=== 1 ? "E" : "W" ;
+        const x = Math.floor(ewCode / 2);
+        return ew + x.toString() + ns + y.toString();
+    },
+
     sPos: function (pos) {
-        return this.sPoint(pos);
+        if (!pos && !pos.roomName) {
+            return
+        }
+        //return this.sPoint(pos) + pos.roomName;
+        return this.sPoint(pos) + this.sRoomName(pos.roomName)
+    },
+
+    dPosRn: function (str) {
+        if (!str) {
+            return
+        }
+        const code = str.charCodeAt(0);
+        //return new RoomPosition(code % 50, Math.floor(code / 50), str.substring(1))
+        return new RoomPosition(code % 50, Math.floor(code / 50), this.dRoomName(str.substring(1)))
     },
 
     dPos: function (str, roomName) {
+        if (!str) {
+            return
+        }
         const point = this.dPoint(str);
         //console.log("dPos str|", JSON.stringify(str), "|roomName", roomName, "point", JSON.stringify(point))
         return new RoomPosition(point.x, point.y, roomName)
@@ -202,12 +238,19 @@ const cache = {
     },
 
     dPoint: function(str) {
+        if (!str) {
+            return
+        }
+        console.log("cache dPoint", JSON.stringify(str))
         const code = str.charCodeAt(0);
         //console.log("dPoint code",code);
         return {"x": code % 50, "y": Math.floor(code / 50)};
     },
 
     dRoomPos: function(str, roomName) {
+        if (!str || roomName) {
+            return
+        }
         const code = str.charCodeAt(0);
         return new RoomPosition(code % 50, Math.floor(code / 50), roomName)
     },

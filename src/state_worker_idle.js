@@ -11,6 +11,7 @@ const economy = require("economy");
 const gf = require("gf");
 const FlagRoom = require("flag_room");
 const StateCreep = require("./state_creep");
+const CreepMemory = require("./creep_memory");
 
 class StateWorkerIdle extends StateCreep {
     constructor(creep) {
@@ -21,15 +22,14 @@ class StateWorkerIdle extends StateCreep {
         //console.log(this.creep.name,"STATE_WORKER_IDLE");
         const room = Game.rooms[this.home];
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+            this.switchTo(this.memory, gc.STATE_WORKER_FULL_IDLE);
         }
 
         if (room.controller.level === 1 && room.controller.my) {
             const sourceInfo = this.findSourceRcl1();
             if (sourceInfo) {
                 this.targetId = sourceInfo.id;
-                return state.switchToMovePos(
-                    this.creep,
+                return this.switchToMovePos(
                     sourceInfo.pos,
                     gc.RANGE_HARVEST,
                     gc.STATE_WORKER_HARVEST,
@@ -43,8 +43,7 @@ class StateWorkerIdle extends StateCreep {
 
         const colony = this.findNewRoom();
         if (colony) {
-            return state.switchMoveToRoom(
-                this.creep,
+            return this.switchMoveToRoom(
                 colony,
                 gc.STATE_WORKER_IDLE,
             );
@@ -67,15 +66,14 @@ class StateWorkerIdle extends StateCreep {
 
     enactOld() {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+            return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
         }
 
         const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: { structureType: FIND_DROPPED_RESOURCES }
         });
         if (drop) {
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 drop.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_WORKER_PICKUP,
@@ -87,8 +85,7 @@ class StateWorkerIdle extends StateCreep {
         if (container) {
             this.targetId = container.id;
             //console.log(this.creep.name,"move to container", container.id, "pos", container.pos);
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 container.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_WORKER_WITHDRAW,
@@ -99,8 +96,7 @@ class StateWorkerIdle extends StateCreep {
         //console.log(this.creep.name, "STATE_WORKER_IDLE findTargetSourcePos", JSON.stringify(post));
         if (sourcePos) {
             this.targetId = sourcePos.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 sourcePos.pos,
                 gc.RANGE_POST,
                 gc.STATE_WORKER_HARVEST,
@@ -110,8 +106,7 @@ class StateWorkerIdle extends StateCreep {
         const colony = this.findNewRoom();
         //console.log(this.creep.name, "STATE_WORKER_IDLE find new room colony", JSON.stringify(colony));
         if (colony) {
-            return state.switchMoveToRoom(
-                this.creep,
+            return this.switchMoveToRoom(
                 colony,
                 gc.STATE_WORKER_IDLE,
             );
@@ -151,9 +146,9 @@ class StateWorkerIdle extends StateCreep {
 
             for (let post of posts) {
                 const postCreeps = _.filter(Game.creeps, function (c) {
-                    return c.memory.targetPos && c.memory.targetPos.x === post.x
-                        && c.memory.targetPos.y === post.y
-                        && c.memory.targetPos.roomName === post.roomName
+                    return CreepMemory.M(c).targetPos && CreepMemory.M(c).targetPos.x === post.x
+                        && CreepMemory.M(c).targetPos.y === post.y
+                        && CreepMemory.M(c).targetPos.roomName === post.roomName
                 });
                 if (postCreeps.length === 0) {
                     return { pos: post, id: source.id };

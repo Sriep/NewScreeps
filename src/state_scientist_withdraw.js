@@ -14,7 +14,7 @@ class StateScientistWithdraw extends StateCreep {
 
     enact() {
         if (this.creep.store.getUsedCapacity() > 0) {
-            state.switchTo(this.creep, this.memory, gc.STATE_SCIENTIST_TRANSFER);
+            this.switchTo( gc.STATE_SCIENTIST_TRANSFER);
         }
         const room = Game.rooms[this.creep.room];
 
@@ -41,7 +41,7 @@ class StateScientistWithdraw extends StateCreep {
             if (flagResource && lab.mineralType && lab.mineralType !== flagResource) {
                 const ok = this.creep.withdraw(lab, lab.mineralType);
                 if  (ok) {
-                    return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                    return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                 } else {
                     console.log(this.creep.name,"mineral", lab.mineralType,"lab", JSON.stringify(lab));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
@@ -61,7 +61,7 @@ class StateScientistWithdraw extends StateCreep {
             if (gf.loadFromFlag(link) && link.store[RESOURCE_ENERGY] > 0) {
                 const ok = this.creep.withdraw(link, RESOURCE_ENERGY);
                 if  (ok) {
-                    return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                    return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                 } else {
                     console.log(this.creep.name, "link", JSON.stringify(link));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
@@ -84,7 +84,7 @@ class StateScientistWithdraw extends StateCreep {
             if (room.terminal && room.terminal.store[withdrawal.resource] > 0) {
                 const ok = this.creep.withdraw(room.terminal, withdrawal.resource, withdrawal.amount);
                 if (ok) {
-                    return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                    return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                 } else {
                     console.log(this.creep.name, "terminal", JSON.stringify(room.terminal));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
@@ -93,7 +93,7 @@ class StateScientistWithdraw extends StateCreep {
             if (room.storage && room.storage.store[withdrawal.resource] > 0) {
                 const ok = this.creep.withdraw(room.storage, withdrawal.resource, withdrawal.amount);
                 if (ok) {
-                    return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                    return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                 } else {
                     console.log(this.creep.name, "storage", JSON.stringify(room.storage));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())

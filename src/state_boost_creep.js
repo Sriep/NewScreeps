@@ -4,7 +4,6 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateBoostCreep extends StateCreep {
@@ -25,12 +24,12 @@ class StateBoostCreep extends StateCreep {
                 for (let lab of labs) {
                     if (lab.mineralType === boost.resource) {
                         lab.boostCreep(this.creep);
-                        return state.switchTo(this.creep, this.m, gc.STATE_FIND_BOOST)
+                        return this.switchTo(gc.STATE_FIND_BOOST)
                     }
                 }
             }
         }
-        state.switchTo(this.creep, this.memory, race.getRace(this.creep) + "_idle")
+        this.switchTo(race.getRace(this.creep) + "_idle")
     };
 }
 

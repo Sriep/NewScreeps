@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
+const CreepMemory = require("./creep_memory");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,
@@ -132,7 +133,7 @@ const race = {
 
     creepPartsAlive(policyId, race, part) {
         const creeps = _.filter(Game.creeps, function (c) {
-            return c.memory.policyId === policyId
+            return CreepMemory.M(c).policyId === policyId
                 && race === c.name.split("_")[0]
         });
         let partsLeft = 0;
@@ -144,7 +145,7 @@ const race = {
 
     ticksLeftByPart(policyId, race, part) {
         const creeps = _.filter(Game.creeps, function (c) {
-            return c.memory.policyId === policyId
+            return CreepMemory.M(c).policyId === policyId
                 && race === c.name.split("_")[0]
         });
          let lifeLeft = 0;
@@ -192,7 +193,7 @@ const race = {
     },
 
     bodyFromArray(array) {
-        const body = []
+        const body = [];
         for (let part of array) {
             body.push({
                 type: part,

@@ -5,8 +5,6 @@
  */
 
 const gf = require("gf");
-const gc = require("gc");
-const state = require("state");
 const cache = require("cache");
 const move = require("state_move");
 const StateCreep = require("./state_creep");
@@ -23,13 +21,13 @@ class StateMovePath  extends StateCreep {
         if (this.creep.pos.inRangeTo(targetPos, this.moveRange)) {
             //delete this.path;
             //console.log(this.creep.name, "STATE_MOVE_PATH inRangeTo",targetPos, "range", this.moveRange);
-            return state.switchTo(this.creep, this.memory, this.nextState)
+            return this.switchTo( this.nextState)
         }
 
         if (this.path.length <=1) {
             //delete this.path;
-            return state.switchToMovePos(
-                this.creep, this.targetPos, this.moveRange, this.nextState,
+            return this.switchToMovePos(
+                this.targetPos, this.moveRange, this.nextState,
             )
         }
         //const posPath = cache.deserialiseRoPath(this.path.substring(0,2) , this.creep.pos.roomName);
@@ -38,16 +36,16 @@ class StateMovePath  extends StateCreep {
             const dPathPos1 = cache.deserialisePosAt(this.path,1, this.creep.pos.roomName);
             //console.log(this.creep.name, "path0", JSON.stringify(path0) ,"path1",dPathPos1,"room",this.creep.pos.roomName);
             if (move.pathBlocked(dPathPos1)) {
-                move.recalculatePath(this.creep);
-                 return state.switchToMovePos(
+                this.recalculatePath();
+                 return this.switchToMovePos(
                     this.creep, this.targetPos, this.moveRange, this.nextState,
                 )
             }
             //this.creep.say("rest");
         } else {
             if (this.path.length === 2) {
-                return state.switchToMoveToPath(
-                    this.creep, this.path, this.targetPos, this.moveRange, this.nextState,
+                return this.switchToMoveToPath(
+                    this.path, this.targetPos, this.moveRange, this.nextState,
                 )
             }
             const path1 = cache.deserialisePtAt(this.path, 1);
@@ -58,8 +56,8 @@ class StateMovePath  extends StateCreep {
                 //path.shift();
             } else {
                 if (this.path.length === 3) {
-                    return state.switchToMoveToPath(
-                        this.creep, this.path, this.targetPos, this.moveRange, this.nextState,
+                    return this.switchToMoveToPath(
+                        this.path, this.targetPos, this.moveRange, this.nextState,
                     )
                 }
                 const path2 = cache.deserialisePtAt(this.path,2);
@@ -71,8 +69,8 @@ class StateMovePath  extends StateCreep {
                     //path.shift();
                 } else {
                     //this.creep.say("lost");
-                    return state.switchToMoveToPath(
-                        this.creep, this.path, this.targetPos, this.moveRange, this.nextState,
+                    return this.switchToMoveToPath(
+                        this.path, this.targetPos, this.moveRange, this.nextState,
                     )
                 }
             }

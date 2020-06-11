@@ -4,11 +4,11 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
-const state = require("state");
 const policy = require("policy");
 const race = require("race");
 const FlagRoom = require("flag_room");
 const StateCreep = require("./state_creep");
+const CreepMemory = require("./creep_memory");
 
 class StateHarvesterIdle extends StateCreep {
     constructor(creep) {
@@ -27,17 +27,14 @@ class StateHarvesterIdle extends StateCreep {
                 const fRoom = new FlagRoom(nextPost.pos.roomName);
                 const path = fRoom.getSPath(this.home, nextPost.id, fRoom.PathTo.Spawn, true);
                 //console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
-                return state.switchToMoveToPath(
-                    this.creep,
+                return this.switchToMoveToPath(
                     path,
                     nextPost.pos,
                     gc.RANGE_POST,
                     gc.STATE_HARVESTER_HARVEST,
                 )
             }
-            //console.log(this.creep.name, "STATE_HARVESTER_IDLE switchToMovePos");
-            state.switchToMovePos(
-                this.creep,
+            this.switchToMovePos(
                 nextPost.pos,
                 gc.RANGE_POST,
                 gc.STATE_HARVESTER_HARVEST,
@@ -47,19 +44,16 @@ class StateHarvesterIdle extends StateCreep {
 
     nextFreeHarvesterPost(colonies) {
         let harvesters = _.filter(Game.creeps, c => {
-            return  c.targetId && race.getRace(c) === gc.RACE_HARVESTER
+            const m = CreepMemory.M(c);
+            return  m.targetId && race.getRace(c) === gc.RACE_HARVESTER
         });
         //console.log("nextFreeHarvesterPost harvesters length", harvesters.length, "colonies", JSON.stringify(colonies));
         for (let colony of colonies) {
             const colonyInfo = new FlagRoom(colony.name);
             //console.log("nextFreeHarvesterPost colony", JSON.stringify(colony));
             for (let sourceId in colonyInfo.getSources()) {
-                //const hAt = harvesters.filter(h => {
-                //    return h.memory.targetId === sourceId
-                //});
-                //console.log("nextFreeHarvesterPost sourceId", sourceId, "number", hAt.length, "objs", JSON.stringify(hAt));
                 if (harvesters.filter(h => {
-                    return h.memory.targetId === sourceId
+                    return CreepMemory.M(h).targetId === sourceId
                 }).length === 0) {
                     //console.log("nextFreeHarvesterPost", sourceId, "lengthis0", hAt.length);
                     const post = colonyInfo.getSourcePosts(sourceId)[0];
@@ -99,8 +93,9 @@ class StateHarvesterIdle extends StateCreep {
             return h1.ticksToLive - h2.ticksToLive
         });    // todo factor in Game.flags[roomname?].memory.sources[harvester.memory.targetId].distance
         for (let harvester of harvesters) {
-            const colony = new FlagRoom(harvester.memory.targetPos.roomName);
-            const posts = colony.getSourcePosts(harvester.memory.targetId);
+            const m = CreepMemory.M(harvester);
+            const colony = new FlagRoom(m.targetPos.roomName);
+            const posts = colony.getSourcePosts(m.targetId);
             console.log("nextFreeHarvesterPost harvester", harvester.name,"posts", JSON.stringify(posts));
             const post = this.findFreePostIfPossible(harvesters, posts);
             if (post) {
@@ -108,7 +103,7 @@ class StateHarvesterIdle extends StateCreep {
                 return {
                     //pos: gf.roomPosFromPos(post, colony.name),
                     pos: { "x":post.x, "y":post.y, "roomName":colony.name },
-                    id: harvester.memory.targetId,
+                    id: m.targetId,
                 }
             }
         }

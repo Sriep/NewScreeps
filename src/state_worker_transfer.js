@@ -5,7 +5,6 @@
  */
 const gc = require("gc");
 const gf = require("gf");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateWorkerTransfer extends StateCreep {
@@ -17,16 +16,16 @@ class StateWorkerTransfer extends StateCreep {
         //console.log(this.creep.name, "in STATE_WORKER_TRANSFER");
         if (this.creep.store.getUsedCapacity() === 0) {
             //console.log(this.creep.name, "in STATE_WORKER_TRANSFER this.creep.store.getUsedCapacity",this.creep.store.getUsedCapacity(RESOURCE_ENERGY)  );
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE)
+            return this.switchTo( gc.STATE_WORKER_IDLE)
         }
         const target = Game.getObjectById(this.targetId);
         if (!target){//} || !target.store.getFreeCapacity(RESOURCE_ENERGY)) {
             //console.log(this.creep.name, "in STATE_WORKER_TRANSFER target",
             //    target, "target.store.getFreeCapacity", target.store.getFreeCapacity(RESOURCE_ENERGY))
             if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY> 0)) {
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             } else {
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+                return this.switchTo( gc.STATE_WORKER_IDLE);
             }
         }
 
@@ -52,10 +51,10 @@ class StateWorkerTransfer extends StateCreep {
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
                 console.log(this.creep.name, "creeps store", this.creep.store, "target store", JSON.stringify(target.store));
                 console.log("STATE_WORKER_TRANSFER result", result);
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 console.log("STATE_WORKER_TRANSFER result", result);
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE); // todo why is this happening
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE); // todo why is this happening
             //return gf.fatalError("transfer ERR_NOT_IN_RANGE");
             case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
                 console.log("STATE_WORKER_TRANSFER result", result);
@@ -64,7 +63,7 @@ class StateWorkerTransfer extends StateCreep {
                 return gf.fatalError("harvest unrecognised return value");
         }
         if (target.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+            return this.switchTo( gc.STATE_WORKER_IDLE);
         }
     };
 }

@@ -4,11 +4,11 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
-const gc = require("gc");
+const StateBuilding = require("state_building");
 
-class StateLabAuto {
+class StateLabAuto extends StateBuilding {
     constructor(structure) {
-        this.type = gc.STATE_LAB_AUTO;
+        super(structure);
         this.lab = structure;
     }
 

@@ -17,7 +17,7 @@ class StateUpgraderWithdraw extends StateCreep {
     enact() {
         //console.log(this.creep.name, "STATE_UPGRADER_WITHDRAW");
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_UPGRADE)
+            return this.switchTo( gc.STATE_UPGRADER_UPGRADE)
         }
         const fRoom = new FlagOwnedRoom(this.creep.room.name);
         const cLinkPos = fRoom.controllerLinkPos();
@@ -28,7 +28,7 @@ class StateUpgraderWithdraw extends StateCreep {
                     if (controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                         const result = this.creep.pos.withdraw(controllerLink, RESOURCE_ENERGY);
                         if (result === OK) {
-                            state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_UPGRADE)
+                            this.switchTo( gc.STATE_UPGRADER_UPGRADE)
                         }
                     }
                 }
@@ -37,7 +37,7 @@ class StateUpgraderWithdraw extends StateCreep {
 
         const container = stateUpgrader.findUpgradeContainerNear(this.creep);
         if (!container) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_IDLE)
+            return this.switchTo( gc.STATE_UPGRADER_IDLE)
         }
 
         if (container.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
@@ -53,11 +53,11 @@ class StateUpgraderWithdraw extends StateCreep {
             case ERR_BUSY:
                 return gf.fatalError("transfer ERR_BUSY");
             case ERR_NOT_ENOUGH_RESOURCES:           // upgraders' bucket is empty
-                return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_IDLE);
+                return this.switchTo( gc.STATE_UPGRADER_IDLE);
             case ERR_INVALID_TARGET:
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:
-                return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_UPGRADE);
+                return this.switchTo( gc.STATE_UPGRADER_UPGRADE);
             case ERR_NOT_IN_RANGE:
                 return gf.fatalError("transfer ERR_NOT_IN_RANGE");
             case ERR_INVALID_ARGS:

@@ -6,10 +6,11 @@
 const C = require("./Constants");
 const gc = require("gc");
 const gf = require("gf");
+const StateBuilding = require("state_building");
 
-class StateLabIdle  {
+class StateLabIdle extends StateBuilding  {
     constructor(structure) {
-        this.type = gc.STATE_LAB_IDLE;
+        super(structure);
         this.lab = structure;
         this.flag = Game.flags[structure.id];
     }

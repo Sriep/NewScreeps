@@ -5,7 +5,6 @@
  */
 const gc = require("gc");
 const gf = require("gf");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateWorkerWithdraw extends StateCreep {
@@ -21,9 +20,9 @@ class StateWorkerWithdraw extends StateCreep {
         }
         if (!target) {
             if (this.creep.store.getUsedCapacity()> 0) {
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             } else {
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+                return this.switchTo( gc.STATE_WORKER_IDLE);
             }
         }
 
@@ -37,19 +36,19 @@ class StateWorkerWithdraw extends StateCreep {
                 return gf.fatalError("transfer ERR_BUSY");
             case ERR_NOT_ENOUGH_RESOURCES:          // The target does not contain any harvestable energy or mineral..
                 if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-                    return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+                    return this.switchTo( gc.STATE_WORKER_IDLE);
                 } else {
-                    return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                    return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
                 }
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
-                return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY)> 0) {
-                    return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+                    return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
                 } else {
-                    return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+                    return this.switchTo( gc.STATE_WORKER_IDLE);
                 }
             case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
                 return gf.fatalError("transfer ERR_INVALID_ARGS");
@@ -57,9 +56,9 @@ class StateWorkerWithdraw extends StateCreep {
                 return gf.fatalError("harvest unrecognised return value");
         }
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+            return this.switchTo( gc.STATE_WORKER_IDLE);
         }
-        state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+        this.switchTo( gc.STATE_WORKER_FULL_IDLE);
     };
 }
 

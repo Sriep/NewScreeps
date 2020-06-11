@@ -17,17 +17,17 @@ class StateHarvesterRepair extends StateCreep {
 
     enact() {
         if (state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST)
+            return this.switchTo( gc.STATE_HARVESTER_HARVEST)
         }
         const fRoom = new RoomFlag(this.targetPos.roomName);
         const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         const container = state.findContainerAt(scPos);
         if (!container) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_BUILD)
+            return this.switchTo( gc.STATE_HARVESTER_BUILD)
         }
 
         if (container.hits === container.hitsMax) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER)
+            return this.switchTo( gc.STATE_HARVESTER_TRANSFER)
         }
 
         const result = this.creep.repair(container);

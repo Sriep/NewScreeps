@@ -82,11 +82,11 @@ FlagRoom.prototype.mapRoom = function() {
     const paths = {};
     for (let room of _.filter(Game.rooms, r => {
         return r.controller && r.controller.my && r.controller.level > 0
-       })) {
-       if (Game.map.getRoomLinearDistance(room.name, this.name) <= gc.MAX_COLONY_DISTANCE) {
-           console.log("FlagRoom mapRoom _setPaths", room.name);
-           paths[room.name] = JSON.stringify(this._setPaths(room));
-       }
+    })) {
+        if (Game.map.getRoomLinearDistance(room.name, this.name) <= gc.MAX_COLONY_DISTANCE) {
+            console.log("FlagRoom mapRoom _setPaths", room.name);
+            paths[room.name] = JSON.stringify(this._setPaths(room));
+        }
     }
     this.m.paths = paths;
     this.m.mapped = true;
@@ -234,7 +234,7 @@ FlagRoom.prototype._valueDefenceCost = function (spawnRoom, value) {
 
 FlagRoom.prototype.getSPath = function (roomName, id, pathTo, reverse) {
     return reverse ? this.paths(roomName)[id][pathTo].path.split("").reverse().join("")
-                    : this.paths()[id][pathTo].path;
+        : this.paths()[id][pathTo].path;
 };
 
 FlagRoom.prototype.recalculatePath = function (roomName, id) {
@@ -351,7 +351,6 @@ FlagRoom.prototype.accessPoints = function (id) {
 };
 
 module.exports = FlagRoom;
-
 
 
 

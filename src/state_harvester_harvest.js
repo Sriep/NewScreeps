@@ -17,7 +17,7 @@ class StateHarvesterHarvest extends StateCreep {
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST dPath", JSON.stringify(cache.deserialisePath(this.m.path)));
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store));
         if (!state.spaceForHarvest(this.creep)) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER);
+            return this.switchTo( gc.STATE_HARVESTER_TRANSFER);
         }
         const source = Game.getObjectById(this.targetId);
 
@@ -35,13 +35,12 @@ class StateHarvesterHarvest extends StateCreep {
                 return ERR_NOT_ENOUGH_RESOURCES;
             //return gf.fatalError("ERR_NOT_ENOUGH_RESOURCES");
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
-                console.log(this.creep.name,"pos", this.creep.pos,"target id", this.creep.memory.targetId,"target", source);
+                console.log(this.creep.name,"pos", this.creep.pos,"target id", this.targetId,"target", source);
                 return gf.fatalError(this.creep.name,"ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 console.log(this.creep.name,"STATE_HARVESTER_HARVEST pos",
                     JSON.stringify(this.creep.pos), "source pos", source.pos, "sourceid", source.id, "type", source.type);
-                //return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_IDLE);
-                return gf.fatalError(this.creep.name,"ERR_NOT_IN_RANGE");
+                 return gf.fatalError(this.creep.name,"ERR_NOT_IN_RANGE");
             case ERR_TIRED:        // The extractor or the deposit is still cooling down.
                 return ERR_TIRED;
             case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.

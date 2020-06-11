@@ -7,6 +7,7 @@
 const gc = require("gc");
 const flag = require("flag");
 const StateCreep = require("./state_creep");
+const CreepMemory = require("./creep_memory");
 
 class StateReserverIdle extends StateCreep {
     constructor(creep) {
@@ -16,9 +17,9 @@ class StateReserverIdle extends StateCreep {
     enact() {
         delete this.targetId;
         const reservers = _.filter(Game.creeps, c => {
-            return c.memory.policyId === this.policyId
+            return CreepMemory.M(c).policyId === this.policyId
                 && race.getRace(creep) === gc.RACE_RESERVER
-                && c.memory.targetId
+                && CreepMemory.M(c).targetId
         });
 
         const colonies = policy.getGouvernerPolicy(this.home).getColonies();
@@ -33,8 +34,8 @@ class StateReserverIdle extends StateCreep {
         }
 
         for (let reserver of reservers) {
-            if (coloniesById[reserver.memory.targetId]) {
-                coloniesById[reserver.memory.targetId].ticks += reserver.ticksToLive;
+            if (coloniesById[CreepMemory.M(reservers).targetId]) {
+                coloniesById[CreepMemory.M(reservers).targetId].ticks += reserver.ticksToLive;
             }
         }
         let minTicks = 99999;
@@ -50,8 +51,7 @@ class StateReserverIdle extends StateCreep {
         const fRoom = flag.getRoom(coloniesById[minId].name);
         const path = fRoom.getSPath(this.home, minId, fRoom.PathTo.Spawn, true);
         console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
-        state.switchToMoveToPath(
-            this.creep,
+        this.switchToMoveToPath(
             path,
             fRoom.getUpgradePosts()[0],
             gc.RANGE_POST,

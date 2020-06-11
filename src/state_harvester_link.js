@@ -21,9 +21,9 @@ class StateHarvesterLink extends StateCreep {
         const controllerLink = state.getObjAtPos(fRoom.controllerLinkPos(), STRUCTURE_LINK);
         if (!sourceLink || !controllerLink) {
             if (state.spaceForHarvest(this.creep)) {
-                return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
+                return this.switchTo( gc.STATE_HARVESTER_HARVEST);
             } else {
-                return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_TRANSFER);
+                return this.switchTo( gc.STATE_HARVESTER_TRANSFER);
             }
         }
 

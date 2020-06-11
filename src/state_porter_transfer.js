@@ -6,7 +6,6 @@
 
 const gc = require("gc");
 const gf = require("gf");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StatePorterTransfer extends StateCreep {
@@ -17,12 +16,12 @@ class StatePorterTransfer extends StateCreep {
     enact() {
         //console.log(this.creep.name, "in STATE_PORTER_TRANSFER");
         if (this.creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE)
+            return this.switchTo( gc.STATE_PORTER_IDLE)
         }
-        const target = Game.getObjectById(this.memory.targetId);
+        const target = Game.getObjectById(this.targetId);
         const resource = this.findTransferResource(target.store, this.creep.store);
         if (!resource) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
+            return this.switchTo( gc.STATE_PORTER_FULL_IDLE);
         }
 
         const result = this.creep.transfer(target, resource);
@@ -38,7 +37,7 @@ class StatePorterTransfer extends StateCreep {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
-                return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
+                return this.switchTo( gc.STATE_PORTER_FULL_IDLE);
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 return gf.fatalError("transfer ERR_NOT_IN_RANGE");
             case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.

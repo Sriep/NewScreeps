@@ -5,7 +5,7 @@
  */
 const gc = require("gc");
 const FlagRoom = require("flag_room");
-const StateCreep = require("./state_creep");
+const CreepMemory = require("./creep_memory");
 
 const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done
@@ -21,9 +21,10 @@ const stateUpgrader = {
 
     isUpgraderPostFree: function (pos, roomName) { // done
         for (let j in Game.creeps) {
+            const m = CreepMemory.M(Game.creeps[j]);
             if (this.isUpgradingHarvester(Game.creeps[j])) {
-                if (Game.creeps[j].memory.targetPos.x === pos.x
-                    && Game.creeps[j].memory.targetPos.y === pos.y
+                if (m.targetPos.x === pos.x
+                    && m.targetPos.y === pos.y
                     && Game.creeps[j].room.name === roomName) {
                     return false;
                 }
@@ -32,11 +33,12 @@ const stateUpgrader = {
         return true;
     },
 
-    isUpgradingHarvester: function(creep) { // done
-        return  (creep.memory.state === gc.STATE_UPGRADER_UPGRADE
-            || creep.memory.state === gc.STATE_UPGRADER_WITHDRAW
-            || ( creep.memory.state === gc.STATE_MOVE_POS
-                && creep.memory.next_state === gc.STATE_UPGRADER_UPGRADE))
+    isUpgradingHarvester: function(creep) {
+        const m = CreepMemory.M(creep);
+        return  (m.state === gc.STATE_UPGRADER_UPGRADE
+            || m.state === gc.STATE_UPGRADER_WITHDRAW
+            || ( m.state === gc.STATE_MOVE_POS
+                && m.nextState === gc.STATE_UPGRADER_UPGRADE))
     },
 
     findUpgradeContainerNear : function (creep) {

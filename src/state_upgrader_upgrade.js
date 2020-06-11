@@ -5,7 +5,6 @@
  */
 const gf = require("gf");
 const gc = require("gc");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateUpgraderUpgrade extends StateCreep {
@@ -16,7 +15,7 @@ class StateUpgraderUpgrade extends StateCreep {
     enact() {
         //console.log(this.creep.name, "STATE_UPGRADER_UPGRADE");
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_WITHDRAW);
+            return this.switchTo( gc.STATE_UPGRADER_WITHDRAW);
         }
         this.targetPos = this.creep.pos;
         const home = Game.rooms[this.home];
@@ -38,7 +37,7 @@ class StateUpgraderUpgrade extends StateCreep {
                 return gf.fatalError("ERR_INVALID_TARGET");
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 gf.fatalError("ERR_NOT_IN_RANGE");
-                return state.switchTo(this.creep, this.memory, gc.STATE_UPGRADER_IDLE);
+                return this.switchTo( gc.STATE_UPGRADER_IDLE);
 
             case ERR_NO_BODYPART:        // There are no WORK body parts in this creep’s body.
                 return gf.fatalError("ERR_NO_BODYPART");

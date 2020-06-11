@@ -6,7 +6,6 @@
 const gc = require("./gc");
 const gf = require("./gf");
 const StateCreep = require("./state_creep");
-const state = require("./state");
 
 class StateScoutIdle  extends StateCreep {
     constructor(creep) {
@@ -90,8 +89,7 @@ class StateScoutIdle  extends StateCreep {
                     //console.log("STATE_SCOUT_IDLE about to move this.nextRoom", this.nextRoom)
                     //const newPosition =  new RoomPosition(25, 25, this.nextRoom);
                     //console.log(this.creep.name,"STATE_SCOUT_IDLE about to move to flag flag", JSON.stringify(myFlag.pos), "id", myFlag.id);
-                    return state.switchToMoveFlag(
-                        this.creep,
+                    return this.switchToMoveFlag(
                         myFlag,
                         4,
                         gc.STATE_SCOUT_IDLE,

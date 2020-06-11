@@ -5,7 +5,6 @@
  */
 const gc = require("gc");
 const gf = require("gf");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StatePorterPickup extends StateCreep {
@@ -20,9 +19,9 @@ class StatePorterPickup extends StateCreep {
 
         if (!drop) {
             if (this.creep.store.getUsedCapacity() > 0) {
-                return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
+                return this.switchTo( gc.STATE_PORTER_FULL_IDLE);
             } else {
-                return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
+                return this.switchTo( gc.STATE_PORTER_IDLE);
             }
         }
 
@@ -39,7 +38,7 @@ class StatePorterPickup extends StateCreep {
             case ERR_INVALID_TARGET:        // 	The target is not a valid source or mineral object
                 return gf.fatalError("transfer ERR_INVALID_TARGET");
             case ERR_FULL:        // The extractor or the deposit is still cooling down.
-                return state.switchToFullIdle();
+                return this.switchTo(gc.STATE_PORTER_FULL_IDLE);
             case ERR_NOT_IN_RANGE:          // The target is too far away.
                 return gf.fatalError("transfer ERR_NOT_IN_RANGE");
             case ERR_INVALID_ARGS:        // There are no WORK body parts in this creep’s body.
@@ -48,9 +47,9 @@ class StatePorterPickup extends StateCreep {
                 return gf.fatalError("harvest unrecognised return value");
         }
         if (creep.store.getUsedCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_IDLE);
+            return this.switchTo( gc.STATE_PORTER_IDLE);
         }
-        state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
+        this.switchTo( gc.STATE_PORTER_FULL_IDLE);
     };
 }
 

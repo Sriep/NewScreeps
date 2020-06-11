@@ -5,7 +5,6 @@
  */
 const gc = require("gc");
 //const gf = require("gf");
-const state = require("state");
 const statePorter = require("state_porter");
 const StateCreep = require("./state_creep");
 
@@ -20,8 +19,7 @@ class StateWorkerFullIdle  extends StateCreep {
         if (home.controller.ticksToDowngrade
             < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {
             this.targetId = home.controller.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 home.controller.pos,
                 gc.RANGE_UPGRADE,
                 gc.STATE_WORKER_UPGRADE
@@ -30,8 +28,7 @@ class StateWorkerFullIdle  extends StateCreep {
 
         if (home.controller.level < 2) {
             this.targetId = home.controller.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 home.controller.pos,
                 gc.RANGE_UPGRADE,
                 gc.STATE_WORKER_UPGRADE
@@ -41,8 +38,7 @@ class StateWorkerFullIdle  extends StateCreep {
         const nextSourceContainer = statePorter.findNextEnergyContainer(this.creep);
         if (nextSourceContainer) {
             this.targetId = nextSourceContainer.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 nextSourceContainer.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_WORKER_TRANSFER
@@ -56,8 +52,7 @@ class StateWorkerFullIdle  extends StateCreep {
         });
         if (damagedStructure != null) {
             this.targetId = damagedStructure.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 damagedStructure.pos,
                 gc.RANGE_REPAIR,
                 gc.STATE_WORKER_REPAIR
@@ -68,8 +63,7 @@ class StateWorkerFullIdle  extends StateCreep {
         if (nextConstructionSite != null) {
             //console.log("nextConstructionSite", JSON.stringify(nextConstructionSite));
             this.targetId = nextConstructionSite.id;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 nextConstructionSite.pos,
                 gc.RANGE_BUILD,
                 gc.STATE_WORKER_BUILD
@@ -77,8 +71,7 @@ class StateWorkerFullIdle  extends StateCreep {
         }
 
         this.targetId = home.controller.id;
-        return state.switchToMovePos(
-            this.creep,
+        return this.switchToMovePos(
             home.controller.pos,
             gc.RANGE_UPGRADE,
             gc.STATE_WORKER_UPGRADE

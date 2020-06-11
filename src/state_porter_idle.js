@@ -11,20 +11,20 @@ const race = require("race");
 const FlagRoom= require("flag_room");
 const FlagOwnedRoom = require("flag_owned_room");
 const StateCreep = require("./state_creep");
+const CreepMemory = require("./creep_memory");
 
 class StatePorterIdle extends StateCreep {
     constructor(creep) {
         super(creep);
     }
 
-//StatePorterIdle.prototype = state;
     enact() {
         //console.log(this.creep.name,"STATE_PORTER_IDLE", this.creep.pos);
         delete this.targetId;
         this.checkFlags();
 
         if (this.creep.store.getUsedCapacity() > 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_PORTER_FULL_IDLE);
+            return this.switchTo( gc.STATE_PORTER_FULL_IDLE);
         }
 
         const governor = policy.getGouvernerPolicy(this.home);
@@ -39,18 +39,16 @@ class StatePorterIdle extends StateCreep {
                 const path = fRoom.getSPath(this.home, info.id, fRoom.PathTo.Spawn, true);
                 //this.setM(this.M.PathName, fRoom.PathTo.Spawn);
                 this.pathName = fRoom.PathTo.Spawn;
-                this.memory.pathId = info.id;
+                this.pathId = info.id;
                 //console.log(this.creep.name,"STATE_PORTER_IDLE path", path,"pathName",this.pathName);
-                return state.switchToMoveToPath(
-                    this.creep,
+                return this.switchToMoveToPath(
                     path,
                     info.pos,
                     gc.RANGE_TRANSFER,
                     gc.STATE_PORTER_WITHDRAW,
                 )
             }
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 info.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_WITHDRAW,
@@ -62,8 +60,7 @@ class StatePorterIdle extends StateCreep {
             filter: { structureType: FIND_DROPPED_RESOURCES }
         });
         if (drop) {
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 drop.pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_PICKUP,
@@ -71,7 +68,7 @@ class StatePorterIdle extends StateCreep {
         }
 
         let creeps = _.filter(Game.creeps, c => {
-            return c.memory.policyId === this.policyId
+            return CreepMemory.M(c).policyId === this.policyId
                 && this.isHarvestingHarvester(c)
         });
         if (creeps.length > 0) {
@@ -80,8 +77,7 @@ class StatePorterIdle extends StateCreep {
                     - a.store.getUsedCapacity(RESOURCE_ENERGY);
             } );
             this.targetId = creeps[0].name;
-            return state.switchToMovePos(
-                this.creep,
+            return this.switchToMovePos(
                 creeps[0].pos,
                 gc.RANGE_TRANSFER,
                 gc.STATE_PORTER_RECEIVE
@@ -92,13 +88,14 @@ class StatePorterIdle extends StateCreep {
 
 
     isHarvestingHarvester(creep) {
+        const m = CreepMemory.M(creep);
         return  race.getRace(creep) === gc.RACE_HARVESTER
-            && (creep.memory.state === gc.STATE_HARVESTER_BUILD
-                || creep.memory.state === gc.STATE_HARVESTER_REPAIR
-                || creep.memory.state === gc.STATE_HARVESTER_TRANSFER
-                || creep.memory.state === gc.STATE_HARVESTER_HARVEST
-                || ( creep.memory.state === gc.STATE_MOVE_POS
-                    && creep.memory.next_state === gc.STATE_HARVESTER_HARVEST))
+            && (m.state === gc.STATE_HARVESTER_BUILD
+                || m.state === gc.STATE_HARVESTER_REPAIR
+                || m.state === gc.STATE_HARVESTER_TRANSFER
+                || m.state === gc.STATE_HARVESTER_HARVEST
+                || ( m.state === gc.STATE_MOVE_POS
+                    && m.nextState === gc.STATE_HARVESTER_HARVEST))
     };
 
     nextHarvestContainer(colonies, capacity) {
@@ -117,10 +114,10 @@ class StatePorterIdle extends StateCreep {
         }
 
         let harvesters = _.filter(Game.creeps, c => {
-            return  c.memory.targetId && race.getRace(c) === gc.RACE_HARVESTER
+            return  CreepMemory.M(c).targetId && race.getRace(c) === gc.RACE_HARVESTER
         });
         for (let info of containersInfo) {
-            info["harvesters"] = harvesters.filter( c => c.memory.targetId === info.id).length
+            info["harvesters"] = harvesters.filter( c => CreepMemory.M(c).targetId === info.id).length
         }
         containersInfo = containersInfo.sort((c1, c2) =>
             c2.harvesters - c1.harvesters
@@ -141,7 +138,7 @@ class StatePorterIdle extends StateCreep {
 
     listHarvestContainers(colonies) {
         let porters = _.filter(Game.creeps, c => {
-            return  c.memory.targetId && race.getRace(c) === gc.RACE_PORTER
+            return  CreepMemory.M(c).targetId && race.getRace(c) === gc.RACE_PORTER
         });
         const containerInfo = [];
         for (let colony of colonies) {
@@ -158,7 +155,7 @@ class StatePorterIdle extends StateCreep {
                     const container  = state.findContainerAt(cPos);
                     if (container) {
                         containerInfo.push({
-                            "porters" : porters.filter( c => c.memory.targetId === sourceId).length,
+                            "porters" : porters.filter( c => CreepMemory.M(c).targetId === sourceId).length,
                             "pos" : cPos,
                             "id" : sourceId,
                             "container" : state.findContainerAt(cPos)
@@ -172,7 +169,7 @@ class StatePorterIdle extends StateCreep {
                 const container  = state.findContainerAt(cPos);
                 if (container) {
                     containerInfo.push({
-                        "porters" : porters.filter( c => c.memory.targetId === colonyRoom.m.mineral.id).length,
+                        "porters" : porters.filter( c => CreepMemory.M(c).targetId === colonyRoom.m.mineral.id).length,
                         "pos" : cPos,
                         "id" : colonyRoom.m.mineral.id,
                         "container" : state.findContainerAt(cPos)
@@ -205,8 +202,7 @@ class StatePorterIdle extends StateCreep {
             const lFlag = Game.flags[lab.id];
             const flagResource = lr.resource(lFlag.color, lFlag.secondaryColor);
             if (flagResource && lab.mineralType && lab.mineralType !== flagResource) {
-                return state.switchToMovePos(
-                    this.creep,
+                return this.switchToMovePos(
                     lab.pos,
                     gc.RANGE_TRANSFER,
                     gc.STATE_PORTER_TRANSFER

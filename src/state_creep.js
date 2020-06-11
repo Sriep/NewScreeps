@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("./gc");
-const CreepMemory = require("creep_memory");
+const CreepMemory = require("./creep_memory");
 const state = require("./state");
 
 class StateCreep extends CreepMemory {
@@ -13,7 +13,7 @@ class StateCreep extends CreepMemory {
     }
 
     enactState() {
-        if (this.stackDepth >= gc.MAX_STATE_STACK) {
+        if (this.stackDepth && this.stackDepth >= gc.MAX_STATE_STACK) {
             return;
         }
         if (!this.state) {
@@ -60,10 +60,10 @@ class StateCreep extends CreepMemory {
             //    console.log("switchToMoveToPath onPath switchToMoveByPath", onPath);
             this.switchToMoveByPath(path, targetPos, range, nextState)
         } else {
-            this.memory.path = path;
-            this.memory.pathTargetPos = targetPos;
-            this.memory.pathRange = range;
-            this.memory.pathNextState = nextState;
+            this.path = path;
+            this.pathTargetPos = targetPos;
+            this.pathRange = range;
+            this.pathNextState = nextState;
             //console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.roomName)) ,"switchToMovePos", JSON.stringify(this.memory));
             this.switchToMovePos(
                 cache.dPos(path.charAt(0), this.creep.pos.roomName),
@@ -105,10 +105,6 @@ class StateCreep extends CreepMemory {
     }
 
     switchTo(newState, targetId) {
-        //console.log("Switch state|", creep.name," |from| ",this.memory.state, " |to| ", newState)
-        if (!obj) {
-            gf.fatalError(" no creep given when changing state to", newState, "targetId", targetId);
-        }
         if (!newState || newState === "undefined_idle") {
             gf.fatalError(" no state to change to, targetId ", targetId, "memory", JSON.stringify(m));
         }
@@ -125,13 +121,41 @@ class StateCreep extends CreepMemory {
             this.switchTo(this.previousState)
         }
         if (this.targetPos && this.moveRange && this.nextState) {
-            console.log(this.creep.name,"m.targetPos",this.targetPos,"m.moveRange",this.moveRange,"m.next_state",this.nextState,"m",JSON.stringify(this.memory));
             gf.assert(this.targetPos.x === this.previousPos.x && this.targetPos.y === this.previousPos.y);
             gf.assert(this.nextState === this.previousState);
-            this.switchToMovePos(this.creep, this.targetPos, this.moveRange, this.nextState)
+            this.switchToMovePos(this.targetPos, this.moveRange, this.nextState)
         }
         this.switchTo( race.getRace(creep) + "_idle", this.targetId)
     }
+
+    // utility functions that use the memory object
+
+    recalculatePath() {
+        if (!Game.rooms[this.targetPos.roomName]) {
+            return;
+        }
+        const home = policy.getPolicy(this.policyId).roomName;
+        console.log("recalculatePath homeid", home);
+        const fRoom = flag.getRoom(this.targetPos.roomName);
+        if (fRoom.resetPaths(home)) {
+            switch (race.getRace(this.creep)) {
+                case gc.RACE_HARVESTER:
+                    return fRoom.getSPath(home, this.targetId, fRoom.PathTo.Spawn, true);
+                case gc.RACE_PORTER:
+                    //const obj = Game.getObjectById(this.targetId);
+                    return fRoom.getSPath(
+                        home,
+                        this.targetId,
+                        fRoom.PathTo.Controller,
+                        this.targetPos.roomName !== home
+                    );
+                case gc.RACE_RESERVER:
+                    return fRoom.getSPath(home, this.targetId, fRoom.PathTo.Spawn, true);
+                default:
+            }
+        }
+    }
+
 
 }
 

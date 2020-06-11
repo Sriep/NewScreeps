@@ -5,7 +5,6 @@
  */
 const gf = require("gf");
 const gc = require("gc");
-const state = require("state");
 const StateCreep = require("./state_creep");
 
 class StateWorkerHarvest extends StateCreep {
@@ -16,7 +15,7 @@ class StateWorkerHarvest extends StateCreep {
     enact() {
         //console.log(this.creep.name, "in STATE_WORKER_HARVEST creep pos",JSON.stringify(this.creep.pos));
         if (this.creep.store.getFreeCapacity() === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_FULL_IDLE);
+            return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
         }
         const target = Game.getObjectById(this.targetId);
         //console.log(this.creep.name, "in STATE_WORKER_HARVEST target pos",JSON.stringify(target.pos),"target",JSON.stringify(target));
@@ -38,7 +37,7 @@ class StateWorkerHarvest extends StateCreep {
                 case ERR_NOT_IN_RANGE:          // The target is too far away.
                     console.log(this.creep.name,"STATE_WORKER_HARVEST ERR_NOT_IN_RANGE pos",this.creep.pos,"m"
                         , JSON.stringify(this.m), "target", target.pos, JSON.stringify(target));
-                    //return state.switchTo(this.creep, this.memory, gc.STATE_WORKER_IDLE);
+                    //return this.switchTo( gc.STATE_WORKER_IDLE);
                     return gf.fatalError("ERR_NOT_IN_RANGE");
                 case ERR_TIRED:        // The extractor or the deposit is still cooling down.
                     return ERR_TIRED;
@@ -49,7 +48,7 @@ class StateWorkerHarvest extends StateCreep {
             }
         }
         if (this.creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_FULL_IDLE);
+            return this.switchTo(gc.STATE_FULL_IDLE);
         }
     };
 }

@@ -4,15 +4,15 @@
  * @author Piers Shepperson
  */
 //const C = require("./Constants");
-const gc = require("gc");
+const StateBuilding = require("state_building");
 
-class StateTowerIdle {
+class StateTowerIdle extends StateBuilding {
     constructor(structure) {
-        this.type = gc.STATE_TERMINAL_IDLE;
-        this.lab = structure;
+        super(structure);
+        //this.terminal = structure;
     }
 
-    enac() {
+    enact() {
 
     };
 }

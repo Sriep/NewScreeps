@@ -3,13 +3,8 @@
  * Created by piers on 11/05/2020
  * @author Piers Shepperson
  */
-const gc = require("gc");
 const gf = require("gf");
 const C = require("./Constants");
-const flag = require("flag");
-const policy = require("policy");
-const race = require("race");
-const StateCreep = require("./state_creep");
 
 // todo implement central moving
 const move = {
@@ -68,32 +63,7 @@ const move = {
         }
     },
 
-    recalculatePath : function(creep) {
-        console.log(creep.memory.targetPos.roomName, "recalculatePath",Game.rooms[creep.memory.targetPos.roomName]);
-        if (!Game.rooms[creep.memory.targetPos.roomName]) {
-            return;
-        }
-        const home = policy.getPolicy(creep.memory.policyId).roomName;
-        console.log("recalculatePath homeid", home);
-        const fRoom = flag.getRoom(creep.memory.targetPos.roomName);
-        if (fRoom.resetPaths(home)) {
-            switch (race.getRace(creep)) {
-                case gc.RACE_HARVESTER:
-                    return fRoom.getSPath(home, creep.memory.targetId, fRoom.PathTo.Spawn, true);
-                case gc.RACE_PORTER:
-                    const obj = Game.getObjectById(creep.memory.targetId);
-                    return fRoom.getSPath(
-                        home,
-                        creep.memory.targetId,
-                        fRoom.PathTo.Controller,
-                        creep.memory.targetPos.roomName !== home
-                    );
-                case gc.RACE_RESERVER:
-                    return fRoom.getSPath(home, creep.memory.targetId, fRoom.PathTo.Spawn, true);
-                default:
-            }
-        }
-    },
+
  };
 
 module.exports = move;

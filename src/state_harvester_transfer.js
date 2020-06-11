@@ -16,23 +16,18 @@ class StateHarvesterTransfer extends StateCreep {
 
     enact() {
         console.log("STATE_HARVESTER_TRANSFER2", this.targetId);
-        //console.log("STATE_HARVESTER_TRANSFER1", this.getM(this.M.TargetId));
-       // if (this.spaceForHarvest(this.creep)) {
-        //    return state.switchTo(this.creep, this.creep.memory, gc.STATE_HARVESTER_HARVEST)
-        //}
-
         if (!this.targetId) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_IDLE);
+            return this.switchTo( gc.STATE_HARVESTER_IDLE);
         }
         const fRoom = new RoomFlag(this.targetPos.roomName);
         const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         const container = state.findContainerAt(scPos);
         if (!container) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_BUILD)
+            return this.switchTo(gc.STATE_HARVESTER_BUILD)
         }
 
         if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
-            return state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_REPAIR)
+            return this.switchTo( gc.STATE_HARVESTER_REPAIR)
         }
 
         const result = this.creep.transfer(container, RESOURCE_ENERGY);
@@ -57,7 +52,7 @@ class StateHarvesterTransfer extends StateCreep {
             default:
                 return gf.fatalError("harvest unrecognised return value");
         }
-        state.switchTo(this.creep, this.memory, gc.STATE_HARVESTER_HARVEST);
+        this.switchTo(gc.STATE_HARVESTER_HARVEST);
     };
 
 }

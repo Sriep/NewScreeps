@@ -14,7 +14,7 @@ class StateScientistTransfer extends StateCreep {
 
     enact() {
         if (this.creep.store.getUsedCapacity() === 0) {
-            state.switchTo(this.creep, this.creep.memory, gc.STATE_SCIENTIST_WITHDRAW);
+            this.switchTo( gc.STATE_SCIENTIST_WITHDRAW);
         }
         const room = Game.rooms[this.creep.room];
         const foRoom = new FlagOwnedRoom(this.home);
@@ -42,9 +42,9 @@ class StateScientistTransfer extends StateCreep {
                     const ok = this.creep.transfer(lab, resource);
                     if  (ok) {
                         if (this.creep.store.getUsedCapacity() === 0) {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_WITHDRAW);
+                            return this.switchTo( state.STATE_SCIENTIST_WITHDRAW);
                         } else {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                            return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
                         console.log(this.creep.name,"mineral", resource,"lab", JSON.stringify(lab));
@@ -58,9 +58,9 @@ class StateScientistTransfer extends StateCreep {
                     const ok = this.creep.transfer(room.terminal, resource);
                     if  (ok) {
                         if (this.creep.store.getUsedCapacity() === 0) {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_WITHDRAW);
+                            return this.switchTo( state.STATE_SCIENTIST_WITHDRAW);
                         } else {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                            return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
                         console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));
@@ -77,9 +77,9 @@ class StateScientistTransfer extends StateCreep {
                     const ok = this.creep.transfer(link, RESOURCE_ENERGY);
                     if  (ok) {
                         if (this.creep.store.getUsedCapacity() === 0) {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_WITHDRAW);
+                            return this.switchTo( state.STATE_SCIENTIST_WITHDRAW);
                         } else {
-                            return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                            return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
                         console.log(this.creep.name,"mineral", RESOURCE_ENERGY,"link", JSON.stringify(link));
@@ -97,9 +97,9 @@ class StateScientistTransfer extends StateCreep {
                 const ok = this.creep.transfer(room.storage, resource);
                 if  (ok) {
                     if (this.creep.store.getUsedCapacity() === 0) {
-                        return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_WITHDRAW);
+                        return this.switchTo( state.STATE_SCIENTIST_WITHDRAW);
                     } else {
-                        return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                        return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                     }
                 } else {
                     console.log(this.creep.name,"mineral", resource,"storage", JSON.stringify(room.storage));
@@ -110,9 +110,9 @@ class StateScientistTransfer extends StateCreep {
                 const ok = this.creep.transfer(room.terminal, resource);
                 if  (ok) {
                     if (this.creep.store.getUsedCapacity() === 0) {
-                        return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_WITHDRAW);
+                        return this.switchTo( state.STATE_SCIENTIST_WITHDRAW);
                     } else {
-                        return state.switchTo(this.creep, this.memory, state.STATE_SCIENTIST_TRANSFER);
+                        return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                     }
                 } else {
                     console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));

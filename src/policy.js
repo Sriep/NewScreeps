@@ -7,9 +7,10 @@ const gc = require("./gc");
 const gf = require("./gf");
 const race = require("./race");
 const flag = require("./flag");
-//const state = require("./state");
+const state = require("./state");
 const construction = require("./construction");
 const FlagRoom = require("./flag_room");
+const CreepMemory = require("./creep_memory");
 
 const policy = {
 
@@ -231,12 +232,12 @@ const policy = {
     getCreeps: function(policyId, cRace) {
         if (cRace) {
             return _.filter(Game.creeps, function (creep) {
-                return creep.memory.policyId === policyId
+                return CreepMemory.M(creep).policyId === policyId
                     && race.getRace(creep) === cRace
             });
         } else {
             return _.filter(Game.creeps, function (creep) {
-                return creep.memory.policyId === policyId
+                return CreepMemory.M(creep).policyId === policyId
             });
         }
 
@@ -244,8 +245,8 @@ const policy = {
 
     reassignCreeps: function (oldPolicy, newPolicy) {
         for (let creep in Game.creeps) {
-            if (Game.creeps[creep].memory.policyId === oldPolicy.id) {
-                Game.creeps[creep].memory.policyId = newPolicy.id
+            if (CreepMemory.M(Game.creeps[creep]).policyId === oldPolicy.id) {
+                CreepMemory.M(Game.creeps[creep]).policyId = newPolicy.id
             }
         }
     },

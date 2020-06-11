@@ -3,13 +3,13 @@
  * Created by piers on 17/05/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
+const StateBuilding = require("state_building");
 
-class StateTowerIdle {
+class StateTowerIdle extends StateBuilding {
     constructor(structure) {
-        this.type = gc.STATE_TOWER_IDLE;
-        this.tower = structure;
+        super(structure);
+        this.tower = structure
     }
 
     enact() {

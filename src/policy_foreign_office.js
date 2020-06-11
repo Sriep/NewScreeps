@@ -6,84 +6,88 @@
 const gc = require("gc");
 const C = require("./Constants");
 const race = require("race");
+const CreepMemory = require("./creep_memory");
 
 // constructor
-function PolicyForeignOffice  (id, data) {
-    this.type = gc.POLICY_FOREIGN_OFFICE;
-    this.id = id;
-    this.m = data.m;
-    this.insurgents = [];
+class PolicyForeignOffice   {
+    constructor (id, data) {
+        this.type = gc.POLICY_FOREIGN_OFFICE;
+        this.id = id;
+        this.m = data.m;
+        this.insurgents = [];
+    }
+
+    initilise() {
+        if (!this.m) {
+            this.m = {}
+        }
+        this.m.insurgencies = {};
+        Memory.policyRates[this.id] = gc.FOREIGN_OFFICE_RATE;
+        return true;
+    };
+
+    enact() {
+        this.checkInsurgencies();
+        this.checkPatrols();
+    };
+
+    checkInsurgencies() {
+        this.m.insurgency = [];
+        for (let roomName in Game.rooms) {
+            const room = Game.rooms[roomName];
+            if (!Game.flags[roomName]) {
+                continue;
+            }
+            if (room.find(C.FIND_HOSTILE_STRUCTURES, {
+                filter: { structureType: STRUCTURE_INVADER_CORE }}).length > 0) {
+                continue;
+            }
+            const insurgents = room.find(FIND_HOSTILE_CREEPS, {
+                filter: object => {
+                    return object.getActiveBodyparts(C.ATTACK) > 0
+                        || object.getActiveBodyparts(C.RANGED_ATTACK) > 0;
+                }
+            });
+            if (insurgents.length > 0) {
+                this.insurgents[roomName] = insurgents;
+                this.sendInsurgentAlert(roomName, insurgents);
+            }
+            this.sendPatrol(roomName)
+        }
+
+    };
+
+    sendInsurgentAlert(roomName) {
+        for (let creep of _.filter(Game.creeps, c => {
+            return c.room.name === roomName && race.isCivilian(c)
+        })) {
+            const m = CreepMemory.M(creep);
+            m.previousState = m.state;
+            m.previousPos = creep.pos;
+            m.state = gc.STATE_DEFENSIVE_RETREAT;
+        }
+    };
+
+    sendPatrol(roomName, insurgants) {
+        const patrols = _.filter(Game.creeps, c => {
+            return CreepMemory.M(c).state === gc.STATE_PATROL_COLONIES
+        })
+
+    };
+
+    checkPatrols() {
+        const patrols = _.filter(Game.creeps, c => {
+            return CreepMemory.M(c).state === gc.STATE_PATROL_COLONIES
+        })
+
+    };
+
+    draftReplacment() {
+        return this
+    };
 }
 
-// runs first time policy is created only
-PolicyForeignOffice.prototype.initilise = function () {
-    if (!this.m) {
-        this.m = {}
-    }
-    this.m.insurgencies = {};
-    Memory.policyRates[this.id] = gc.FOREIGN_OFFICE_RATE;
-    return true;
-};
 
-// runs once every tick
-PolicyForeignOffice.prototype.enact = function () {
-    this.checkInsurgencies();
-    this.checkPatrols();
-};
-
-PolicyForeignOffice.prototype.checkInsurgencies = function () {
-    this.m.insurgency = [];
-    for (let roomName in Game.rooms) {
-        const room = Game.rooms[roomName];
-        if (!Game.flags[roomName]) {
-            continue;
-        }
-        if (room.find(C.FIND_HOSTILE_STRUCTURES, {
-            filter: { structureType: STRUCTURE_INVADER_CORE }}).length > 0) {
-            continue;
-        }
-        const insurgents = room.find(FIND_HOSTILE_CREEPS, {
-            filter: object => {
-                return object.getActiveBodyparts(C.ATTACK) > 0
-                    || object.getActiveBodyparts(C.RANGED_ATTACK) > 0;
-            }
-        });
-        if (insurgents.length > 0) {
-            this.insurgents[roomName] = insurgents;
-            this.sendInsurgentAlert(roomName, insurgents);
-        }
-        this.sendPatrol(roomName)
-    }
-
-};
-
-PolicyForeignOffice.prototype.sendInsurgentAlert = function (roomName) {
-    for (let creep of _.filter(Game.creeps, c => {
-        return c.room.name === roomName && race.isCivilian(c)
-    })) {
-        creep.memory["previous_state"] = creep.memory.state;
-        creep.memory["previous_pos"] = creep.pos;
-        creep.memory.state = gc.STATE_DEFENSIVE_RETREAT;
-    }
-};
-
-PolicyForeignOffice.prototype.sendPatrol = function(roomName, insurgants) {
-    const patrols = _.filter(Game.creeps, c => {
-        return c.memory.state === gc.STATE_PATROL_COLONIES
-    })
-
-};
-
-PolicyForeignOffice.prototype.checkPatrols= function() {
-    const patrols = _.filter(Game.creeps, c => {
-        return c.memory.state === gc.STATE_PATROL_COLONIES
-    })
-
-};
-
-PolicyForeignOffice.prototype.draftReplacment = function() {
-    return this
-};
 
 module.exports = PolicyForeignOffice;
 

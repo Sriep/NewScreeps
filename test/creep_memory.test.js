@@ -20,19 +20,19 @@ describe("creep_memory", function() {
                 //home
                 state : "state_creep_idle",
                 policyId : 1,
-                targetPos : {x:25, y: 30, roomName : "W3N9" },
+                //targetPos : {x:25, y: 30, roomName : "W3N9" },
                 targetId : "1234567890",
                 targetName : "Fred",
                 moveRange : 5,
                 nextState : "state_creep_full",
                 path : cache.serialisePath([{x: 25, y:25},{x:25, y:24}]),
                 pathName : "my path",
-                pathTargetPos : { x:7, y:32, roomName : "W1N9"},
+                //pathTargetPos : { x:7, y:32, roomName : "W1N9"},
                 pathRange : 2,
                 pathNextState : "state_creep_do_stuff",
                 pathId : "0987654321",
                 previousState : "state_creep_do_other_stuff",
-                previousPos : {x:11, y:22, roomName : "E80X123"},
+                //previousPos : {x:11, y:22, roomName : "E80X123"},
                 direction : C.TOP,
                 nextRoom : "E32S101",
 
@@ -41,10 +41,14 @@ describe("creep_memory", function() {
             for (let property in properties) {
                 creepM[property] = properties[property]
             }
+            //console.log(JSON.stringify(creepM, "", "\t"));
             for (let property in properties) {
                 //console.log("expected", properties[property],"actual", creepM[property]);
                 assert.strictEqual(JSON.stringify(creepM[property]), JSON.stringify(properties[property]))
             }
+            //console.log(JSON.stringify(creepM, "", "\t"));
+            assert.deepStrictEqual(creepM.memory, properties);
+
         });
     });
 });
