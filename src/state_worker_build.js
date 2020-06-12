@@ -3,7 +3,6 @@
  * Created by piers on 27/04/2020
  * @author Piers Shepperson
  */
-
 const gc = require("gc");
 const gf = require("gf");
 const StateCreep = require("./state_creep");
@@ -50,7 +49,5 @@ class StateWorkerBuild extends StateCreep {
         //console.log("STATE_WORKER_BUILD dropped though")
     };
 }
-
-
 
 module.exports = StateWorkerBuild;

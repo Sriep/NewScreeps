@@ -15,7 +15,7 @@ class StateHarvesterTransfer extends StateCreep {
     }
 
     enact() {
-        console.log("STATE_HARVESTER_TRANSFER2", this.targetId);
+        //console.log("STATE_HARVESTER_TRANSFER2", this.targetId);
         if (!this.targetId) {
             return this.switchTo( gc.STATE_HARVESTER_IDLE);
         }

@@ -54,7 +54,6 @@ class PolicyForeignOffice   {
             }
             this.sendPatrol(roomName)
         }
-
     };
 
     sendInsurgentAlert(roomName) {
