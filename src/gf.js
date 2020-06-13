@@ -17,30 +17,35 @@ const gf = {
 
     assert: function (a, ...msg) {
         if (!a && gc.DEBUG) {
+            console.log("assert failed");
             console.log("assert failed: ", JSON.stringify(a));
             this.fatalError(msg)
         }
     },
     assertEq: function (a, b, ...msg) {
         if (a !== b && gc.DEBUG) {
+            console.log("assert failed");
             console.log("assert failed: ", JSON.stringify(a), " !=== ", JSON.stringify(b));
             this.fatalError( msg)
         }
     },
     assertNeq: function (a, b, ...msg) {
         if (a === b && gc.DEBUG) {
+            console.log("assert failed");
             console.log("assert failed: ", JSON.stringify(a), " === ", JSON.stringify(b));
             this.fatalError( msg)
         }
     },
     assertGt: function (a, b, ...msg) {
         if (a <= b && gc.DEBUG) {
+            console.log("assert failed");
             console.log("assert failed: ", JSON.stringify(a), " < ", JSON.stringify(b));
             this.fatalError( msg)
         }
     },
     assertLt: function (a, b, ...msg) {
         if (a >= b && gc.DEBUG) {
+            console.log("assert failed");
             console.log("assert failed: ", JSON.stringify(a), " > ", JSON.stringify(b));
             this.fatalError(msg)
         }

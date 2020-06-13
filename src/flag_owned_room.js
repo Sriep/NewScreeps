@@ -195,7 +195,7 @@ class FlagOwnedRoom extends FlagRoom {
         //FlagRoom = require("flag_room");
         const fRoom = new FlagRoom(this.name);
         const containerPos = fRoom.upgradeContainerPos[0];
-        console.log("sLinkPos containerPos", JSON.stringify(fRoom.upgradeContainerPos));
+        //console.log("sLinkPos containerPos", JSON.stringify(fRoom.upgradeContainerPos));
         //const containerPos = this.m.sources[source.id]["containerPos"];
         const terrain = source.room.getTerrain();
         let adjacent = 0;

@@ -33,7 +33,7 @@ const policy = {
                 continue;
             }
 
-            //console.log("enact policies id", id, "type", Memory.policies[id].type);
+            console.log("enact policies id", id, "type", Memory.policies[id].type);
             console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
@@ -279,6 +279,7 @@ const policy = {
         }
         const result = gf.roomPosFromPos(cPos).createConstructionSite(STRUCTURE_CONTAINER);
         if (result !== OK) {
+            console.log("buildSourceContainer fatal error");
             gf.fatalError("construction failed " + result.toString(),"pos", JSON.stringify(spots[0].pos));
         }
     },

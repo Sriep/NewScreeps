@@ -6,10 +6,12 @@
 const gc = require("gc");
 const C = require("./Constants");
 const race = require("race");
+const flag = require("flag");
 const policy = require("policy");
 const CreepMemory = require("./creep_memory");
 const _ = require("lodash");
 const PolicyBase = require("policy_base");
+const FlagRoom = require("flag_room");
 
 class PolicyForeignOffice extends PolicyBase {
     constructor (id, data) {
@@ -60,7 +62,7 @@ class PolicyForeignOffice extends PolicyBase {
                 }
             });
             if (insurgents.length > 0) {
-                this.insurgents[roomName] = insurgents;
+                this.insurgencies[roomName] = insurgents;
                 this.sendInsurgentAlert(roomName, insurgents);
             }
             this.sendPatrol(roomName)
@@ -79,11 +81,47 @@ class PolicyForeignOffice extends PolicyBase {
     };
 
     sendPatrol(roomName, insurgants) {
-        const patrols = _.filter(Game.creeps, c => {
-            return CreepMemory.M(c).state === gc.STATE_PATROL
-        })
-
+        const iStrength = this.strength(insurgants);
+        let localDefense = [];
+        const room = Game.rooms[roomName];
+        if (room) {
+            localDefense = room.find(FIND_MY_CREEPS, c => {
+                return !race.isCivilian(c)
+            })
+        }
+        const dStrength = this.strength(localDefense);
+        if (iStrength > dStrength) {
+            let shortfall = iStrength - dStrength;
+            const patrols = _.filter(Game.creeps, c => {
+                return CreepMemory.M(c).state === gc.STATE_PATROL
+                            && c.pos.roomName !== roomName
+            });
+            patrols.sortsort( (a,b) =>  {
+                return Game.map.getRoomLinearDistance(a.room.name, roomName)
+                    - Game.map.getRoomLinearDistance(b.room.name, roomName);
+            });
+            for (let patrol of patrols) {
+                this.sendPatrol(patrol);
+                shortfall -= this.strength([patrol]);
+                if (shortfall < 0) {
+                    break;
+                }
+            }
+            if (shortfall>0) {
+                shortfall -= this.buildPatrol(shortfall)
+            }
+        }
     };
+
+    buildPatrol() {
+        let strength  = 0;
+        const spawnRoom = FlagRoom.getNew(roomName).spawnRoom;
+        if (policy.getRoomEconomyPolicy(spawnRoom).localBuildsFinished) {
+            strength += this.buildSwordsman(spawnRoom);
+            strength += this.buildHealer(spawnRoom);
+        }
+        return strength;
+    }
 
     checkPatrols() {
         const patrols = _.filter(Game.creeps, c => {
@@ -91,6 +129,16 @@ class PolicyForeignOffice extends PolicyBase {
         })
 
     };
+
+    strength(creeps) {
+        let strength = 0;
+        for (let creep of creeps) {
+            strength += race.partCount(creep, C.ATTACK);
+            strength += race.partCount(creep, C.ATTACK_POWER);
+            strength += race.partCount(creep, C.HEAL);
+        }
+        return strength;
+    }
 
     checkColonyDefence() {
         this.m.colonyDef = [];
@@ -126,6 +174,47 @@ class PolicyForeignOffice extends PolicyBase {
 
     nextPatrolRoute() {
         return this.colonyDef[0]
+    }
+
+    // todo improve this stuff
+    buildSwordsman(spawnRoom) {
+        const data = {
+            "body": race.body(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable),
+            "opts": {"memory": {}},
+            "name": gc.RACE_SWORDSMAN + spawnRoom.energyCapacityAvailable.toString(),
+        };
+        flag.getSpawnQueue(this.home).addSpawn(
+            data,
+            gc.SPAWN_PRIORITY_FOREIGN,
+            this.id,
+            gc.STATE_SWORDSMAN_IDLE,
+        );
+        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable)
+        let strength = 0;
+        strength += bodyCounts[C.ATTACK] ? bodyCounts[C.ATTACK] : 0;
+        strength += bodyCounts[C.RANGED_ATTACK] ? bodyCounts[C.RANGED_ATTACK] : 0;
+        strength += bodyCounts[C.HEAL] ? bodyCounts[C.HEAL] : 0;
+        return strength;
+    }
+
+    buildHealer(spawnRoom) {
+        const data = {
+            "body": race.body(gc.RACE_HEALER, spawnRoom.energyCapacityAvailable),
+            "opts": {"memory": {}},
+            "name": gc.RACE_SWORDSMAN + spawnRoom.energyCapacityAvailable.toString(),
+        };
+        flag.getSpawnQueue(this.home).addSpawn(
+            data,
+            gc.SPAWN_PRIORITY_FOREIGN,
+            this.id,
+            gc.STATE_SWORDSMAN_IDLE,
+        );
+        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable)
+        let strength = 0;
+        strength += bodyCounts[C.ATTACK] ? bodyCounts[C.ATTACK] : 0;
+        strength += bodyCounts[C.RANGED_ATTACK] ? bodyCounts[C.RANGED_ATTACK] : 0;
+        strength += bodyCounts[C.HEAL] ? bodyCounts[C.HEAL] : 0;
+        return strength
     }
 
 }

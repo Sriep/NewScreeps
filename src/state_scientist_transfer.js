@@ -47,7 +47,7 @@ class StateScientistTransfer extends StateCreep {
                             return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
-                        console.log(this.creep.name,"mineral", resource,"lab", JSON.stringify(lab));
+                        //console.log(this.creep.name,"mineral", resource,"lab", JSON.stringify(lab));
                         gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
                     }
                 }
@@ -63,7 +63,7 @@ class StateScientistTransfer extends StateCreep {
                             return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
-                        console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));
+                        //console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));
                         gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
                     }
                 }
@@ -82,7 +82,7 @@ class StateScientistTransfer extends StateCreep {
                             return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                         }
                     } else {
-                        console.log(this.creep.name,"mineral", RESOURCE_ENERGY,"link", JSON.stringify(link));
+                        //console.log(this.creep.name,"mineral", RESOURCE_ENERGY,"link", JSON.stringify(link));
                         gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
                     }
                 }
@@ -102,7 +102,7 @@ class StateScientistTransfer extends StateCreep {
                         return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                     }
                 } else {
-                    console.log(this.creep.name,"mineral", resource,"storage", JSON.stringify(room.storage));
+                    //console.log(this.creep.name,"mineral", resource,"storage", JSON.stringify(room.storage));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
                 }
             }
@@ -115,7 +115,7 @@ class StateScientistTransfer extends StateCreep {
                         return this.switchTo( state.STATE_SCIENTIST_TRANSFER);
                     }
                 } else {
-                    console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));
+                    //console.log(this.creep.name,"mineral", resource,"terminal", JSON.stringify(room.terminal));
                     gf.fatalError("STATE_SCIENTIST_WITHDRAW can't withdraw", ok.toString())
                 }
             }

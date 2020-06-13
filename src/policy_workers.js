@@ -25,7 +25,7 @@ class PolicyWorkers  extends PolicyBase {
     };
 
     enact() {
-        console.log("POLICY_WORKERS enact budget room", JSON.stringify(this.budget()));
+        //console.log("POLICY_WORKERS enact budget room", JSON.stringify(this.budget()));
         const room = Game.rooms[this.home];
         const policyId = this.parentId;
         const orders = flag.getSpawnQueue(this.home).orders(policyId, gc.SPAWN_PRIORITY_LOCAL);

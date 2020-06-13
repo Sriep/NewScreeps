@@ -24,18 +24,6 @@ class PolicyExplore extends PolicyBase {
         return true;
     };
 
-    get id() {
-        return this._id
-    }
-
-    get parentId() {
-        return this.m.parentId
-    }
-
-    get home() {
-        return this.m.home
-    }
-
     get direction() {
         return this.m.direction
     }

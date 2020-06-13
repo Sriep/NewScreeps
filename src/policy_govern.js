@@ -42,6 +42,7 @@ class PolicyGovern extends PolicyBase {
     }
 
     get colonies() {
+        console.log("get colonies")
         return JSON.parse(JSON.stringify(this.m.colonies))
     }
 

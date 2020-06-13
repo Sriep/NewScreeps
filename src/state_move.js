@@ -28,11 +28,11 @@ const move = {
             let targetPos;
             if (this.movingCreeps.includes(name)) {
                 if (!m._move) {
-                    creep(name,"memory",JSON.stringify(m));
+                    //creep(name,"memory",JSON.stringify(m));
                     gf.fatalError("moving creep with no _move")
                 }
                 if (!m._move.path) {
-                    creep(name,"memory",JSON.stringify(m));
+                    this.creep(name,"memory",JSON.stringify(m));
                     gf.fatalError("moving creep with no _move.path")
                 }
                 targetPos = m._move.path.substr(0,4) + m_move.room;

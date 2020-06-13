@@ -33,6 +33,12 @@ class PolicyColonialOffice extends PolicyBase {
         return this.m.colonies
     }
 
+    get spawnRooms() {
+        return _.filter(Game.rooms, rn  => {
+            return !!Game.rooms[rn].memory.spawnQueue
+        });
+    }
+
     enact() {
         if ((Game.time + this.id) % 100 !== 0) {
             return;

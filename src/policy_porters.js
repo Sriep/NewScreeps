@@ -25,8 +25,18 @@ class PolicyPorters  extends PolicyBase {
     initilise() {
         super.initilise();
         this.m.curProduction = {};
+        this.m.buildsFinished = false;
+        this.m.localBuildsFinished = false;
         return true
     };
+
+    get buildsFinished() {
+        return this.m.buildsFinished
+    }
+
+    get localBuildsFinished() {
+        return this.m.localBuildsFinished
+    }
 
     enact() {
         //console.log("POLICY_PORTERS budget", JSON.stringify( budget.porterRoom(Game.rooms[this.home])));
@@ -45,6 +55,7 @@ class PolicyPorters  extends PolicyBase {
 
     spawns(room, resources) {
         console.log("pp spawns resources", JSON.stringify(resources));
+        this.m.buildsFinished = false;
 
         const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
         const workers = policy.getCreeps(this.parentId, gc.RACE_WORKER).length;
@@ -58,6 +69,10 @@ class PolicyPorters  extends PolicyBase {
         const cPorter = race.creepPartsAlive(this.parentId, gc.RACE_PORTER, CARRY);
         const wUpgrader = race.creepPartsAlive(this.parentId, gc.RACE_UPGRADER, WORK);
         const rReserver = race.creepPartsAlive(this.parentId, gc.RACE_RESERVER, CLAIM);
+
+        this.m.localBuildsFinished = wHarvester > this.m.localResoures.hW && cPorter>this.m.localResoures.pC
+                                && cWorker > this.m.localResoures.wW && wUpgrader>this.m.localResoures.uW;
+
         console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,
             "reservers",reservers,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,
             "cPorter",cPorter,"rReserver",rReserver);
@@ -169,50 +184,42 @@ class PolicyPorters  extends PolicyBase {
                     gc.SPAWN_PRIORITY_LOCAL
                 );
             }
+            return;
         }
+        this.m.buildsFinished = true;
     };
 
     portersCsRoom(useRoad) {
         useRoad = !!useRoad;
-        //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.portersCsRoom,this.m.portersCsRoom[useRoad], "&&",this.m.portersCsRoom  && this.m.portersCsRoom[useRoad])
         if (this.m.portersCsRoom  && this.m.portersCsRoom[useRoad]) {
-            //console.log(!!useRoad,"|",useRoad,"pp portersCsRoom exists");
             return this.m.portersCsRoom[useRoad]
         } else {
-            //console.log(useRoad,"pp portersCsRoom does not exist before", JSON.stringify(this.m.portersCsRoom));
             this.m.portersCsRoom = {};
             this.m.portersCsRoom[true] = budget.portersCsRoom(Game.rooms[this.home], true);
             this.m.portersCsRoom[false] = budget.portersCsRoom(Game.rooms[this.home], false);
-            //console.log(useRoad,"pp portersCsRoom after", JSON.stringify(this.m.portersCsRoom));
         }
     };
 
     harvesterWsRoom(useRoad) {
         useRoad = !!useRoad;
-        //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.harvesterWsRoom,this.m.harvesterWsRoom[useRoad], "&&",this.m.harvesterWsRoom  && this.m.harvesterWsRoom[useRoad])
         if (this.m.harvesterWsRoom && this.m.harvesterWsRoom[useRoad]) {
             return this.m.harvesterWsRoom[useRoad]
         } else {
-            //console.log("pp harvesterWsRoom does not exist before", JSON.stringify(this.m.harvesterWsRoom));
             this.m.harvesterWsRoom = {};
             this.m.harvesterWsRoom[true] = budget.harvesterWsRoom(Game.rooms[this.home], true);
             this.m.harvesterWsRoom[false] = budget.harvesterWsRoom(Game.rooms[this.home], false);
-            //console.log("pp harvesterWsRoom does not exist after", JSON.stringify(this.m.harvesterWsRoom));
         }
     };
 
     upgradersWsRoom(useRoad) {
         useRoad = !!useRoad;
-        //console.log(!!useRoad,"|",useRoad,"portersCsRoom",this.m.upgradersWsRoom,this.m.upgradersWsRoom[useRoad], "&&",this.m.upgradersWsRoom  && this.m.upgradersWsRoom[useRoad])
         if (this.m.upgradersWsRoom && this.m.upgradersWsRoom[useRoad]) {
             return this.m.upgradersWsRoom[useRoad]
         } else {
-            //console.log("pp upgradersWsRoomRoom does not exist before", JSON.stringify(this.m.upgradersWsRoom));
             const room = Game.rooms[this.home];
             this.m.upgradersWsRoom = {};
             this.m.upgradersWsRoom[true] = budget.upgradersWsRoom(room, room.energyCapacityAvailable, true);
             this.m.upgradersWsRoom[false] = budget.upgradersWsRoom(room, room.energyCapacityAvailable, false)
-            //console.log("pp upgradersWsRoomRoom does not exist after", JSON.stringify(this.m.upgradersWsRoom));
         }
     };
 
@@ -353,10 +360,12 @@ class PolicyPorters  extends PolicyBase {
     };
 
 }
+
 if (gc.USE_PROFILER && !gc.UNIT_TEST) {
     const profiler = require('screeps-profiler');
     profiler.registerClass(PolicyPorters, 'PolicyPorters');
 }
+
 module.exports = PolicyPorters;
 
 

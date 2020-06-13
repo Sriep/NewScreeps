@@ -150,6 +150,7 @@ const tile = {
 
 
     getCopy : function (tileObj) {
+        console.log("copy tile")
         if (!tileObj) {
             return;
         }
