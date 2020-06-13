@@ -29,6 +29,7 @@ class PolicyBuildRoads extends PolicyBase {
             return;
         }
         const room = Game.rooms[this.home];
+        // todo avoid structures
         construction.buildRoadsBetween(
             room, this.fromFind, this.fromStruct, this.toFind, this.toStruct
         );

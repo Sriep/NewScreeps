@@ -9,7 +9,7 @@ const race = require("race");
 const flag = require("flag");
 const policy = require("policy");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 const PolicyBase = require("policy_base");
 const FlagRoom = require("flag_room");
 

@@ -6,7 +6,7 @@
 
 const gc = require("./gc");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 const economy = {
 

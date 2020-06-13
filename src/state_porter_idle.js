@@ -12,7 +12,7 @@ const FlagRoom= require("flag_room");
 const FlagOwnedRoom = require("flag_owned_room");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 class StatePorterIdle extends StateCreep {
     constructor(creep) {
@@ -186,6 +186,7 @@ class StatePorterIdle extends StateCreep {
             return;
         }
         const foRoom = new FlagOwnedRoom(this.home);
+        console.log("check flags before slice1", JSON.stringify(foRoom.plan));
         const labPos = foRoom.plan.lab.slice(foRoom.plan.base_labs);
         const labs = room.find(FIND_MY_STRUCTURES, {
             filter: obj => {

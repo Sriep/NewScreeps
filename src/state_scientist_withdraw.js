@@ -19,6 +19,7 @@ class StateScientistWithdraw extends StateCreep {
         const room = Game.rooms[this.creep.room];
 
         const foRoom = new FlagOwnedRoom(this.home);
+        console.log("StateScientistWithdraw enact flags before slice",foRoom.plan.lab);
         const labPos = foRoom.plan.lab.slice(0, foRoom.plan.base_labs);
         const labs = room.find(FIND_MY_STRUCTURES, {
             filter: obj => {

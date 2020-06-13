@@ -11,7 +11,7 @@ const state = require("./state");
 const construction = require("./construction");
 const FlagRoom = require("./flag_room");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 const policy = {
 
@@ -33,8 +33,8 @@ const policy = {
                 continue;
             }
 
-            console.log("enact policies id", id, "type", Memory.policies[id].type);
-            console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
+            //console.log("enact policies id", id, "type", Memory.policies[id].type);
+            //console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
 
@@ -62,7 +62,7 @@ const policy = {
                 }
                 replacement.enact();
             } else {
-                console.log("enactPolicies delete policy", id);
+                //console.log("enactPolicies delete policy", id);
                 Memory.records.policies.replaced[Game.time.toString()] = {
                     "time" : Game.time,
                     "old" : policy.type,

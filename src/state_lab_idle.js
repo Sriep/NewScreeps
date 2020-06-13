@@ -6,6 +6,7 @@
 const C = require("./Constants");
 const gc = require("gc");
 const gf = require("gf");
+const lr = require("lab_reactions");
 const StateBuilding = require("state_building");
 
 class StateLabIdle extends StateBuilding  {
@@ -16,9 +17,9 @@ class StateLabIdle extends StateBuilding  {
     }
 
     enact() {
-        const resourceId = gf.resource(this.flag.color, this.flag.secondaryColor);
+        const resourceId = lr.resource(this.flag.color, this.flag.secondaryColor);
         if (resourceId) {
-            const reagents = gf.reagents(resourceId);
+            const reagents = lr.reagents(resourceId);
             if (reagents) {
                 const lab1s = this.lab.room.find(C.FIND_STRUCTURES, {
                     filter: l => {

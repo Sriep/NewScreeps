@@ -4,6 +4,7 @@
  * @author Piers Shepperson
  */
 const gc = require("gc");
+const race = require("race");
 const StateCreep = require("./state_creep");
 
 class StateFindBoost  extends StateCreep {

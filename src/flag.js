@@ -17,6 +17,7 @@ const flag = {
     },
 
     getRoomFlag: function(roomName) {
+        //console.log("flag getRoomFlag", roomName);
         let roomFlag = Game.flags[roomName];
         if (!roomFlag) {
             this.flagRoom(roomName);

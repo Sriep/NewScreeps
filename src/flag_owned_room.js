@@ -19,6 +19,107 @@ class FlagOwnedRoom extends FlagRoom {
         this.m = flag.getRoomFlag(name).memory;
     }
 
+    get origin() {
+        return this.plan["origin"]
+    }
+
+    get xDim() {
+        return this.plan["xDim"]
+    }
+
+    get yDim() {
+        return this.plan["yDim"]
+    }
+
+    get lab() {
+        return this.plan[STRUCTURE_LAB]
+    }
+
+    get labMap() {
+        return this.plan["labMap"]
+    }
+
+    get baseLabs() {
+        return this.plan["baseLabs"]
+    }
+
+    get storage() {
+        return this.plan[STRUCTURE_STORAGE]
+    }
+
+    get terminal() {
+        return this.plan[STRUCTURE_TERMINAL]
+    }
+
+    get link() {
+        return this.plan[STRUCTURE_LINK]
+    }
+
+    get spawn() {
+        return this.plan[STRUCTURE_SPAWN]
+    }
+
+    get powerSpawn() {
+        return this.plan[STRUCTURE_POWER_SPAWN]
+    }
+
+    get scientist() {
+        return this.plan["scientist"]
+    }
+
+    get observer() {
+        return this.plan[STRUCTURE_OBSERVER]
+    }
+
+    get tower() {
+        return this.plan[STRUCTURE_TOWER]
+    }
+
+    get extension() {
+        return this.plan[STRUCTURE_EXTENSION]
+    }
+
+    get centre() {
+        return this.plan["centre"]
+        //return  cache.global(
+        //    FlagOwnedRoom.prototype._centre,
+        //    this,
+        //    [],
+        //    "FLO." +this.name + ".centre",
+        //);
+    }
+
+    get plan() {
+        return this.memory.plan;
+        //return cache.global(
+        //    FlagOwnedRoom.prototype._planObj,
+        //    this,
+        //    [objType],
+        //    "FLO." + this.name + ".plan" + objType
+        //)
+    };
+    placeCentre2(centreTile, start) {
+        let avoid = [];
+        const sources = Game.rooms[this.name].find(FIND_SOURCES);
+        for (let source of sources) {
+            avoid = avoid.concat(gf.posPlusDeltaArray(source.pos, gc.ONE_MOVE))
+        }
+        avoid = avoid.concat(gf.posPlusDeltaArray(Game.rooms[this.name].controller.pos, gc.THREE_MOVES));
+
+        this.memory.plan = {};
+        this.plan["centre"] = centreTile;
+        if (start) {
+            this.plan["origin"] = start;
+        } else {
+            this.plan["origin"] = this.findLocationForCentre(centre, avoid);
+        }
+        const terrain = new Room.Terrain(this.name);
+        this.plan[STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
+        this.plan[STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
+        this.plan[STRUCTURE_LINK].push(this.setControllerLinkPos());
+        this.plan[STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos());
+    }
+
     placeCentre(centreTile, start) {
         const centre = tile.centres[centreTile];
         let avoid = [];
@@ -28,13 +129,13 @@ class FlagOwnedRoom extends FlagRoom {
         }
         avoid = avoid.concat(gf.posPlusDeltaArray(Game.rooms[this.name].controller.pos, gc.THREE_MOVES));
 
-        this.m["plan"] = tile.getCopy(centre);
+        this.memory.plan = tile.getCopy(centre);
         if (start) {
-            this.m["plan"]["origin"] = start;
+            this.plan["origin"] = start;
         } else {
-            this.m["plan"]["origin"] = this.findLocationForCentre(centre, avoid);
+            this.plan["origin"] = this.findLocationForCentre(centre, avoid);
         }
-        tile.shiftToOrigin(this.m["plan"]);
+        tile.shiftToOrigin(this.plan);
         for ( let dx = 0 ; dx < this.m["plan"].x_dim ; dx++ ) {
             for ( let dy = 0 ; dy < this.m["plan"].y_dim ; dy++ ) {
                 avoid.push({
@@ -45,32 +146,25 @@ class FlagOwnedRoom extends FlagRoom {
         }
 
         const terrain = new Room.Terrain(this.name);
-        this.m["plan"][STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
-        this.m["plan"][STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
+        this.plan[STRUCTURE_TOWER] = this.getTowerPos(terrain, this.m["plan"].origin, avoid);
+        this.plan[STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.m["plan"].origin, avoid);
 
-        this.m["plan"][STRUCTURE_LINK].push(this.setControllerLinkPos());
-        this.m["plan"][STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos());
+        this.plan[STRUCTURE_LINK].push(this.setControllerLinkPos());
+        this.plan[STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos());
 
-        this.m["plan"]["centre"] = centreTile
+        this.plan["centre"] = centreTile
     };
 
-    plan(objType) {
-        return cache.global(
-            FlagOwnedRoom.prototype._planObj,
-            this,
-            [objType],
-            "FLO." + this.name + ".plan" + objType
-        )
-    };
 
-    centre() {
-        return  cache.global(
-            FlagOwnedRoom.prototype._centre,
-            this,
-            [],
-            "FLO." +this.name + ".centre",
-        );
-    };
+
+    //centre() {
+    //    return  cache.global(
+    //        FlagOwnedRoom.prototype._centre,
+    //        this,
+    //        [],
+    //        "FLO." +this.name + ".centre",
+    //    );
+    //};
 
     _centre() {
         const centre = tile.getCopy(tile.centres[this.m["plan"]["centre"]]);
@@ -149,7 +243,7 @@ class FlagOwnedRoom extends FlagRoom {
             terrain, start, towerTile.x_dim, towerTile.y_dim, avoid
         );
         const rtv = [];
-        this.m["plan"][STRUCTURE_TOWER] = [];
+        //this.m["plan"][STRUCTURE_TOWER] = [];
         for (let delta of towerTile[STRUCTURE_TOWER]) {
             avoid.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
             rtv.push({"x":origin.x+delta.x, "y":origin.y+delta.y});
@@ -213,16 +307,14 @@ class FlagOwnedRoom extends FlagRoom {
         }
     };
 
-    flagLabs(boost, stores) {
-        const labs = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES,
-            { filter: s => { return s.structureType === C.STRUCTURE_LAB }
-            }
-        );
+    flagLabs(boost, stores, numLabs) {
+        console.log("flagLags boost",boost, "stores",JSON.stringify(stores), "labsLength", numLabs)
         const mapping = lr.mapReagentsToLabs(
             lr.reagentMap(boost, stores),
-            labs.length,
-            this.m["plan"], // this.plan(),
+            numLabs,
+            this.m["plan"],
         );
+        console.log("flagLabs mapping", JSON.stringify(mapping));
         this.colourLabFlags(mapping);
     };
 

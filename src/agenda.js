@@ -176,8 +176,8 @@ const agenda = {
 
     items : function () {
         const fc = {};
-        fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
-        // fc[gc.POLICY_BUILD_ROADS] = skip;
+        //fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
+        fc[gc.POLICY_BUILD_ROADS] = skip;
         fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
         fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
         fc[gc.POLICY_EXPLORE] = newPolicy;

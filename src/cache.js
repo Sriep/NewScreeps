@@ -5,7 +5,7 @@
  */
 const gc = require("./gc");
 const gf = require("./gf");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 const cache = {
 
@@ -239,7 +239,7 @@ const cache = {
         if (!str) {
             return
         }
-        console.log("cache dPoint", JSON.stringify(str));
+        //console.log("cache dPoint", JSON.stringify(str));
         const code = str.charCodeAt(0);
         //console.log("dPoint code",code);
         return {"x": code % 50, "y": Math.floor(code / 50)};

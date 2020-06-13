@@ -10,7 +10,7 @@ const gf = require("./gf");
 const gc = require("./gc");
 const cache = require("./cache");
 const race = require("./race");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 class FlagRoom {
     constructor (name) {
@@ -35,8 +35,12 @@ class FlagRoom {
         }
     }
 
+    get home() {
+        return this.name
+    }
+
     get memory() {
-        this.roomFlag.memory;
+        return this.roomFlag.memory;
     }
 
     get local() {
@@ -121,7 +125,7 @@ class FlagRoom {
     }
 
     mapRoom() {
-        this.m.roomType = this.roomType();
+        this.m.roomType = this.roomType;
         if (this.m.roomType === this.RoomType.Unknown) {
             return false;
         }

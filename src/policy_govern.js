@@ -42,7 +42,7 @@ class PolicyGovern extends PolicyBase {
     }
 
     get colonies() {
-        console.log("get colonies")
+        //console.log("get colonies")
         return JSON.parse(JSON.stringify(this.m.colonies))
     }
 
@@ -93,10 +93,10 @@ class PolicyGovern extends PolicyBase {
         )) {
             if (this.m.agendaIndex !== -1) {
                 Memory.records.agenda.push(lastAgendaItem + " checked " + Game.time.toString());
-                //console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
+                console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
             }
             const nextAgendaItem = this.agenda[this.m.rcl][this.m.agendaIndex+1];
-            //console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
+            console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
             agenda.items()[nextAgendaItem.activity].enact(
                 nextAgendaItem.activity,
                 this.id,
@@ -106,7 +106,7 @@ class PolicyGovern extends PolicyBase {
             this.m.agendaIndex++;
             return;
         }
-        //console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
+        console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
     };
 
     getColonies() {

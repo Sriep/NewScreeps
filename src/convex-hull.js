@@ -28,6 +28,7 @@ var convexhull =  {
     // the given set of points. The convex hull excludes collinear points.
     // This algorithm runs in O(n log n) time.
     makeHull : function(points) {
+        console.log("convexhull flags before slice",points);
         var newPoints = points.slice();
         newPoints.sort(this.POINT_COMPARATOR);
         return this.makeHullPresorted(newPoints);

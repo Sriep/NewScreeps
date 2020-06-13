@@ -18,7 +18,7 @@ const state = {
         let requireString = "state_" + flag.getFlag(building).memory.state;
         requireString = "./" + requireString;
         const StateConstructor = require(requireString);
-        const creepState = new StateConstructor(creep);
+        const creepState = new StateConstructor(building);
         creepState.enact();
     },
 

@@ -22,14 +22,16 @@ class PolicyLabs extends PolicyBase {
             { filter: s => { return s.structureType === C.STRUCTURE_LAB }
             }
         );
+
         const totals = this.countResources();
-        const fRoom = new FlagOwnedRoom(this.hame);
-        const labPower = Math.min(labs.length, 2*fRoom.flagLabs.m.plan["base_labs"]+1);
+        const fRoom = new FlagOwnedRoom(this.home);
+        const labPower = labs.length; //Math.min(labs.length, 2*fRoom.flagLabs.m.plan["base_labs"]+1);
         const products = lr.assesProducts(totals, labPower);
         console.log("POLICY_LABS products", JSON.stringify(products));
         for (let boost of lr.prioiritisedBoosts) {
             if (boost in products) {
-                fRoom.flagLabs(boost, totals)
+                fRoom.flagLabs(boost, totals, labPower);
+                break; // todo handle multiple boosts
             }
         }
     };

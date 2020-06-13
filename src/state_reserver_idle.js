@@ -8,7 +8,7 @@ const gc = require("gc");
 const flag = require("flag");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 class StateReserverIdle extends StateCreep {
     constructor(creep) {

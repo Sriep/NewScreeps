@@ -9,7 +9,7 @@ const race = require("race");
 const FlagRoom = require("flag_room");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
-const _ = require("lodash");
+//const _ = require("lodash");
 
 class StateHarvesterIdle extends StateCreep {
     constructor(creep) {
