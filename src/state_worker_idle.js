@@ -12,6 +12,7 @@ const gf = require("gf");
 const FlagRoom = require("flag_room");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 class StateWorkerIdle extends StateCreep {
     constructor(creep) {
@@ -183,7 +184,7 @@ class StateWorkerIdle extends StateCreep {
     getHarvestContainersPos(room) {
         const fRoom = new FlagRoom(room.name);
         const containersPos = [];
-        for (let sourceId in fRoom.getSources()) {
+        for (let sourceId in fRoom.sources) {
             const cPos = fRoom.getSourceContainerPos(sourceId);
             if (cPos) {
                 containersPos.push(gf.roomPosFromPos(cPos));

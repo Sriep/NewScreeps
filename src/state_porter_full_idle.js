@@ -29,7 +29,7 @@ class StatePorterFullIdle extends StateCreep {
                     const pathName = this.pathName;
                     const pathId = this.pathId;
                     const fRoom = flag.getRoom(this.creep.pos.roomName);
-                    //const fRoom = new FlagRoom(info.pos.roomName);
+                    //const fRoom = new FlagRoom(info.pos.home);
                     const path = fRoom.getSPath(this.home, pathId, pathName, true);
                     return this.switchToMoveToPath(
                         path,

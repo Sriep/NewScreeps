@@ -10,6 +10,7 @@ const race = require("./race");
 const move = require("./state_move");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 class StateMovePos extends StateCreep {
     constructor(creep) {
@@ -71,7 +72,7 @@ class StateMovePos extends StateCreep {
         if (this.nextState === gc.STATE_MOVE_PATH) {
             if (this.creep.pos.isNearTo(this.targetPos.x, this.targetPos.y)) {
                 //console.log(this.creep.name, "STATE_MOVE_PATH targetpos", JSON.stringify(this.targetPos), "room",
-                //    this.creep.pos.roomName,"len", this.path.length,"path",this.path);
+                //    this.creep.pos.home,"len", this.path.length,"path",this.path);
                 if (move.pathBlocked(gf.roomPosFromPos(this.targetPos))) {
                     this.recalculatePath();
                     return this.switchToMovePos(

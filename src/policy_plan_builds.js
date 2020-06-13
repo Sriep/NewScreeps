@@ -5,25 +5,19 @@
  */
 const gc = require("gc");
 const FlagOwnedRoom = require("flag_owned_room");
-//const tile = require("tile");
+const PolicyBase = require("policy_base");
 
 // constructor
-class PolicyPlanBuilds {
+class PolicyPlanBuilds extends PolicyBase {
     constructor (id, data) {
+        super(id, data);
         this.type = gc.POLICY_PLAN_BUILDS;
-        this.id = id;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
+        super.initilise();
         this.m.finished = false;
-        this.home = Memory.policies[this.parentId].roomName;
-        return gc.PLANNED_BUILDS;
+        return true;
     };
 
     enact() {
@@ -34,8 +28,7 @@ class PolicyPlanBuilds {
         this.m.finished = true;
     };
 
-    draftReplacment() {
-        console.log("POLICY_PLAN_BUILDS draftReplacment this.m.finished",this.m.finished );
+    draftReplacement() {
         return this.m.finished ? false : this;
     };
 }

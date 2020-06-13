@@ -7,24 +7,13 @@
 //const gf = require("gf");
 const gc = require("gc");
 const policy = require("policy");
+const PolicyBase = require("policy_base");
 
-class PolicyBuildSourceContainers  {
+class PolicyBuildSourceContainers extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_BUILD_SOURCE_CONTAINERS;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
-
-    initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
-        const room = Game.rooms[this.home];
-        return !!room && !!room.controller && room.controller.my;
-    };
 
     enact() {
         if (Game.time % gc.BUILD_CHECK_RATE !== 0) {
@@ -37,7 +26,7 @@ class PolicyBuildSourceContainers  {
         }
     };
 
-    draftReplacment() {
+    draftReplacement() {
         const room = Game.rooms[this.home];
         return policy.areSourceContainersFinished(room) ? false : this;
     };

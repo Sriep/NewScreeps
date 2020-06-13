@@ -30,11 +30,11 @@ class StateMovePath  extends StateCreep {
                 this.targetPos, this.moveRange, this.nextState,
             )
         }
-        //const posPath = cache.deserialiseRoPath(this.path.substring(0,2) , this.creep.pos.roomName);
+        //const posPath = cache.deserialiseRoPath(this.path.substring(0,2) , this.creep.pos.home);
         const path0 = cache.deserialisePtAt(this.path, 0);
         if (path0.x === this.creep.pos.x && path0.y === this.creep.pos.y) {
             const dPathPos1 = cache.deserialisePosAt(this.path,1, this.creep.pos.roomName);
-            //console.log(this.creep.name, "path0", JSON.stringify(path0) ,"path1",dPathPos1,"room",this.creep.pos.roomName);
+            //console.log(this.creep.name, "path0", JSON.stringify(path0) ,"path1",dPathPos1,"room",this.creep.pos.home);
             if (move.pathBlocked(dPathPos1)) {
                 this.recalculatePath();
                  return this.switchToMovePos(
@@ -77,7 +77,7 @@ class StateMovePath  extends StateCreep {
         }
         const posPath = cache.deserialiseRoPath(this.path.substring(0,2), this.creep.pos.roomName);
 
-        //console.log(this.creep.name,"creep pos", this.creep.pos,"moveByPath path", JSON.stringify(posPath), this.creep.pos.roomName, "new path", this.m.path);
+        //console.log(this.creep.name,"creep pos", this.creep.pos,"moveByPath path", JSON.stringify(posPath), this.creep.pos.home, "new path", this.m.path);
         const result = this.creep.moveByPath(posPath);
         switch (result) {
             case OK:

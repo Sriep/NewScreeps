@@ -5,23 +5,18 @@
  */
 const gc = require("gc");
 const FlagOwnedRoom = require("flag_owned_room");
+const PolicyBase = require("policy_base");
 
-class PolicyBuildStructure   {
+class PolicyBuildStructure extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_BUILD_STRUCTURE;
         this.structureType = data.structureType;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
+        super.initilise();
         this.m.built = false;
-        this.home = Memory.policies[this.parentId].roomName;
-        return gc.PLANNED_BUILDS;
+        return true
     };
 
     enact() {
@@ -30,7 +25,7 @@ class PolicyBuildStructure   {
         this.m.built = !fRoom.buildStructure(this.structureType)
     };
 
-    draftReplacment() {
+    draftReplacement() {
         return this.m.built ? false : this;
     };
 }

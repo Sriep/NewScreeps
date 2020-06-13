@@ -3,7 +3,7 @@
  * Created by piers on 05/06/2020
  * @author Piers Shepperson
  */
-//const cache = require("./cache");
+const cache = require("./cache");
 
 class CreepMemory {
     constructor(creep) {
@@ -23,7 +23,8 @@ class CreepMemory {
     }
 
     get home() {
-        return Memory.policies[this.policyId].roomName
+        const policy = require("./policy");
+        return policy.getPolicy(this.policyId).home;
     }
 
     get state() {
@@ -42,19 +43,19 @@ class CreepMemory {
 
     get targetPos() {
         if (this.creep.memory.targetPos) {
-            return new RoomPosition(
-                this.creep.memory.targetPos.x,
-                this.creep.memory.targetPos.y,
-                this.creep.memory.targetPos.roomName
-            )
-            //return cache.dPosRn(this.creep.memory.targetPos);
+            //return new RoomPosition(
+            //    this.creep.memory.targetPos.x,
+            //    this.creep.memory.targetPos.y,
+            //    this.creep.memory.targetPos.home
+            //)
+            return cache.dPosRn(this.creep.memory.targetPos);
         }
         //return this.creep.memory.targetPos;
 
     }
     set targetPos(v) {
-        this.creep.memory.targetPos = v;
-        //this.creep.memory.targetPos = cache.sPos(v);
+        //this.creep.memory.targetPos = v;
+        this.creep.memory.targetPos = cache.sPos(v);
     }
 
     get targetId() {
@@ -101,20 +102,20 @@ class CreepMemory {
 
     get pathTargetPos() {
         if (this.creep.memory.pathTargetPos) {
-            return new RoomPosition(
-                this.creep.memory.pathTargetPos.x,
-                this.creep.memory.pathTargetPos.y,
-                this.creep.memory.pathTargetPos.roomName
-            )
-            //return cache.dPosRn(this.creep.memory.pathTargetPos);
+            //return new RoomPosition(
+            //    this.creep.memory.pathTargetPos.x,
+            //    this.creep.memory.pathTargetPos.y,
+            //    this.creep.memory.pathTargetPos.home
+            //)
+            return cache.dPosRn(this.creep.memory.pathTargetPos);
         }
         //return this.creep.memory.pathTargetPos;
         //
     }
     set pathTargetPos(v) {
-        this.creep.memory.pathTargetPos = v;
+        //this.creep.memory.pathTargetPos = v;
         //this.creep.memory.pathTargetPos = v
-        //this.creep.memory.pathTargetPos = cache.sPos(v);
+        this.creep.memory.pathTargetPos = cache.sPos(v);
     }
 
     get pathRange() {
@@ -147,18 +148,18 @@ class CreepMemory {
 
     get previousPos() {
         if (this.creep.memory.previousPos) {
-            return new RoomPosition(
-                this.creep.memory.previousPos.x,
-                this.creep.memory.previousPos.y,
-                this.creep.memory.previousPos.roomName
-            )
-            //return cache.dPosRn(this.creep.memory.previousPos);
+        //    return new RoomPosition(
+        //        this.creep.memory.previousPos.x,
+        //        this.creep.memory.previousPos.y,
+         //       this.creep.memory.previousPos.home
+         //   )
+            return cache.dPosRn(this.creep.memory.previousPos);
         }
         //return this.creep.memory.previousPos;
     }
     set previousPos(v) {
-        this.creep.memory.previousPos = v;
-        //this.creep.memory.previousPos = cache.sPos(v);
+        //this.creep.memory.previousPos = v;
+        this.creep.memory.previousPos = cache.sPos(v);
     }
 
     get direction() {
@@ -177,19 +178,19 @@ class CreepMemory {
 
     get lastPosition() {
         if (this.creep.memory.lastPosition) {
-            return new RoomPosition(
-                this.creep.memory.lastPosition.x,
-                this.creep.memory.lastPosition.y,
-                this.creep.memory.lastPosition.roomName
-            )
-            //return cache.dPosRn(this.creep.memory.lastPosition);
+            //return new RoomPosition(
+            //    this.creep.memory.lastPosition.x,
+            ///    this.creep.memory.lastPosition.y,
+            //    this.creep.memory.lastPosition.home
+            //)
+            return cache.dPosRn(this.creep.memory.lastPosition);
         }
         //return this.creep.memory.lastPosition
 
     }
     set lastPosition(v) {
-        this.creep.memory.lastPosition = v
-        //this.creep.memory.lastPosition = cache.sPos(v);
+        //this.creep.memory.lastPosition = v
+        this.creep.memory.lastPosition = cache.sPos(v);
     }
 
 }

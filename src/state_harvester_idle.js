@@ -9,6 +9,7 @@ const race = require("race");
 const FlagRoom = require("flag_room");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 class StateHarvesterIdle extends StateCreep {
     constructor(creep) {
@@ -17,7 +18,7 @@ class StateHarvesterIdle extends StateCreep {
 
     enact() {
         console.log(this.creep.name, "STATE_HARVESTER_IDLE");
-        const colonies =  policy.getGouvernerPolicy(this.home).getColonies();
+        const colonies =  policy.getGouvernerPolicy(this.home).colonies;
         const nextPost = this.nextFreeHarvesterPost(colonies);
         //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
         if (nextPost) {
@@ -51,7 +52,7 @@ class StateHarvesterIdle extends StateCreep {
         for (let colony of colonies) {
             const colonyInfo = new FlagRoom(colony.name);
             //console.log("nextFreeHarvesterPost colony", JSON.stringify(colony));
-            for (let sourceId in colonyInfo.getSources()) {
+            for (let sourceId in colonyInfo.sources) {
                 if (harvesters.filter(h => {
                     return CreepMemory.M(h).targetId === sourceId
                 }).length === 0) {
@@ -82,7 +83,7 @@ class StateHarvesterIdle extends StateCreep {
                         return {
                             //pos: gf.roomPosFromPos(posts[0], colony.name),
                             pos: {"x": posts[0].x, "y": posts[0].y, "roomName": colony.name},
-                            id: colonyInfo.getMineral().id,
+                            id: colonyInfo.mineral.id,
                         }
                     }
                 }

@@ -12,25 +12,20 @@ const budget = require("budget");
 const race = require("race");
 const flag = require("flag");
 const race_harvester = require("race_harvester");
-//const memory = require("memory");
+const state = require("state");
 const FlagRoom = require("flag_room");
+const PolicyBase = require("policy_base");
 
-class PolicyPorters  {
+class PolicyPorters  extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_PORTERS;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
+        super.initilise();
         this.m.curProduction = {};
-        return true;
+        return true
     };
 
     enact() {
@@ -85,10 +80,20 @@ class PolicyPorters  {
         const fRoom = new FlagRoom(this.home);
         const canBuildHarvesters =  (wHarvester < resources.hW || harvesters < resources.minHarvesters) && harvesters <= resources.maxHarvesters;
         const canBuildWorkers = cWorker < resources.wW;
-        const canBuildPorters = cPorter < resources.pC - 0.1;
-        const canBuildUpgrader = wUpgrader < resources.uW - 0.2 && upgraders < fRoom.getUpgradePosts().length-2;
+
+        //const isSourceContainer = fRoom.sourceContainerPos.some(s =>
+        //    (state.findContainerAt(s))
+        //);
+        const canBuildPorters = cPorter < resources.pC;// && isSourceContainer;
+
+        const isUpgradeContainer = fRoom.upgradeContainerPos.some(s =>
+            (state.findContainerAt(s))
+        );
+        const isSpaceForPorterToReachContainer = upgraders < fRoom.upgradePosts.length-2;
+        const canBuildUpgrader = wUpgrader < resources.uW && isUpgradeContainer && isSpaceForPorterToReachContainer;
+
         const canBuildReserver = rReserver < resources.cR - 0.2;
-        //console.log("pp getUpgradeContainerPos", fRoom.getUpgradePosts().length);
+        //console.log("pp upgradeContainerPos", fRoom.upgradePosts.length);
         console.log("pp wHarvester",wHarvester,"cWorker",cWorker, "cPorter", cPorter,"wUpgrader",wUpgrader,"rReserver",rReserver);
 
         //console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
@@ -114,7 +119,6 @@ class PolicyPorters  {
             && (!canBuildPorters || cWorker <= cPorter)) {
             //console.log("pp next build worker","canBuildPorters",canBuildPorters,"cWorker",cWorker,"cPorter",cPorter );
             if (race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable) <= room.energyAvailable) {
-
                 policy.sendOrderToQueue(
                     room,
                     gc.RACE_WORKER,
@@ -129,7 +133,6 @@ class PolicyPorters  {
         if (canBuildPorters
             && (!canBuildUpgrader || cPorter <= 2*wUpgrader)) {
             if (race.getCost(gc.RACE_PORTER, room.energyCapacityAvailable) <= room.energyAvailable) {
-                //console.log("next build porter", "canBuildPorters",canBuildPorters)
                 policy.sendOrderToQueue(
                     room,
                     gc.RACE_PORTER,
@@ -219,11 +222,11 @@ class PolicyPorters  {
         let maxHarvesters = 0;
         this.m.curProduction = {};
         const governor = policy.getGouvernerPolicy(this.home);
-        const colonies = governor.getColonies();
+        const colonies = governor.colonies;
         for (let colonyObj of colonies) {
             let colonyResources;
             const fRoom = new FlagRoom(colonyObj.name);
-            const sources = fRoom.getSources();
+            const sources = fRoom.sources;
             for (let id in sources ) {
                 minHarvesters++;
                 maxHarvesters += fRoom.accessPoints(id);
@@ -284,16 +287,16 @@ class PolicyPorters  {
     };
 
     updateRoomResources(roomName, hW, pC, uW) {
-        //console.log("updateRoomResources roomName", roomName, "hW", hW, "pC", pC, "uW", uW);
+        //console.log("updateRoomResources home", home, "hW", hW, "pC", pC, "uW", uW);
         const room = Game.rooms[roomName];
         if (!room) { // todo cache updateRoomResources somehow so can return that if no sight on room
             return { "hW": hW, "pC" : pC, "wW" : 0,  "uW": uW };
         }
         let buildTicks, ratioHtoW;
 
-        buildTicks = economy.constructionRepairLeft(room, true);
+        const skip = flag.getRoom(roomName).sourceContainerPos;
+        buildTicks = economy.constructionRepairLeft(room, skip);
         ratioHtoW = budget.workersRoomRationHtoW(room, Game.rooms[this.home], false);
-        //console.log("pp updateRoomResources room", roomName, "unultTicks", buildTicks)
         let workerWs = 0;
         let porterCs = pC;
         let upgradeWs = uW;
@@ -349,13 +352,11 @@ class PolicyPorters  {
         };
     };
 
-    draftReplacment() {
-        return this
-    };
-
 }
-
-
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+    profiler.registerClass(PolicyPorters, 'PolicyPorters');
+}
 module.exports = PolicyPorters;
 
 

@@ -7,21 +7,16 @@
 const gc = require("gc");
 const policy = require("policy");
 const flag = require("flag");
+const PolicyBase = require("policy_base");
 
-class PolicyRcl1  {
+class PolicyRcl1 extends PolicyBase {
     constructor(id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_RCL1;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
+        super.initilise();
         const queue = flag.getSpawnQueue(this.home);
         queue.clear();
         queue.halt(gc.SPAWN_PRIORITY_LOCAL);
@@ -52,7 +47,7 @@ class PolicyRcl1  {
         return { "net energy" : 0, "parts" : 0 };
     };
 
-    draftReplacment() {
+    draftReplacement() {
         return Game.rooms[this.home].controller.level === 1 ? this : false;
     };
 }

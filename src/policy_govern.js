@@ -9,81 +9,107 @@ const policy = require("./policy");
 const gf = require("./gf");
 const flag = require("./flag");
 const FlagRoom = require("./flag_room");
+const PolicyBase = require("policy_base");
 
-class PolicyGovern   {
+class PolicyGovern extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        //console.log(id,"PolicyGovern constructor data", JSON.stringify(data))
+        super(id, data);
+        //this.home = data.home;
         this.type = gc.POLICY_GOVERN;
-        this.roomName = data.roomName;
-        this.m = data.m;
-        if (this.m && this.m.agendaName) {
-            this.agenda = agenda.agendas[this.m.agendaName];
-        }
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.m.rcl = Game.rooms[this.roomName].controller.level;
+        super.initilise();
+        //console.log("PolicyGovern initilise","this",JSON.stringify(this));
+        //this.m.home = home;
+        this.m.rcl = Game.rooms[this.home].controller.level;
         this.m.agendaIndex = -1;
         this.m.childTypes = [];
-        this.m.colonies = [{ "name" : this.roomName }];
+        this.m.colonies = [{ "name" : this.home }];
         this.m.agendaName = gc.AGENDA_DEFAULT;
         this.m[gc.ACTIVITY_MINE_COLONIES] = false;
         this.m.parts = 0;
         return true;
     };
 
+    get rcl() {
+        return this.m.rcl
+    }
+
+    get agendaIndex() {
+        return this.m.agendaIndex
+    }
+
+    get colonies() {
+        return JSON.parse(JSON.stringify(this.m.colonies))
+    }
+
+    get agendaName() {
+        return this.m.agendaName
+    }
+
+    get agenda() {
+        return agenda.agendas[this.m.agendaName];
+    }
+
+    get parts() {
+        return this.m.parts
+    }
+
     enact() {
         //console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
-        //console.log("POLICY_GOVERN enact this.m", JSON.stringify(this.m));
+        //console.log("POLICY_GOVERN enact this", JSON.stringify(this),"super", super.this);
+        //console.log("PolicyGovern this.m", JSON.stringify(this.m));
         if (!Memory.records["rcl "+this.m.rcl] ) {
-            //Memory.records["rcl "+ Game.rooms[this.roomName].controller.level.toString()] = {};
+            //Memory.records["rcl "+ Game.rooms[this.home].controller.level.toString()] = {};
         }
-        if (Game.rooms[this.roomName].controller.level !== this.m.rcl) {
-            this.m.rcl = Game.rooms[this.roomName].controller.level;
+        if (Game.rooms[this.home].controller.level !== this.m.rcl) {
+            this.m.rcl = Game.rooms[this.home].controller.level;
             this.m.agendaIndex = -1;
-            //Memory.records.agenda.push("rcl "+Game.rooms[this.roomName].controller.level.toString() + " " + Game.time.toString())
+            //Memory.records.agenda.push("rcl "+Game.rooms[this.home].controller.level.toString() + " " + Game.time.toString())
         }
         this.govern();
         this.refreshRoomInfo();
     };
+
+
 
     governNew() {
         this.m.agendaIndex = agenda.enact(this.id, this.agenda, this.m.rcl, this.m.agendaIndex)
     };
 
     govern() {
-        //console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.roomName].controller.level)
+        //console.log("govern this.m.rcl",this.m.rcl,"rcl",Game.rooms[this.home].controller.level)
         if (this.m.agendaIndex >= this.agenda[this.m.rcl].length) {
             return;
         }
         const lastAgendaItem = this.agenda[this.m.rcl][this.m.agendaIndex === -1 ? 0 : this.m.agendaIndex];
-        console.log("govern lastAgendaItem", JSON.stringify(lastAgendaItem));
+        //console.log("govern lastAgendaItem", JSON.stringify(lastAgendaItem));
         if (this.m.agendaIndex === -1 || agenda.items()[lastAgendaItem.activity].check(
             lastAgendaItem.activity,
             this.id
         )) {
             if (this.m.agendaIndex !== -1) {
                 Memory.records.agenda.push(lastAgendaItem + " checked " + Game.time.toString());
-                console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
+                //console.log("POLICY_GOVERN check PASSED for", JSON.stringify(lastAgendaItem))
             }
             const nextAgendaItem = this.agenda[this.m.rcl][this.m.agendaIndex+1];
-            console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
+            //console.log("POLICY_GOVERN next item", JSON.stringify(nextAgendaItem));
             agenda.items()[nextAgendaItem.activity].enact(
                 nextAgendaItem.activity,
                 this.id,
                 nextAgendaItem.params
             );
-            console.log("POLICY_GOVERN enacted agemda item", JSON.stringify(nextAgendaItem));
+            //console.log("POLICY_GOVERN enacted agemda item", JSON.stringify(nextAgendaItem));
             this.m.agendaIndex++;
             return;
         }
-        console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
+        //console.log("POLICY_GOVERN check failed", JSON.stringify(lastAgendaItem))
     };
 
     getColonies() {
+        console.log("getColonies");
         return JSON.parse(JSON.stringify(this.m.colonies))
     };
 
@@ -113,7 +139,7 @@ class PolicyGovern   {
     };
 
     refreshRoomInfo() {
-        const economicPolicy = policy.getRoomEconomyPolicy(this.roomName);
+        const economicPolicy = policy.getRoomEconomyPolicy(this.home);
         //console.log("refreshRoomInfo economicPolicy", JSON.stringify(economicPolicy));
         if (economicPolicy) {
             const budget =  economicPolicy.localBudget();
@@ -126,7 +152,7 @@ class PolicyGovern   {
     };
 
     checkPaybackByNextUpgrade(value) {
-        const room = Game.rooms[this.roomName];
+        const room = Game.rooms[this.home];
         const energyLeft = room.controller.progressTotal - room.controller.progress;
         const ltToNextLevel = energyLeft / (2*SOURCE_ENERGY_CAPACITY*gc.SORCE_REGEN_LT);
         const ltToPayOff = value.startUpCost / value.netEnergy;
@@ -135,15 +161,15 @@ class PolicyGovern   {
 
     requestAddColony(fRoom) {
         //console.log("POLICY_GOVERN requestAddColony ", fRoom.name,"fRoom", JSON.stringify(fRoom));
-        if (!this.m[gc.ACTIVITY_MINE_COLONIES] || this.roomName === fRoom.name) {
+        if (!this.m[gc.ACTIVITY_MINE_COLONIES] || this.home === fRoom.name) {
             console.log("this.m[gc.ACTIVITY_MINE_COLONIES]",this.m[gc.ACTIVITY_MINE_COLONIES]);
             return {added: false}
         }
         const value = fRoom.value(
-            this.roomName,
+            this.home,
             this.m[gc.ACTIVITY_COLONY_ROADS],
             this.m[gc.ACTIVITY_RESERVED_COLONIES],
-            this.m[gc.ACTIVITY_FLEXI_HARVESTERS] ? Game.rooms[this.roomName].energyCapacityAvailable : false
+            this.m[gc.ACTIVITY_FLEXI_HARVESTERS] ? Game.rooms[this.home].energyCapacityAvailable : false
         );
         if (value.profitParts < gc.COLONY_PROFIT_PART_MARGIN
             || !this.checkPaybackByNextUpgrade(value)) {
@@ -165,7 +191,7 @@ class PolicyGovern   {
             coloniesDropped++
         }
         for (let i = 0 ; i < coloniesDropped ; i++) {
-            this.removeColony(this.m.colonies.length-1);
+            this.decolonise(this.m.colonies.length-1);
         }
         this.m.colonies.push({
             "name" : fRoom.name,
@@ -213,22 +239,19 @@ class PolicyGovern   {
         }
     };
 
-    removeColony(index) {
+    decolonise(index) {
         //console.log("POLICY_GOVERN removeColony as spawnRoom", colony.name);
-        gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.roomName,
+        gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.home,
             "Invalid spawn room setting", JSON.stringify(Game.flags[colony.name].memory));
         this.m.colonies.splice(index, 0);
-        delete Game.flags[colony.name].memory.spawnRoom;
+        policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE).decolonise(colony.name);
     };
 
     partsSurppliedLT() {
-        const spawns = Game.rooms[this.roomName].find(FIND_MY_SPAWNS).length;
+        const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS).length;
         return spawns * CREEP_LIFE_TIME / 3;
     };
 
-    draftReplacment() {
-        return this
-    };
 }
 
 module.exports = PolicyGovern;

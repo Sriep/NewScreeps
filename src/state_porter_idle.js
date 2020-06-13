@@ -12,6 +12,7 @@ const FlagRoom= require("flag_room");
 const FlagOwnedRoom = require("flag_owned_room");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 class StatePorterIdle extends StateCreep {
     constructor(creep) {
@@ -28,7 +29,7 @@ class StatePorterIdle extends StateCreep {
         }
 
         const governor = policy.getGouvernerPolicy(this.home);
-        let colonies = governor.getColonies();
+        let colonies = governor.colonies;
         const info = this.nextHarvestContainer(
             colonies, race.partCount(this.creep, CARRY)*CARRY_CAPACITY
         );
@@ -148,7 +149,7 @@ class StatePorterIdle extends StateCreep {
             //console.log("listHarvestContainers colony", JSON.stringify(colony));
             const colonyRoom = new FlagRoom(colony.name);
             //console.log("listHarvestContainers memory", JSON.stringify(colonyRoom.m));
-            for (let sourceId in colonyRoom.getSources()) {
+            for (let sourceId in colonyRoom.sources) {
                 let cPos = colonyRoom.getSourceContainerPos(sourceId);
                 if (cPos) {
                     cPos = gf.roomPosFromPos(cPos, colony.name);
@@ -163,7 +164,7 @@ class StatePorterIdle extends StateCreep {
                     }
                 }
             }
-            let cPos = colonyRoom.getMineralContainerPos();
+            let cPos = colonyRoom.mineralContainerPos;
             if (cPos) {
                 cPos = gf.roomPosFromPos(cPos, colony.name);
                 const container  = state.findContainerAt(cPos);

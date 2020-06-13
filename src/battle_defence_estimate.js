@@ -197,7 +197,7 @@ const Battle_defence_estimate = {
             y += creeps[i].pos.y * thisParts;
             parts += thisParts;
         }
-        //console.log("weightedCentroid x",x,"y",y,"parts",parts,"roomName",creeps[0].pos.roomName);
+        //console.log("weightedCentroid x",x,"y",y,"parts",parts,"home",creeps[0].pos.home);
         //console.log("weightedCentroid x/parts", x/parts,"y/poarts", y/parts, "pos",weightedCentroid);
 
         return new RoomPosition(

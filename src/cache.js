@@ -5,11 +5,7 @@
  */
 const gc = require("./gc");
 const gf = require("./gf");
-//console.log("in cache gc.USE_PROFILER",gc.USE_PROFILER,"!gc.UNIT_TEST",!gc.UNIT_TEST);
-if (gc.USE_PROFILER && !gc.UNIT_TEST) {
-    //console.log("inside gc.USE_PROFILER && !gc.UNIT_TEST",gc.USE_PROFILER && !gc.UNIT_TEST);
-    const profiler = require('screeps-profiler');
-}
+const _ = require("lodash");
 
 const cache = {
 
@@ -208,11 +204,12 @@ const cache = {
     },
 
     sPos: function (pos) {
-        if (!pos && !pos.roomName) {
+        if (!pos || !pos.roomName) {
             return
         }
-        //return this.sPoint(pos) + pos.roomName;
-        return this.sPoint(pos) + this.sRoomName(pos.roomName)
+        return this.sPoint(pos) + pos.roomName;
+        //console.log("sPos room", this.sPoint(pos) + this.sRoomName(pos.home));
+        //return this.sPoint(pos) + this.sRoomName(pos.home)
     },
 
     dPosRn: function (str) {
@@ -220,8 +217,9 @@ const cache = {
             return
         }
         const code = str.charCodeAt(0);
-        //return new RoomPosition(code % 50, Math.floor(code / 50), str.substring(1))
-        return new RoomPosition(code % 50, Math.floor(code / 50), this.dRoomName(str.substring(1)))
+        //console.log(str,"dPosRn room", this.dRoomName(str.substring(1)) );
+        return new RoomPosition(code % 50, Math.floor(code / 50), str.substring(1))
+        ////return new RoomPosition(code % 50, Math.floor(code / 50), this.dRoomName(str.substring(1)))
     },
 
     dPos: function (str, roomName) {
@@ -229,7 +227,7 @@ const cache = {
             return
         }
         const point = this.dPoint(str);
-        //console.log("dPos str|", JSON.stringify(str), "|roomName", roomName, "point", JSON.stringify(point))
+        //console.log("dPos str|", JSON.stringify(str), "|home", home, "point", JSON.stringify(point))
         return new RoomPosition(point.x, point.y, roomName)
     },
 
@@ -241,7 +239,7 @@ const cache = {
         if (!str) {
             return
         }
-        console.log("cache dPoint", JSON.stringify(str))
+        console.log("cache dPoint", JSON.stringify(str));
         const code = str.charCodeAt(0);
         //console.log("dPoint code",code);
         return {"x": code % 50, "y": Math.floor(code / 50)};
@@ -332,7 +330,7 @@ const cache = {
                 }
             }
             path.push(new RoomPosition(x, y, gf.roomNameFromSplit(rSplit)));
-            //path.push({x:x, y:y, roomName:gf.roomNameFromSplit(rSplit)});
+            //path.push({x:x, y:y, home:gf.roomNameFromSplit(rSplit)});
             lastX = x;
             lastY = y;
         }
@@ -375,6 +373,46 @@ const cache = {
 };
 
 if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require("screeps-profiler");
     profiler.registerObject(cache, 'cache');
 }
 module.exports = cache;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

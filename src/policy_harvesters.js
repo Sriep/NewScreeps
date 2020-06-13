@@ -8,24 +8,13 @@ const policy = require("policy");
 const budget = require("budget");
 const race = require("race");
 const flag = require("flag");
+const PolicyBase = require("policy_base");
 
-
-class PolicyHarvesters  {
+class PolicyHarvesters extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_HARVESTERS;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
-
-    initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
-        return true;
-    };
 
     enact() {
         console.log("POLICY_HARVESTERS enact budget", JSON.stringify(this.budget()));
@@ -86,7 +75,7 @@ class PolicyHarvesters  {
     countHarvesterPosts(room) {
         const fRoom = new FlagRoom(room.name);
         let posts = 0;
-        for (let sourceId in fRoom.getSources()) {
+        for (let sourceId in fRoom.sources) {
             if (fRoom.getSourcePosts(sourceId)) {
                 posts += fRoom.getSourcePosts(sourceId).length;
             }
@@ -102,9 +91,6 @@ class PolicyHarvesters  {
         //return budget.harvesterRoom(Game.rooms[this.home]);
     };
 
-    draftReplacment() {
-        return this
-    };
 }
 
 

@@ -11,10 +11,11 @@ const tile = require("./tile");
 const flag = require("./flag");
 const lr = require("./lab_reactions");
 const cache = require("./cache");
+const FlagRoom = require("./flag_room");
 
-class FlagOwnedRoom {
+class FlagOwnedRoom extends FlagRoom {
     constructor (name) {
-        this.name = name;
+        super(name);
         this.m = flag.getRoomFlag(name).memory;
     }
 
@@ -172,8 +173,8 @@ class FlagOwnedRoom {
         //console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
         // = require("flag_room");
         const fRoom = new FlagRoom(this.name);
-        fRoom.getUpgradeContainerPos();
-        const posts = fRoom.getUpgradeContainerPos();
+        fRoom.upgradeContainerPos;
+        const posts = fRoom.upgradeContainerPos;
         const post = posts[0];
         for (let delta of gc.ONE_MOVE) {
             if (terrain.get(post.x+delta.x, post.y+delta.y) !== TERRAIN_MASK_WALL) {
@@ -193,8 +194,8 @@ class FlagOwnedRoom {
     sLinkPos(source) {
         //FlagRoom = require("flag_room");
         const fRoom = new FlagRoom(this.name);
-        const containerPos = fRoom.getUpgradeContainerPos()[0];
-        console.log("sLinkPos containerPos", JSON.stringify(fRoom.getUpgradeContainerPos()));
+        const containerPos = fRoom.upgradeContainerPos[0];
+        console.log("sLinkPos containerPos", JSON.stringify(fRoom.upgradeContainerPos));
         //const containerPos = this.m.sources[source.id]["containerPos"];
         const terrain = source.room.getTerrain();
         let adjacent = 0;

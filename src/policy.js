@@ -11,6 +11,7 @@ const state = require("./state");
 const construction = require("./construction");
 const FlagRoom = require("./flag_room");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 const policy = {
 
@@ -33,10 +34,11 @@ const policy = {
             }
 
             //console.log("enact policies id", id, "type", Memory.policies[id].type);
+            console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
 
-            const replacement = policy.draftReplacment();
+            const replacement = policy.draftReplacement();
             //console.log("enactPolicies replacement", replacement);
             if (replacement && replacement.type) {
                 //console.log("enactPolicies replacement", replacement, "type", replacement.type);
@@ -60,7 +62,7 @@ const policy = {
                 }
                 replacement.enact();
             } else {
-                //console.log("enactPolicies delete policy", id);
+                console.log("enactPolicies delete policy", id);
                 Memory.records.policies.replaced[Game.time.toString()] = {
                     "time" : Game.time,
                     "old" : policy.type,
@@ -76,26 +78,21 @@ const policy = {
             const room = Game.rooms[roomName];
             if (!room.memory.policy || !Memory.policies[room.memory.policy] ) {
                 if (room.controller && room.controller.my) {
-                    room.memory.policy = this.activatePolicy(gc.POLICY_GOVERN, {roomName: roomName})
+                    room.memory.policy = this.activatePolicy(gc.POLICY_GOVERN, { m:{home: roomName}})
                 }
             }
         }
     },
 
     activatePolicy: function(policyType, data, parentId, policyRate) {
-        console.log("activatePolicy type", policyType, "data", JSON.stringify(data), "parentid", parentId);
         if (parentId) {
             data.parentId = parentId;
         }
         const newPolicyId = this.getNextPolicyId();
         const policyConstructor = require("policy_" + policyType);
-        //console.log("activatePolicy data", JSON.stringify(data));
         const policy = new policyConstructor(newPolicyId, data);
         Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
-        //console.log("calling initilise policy", JSON.stringify(policy));
         if (!policy.initilise()) {
-            console.log("Policy initilise failed no policy added policyType", policyType,
-                "data", JSON.stringify(data), "parentId", parentId);
             delete Memory.policyRates[newPolicyId];
             Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
@@ -103,7 +100,6 @@ const policy = {
          if (parentId) {
             Memory.policies[parentId].m.childTypes.push(policyType);
         }
-        //console.log("activatePolicy before new policy added", JSON.stringify(Memory.policies));
         Memory.policies[newPolicyId] = policy;
 
         Memory.nextPolicyId = Memory.nextPolicyId + 1;
@@ -134,6 +130,16 @@ const policy = {
     getPolicy: function(id) {
         const Policy = require("policy_" + Memory.policies[id].type);
         return new Policy(id, Memory.policies[id]);
+    },
+
+    getPoliciesByType: function(type) {
+        const policies = [];
+        for (let id in Memory.policies) {
+            if (Memory.policies[id].type === type) {
+                policies.push(this.getPolicy(id));
+            }
+        }
+        return policies;
     },
 
     getPolicyByType: function(type) {
@@ -169,15 +175,14 @@ const policy = {
 
     getGouvernerPolicy : function(roomName) {
         for (let id in Memory.policies) {
-            //console.log("getGouvernerPolicy roomName", roomName, "home",
-            //     Memory.policies[id].roomName, "type", Memory.policies[id].type);
-            if (Memory.policies[id].roomName === roomName &&
+            //console.log("getGouvernerPolicy home", home, "home",
+            //     Memory.policies[id].home, "type", Memory.policies[id].type);
+            if (Memory.policies[id].m.home === roomName &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {
-                //console.log("found getGouvernerPolicy", id)
                 return this.getPolicy(id);
             }
         }
-        //console.log("getGouvernerPolicy dropped though", roomName)
+        //console.log("getGouvernerPolicy dropped though", home)
         return undefined;
     },
 
@@ -280,7 +285,7 @@ const policy = {
 
     areSourceContainersFinished : function (room) {
         const fRoom = new FlagRoom(room.name);
-        for (let sourceId in fRoom.getSources()) {
+        for (let sourceId in fRoom.sources) {
             const cPos = fRoom.getSourceContainerPos(sourceId);
             if (!cPos) {
                 return false;

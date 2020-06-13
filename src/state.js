@@ -3,6 +3,7 @@
  * Created by piers on 26/04/2020
  * @author Piers Shepperson
  */
+const gc = require("./gc");
 const cache = require("./cache");
 const race = require("./race");
 const flag = require("./flag");
@@ -94,7 +95,7 @@ const state = {
 
     atHarvestingPost: function(pos) {
         const fRoom = new FlagRoom(pos.roomName);
-        for (let sourceId in fRoom.getSources()) {
+        for (let sourceId in fRoom.sources) {
             const posts = fRoom.getSourcePosts(sourceId);
             for (let post of posts) {
                 if (pos.x === post.x && pos.y ===post.y) {
@@ -154,5 +155,8 @@ const state = {
     }
 
 };
-
-    module.exports = state;
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require("screeps-profiler");
+    profiler.registerObject(state, 'state');
+}
+module.exports = state;

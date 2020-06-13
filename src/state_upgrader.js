@@ -10,7 +10,7 @@ const CreepMemory = require("./creep_memory");
 const stateUpgrader = {
     findFreeUpgraderPost: function(room) { // done
         const fRoom = new FlagRoom(room.name);
-        const upgraderPosts = fRoom.getUpgradePosts();
+        const upgraderPosts = fRoom.upgradePosts;
         for ( let i = 0 ; i < upgraderPosts.length; i++ ) {
             const index = i % 2 === 0 ? i/2 : upgraderPosts.length - (i+1)/2;
             if (this.isUpgraderPostFree(upgraderPosts[index], room.name)) {

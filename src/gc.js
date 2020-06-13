@@ -190,7 +190,9 @@ const gc = {
     STATE_SCIENTIST_WITHDRAW:  "scientist_withdraw",
     STATE_SCIENTIST_TRANSFER:  "scientist_transfer",
     // military
-    STATE_PATROL_COLONIES: "patrol_colonies",
+    STATE_SWORDSMAN_IDLE: "patrol_colonies",
+    STATE_PATROL: "patrol",
+    STATE_HEALER_IDLE: "healer_idle",
 
     MAX_STATE_STACK: 5,
 
@@ -447,8 +449,8 @@ const gc = {
     MAX_SIM_BATTLE_LENGTH: 100,
     MAX_SIM_DEFENCE_LENGTH: 10,
     TICK_NUMBER: "tick number",
-    USE_PROFILER: false,
-    UNIT_TEST: true,
+    USE_PROFILER: true,
+    UNIT_TEST: false,
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
 

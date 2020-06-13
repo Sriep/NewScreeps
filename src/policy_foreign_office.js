@@ -6,29 +6,40 @@
 const gc = require("gc");
 const C = require("./Constants");
 const race = require("race");
+const policy = require("policy");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
+const PolicyBase = require("policy_base");
 
-// constructor
-class PolicyForeignOffice   {
+class PolicyForeignOffice extends PolicyBase {
     constructor (id, data) {
+        super(id, data);
         this.type = gc.POLICY_FOREIGN_OFFICE;
-        this.id = id;
-        this.m = data.m;
-        this.insurgents = [];
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
+        super.initilise();
+        if (policy.getPoliciesByType(gc.POLICY_FOREIGN_OFFICE > 0)) {
+            return false
         }
         this.m.insurgencies = {};
+        this.m.colonyDef = [];
         Memory.policyRates[this.id] = gc.FOREIGN_OFFICE_RATE;
         return true;
     };
 
+    get insurgencies() {
+        return this.m.insurgencies;
+    }
+
+    get colonyDef() {
+        this.m.colonyDef;
+    }
+
     enact() {
         this.checkInsurgencies();
         this.checkPatrols();
+        this.checkColonyDefence();
     };
 
     checkInsurgencies() {
@@ -69,25 +80,59 @@ class PolicyForeignOffice   {
 
     sendPatrol(roomName, insurgants) {
         const patrols = _.filter(Game.creeps, c => {
-            return CreepMemory.M(c).state === gc.STATE_PATROL_COLONIES
+            return CreepMemory.M(c).state === gc.STATE_PATROL
         })
 
     };
 
     checkPatrols() {
         const patrols = _.filter(Game.creeps, c => {
-            return CreepMemory.M(c).state === gc.STATE_PATROL_COLONIES
+            return CreepMemory.M(c).state === gc.STATE_PATROL
         })
 
     };
 
-    draftReplacment() {
-        return this
-    };
+    checkColonyDefence() {
+        this.m.colonyDef = [];
+        const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
+        for (let colony of colonialOffice.colonies) {
+            const defence = { attack:0, heal:0 };
+            const room = Game.rooms[colony.name];
+            if (!room) {
+                this.m.colonyDef.push(defence);
+            }
+            for (let creep of room.find(C.FIND_MY_CREEPS, {
+                filter: creep => {
+                    return !race.isCivilian(creep)
+                        && (CreepMemory.M.state === gc.STATE_PATROL
+                        || CreepMemory.M.nextState === gc.STATE_PATROL)
+                }
+            })) {
+                defence.attack += creep.getActiveBodyparts(C.ATTACK);
+                defence.attack += creep.getActiveBodyparts(C.RANGED_ATTACK);
+                defence.heal += creep.getActiveBodyparts(C.HEAL);
+            }
+            const numTowers = room.find(C.FIND_MY_STRUCTURES, {
+                filter: s => { s.structureType === C.STRUCTURE_TOWER}
+            }).length;
+            defence.attack += numTowers*C.TOWER_POWER_ATTACK;
+            defence.heal += numTowers*C.TOWER_POWER_HEAL;
+            this.m.colonyDef.push(defence);
+        }
+        this.m.colonyDef.sort( (c1, c2) => {
+            return c1.attack - c2.attack + c1.heal - c2.heal
+        });
+    }
+
+    nextPatrolRoute() {
+        return this.colonyDef[0]
+    }
+
 }
-
-
-
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+    profiler.registerClass(PolicyForeignOffice, 'PolicyForeignOffice');
+}
 module.exports = PolicyForeignOffice;
 
 

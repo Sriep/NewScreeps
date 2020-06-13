@@ -6,28 +6,22 @@
 
 const gc = require("gc");
 const construction = require("construction");
+const PolicyBase = require("policy_base");
 
-class PolicyBuildRoads   {
+class PolicyBuildRoads extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_BUILD_ROADS;
-        this.parentId = data.parentId;
-        this.home = data.home;
         this.fromFind = data.fromFind;
         this.fromStruct = data.fromStruct;
         this.toFind = data.toFind;
         this.toStruct = data.toStruct;
-        this.m = data;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
+        super.initilise();
         this.m.planned = false;
-        this.home = Memory.policies[this.parentId].roomName;
-        const room = Game.rooms[this.home];
-        return !!room && !!room.controller && room.controller.my;
+        return true;
     };
 
     enact() {
@@ -41,7 +35,7 @@ class PolicyBuildRoads   {
         this.m.planned = true;
     };
 
-    draftReplacment() {
+    draftReplacement() {
         const room = Game.rooms[this.home];
         return construction.roadsBuilt(room) && this.m.planned ? false : this;
     };

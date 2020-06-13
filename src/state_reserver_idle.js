@@ -8,6 +8,7 @@ const gc = require("gc");
 const flag = require("flag");
 const StateCreep = require("./state_creep");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 class StateReserverIdle extends StateCreep {
     constructor(creep) {
@@ -22,11 +23,11 @@ class StateReserverIdle extends StateCreep {
                 && CreepMemory.M(c).targetId
         });
 
-        const colonies = policy.getGouvernerPolicy(this.home).getColonies();
+        const colonies = policy.getGouvernerPolicy(this.home).colonies;
         let coloniesById = {};
         for (let colony of colonies) {
             if (colony.name !== this.home) {
-                colony[flag.getRoom(colony.name).getController().id] = {
+                colony[flag.getRoom(colony.name).controller.id] = {
                     name : colony.name,
                     ticks : 0
                 }
@@ -53,7 +54,7 @@ class StateReserverIdle extends StateCreep {
         console.log(this.creep.name,"STATE_HARVESTER_IDLE path", path);
         this.switchToMoveToPath(
             path,
-            fRoom.getUpgradePosts()[0],
+            fRoom.upgradePosts[0],
             gc.RANGE_POST,
             gc.STATE_HARVESTER_HARVEST,
         )

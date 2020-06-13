@@ -13,9 +13,13 @@ class StateSwordsmanIdle extends StateCreep {
     }
 
     enact() {
-        const foreignOffice =  policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
-        const roomToPatrol = foreignOffice.nextPatrolRoute(creep);
-        this.switchMoveToRoom(roomToPatrol, 20,  gc.STATE_PATROL)
+        const target = this.creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        if (target) {
+            this.creep.moveTo(target);
+            this.creep.attack(target);
+        } else {
+            this.switchTo(gc.STATE_PATROL)
+        }
     };
 }
 

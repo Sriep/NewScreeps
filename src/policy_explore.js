@@ -10,24 +10,35 @@ const gc = require("gc");
 const flag = require("flag");
 const policy = require("policy");
 const FlagRoom = require("flag_room");
+const PolicyBase = require("policy_base");
 
-class PolicyExplore  {
+class PolicyExplore extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_EXPLORE;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
+        super.initilise();
         this.m.direction = TOP;
         return true;
     };
+
+    get id() {
+        return this._id
+    }
+
+    get parentId() {
+        return this.m.parentId
+    }
+
+    get home() {
+        return this.m.home
+    }
+
+    get direction() {
+        return this.m.direction
+    }
 
     enact() {
         if (!this.m.direction) {
@@ -80,12 +91,12 @@ class PolicyExplore  {
         }
     };
 
-    draftReplacment() {
+    draftReplacement() {
         return Game.map.describeExits(this.home) ? this : false;
     };
 }
 
-odule.exports = PolicyExplore;
+module.exports = PolicyExplore;
 
 
 

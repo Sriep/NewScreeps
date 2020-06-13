@@ -68,7 +68,7 @@ const gf = {
     },
 
     splitRoomName: function(roomName) {
-        //console.log(roomName);
+        //console.log(home);
         const nsew = roomName.split(/[0123456789]/).filter(n=>n);
         const xy = roomName.split(/[NSEW]/).filter(n=>n);
         return { EW: nsew[0], NS: nsew[1], x: xy[0]*1, y: xy[1]*1};

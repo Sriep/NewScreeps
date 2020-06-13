@@ -8,24 +8,13 @@ const gf = require("gf");
 const gc = require("gc");
 const state = require("state");
 const FlagRoom = require("flag_room");
+const PolicyBase = require("policy_base");
 
-class PolicyBuildControllerContainers {
+class PolicyBuildControllerContainers extends PolicyBase {
     constructor (id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_BUILD_CONTROLLER_CONTAINERS;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data.m;
     }
-
-    initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
-        const room = Game.rooms[this.home];
-        return !!room && !!room.controller && room.controller.my;
-    };
 
     enact() {
         // console.log("POLICY_BUILD_CONTROLLER_CONTAINERS enact");
@@ -37,8 +26,8 @@ class PolicyBuildControllerContainers {
 
     setContainerSites() {
         const fRoom = new FlagRoom(this.home);
-        const posts = fRoom.getUpgradeContainerPos();
-        console.log("setContainerSites posts", JSON.stringify(posts));
+        const posts = fRoom.upgradeContainerPos;
+        //console.log("setContainerSites posts", JSON.stringify(posts));
         for (let post of posts) {
             const pos = gf.roomPosFromPos(post);
             //console.log("setContainerSites pos", JSON.stringify(pos));
@@ -54,7 +43,7 @@ class PolicyBuildControllerContainers {
 
     areControllerContainerFinished() {
         const fRoom = new FlagRoom(this.home);
-        const posts = fRoom.getUpgradeContainerPos();
+        const posts = fRoom.upgradeContainerPos;
         if (!posts) {
             return false;
         }
@@ -66,7 +55,7 @@ class PolicyBuildControllerContainers {
         return true;
     };
 
-    draftReplacment() {
+    draftReplacement() {
         const room = Game.rooms[this.home];
         return this.areControllerContainerFinished(room) ? false : this;
     };

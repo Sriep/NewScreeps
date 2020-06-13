@@ -10,23 +10,28 @@ const policy = require("policy");
 const flag = require("flag");
 const cache = require("cache");
 const FlagRoom = require("flag_room");
+const PolicyBase = require("policy_base");
 
-// constructor
-class PolicyColonialOffice  {
+class PolicyColonialOffice extends PolicyBase {
     constructor (id, data) {
+        super(id, data);
         this.type = gc.POLICY_COLONIAL_OFFICE;
-        this.id = id;
-        this.m = data.m;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
+        super.initilise();
+        if (policy.getPoliciesByType(gc.POLICY_COLONIAL_OFFICE > 0)) {
+            return false
         }
+        this.m.colonies = [];
         this.m.underConstruction = [];
         Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
         return true;
     };
+
+    get colonies() {
+        return this.m.colonies
+    }
 
     enact() {
         if ((Game.time + this.id) % 100 !== 0) {
@@ -58,8 +63,20 @@ class PolicyColonialOffice  {
         }
     };
 
+    decolonise(colony) {
+        this.m.colonies = this.m.colonies.filter( c => { c.colony.name !== colony });
+        FlagRoom.getNew(colony).spawnRoom = undefined;
+    }
+
+    colonise(colony, spawnRoom) {
+        if (!this.m.colonies.some(c => (c.colony === colony))) {
+            this.m.colonies.push({name:colony, owner:spawnRoom});
+        }
+        FlagRoom.getNew(colony).spawnRoom = spawnRoom;
+    }
+
     checkRoom(roomName) {
-        //console.log("checkRoom", roomName);
+        //console.log("checkRoom", home);
         const fRoom = new FlagRoom(roomName);
         let candidates = [];
         for (let spawnRoom in fRoom.m.paths) {
@@ -76,10 +93,9 @@ class PolicyColonialOffice  {
         //console.log("checkRoom candidates", candidates);
         for (let candidate of candidates) {
             const newColony = candidate.governor.requestAddColony(fRoom);
-            //console.log("checkRoom requestAddColony",newColony, newColony.added);
-            console.log("checkRoom requestAddColony",JSON.stringify(newColony));
+            //console.log("checkRoom requestAddColony",JSON.stringify(newColony));
             if (newColony.added) {
-                fRoom.m.spawnRoom = candidate.governor.roomName;
+                //this.colonise(home, candidate.name);
                 if (Game.rooms[roomName]) {
                     this.build(
                         Game.rooms[roomName],
@@ -170,11 +186,6 @@ class PolicyColonialOffice  {
         }
     };
 
-    myConstructionSites = function() {
-        Object.keys(Game.constructionSites).length
-
-    };
-
     findRoadAt(pos) {
         const structAt = pos.lookFor(C.LOOK_STRUCTURES);
         if (structAt.length > 0 && struct[0].structureType === C.STRUCTURE_ROAD) {
@@ -187,13 +198,12 @@ class PolicyColonialOffice  {
         return false;
     };
 
-    draftReplacment() {
-        return this
-    };
 }
 
-
-
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+    profiler.registerClass(PolicyColonialOffice, 'PolicyColonialOffice');
+}
 module.exports = PolicyColonialOffice;
 
 

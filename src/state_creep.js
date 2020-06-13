@@ -64,7 +64,7 @@ class StateCreep extends CreepMemory {
             this.pathTargetPos = targetPos;
             this.pathRange = range;
             this.pathNextState = nextState;
-            //console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.roomName)) ,"switchToMovePos", JSON.stringify(this.memory));
+            //console.log(creep.name,"switchToMoveToPath move to",JSON.stringify(cache.dPos(path.charAt(0), creep.pos.home)) ,"switchToMovePos", JSON.stringify(this.memory));
             this.switchToMovePos(
                 cache.dPos(path.charAt(0), this.creep.pos.roomName),
                 0,

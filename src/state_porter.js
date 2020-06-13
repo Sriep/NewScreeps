@@ -12,7 +12,7 @@ const statePorter = {
 
     findUpgradeContainerToFill : function(room) {
         const fRoom = new FlagRoom(room.name);
-        const containerPosts = fRoom.getUpgradeContainerPos();
+        const containerPosts = fRoom.upgradeContainerPos;
         if (!containerPosts) {
             return undefined;
         }

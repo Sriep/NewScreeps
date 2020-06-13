@@ -5,6 +5,7 @@
  */
 const C = require("./Constants");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 const race = {
     NUMBER_ROLE_TYPES: 6,

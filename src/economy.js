@@ -6,6 +6,7 @@
 
 const gc = require("./gc");
 const CreepMemory = require("./creep_memory");
+const _ = require("lodash");
 
 const economy = {
 
@@ -96,22 +97,29 @@ const economy = {
         return { count: count, neighbours: neighbours};
     },
 
-    constructionRepairLeft: function (room, excludeContainers) {
+    constructionRepairLeft: function (room, skipPos) {
+        //console.log("constructionRepairLeft skipPos", JSON.stringify(skipPos));
         let construction = 0;
-        room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function (site) {
-            if (!excludeContainers || (excludeContainers && site.structureType !== STRUCTURE_CONTAINER)
-                && site.structureType !== STRUCTURE_WALL
-                && site.structureType !== STRUCTURE_RAMPART) {
+        room.find(FIND_MY_CONSTRUCTION_SITES).forEach( site => {
+            if (site.structureType !== STRUCTURE_WALL
+                && site.structureType !== STRUCTURE_RAMPART
+                && !(skipPos
+                    && site.structureType === STRUCTURE_CONTAINER
+                    && skipPos.some(s => (s.x === site.pos.x && s.y === site.pos.y)))
+            ) {
                 construction += site.progressTotal - site.progress
             }
         });
 
         const damaged = room.find(FIND_STRUCTURES, {
-            filter: function(s)  {
-                if (!excludeContainers || (excludeContainers && s.structureType !== STRUCTURE_CONTAINER)
-                    && s.structureType !== STRUCTURE_WALL
-                    && s.structureType !== STRUCTURE_RAMPART) {
-                    return s.hits < s.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
+            filter: site =>  {
+                if (site.structureType !== STRUCTURE_WALL
+                    && site.structureType !== STRUCTURE_RAMPART
+                    && !(skipPos
+                        && site.structureType === STRUCTURE_CONTAINER
+                        && skipPos.some(s => (s.x === site.pos.x && s.y === site.pos.y)))
+                ) {
+                    return site.hits < site.hitsMax * gc.STRUCTURE_REPAIR_THRESHOLD;
                 }
             }
         });
@@ -349,3 +357,8 @@ const economy = {
 };
 
 module.exports = economy;
+
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+    profiler.registerObject(economy, 'economy');
+}

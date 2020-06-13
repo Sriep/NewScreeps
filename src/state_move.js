@@ -45,13 +45,10 @@ const move = {
             destinatons[targetPos].push(name);
         }
 
-        //const probDest = _.filter( destinatons, cNames => cNames > 1 ); {
-
-       // }
     },
 
     pathBlocked : function(pos) {
-        //const pos = cache.dPos(this.m.path.substring(1,1), this.creep.pos.roomName)
+        //const pos = cache.dPos(this.m.path.substring(1,1), this.creep.pos.home)
         for (let item of pos.look()) {
             if (item.type === "structure"
                 && item.structure.structureType !== C.STRUCTURE_ROAD

@@ -28,7 +28,7 @@ class StateUpgraderIdle extends StateCreep {
         const fRoom = new FlagRoom(this.home);
         if (this.atUpgradingPost(this.creep.pos)) {
             //console.log("STATE_UPGRADER_IDLE at UpgradingPost", JSON.stringify(this.creep.pos))
-            const upgradeContainerPoses = fRoom.getUpgradePosts();
+            const upgradeContainerPoses = fRoom.upgradePosts;
             for (let cPos of upgradeContainerPoses) {
                 const upgradeContainer = state.findContainerAt(gf.roomPosFromPos(cPos));
                 if (upgradeContainer.store.getUsedCapacity(RESOURCE_ENERGY) !== 0) {
@@ -67,7 +67,7 @@ class StateUpgraderIdle extends StateCreep {
 
     atUpgradingPost(pos) {
         const fRoom = new FlagRoom(pos.roomName);
-        const posts = fRoom.getUpgradePosts();
+        const posts = fRoom.upgradePosts;
         for (let i in posts) {
             if (pos.x === posts[i].x && pos.y === posts[i].y){
                 return true;

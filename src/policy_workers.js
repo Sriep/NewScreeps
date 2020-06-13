@@ -10,29 +10,18 @@ const economy = require("economy");
 const flag = require("flag");
 const budget = require("budget");
 const race = require("race");
+const PolicyBase = require("policy_base");
 
-class PolicyWorkers   {
+class PolicyWorkers  extends PolicyBase {
     constructor(id, data) {
-        this.id = id;
+        super(id, data);
         this.type = gc.POLICY_WORKERS;
-        this.parentId = data.parentId;
-        this.home = data.home;
-        this.m = data;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
+        super.initilise();
         flag.getSpawnQueue(this.home).clear();
-        for (let id in Memory.policies) {
-            if (id !== this.id && Memory.policies[id].type === gc.POLICY_WORKERS) {
-                //console.log("Worker policy", JSON.stringify(this));
-                gf.fatalError("two worker policies");
-            }
-        }
-        return true;
+        return true
     };
 
     enact() {
@@ -93,10 +82,6 @@ class PolicyWorkers   {
     budget() {
         const netEnergy = budget.workerRoom(Game.rooms[this.home], this.equilibriumWorkers());
         return { "profit" : netEnergy, "parts" :  this.equilibriumWorkers()*3 };
-    };
-
-    draftReplacment() {
-        return this
     };
 
 }

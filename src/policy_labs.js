@@ -8,23 +8,14 @@ const C = require("./Constants");
 const gc = require("./gc");
 const lr = require("./lab_reactions");
 const FlagOwnedRoom = require("./flag_owned_room");
+const PolicyBase = require("policy_base");
 
 // constructor
-class PolicyLabs   {
+class PolicyLabs extends PolicyBase {
     constructor (id, data) {
+        super(id, data);
         this.type = gc.POLICY_LABS;
-        this.id = id;
-        this.home = data.home;
-        this.m = data.m;
-        this.parentId = data.parentId;
     }
-
-    initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
-        this.home = Memory.policies[this.parentId].roomName;
-    };
 
     enact() {
         const labs = Game.rooms[this.home].find(C.FIND_MY_STRUCTURES,
@@ -41,10 +32,6 @@ class PolicyLabs   {
                 fRoom.flagLabs(boost, totals)
             }
         }
-    };
-
-    draftReplacment() {
-        return this
     };
 
     countResources() {

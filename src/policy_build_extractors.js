@@ -6,32 +6,23 @@
 
 const gc = require("gc");
 const policy = require("policy");
+const PolicyBase = require("policy_base");
 
-// constructor
-class PolicyBuildExtractors {
+class PolicyBuildExtractors extends PolicyBase {
     constructor (id, data)  {
+        super(id, data);
         this.type = gc.POLICY_BUILD_EXTRACTORS;
-        this.id = id;
-        this.home = data.home;
-        this.m = data.m;
-        this.parentId = data.parentId;
     }
 
     initilise() {
-        if (!this.m) {
-            this.m = {}
-        }
+        super.initilise();
         this.m.finished = false;
-        //console.log("PolicyBuildExtractors initilise", JSON.stringify(this));
-        //console.log("Memory.policies[this.parentId]", JSON.stringify(Memory.policies[this.parentId]))
-        this.home = Memory.policies[this.parentId].roomName;
-        const room = Game.rooms[this.home];
-        return !!room && !!room.controller && room.controller.my;
+        return true;
     };
 
     enact() {
         //console.log("POLICY_BUILD_EXTRACTORS this", JSON.stringify(this));
-        const colonies = policy.getGouvernerPolicy(this.home).getColonies();
+        const colonies = policy.getGouvernerPolicy(this.home).colonies;
         this.m.finished = true;
         for (let colonyInfo of colonies) {
             const colony = Game.rooms[colonyInfo.name];
@@ -60,10 +51,6 @@ class PolicyBuildExtractors {
         }
     };
 
-    draftReplacment() {
-        return this;
-        //return this.m.finished ? false : this;
-    };
 }
 
 
