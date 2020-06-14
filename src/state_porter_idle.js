@@ -186,8 +186,7 @@ class StatePorterIdle extends StateCreep {
             return;
         }
         const foRoom = new FlagOwnedRoom(this.home);
-        console.log("check flags before slice1", JSON.stringify(foRoom.plan));
-        const labPos = foRoom.plan.lab.slice(foRoom.plan.base_labs);
+        const labPos = foRoom.lab.slice(foRoom.baseLabs);
         const labs = room.find(FIND_MY_STRUCTURES, {
             filter: obj => {
                 if (obj.structureType === STRUCTURE_LAB) {

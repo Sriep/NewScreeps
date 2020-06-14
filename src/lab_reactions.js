@@ -37,18 +37,17 @@ const lr = {
         return map;
     },
 
-    mapReagentsToLabs : function(reagentMap, numLabs, centreTile) {
-        //const leafLabs = centerTile.lab_map.slice(0,centreTile.base_labs);
-        //console.log("leafLabs", JSON.stringify(leafLabs));
-        console.log("mapReagentsToLabs", JSON.stringify(reagentMap), "numLabs", numLabs, "centreTile", JSON.stringify(centreTile))
+    mapReagentsToLabs : function(reagentMap, numLabs, baseLabs, labMap) {
+        console.log("mapReagentsToLabs", JSON.stringify(reagentMap), "numLabs", numLabs
+            ,"baseLabs",baseLabs,"labMap", JSON.stringify(labMap));
         return this.mapReagentsToLabsI(
             [],
             reagentMap,
             [...Array(numLabs).keys()],
             [...Array(numLabs).keys()],
             [],
-            centreTile.lab_map,
-            [...Array(centreTile.base_labs).keys()],
+            labMap,
+            [...Array(baseLabs).keys()],
         ).mapping
     },
 

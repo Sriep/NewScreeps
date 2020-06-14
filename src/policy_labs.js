@@ -25,7 +25,7 @@ class PolicyLabs extends PolicyBase {
 
         const totals = this.countResources();
         const fRoom = new FlagOwnedRoom(this.home);
-        const labPower = labs.length; //Math.min(labs.length, 2*fRoom.flagLabs.m.plan["base_labs"]+1);
+        const labPower = labs.length;
         const products = lr.assesProducts(totals, labPower);
         console.log("POLICY_LABS products", JSON.stringify(products));
         for (let boost of lr.prioiritisedBoosts) {

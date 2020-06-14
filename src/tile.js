@@ -81,14 +81,14 @@ const tile = {
     centres: {
         CENTRE_6x6_1 : {
             "origin" : {"x":0,"y":0},
-            "x_dim" : 6,
-            "y_dim": 6,
+            "xDim" : 6,
+            "yDim": 6,
             [C.STRUCTURE_LAB] : [
                 {"x":2,"y":3},{"x":2,"y":4},{"x":3,"y":3},
                 {"x":2,"y":5},{"x":1,"y":3},{"x":1,"y":2},
                 {"x":2,"y":2},{"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4}
             ],
-            ["base_labs"] : 4,
+            ["baseLab"] : 4,
             [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
             [C.STRUCTURE_TERMINAL] : [{"x":4,"y":5}],
             [C.STRUCTURE_LINK] : [{"x":3,"y":5}],
@@ -106,14 +106,14 @@ const tile = {
 
         CENTRE_6x6_2 : {
             "origin" : {"x":0,"y":0},
-            "x_dim" : 6,
-            "y_dim": 6,
+            "xDim" : 6,
+            "yDim": 6,
             [C.STRUCTURE_LAB] : [
                 {"x":2,"y":2},{"x":2,"y":3},{"x":3,"y":2},
                 {"x":2,"y":4},{"x":3,"y":1},{"x":4,"y":1},
                 {"x":1,"y":3},{"x":1,"y":4},{"x":5,"y":2},{"x":5,"y":3}
             ],
-            ["base_labs"] : 4,
+            ["baseLab"] : 4,
             [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
             [C.STRUCTURE_TERMINAL] : [{"x":3,"y":4}],
             [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
@@ -125,19 +125,19 @@ const tile = {
 
         CENTRE_6x6_3 : {
             "origin" : {"x":0,"y":0},
-            "x_dim" : 6,
-            "y_dim": 6,
+            "xDim" : 6,
+            "yDim": 6,
             [C.STRUCTURE_LAB] : [
                 {"x":2,"y":2},{"x":2,"y":3},{"x":3,"y":2},
                 {"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4},
                 {"x":3,"y":1},{"x":2,"y":1},{"x":1,"y":1},{"x":4,"y":1}
             ],
-            ["lab_map"] : [
+            ["labMap"] : [
                 [1,2,3,4,5,6,7,8,9],[0,2,3,4,5,6,7,8,9],[0,1,3,4,5,6,7,8,9],
                 [0,1,2,4,5,6,7,8],[0,1,2,3,5],[0,1,2,3,4],
                 [0,1,2,3,7,8,9],[0,1,2,3,6,8,9],[0,1,2,3,6,7],[0,1,2,6,7]
             ],
-            ["base_labs"] : 4,
+            ["baseLab"] : 4,
             [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
             [C.STRUCTURE_TERMINAL] : [{"x":3,"y":4}],
             [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
@@ -150,7 +150,7 @@ const tile = {
 
 
     getCopy : function (tileObj) {
-        console.log("copy tile")
+        //console.log("copy tile");
         if (!tileObj) {
             return;
         }

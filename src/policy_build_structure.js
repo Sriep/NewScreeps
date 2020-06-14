@@ -22,6 +22,7 @@ class PolicyBuildStructure extends PolicyBase {
     enact() {
         //console.log("POLICY_BUILD_STRUCTURE this",JSON.stringify(this));
         const fRoom = new FlagOwnedRoom(this.home);
+        //console.log("fRoom spawn", JSON.stringify(fRoom["spawn"]));
         this.m.built = !fRoom.buildStructure(this.structureType)
     };
 

@@ -18,8 +18,8 @@ class StateScientistTransfer extends StateCreep {
         }
         const room = Game.rooms[this.creep.room];
         const foRoom = new FlagOwnedRoom(this.home);
-        console.log("check flags before slice2",foRoom.plan.lab);
-        const labPos = foRoom.plan.lab.slice(0, foRoom.plan.base_labs);
+        console.log("check flags before slice2",foRoom.lab);
+        const labPos = foRoom.lab.slice(0, foRoom.baseLabs);
         const labs = room.find(FIND_MY_STRUCTURES, {
             filter: obj => {
                 if (obj.structureType === STRUCTURE_LAB) {

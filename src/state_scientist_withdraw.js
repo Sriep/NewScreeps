@@ -19,8 +19,8 @@ class StateScientistWithdraw extends StateCreep {
         const room = Game.rooms[this.creep.room];
 
         const foRoom = new FlagOwnedRoom(this.home);
-        console.log("StateScientistWithdraw enact flags before slice",foRoom.plan.lab);
-        const labPos = foRoom.plan.lab.slice(0, foRoom.plan.base_labs);
+        console.log("StateScientistWithdraw enact flags before slice",foRoom.lab);
+        const labPos = foRoom.lab.slice(0, foRoom.baseLabs);
         const labs = room.find(FIND_MY_STRUCTURES, {
             filter: obj => {
                 if (obj.structureType === STRUCTURE_LAB) {
@@ -57,7 +57,7 @@ class StateScientistWithdraw extends StateCreep {
             }
         }
 
-        const link = state.getObjAtPos(gf.roomPosFromPos(foRoom.plan.link[0], room.name), STRUCTURE_LINK);
+        const link = state.getObjAtPos(gf.roomPosFromPos(foRoom.link[0], room.name), STRUCTURE_LINK);
         if (link) {
             if (gf.loadFromFlag(link) && link.store[RESOURCE_ENERGY] > 0) {
                 const ok = this.creep.withdraw(link, RESOURCE_ENERGY);
