@@ -380,9 +380,16 @@ const gc = {
     POLICY_BUILD_STRUCTURE: "build_structure",
     POLICY_LABS: "labs",
 
-    //policy
+    // policy
     PLANNED_BUILDS: true,
     EXPLORE_CREEPS: 4,
+
+    // links
+    LINK_POS_EXIT: "exit",
+    LINK_POS_SOURCE: "source",
+    LINK_POS_CONTROLLER: "controller",
+    LINK_POS_STORAGE: "storage",
+
 
     // spawn priories
     SPAWN_PRIORITY_CRITICAL: 0,

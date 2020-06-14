@@ -7,23 +7,16 @@ const C = require("./Constants");
 
 const tile = {
 
-    p: {
-        Origin: "origin",
-        XDim:  "x_dim",
-        YDim: "y_dim",
-        Scientist: "scientist",
-        LabMap: "lab_map",
-        BaseLabs: "base_labs",
-        [C.STRUCTURE_TOWER]: C.STRUCTURE_TOWER,
-        [C.STRUCTURE_EXTENSION]: C.STRUCTURE_EXTENSION,
-        [C.STRUCTURE_LAB]: C.STRUCTURE_LAB,
-        [C.STRUCTURE_TERMINAL]: C.STRUCTURE_TERMINAL,
-        [C.STRUCTURE_SPAWN]: C.STRUCTURE_SPAWN,
-        [C.STRUCTURE_POWER_SPAWN]: C.STRUCTURE_POWER_SPAWN,
-        [C.STRUCTURE_ROAD]: C.STRUCTURE_ROAD,
-        [C.STRUCTURE_OBSERVER]: C.STRUCTURE_OBSERVER,
-        [C.STRUCTURE_LINK]: C.STRUCTURE_LINK,
-    },
+    link :[
+        gc.LINK_POS_CONTROLLER,
+        gc.LINK_POS_SOURCE,
+        gc.LINK_POS_STORAGE,
+        gc.LINK_POS_EXIT,
+        gc.LINK_POS_EXIT,
+        gc.LINK_POS_EXIT,
+        gc.LINK_POS_EXIT,
+        gc.LINK_POS_SOURCE,
+    ],
 
     towers: {
         TOWER_3x3 : {

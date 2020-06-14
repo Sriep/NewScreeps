@@ -220,6 +220,8 @@ class FlagOwnedRoom extends FlagRoom {
         return rtv;
     };
 
+
+
     setSourcesLinkPos() {
         const links = [];
         const sources = Game.rooms[this.name].find(FIND_SOURCES);
