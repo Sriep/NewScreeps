@@ -20,63 +20,19 @@ class FlagOwnedRoom extends FlagRoom {
     }
 
     get origin() {
-        return this.plan["origin"]
-    }
-
-    get xDim() {
-        return tile.centres[this.plan["centreTile"]].xDim;
-    }
-
-    get yDim() {
-        return tile.centres[this.plan["centreTile"]].yDim;
-    }
-
-    get lab() {
-        return this.centre[STRUCTURE_LAB]
-    }
-
-    get labMap() {
-        return tile.centres[this.plan["centreTile"]].labMap;
-    }
-
-    get baseLabs() {
-        return tile.centres[this.plan["centreTile"]].baseLabs;
-    }
-
-    get storage() {
-        return this.centre[STRUCTURE_STORAGE]
-    }
-
-    get terminal() {
-        return this.centre[STRUCTURE_TERMINAL]
+        return cache.dPos(this.plan["origin"], this.home)
     }
 
     get link() {
-        return this.plan[STRUCTURE_LINK]
-    }
-
-    get spawn() {
-        return this.centre[STRUCTURE_SPAWN]
-    }
-
-    get powerSpawn() {
-        return this.centre[STRUCTURE_POWER_SPAWN]
-    }
-
-    get scientist() {
-        return this.centre["scientist"]
-    }
-
-    get observer() {
-        return this.centre[STRUCTURE_OBSERVER]
+        return cache.deserialiseRoArray(this.plan[STRUCTURE_LINK], this.home)
     }
 
     get tower() {
-        return this.plan[STRUCTURE_TOWER]
+        return cache.deserialiseRoArray(this.plan[STRUCTURE_TOWER], this.home)
     }
 
     get extension() {
-        return this.plan[STRUCTURE_EXTENSION]
+        return cache.deserialiseRoArray(this.plan[STRUCTURE_EXTENSION], this.home)
     }
 
     get centreTile() {
@@ -86,6 +42,50 @@ class FlagOwnedRoom extends FlagRoom {
     get plan() {
         return this.memory.plan;
     };
+
+    get xDim() {
+        return tile.centres[this.centreTile].xDim;
+    }
+
+    get yDim() {
+        return tile.centres[this.centreTile].yDim;
+    }
+
+    get labMap() {
+        return tile.centres[this.centreTile].labMap;
+    }
+
+    get baseLabs() {
+        return tile.centres[this.centreTile].baseLabs;
+    }
+
+    get lab() {
+        return this.getTileItem(STRUCTURE_LAB)
+    }
+
+    get storage() {
+        return this.getTileItem(STRUCTURE_STORAGE)
+    }
+
+    get terminal() {
+        return this.getTileItem(STRUCTURE_TERMINAL)
+    }
+
+    get spawn() {
+        return this.getTileItem(STRUCTURE_SPAWN)
+    }
+
+    get powerSpawn() {
+        return this.getTileItem(STRUCTURE_POWER_SPAWN)
+    }
+
+    get scientist() {
+        return this.getTileItem("scientist")
+    }
+
+    get observer() {
+        return this.getTileItem(STRUCTURE_OBSERVER)
+    }
 
     get centre() {
         return  cache.global(
@@ -97,11 +97,28 @@ class FlagOwnedRoom extends FlagRoom {
     }
 
     _centre() {
-        const centre = tile.getCopy(tile.centres[this.plan["centreTile"]]);
+        const centre = tile.getCopy(tile.centres[this.centreTile]);
         centre.origin = this.origin;
         tile.shiftToOrigin(centre);
         return centre;
     };
+
+    getTileItem(type) {
+        return  cache.global(
+            FlagOwnedRoom.prototype._getTileItem,
+            this,
+            [type],
+            "FLO." +this.name + ".getTileItem." + type,
+        );
+    }
+
+    _getTileItem(type) {
+        const item = {};
+        item[type] = tile.getCopy(tile.centres[this.centreTile][type]);
+        item["origin"] = this.origin;
+        tile.shiftToOrigin(item);
+        return item[type]
+    }
 
     placeCentre(centreTile, start) {
         let avoid = [];
@@ -114,27 +131,21 @@ class FlagOwnedRoom extends FlagRoom {
         this.memory.plan = {};
         this.plan["centreTile"] = centreTile;
         const centre = tile.centres[centreTile];
-        if (start) {
-            this.plan["origin"] = start;
-        } else {
-            this.plan["origin"] = this.findLocationForCentre(centre.xDim, centre.yDim, avoid);
-        }
-        tile.shiftToOrigin(this.plan);
+        let origin = start ? start : this.findLocationForCentre(centre.xDim, centre.yDim, avoid);
+        this.plan["origin"] = cache.sPoint(origin);
         for ( let dx = 0 ; dx < centre.xDim ; dx++ ) {
             for ( let dy = 0 ; dy < centre.yDim ; dy++ ) {
                 avoid.push({
-                    "x": this.plan["origin"].x + dx,
-                    "y": this.plan["origin"].y + dy
+                    "x": origin.x + dx,
+                    "y": origin.y + dy
                 })
             }
         }
 
         const terrain = new Room.Terrain(this.name);
-        this.plan[STRUCTURE_TOWER] = this.getTowerPos(terrain, this.origin, avoid);
-        this.plan[STRUCTURE_EXTENSION] = this.getExtensionPos(terrain, this.origin, avoid);
-        this.plan[STRUCTURE_LINK] = [];
-        this.plan[STRUCTURE_LINK].push(this.setControllerLinkPos());
-        this.plan[STRUCTURE_LINK] = this.m["plan"][STRUCTURE_LINK].concat(this.setSourcesLinkPos());
+        this.plan[STRUCTURE_TOWER] = cache.serialisePath(this.getTowerPos(terrain, origin, avoid));
+        this.plan[STRUCTURE_EXTENSION] = cache.serialisePath(this.getExtensionPos(terrain, origin, avoid));
+        this.plan[STRUCTURE_LINK] = cache.serialisePath(this.linkPos());
     }
 
     placeCentreOld(centreTile, start) {
@@ -220,9 +231,45 @@ class FlagOwnedRoom extends FlagRoom {
         return rtv;
     };
 
+    linkPos() {
+        const links = [];
+        let linkSource = 0;
+        let sourceLinkPos = this.sourceLinkPos();
+        let linkExit = 0;
+        let exitLinkPos = this.exitLinkPos();
+        let linkController = 0;
+        let controllerLinkPos = this.controllerLinkPos();
+        for (let linkType of tile.links) {
+            switch (linkType) {
+                case gc.LINK_POS.Exit:
+                    if (exitLinkPos.length > linkExit) {
+                        links.push(exitLinkPos[linkExit]);
+                        linkExit++
+                    }
+                    break;
+                case gc.LINK_POS.Source:
+                    if (sourceLinkPos.length > linkSource) {
+                        links.push(sourceLinkPos[linkSource]);
+                        linkSource++
+                    }
+                    break;
+                case gc.LINK_POS.Controller:
+                    if (controllerLinkPos.length > linkController) {
+                        links.push(controllerLinkPos[linkController]);
+                        linkController++
+                    }
+                    break;
+                case gc.LINK_POS.Storage:
+                    links.push(this.centre.link[0]);
+                    break;
+                default:
+                    gf.fatalError("Invalid link type", linkType);
+            }
+        }
+        return links;
+    }
 
-
-    setSourcesLinkPos() {
+    sourceLinkPos() {
         const links = [];
         const sources = Game.rooms[this.name].find(FIND_SOURCES);
         for (let source of sources) {
@@ -232,7 +279,7 @@ class FlagOwnedRoom extends FlagRoom {
     };
 
     // todo improve this logic
-    setControllerLinkPos() {
+    controllerLinkPos() {
         const room = Game.rooms[this.name];
         const terrain = room.getTerrain();
         //console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
@@ -243,18 +290,49 @@ class FlagOwnedRoom extends FlagRoom {
         const post = posts[0];
         for (let delta of gc.ONE_MOVE) {
             if (terrain.get(post.x+delta.x, post.y+delta.y) !== TERRAIN_MASK_WALL) {
-                return new RoomPosition(post.x+delta.x, post.y+delta.y, room.name);
+                return [new RoomPosition(post.x+delta.x, post.y+delta.y, room.name)];
             }
         }
     };
 
-    sourceLinkPos(id) {
+    exitLinkPos() {
+        const terrain = Game.map.getRoomTerrain(this.home);
+        const exitLinks = [];
+        const exits = Game.map.describeExits(this.home);
+        for ( let direction in exits ) {
+            const route = Game.map.findRoute(this.home, exits[direction]);
+            let targetPos;
+            for ( let i = 0 ; i < 49 && !targetPos ; i++ ) {
+                switch (direction) {
+                    case C.TOP:
+                        if (terrain.get(i, 0) !== TERRAIN_MASK_WALL) {
+                            targetPos = {x:i, y:0}
+                        }
+                        break;
+                    case C.RIGHT:
+                        if (terrain.get(49, i) !== TERRAIN_MASK_WALL) {
+                            targetPos = {x:49, y:i}
+                        }
+                        break;
+                    case C.BOTTOM:
+                        if (terrain.get(i, 49) !== TERRAIN_MASK_WALL) {
+                            targetPos = {x:i, y:49}
+                        }
+                        break;
+                    case C.LEFT:
+                        if (terrain.get(0, i) !== TERRAIN_MASK_WALL) {
+                            targetPos = {x:0, y:i}
+                        }
+                        break;
+                }
+            }
+            if (targetPos) {
+                exitLinks.push(targetPos)
+            }
+        }
+        return exitLinks;
+    }
 
-    };
-
-    controllerLinkPos(id) {
-
-    };
 
     sLinkPos(source) {
         //FlagRoom = require("flag_room");
@@ -334,6 +412,11 @@ class FlagOwnedRoom extends FlagRoom {
         }
         return true;
     };
+}
+
+if (gc.USE_PROFILER && !gc.UNIT_TEST) {
+    const profiler = require('screeps-profiler');
+    profiler.registerClass(FlagOwnedRoom, 'FlagOwnedRoom');
 }
 
 module.exports = FlagOwnedRoom;

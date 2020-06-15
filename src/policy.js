@@ -18,56 +18,57 @@ const policy = {
     //M : Memory.policies,
 
     enactPolicies: function() {
+        console.log("enactPolicies");
         if (undefined === Memory.policies) {
             Memory.policies = {};
         }
-        if (undefined === Memory.policyRates) {
-            Memory.policyRates = {};
-        }
+        //if (undefined === Memory.policyRates) {
+        //    Memory.policyRates = {};
+        //}
         this.checkRoomPolicies();
         for (let id in Memory.policies) {
             //Game.time % gc.FLAG_UPDATE_RATE === 0
             //console.log("policy id", id, "Game.time + id",Game.time + id, "Memory.policyRates[id]",Memory.policyRates[id]
             //,"Game.time + id % Memory.policyRates[id] ",(Game.time + id) % Memory.policyRates[id] )
-            if ((Game.time + id) % Memory.policyRates[id] !== 0) {
-                continue;
-            }
+            //if ((Game.time + id) % Memory.policyRates[id] !== 0) {
+            //    continue;
+            //}
 
             //console.log("enact policies id", id, "type", Memory.policies[id].type);
-            //console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
+            console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
-
+            //console.log("policy id",id,"type",policy.type);
             const replacement = policy.draftReplacement();
             //console.log("enactPolicies replacement", replacement);
             if (replacement && replacement.type) {
                 //console.log("enactPolicies replacement", replacement, "type", replacement.type);
                 if (replacement.type !== policy.type) {
-                    this.removeFromParentChildList(policy.parentId, policy.type);
+                    //this.removeFromParentChildList(policy.parentId, policy.type);
                     //console.log("enactPolicies replace policy with", JSON.stringify(replacement));
                     if (!replacement.policy.initilise()) {
                         //console.log("replacement for policy", id, "does not initilise");
-                        Memory.records.policies.replaced[Game.time.toString()] = {
-                            "time" : Game.time,
-                            "old" : policy.type,
-                        };
+                        //Memory.records.policies.replaced[Game.time.toString()] = {
+                        //    "time" : Game.time,
+                        //    "old" : policy.type,
+                        //};
                         continue;
                     }
-                    Memory.records.policies.replaced[Game.time.toString()] = {
-                        "time" : Game.time,
-                        "old" : policy.type,
-                        "new" : replacement.type,
-                    };
+                    //Memory.records.policies.replaced[Game.time.toString()] = {
+                    //    "time" : Game.time,
+                    //    "old" : policy.type,
+                    //    "new" : replacement.type,
+                    //};
                     Memory.policies[id] = replacement;
                 }
                 replacement.enact();
             } else {
                 //console.log("enactPolicies delete policy", id);
-                Memory.records.policies.replaced[Game.time.toString()] = {
-                    "time" : Game.time,
-                    "old" : policy.type,
-                    "policy" : JSON.stringify(policy)
-                };
+                //Memory.records.policies.replaced[Game.time.toString()] = {
+                //    "time" : Game.time,
+                //    "old" : policy.type,
+                //    "policy" : JSON.stringify(policy)
+                //};
                 delete Memory.policies[id];
             }
         }
@@ -88,18 +89,19 @@ const policy = {
         if (parentId) {
             data.parentId = parentId;
         }
+        console.log("activatePolicy", policyType, "data", JSON.stringify(data), "policyRate", policyRate);
         const newPolicyId = this.getNextPolicyId();
         const policyConstructor = require("policy_" + policyType);
         const policy = new policyConstructor(newPolicyId, data);
-        Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
+        //Memory.policyRates[newPolicyId] = policyRate ? policyRate : 1;
         if (!policy.initilise()) {
-            delete Memory.policyRates[newPolicyId];
+            //delete Memory.policyRates[newPolicyId];
             Memory.records.policies.initilise_failed[Game.time.toString()] = policy.type;
             return undefined;
         }
-         if (parentId) {
-            Memory.policies[parentId].m.childTypes.push(policyType);
-        }
+         //if (parentId) {
+            //Memory.policies[parentId].m.childTypes.push(policyType);
+        //}
         Memory.policies[newPolicyId] = policy;
 
         Memory.nextPolicyId = Memory.nextPolicyId + 1;
@@ -198,22 +200,22 @@ const policy = {
 
     removePolicy: function(id) {
         //console.log("policy remove policy", id, "type",Memory.policies[id].type);
-        this.removeFromParentChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
+        //this.removeFromParentChildList(Memory.policies[id].parentId, Memory.policies[id].type)   ;
         delete Memory.policies[id];
-        delete Memory.policyRates[id];
-        Memory.records.policies.replaced[Game.time.toString()] = {
-            "time" : Game.time,
-            "old" : policy.type,
-        };
+        //delete Memory.policyRates[id];
+        //Memory.records.policies.replaced[Game.time.toString()] = {
+        //    "time" : Game.time,
+        //    "old" : policy.type,
+        //};
     },
 
-    removeFromParentChildList: function(parentId, childType) {
-        if (Memory.policies[parentId].m.childTypes) {
-             Memory.policies[parentId].childType = Memory.policies[parentId].m.childTypes.filter(
-                child => child !== childType
-            );
-        }
-    },
+    //removeFromParentChildList: function(parentId, childType) {
+    //    if (Memory.policies[parentId].m.childTypes) {
+    //         Memory.policies[parentId].childType = Memory.policies[parentId].m.childTypes.filter(
+    //            child => child !== childType
+    //        );
+    //    }
+    //},
 
     iterateChildren: function(parentId, fn) {
         for (let id in Memory.policies) {

@@ -119,6 +119,7 @@ const state = {
         if (!pos) {
             return undefined;
         }
+        //console.log("findContainerAt pos",pos);
         const StructAt = pos.lookFor(LOOK_STRUCTURES);
         if (StructAt.length > 0 && StructAt[0].structureType === STRUCTURE_CONTAINER) {
             return StructAt[0];
@@ -145,6 +146,7 @@ const state = {
     },
 
     getObjAtPos(pos, type) {
+        console.log("getObjAtPos pos",pos);
         if (pos) {
             for (let struc of pos.lookFor(LOOK_STRUCTURES)) {
                 if (struc.structureType === type) {

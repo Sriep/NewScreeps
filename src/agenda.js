@@ -12,25 +12,73 @@ const policy = require("./policy");
 const agenda = {
 
     enact: function (id, agenda, rcl, index) {
-        const item = agenda[rcl][index];
-        if (!this.agendaFns()[item.type].check(item.activity, id)) {
-            return index;
+        if (index >= 0) {
+            if (index >= agenda[rcl].length) {
+                return index;
+            }
+            if (!this.agendaFns()[agenda[rcl][index].type].check.call(
+                this,
+                agenda[rcl][index].activity,
+                id
+            )) {
+                return index
+            }
+            index++
+        } else {
+            index = 0;
         }
-        this.agendaFns()[item.type].enact(item.activity, id, item.params);
-        return index+1;
+        this.agendaFns()[agenda[rcl][index].type].enact.call(
+            this,
+            agenda[rcl][index].activity,
+            id,
+            agenda[rcl][index].params
+        );
+        return index;
     },
 
     agendaFns: function() {
         return {
-            [gc.Activity.Flag] : this.newActivity,
-            [gc.Activity.Policy] : this.newPolicy,
-            [gc.Activity.PolicyBlocker] : this.newBlockerPolicy,
-            [gc.Activity.PolicyReplacement] : his.newPolicyReplacment,
+            [gc.Activity.Flag] : {
+                "enact": function (activity, parnetId) {
+                    policy.getPolicy(parnetId).m[activity] = true;
+                },
+                "check": function() { return true; },
+            },
+            [gc.Activity.Policy] : {
+                "enact": this.activateNewPolicy,
+                "check": function() { console.log("agenda check return true"); return true; },
+            },
+            [gc.Activity.PolicyBlocker] : {
+                "enact": this.activateNewPolicy,
+                "check": function (activity, parnetId)  {
+                    //console.log("PolicyBlocker chack");
+                    return !policy.hasChildType(parnetId, activity);
+                }
+            },
+            [gc.Activity.PolicyReplacement] : {
+                "enact": this.activateNewReplacementPolicy,
+                "check": function() { return true; },
+            },
             [gc.Activity.Control] : {
                 "enact": function(activity) { gf.assert(activity !== gc.ACTIVITY_DISALLOWED) },
                 "check": function(){ return false; },
             },
         }
+    },
+
+    activateNewReplacementPolicy : function ( activity, parentId)  {
+        //console.log("activateNewReplacementPolicy activity",activity,"id",parentId);
+        policy.activateReplacePolicy(
+            activity,
+            {},
+            parentId,
+            gc.ECONOMIES,
+        );
+    },
+
+    activateNewPolicy : function ( activity, parentId, params)  {
+        //console.log("activateNewPolicy activity",activity,"id",parentId, "params", JSON.stringify(params));
+        policy.activatePolicy(activity, params ? params : {}, parentId);
     },
 
     agendas: {
@@ -47,12 +95,12 @@ const agenda = {
                 { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
                 //{ "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Policy},
                 //{ "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
-                //{ "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
+                { "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS, type: gc.Activity.PolicyBlocker},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
                 { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS, type: gc.Activity.PolicyBlocker},
                 { "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Flag},
-                { "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
+                //{ "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
                 { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
             ],
@@ -172,82 +220,6 @@ const agenda = {
         ],
     },
 
-
-
-    items : function () {
-        const fc = {};
-        //fc[gc.POLICY_BUILD_ROADS] = newBlockerPolicy;
-        fc[gc.POLICY_BUILD_ROADS] = skip;
-        fc[gc.POLICY_BUILD_STRUCTURE] = newBlockerPolicy;
-        fc[gc.POLICY_PLAN_BUILDS] = newBlockerPolicy;
-        fc[gc.POLICY_EXPLORE] = newPolicy;
-        fc[gc.POLICY_LABS] = newPolicy;
-        fc[gc.POLICY_COLONIAL_OFFICE] = newPolicy;
-        fc[gc.POLICY_FOREIGN_OFFICE] = newPolicy;
-        fc[gc.POLICY_BUILD_EXTRACTORS] = newPolicy;
-        fc[gc.POLICY_RCL1] = newPolicyReplacment;
-        fc[gc.POLICY_WORKERS] = newPolicyReplacment;
-        fc[gc.POLICY_HARVESTERS] = newPolicyReplacment;
-        fc[gc.POLICY_PORTERS] = newPolicyReplacment;
-        fc[gc.POLICY_BUILD_CONTROLLER_CONTAINERS] = newBlockerPolicy;
-        fc[gc.POLICY_BUILD_SOURCE_CONTAINERS] = newBlockerPolicy;
-        fc[gc.ACTIVITY_MINE_COLONIES] = newActivity;
-        fc[gc.ACTIVITY_RESERVED_COLONIES] = newActivity;
-        fc[gc.ACTIVITY_COLONY_ROADS] = newActivity;
-        fc[gc.ACTIVITY_FLEXI_HARVESTERS] = newActivity;
-        fc[gc.ACTIVITY_FINISHED]  = {
-            "enact": function(){},
-            "check": function(){ return false; },
-        };
-        fc[gc.ACTIVITY_DISALLOWED] = {
-            "enact": function(){ gf.fatalError("activity not allowed at this rcl")},
-            "check": function(){ return true; },
-        };
-        return fc;
-    }
-
-};
-
-const activateNewPolicy = function ( activity, parnetId, params)  {
-     policy.activatePolicy(activity, params ? params : {}, parnetId);
-};
-
-const activateNewReplacementPolicy = function ( activity, parnetId)  {
-   policy.activateReplacePolicy(
-       activity,
-        { parentId: parnetId },
-        parnetId,
-        gc.ECONOMIES,
-    );
-};
-
-const skip = {
-    "enact": function () {} ,
-    "check": function () { return true; }
-};
-
-const newActivity = {
-    "enact": function (activity, parnetId) {
-        policy.getPolicy(parnetId).m[activity] = true;
-    },
-    "check": function() { return true; },
-};
-
-const newPolicy = {
-    "enact": activateNewPolicy,
-    "check": function() { console.log("agenda check return true"); return true; },
-};
-
-const newPolicyReplacment ={
-    "enact": activateNewReplacementPolicy,
-    "check": function() { return true; },
-};
-
-const newBlockerPolicy = {
-    "enact": activateNewPolicy,
-    "check": function (activity, parnetId)  {
-         return !policy.hasChildType(parnetId, activity);
-    },
 };
 
 module.exports = agenda;

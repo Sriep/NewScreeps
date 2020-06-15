@@ -58,7 +58,7 @@ describe("policy_govern", function() {
 
                     ]
             }};
-            PolicyGovern.prototype.partsSurppliedLT = function() { return 500 };
+            PolicyGovern.prototype.partsSuppliedLT = function() { return 500 };
             PolicyGovern.prototype.checkPaybackByNextUpgrade = function() { return true };
             PolicyGovern.prototype.removeColony = function() { };
             const policyGovern = new PolicyGovern(1, data);

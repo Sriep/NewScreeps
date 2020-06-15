@@ -26,7 +26,7 @@ class PolicyForeignOffice extends PolicyBase {
         }
         this.m.insurgencies = {};
         this.m.colonyDef = [];
-        Memory.policyRates[this.id] = gc.FOREIGN_OFFICE_RATE;
+        //Memory.policyRates[this.id] = gc.FOREIGN_OFFICE_RATE;
         return true;
     };
 

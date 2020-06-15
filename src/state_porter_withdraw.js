@@ -67,6 +67,7 @@ class StatePorterWithdraw extends StateCreep {
     };
 
     getTarget(pos) {
+        console.log("getTarget pos",pos);
         const StructAt = pos.lookFor(LOOK_STRUCTURES);
         for (let struct of StructAt) {
             switch(struct.structureType) {

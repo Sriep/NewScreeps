@@ -4,18 +4,20 @@
  * @author Piers Shepperson
  */
 const C = require("./Constants");
+const gc = require("./gc");
 
 const tile = {
 
-    link :[
-        gc.LINK_POS_CONTROLLER,
-        gc.LINK_POS_SOURCE,
-        gc.LINK_POS_STORAGE,
-        gc.LINK_POS_EXIT,
-        gc.LINK_POS_EXIT,
-        gc.LINK_POS_EXIT,
-        gc.LINK_POS_EXIT,
-        gc.LINK_POS_SOURCE,
+    links :[
+        gc.LINK_POS.Controller,
+        gc.LINK_POS.Source,
+        gc.LINK_POS.Storage,
+        gc.LINK_POS.Exit,
+        gc.LINK_POS.Exit,
+        gc.LINK_POS.Exit,
+        gc.LINK_POS.Exit,
+        gc.LINK_POS.Source,
+        gc.LINK_POS.Controller,
     ],
 
     towers: {
@@ -72,50 +74,6 @@ const tile = {
 
     //tile.Centers.CENTRE_6x6_3
     centres: {
-        CENTRE_6x6_1 : {
-            "origin" : {"x":0,"y":0},
-            "xDim" : 6,
-            "yDim": 6,
-            [C.STRUCTURE_LAB] : [
-                {"x":2,"y":3},{"x":2,"y":4},{"x":3,"y":3},
-                {"x":2,"y":5},{"x":1,"y":3},{"x":1,"y":2},
-                {"x":2,"y":2},{"x":1,"y":3},{"x":2,"y":4},{"x":1,"y":4}
-            ],
-            ["baseLab"] : 4,
-            [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
-            [C.STRUCTURE_TERMINAL] : [{"x":4,"y":5}],
-            [C.STRUCTURE_LINK] : [{"x":3,"y":5}],
-            [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":3,"y":0},{"x":4,"y":0}],
-            [C.STRUCTURE_POWER_SPAWN] : [{"x":1,"y":0}],
-            "scientist" : [{"x":3,"y":4}],
-            [C.STRUCTURE_ROAD] : [
-                {"x":0,"y":5},{"x":0,"y":4},{"x":0,"y":3},{"x":0,"y":2},{"x":0,"y":1},{"x":0,"y":0},
-                {"x":1,"y":1},{"x":2,"y":1},{"x":3,"y":1},{"x":4,"y":1},{"x":5,"y":1},
-                {"x":5,"y":0},{"x":5,"y":2},{"x":5,"y":3},{"x":5,"y":4},{"x":5,"y":5},
-                {"x":4,"y":3}, {"x":3,"y":4}
-            ],
-            [C.STRUCTURE_OBSERVER]:  [{"x":1,"y":5}]
-        },
-
-        CENTRE_6x6_2 : {
-            "origin" : {"x":0,"y":0},
-            "xDim" : 6,
-            "yDim": 6,
-            [C.STRUCTURE_LAB] : [
-                {"x":2,"y":2},{"x":2,"y":3},{"x":3,"y":2},
-                {"x":2,"y":4},{"x":3,"y":1},{"x":4,"y":1},
-                {"x":1,"y":3},{"x":1,"y":4},{"x":5,"y":2},{"x":5,"y":3}
-            ],
-            ["baseLab"] : 4,
-            [C.STRUCTURE_STORAGE] : [{"x":4,"y":4}],
-            [C.STRUCTURE_TERMINAL] : [{"x":3,"y":4}],
-            [C.STRUCTURE_LINK] : [{"x":4,"y":3}],
-            [C.STRUCTURE_SPAWN] : [{"x":0,"y":0},{"x":1,"y":1},{"x":5,"y":0}],
-            [C.STRUCTURE_POWER_SPAWN] : [{"x":0,"y":2}],
-            "scientist" : [{"x":3,"y":3},{"x":4,"y":2}],
-            [C.STRUCTURE_OBSERVER]:  [{"x":0,"y":5}]
-        },
-
         CENTRE_6x6_3 : {
             "origin" : {"x":0,"y":0},
             "xDim" : 6,

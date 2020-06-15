@@ -25,7 +25,7 @@ class PolicyColonialOffice extends PolicyBase {
         }
         this.m.colonies = [];
         this.m.underConstruction = [];
-        Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
+        //Memory.policyRates[this.id] = gc.COLONIAL_OFFICE_RATE;
         return true;
     };
 
@@ -151,6 +151,7 @@ class PolicyColonialOffice extends PolicyBase {
         const minerals = colony.find(C.FIND_MINERALS);
         for (let mineral of minerals) {
             policy.buildSourceContainer(mineral);
+            console.log("buildExtractor pos",mineral.pos);
             const structs = mineral.pos.lookFor(C.LOOK_STRUCTURES);
             let found = false;
             for (let struct of structs) {
@@ -193,6 +194,7 @@ class PolicyColonialOffice extends PolicyBase {
     };
 
     findRoadAt(pos) {
+        console.log("findRoadAt pos",pos);
         const structAt = pos.lookFor(C.LOOK_STRUCTURES);
         if (structAt.length > 0 && struct[0].structureType === C.STRUCTURE_ROAD) {
             return structAt[0];

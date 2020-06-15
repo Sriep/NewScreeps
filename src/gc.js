@@ -385,10 +385,13 @@ const gc = {
     EXPLORE_CREEPS: 4,
 
     // links
-    LINK_POS_EXIT: "exit",
-    LINK_POS_SOURCE: "source",
-    LINK_POS_CONTROLLER: "controller",
-    LINK_POS_STORAGE: "storage",
+    LINK_POS: Object.freeze({
+        Exit: "exit",
+        Source: "source",
+        Controller: "controller",
+        Storage: "storage",
+    }),
+
 
 
     // spawn priories

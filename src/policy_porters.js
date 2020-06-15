@@ -96,10 +96,10 @@ class PolicyPorters  extends PolicyBase {
         const canBuildHarvesters =  (wHarvester < resources.hW || harvesters < resources.minHarvesters) && harvesters <= resources.maxHarvesters;
         const canBuildWorkers = cWorker < resources.wW;
 
-        //const isSourceContainer = fRoom.sourceContainerPos.some(s =>
-        //    (state.findContainerAt(s))
-        //);
-        const canBuildPorters = cPorter < resources.pC;// && isSourceContainer;
+        const isSourceContainer = fRoom.sourceContainerPos.some(s =>
+            (state.findContainerAt(s))
+        );
+        const canBuildPorters = cPorter < resources.pC && isSourceContainer;
 
         const isUpgradeContainer = fRoom.upgradeContainerPos.some(s =>
             (state.findContainerAt(s))
@@ -132,7 +132,6 @@ class PolicyPorters  extends PolicyBase {
 
         if (canBuildWorkers
             && (!canBuildPorters || cWorker <= cPorter)) {
-            //console.log("pp next build worker","canBuildPorters",canBuildPorters,"cWorker",cWorker,"cPorter",cPorter );
             if (race.getCost(gc.RACE_WORKER, room.energyCapacityAvailable) <= room.energyAvailable) {
                 policy.sendOrderToQueue(
                     room,
