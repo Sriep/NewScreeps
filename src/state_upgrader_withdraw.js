@@ -22,6 +22,7 @@ class StateUpgraderWithdraw extends StateCreep {
         const fRoom = new FlagOwnedRoom(this.creep.room.name);
         const cLinkPos = fRoom.controllerLinkPos();
         if (cLinkPos) {
+            //console.log("StateUpgraderWithdraw clinkpos", cLinkPos,"x",cLinkPos.x, cLinkPos.y, cLinkPos.roomName);
             const controllerLink = state.getObjAtPos(cLinkPos, STRUCTURE_LINK);
             if (controllerLink) {
                 if (this.creep.pos.isNearTo(controllerLink)) {

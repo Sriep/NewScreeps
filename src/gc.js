@@ -67,6 +67,15 @@ const pgc = {
 
 const gc = {
 
+    // Game constants
+    NOTIFY_INTERVAL: 10,
+    DEBUG: true,
+    MAX_SIM_BATTLE_LENGTH: 100,
+    MAX_SIM_DEFENCE_LENGTH: 10,
+    TICK_NUMBER: "tick number",
+    USE_PROFILER: false,
+    UNIT_TEST: false,
+
     // Races
     RACE_WORKER: "worker",
     RACE_HARVESTER: "harvester",
@@ -141,6 +150,7 @@ const gc = {
     STATE_BOOST_CREEP: "boost_creep",
     STATE_FIND_BOOST: "find_boost",
     STATE_DEFENSIVE_RETREAT: "defensive_retreat",
+    STATE_SPAWNING: "spawning",
     // states worker
     STATE_WORKER_IDLE: "worker_idle",
     STATE_WORKER_UPGRADE: "worker_upgrade",
@@ -392,8 +402,6 @@ const gc = {
         Storage: "storage",
     }),
 
-
-
     // spawn priories
     SPAWN_PRIORITY_CRITICAL: 0,
     SPAWN_PRIORITY_LOCAL: 1,
@@ -452,15 +460,6 @@ const gc = {
     ROOM_RESERVED_ROADS: "reserved_roads",
     ROOM_OWNED: "owned",
     ROOM_OWNED_ROADS: "owned_roads",
-
-    // Game constants
-    NOTIFY_INTERVAL: 10,
-    DEBUG: true,
-    MAX_SIM_BATTLE_LENGTH: 100,
-    MAX_SIM_DEFENCE_LENGTH: 10,
-    TICK_NUMBER: "tick number",
-    USE_PROFILER: true,
-    UNIT_TEST: false,
 
     RCL_EC: [0, 300, 550, 800, 1300, 1800, 2300, 5600, 12900],
 

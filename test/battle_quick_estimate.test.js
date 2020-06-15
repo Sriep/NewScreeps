@@ -47,26 +47,39 @@ describe("quickCombat", function() {
     });
 
     describe("source Keeper", function() {
-        it.skip("simulate source keeper vrs keeper's bane", function() {
+        it("simulate source keeper vrs keeper's bane", function() {
             //console.log("sourceKeeper", JSON.stringify(sourceKeeper));
-            const baneBody = race.bodyFromBodyCount(
+            const keeperBane = race.bodyFromBodyCount(
                 race.getBodyCounts(gc.RACE_PALADIN, 10000, 11)
             );
-            //console.log(race.getBodyCounts(gc.RACE_PALADIN, 1000, 11).length,"race.getBodyCounts(gc.RACE_PALADIN, 1000, 11)",race.getBodyCounts(gc.RACE_PALADIN, 1000, 11))
-            const keeperBane = {
-                hits: baneBody.length*100,
-                hitsMax: baneBody.length*100,
-                body: baneBody,
-            };
-            //console.log("keeper bane", JSON.stringify(keeperBane));
-
             const result = BattleQuickEstimate.quickCombat(
-                [bodies.sourceKeeper],
-                [keeperBane]
+                [keeperBane],
+                [bodies.sourceKeeper.body],
             );
             console.log("simulate combat result", JSON.stringify(result));
-            assert(result.enemies === []);
+            assert(result.enemies.length === 0);
         });
+        it("simulate source keeper vrs swordsman plus healer", function() {
+            for (let ec = 800; ec <= 2300; ec += 500) {
+                let swordsmanEC = race.bodyFromBodyCount(
+                    race.getBodyCounts(gc.RACE_SWORDSMAN, ec)
+                );
+                let healerEC = race.bodyFromBodyCount(
+                    race.getBodyCounts(gc.RACE_HEALER, ec)
+                );
+                resultEc = BattleQuickEstimate.quickCombat(
+                    [swordsmanEC, healerEC],
+                    [bodies.sourceKeeper.body],
+                    gc.MAX_SIM_BATTLE_LENGTH,
+                    false
+                );
+                console.log(ec, "friends", JSON.stringify(resultEc.friends),);
+                console.log(ec, "enemies", JSON.stringify(resultEc.enemies),);
+                //console.log(ec, "resultEc.friends === []",resultEc.friends,resultEc.friends === []);
+                console.log("ec >= 1800",ec >= 1800, "resultEc.enemies.length",resultEc.enemies.length,"resultEc.friends.length", resultEc.friends.length);
+                assert(ec >= 1800 ? resultEc.enemies.length === 0 : resultEc.friends.length === 0);
+            }
+        })
 
        // it("simulate combat", function() {
        //     const result = BattleQuickEstimate.quickCombat(

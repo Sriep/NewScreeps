@@ -282,15 +282,13 @@ class FlagOwnedRoom extends FlagRoom {
     controllerLinkPos() {
         const room = Game.rooms[this.name];
         const terrain = room.getTerrain();
-        //console.log("setControllerLinkPos this.m", JSON.stringify(this.m.controller));
-        // = require("flag_room");
         const fRoom = new FlagRoom(this.name);
         fRoom.upgradeContainerPos;
         const posts = fRoom.upgradeContainerPos;
         const post = posts[0];
         for (let delta of gc.ONE_MOVE) {
             if (terrain.get(post.x+delta.x, post.y+delta.y) !== TERRAIN_MASK_WALL) {
-                return [new RoomPosition(post.x+delta.x, post.y+delta.y, room.name)];
+                return new RoomPosition(post.x+delta.x, post.y+delta.y, room.name);
             }
         }
     };

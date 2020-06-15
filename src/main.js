@@ -29,24 +29,32 @@ if (gc.USE_PROFILER) {
 
 module.exports.loop = function () {
     //console.log("main start");
-    profiler.wrap(function() {
-        console.log("************************ Start ", Game.time," *********************************");
-        inserted.top();
-        if (!Memory.started) {
-            startup();
-            records.startup()
-        }
-        freeCreeps();
-        enactPolicies();
-        buildingAct();
-        moveCreeps();
-        spawnCreeps();
-        inserted.bottom();
-        console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
-        console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
-        console.log("************************ End ",  Game.time, " *********************************");
-    });
+    if (gc.USE_PROFILER) {
+        profiler.wrap(function() {
+            main()
+        });
+    } else {
+        main()
+    }
 };
+
+function main() {
+    console.log("************************ Start ", Game.time," *********************************");
+    inserted.top();
+    if (!Memory.started) {
+        startup();
+        records.startup()
+    }
+    freeCreeps();
+    enactPolicies();
+    buildingAct();
+    moveCreeps();
+    spawnCreeps();
+    inserted.bottom();
+    console.log("cpu used", Game.cpu.getUsed(), "number of creeps", Object.keys(Game.creeps).length);
+    console.log("cpu limit", Game.cpu.limit, "ticklimit", Game.cpu.tickLimit, "bucket", Game.cpu.bucket, "shardlimits", Game.cpu.shardLimits);
+    console.log("************************ End ",  Game.time, " *********************************");
+}
 
 function startup() {
     Memory.started = true;
@@ -101,6 +109,7 @@ function enactPolicies() {
 
 function spawnCreeps() {
     for (let i in Game.spawns) {
+        console.log(i,"spawn", JSON.stringify(Game.spawns[i]));
         if (!Game.spawns[i].spawning) {
             flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
         }

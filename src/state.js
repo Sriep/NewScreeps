@@ -146,11 +146,12 @@ const state = {
     },
 
     getObjAtPos(pos, type) {
-        console.log("getObjAtPos pos",pos);
+        //console.log(JSON.stringify(pos),"getObjAtPos pos",pos,"type", type,"x",pos.x, pos.y, pos.roomName);
         if (pos) {
-            for (let struc of pos.lookFor(LOOK_STRUCTURES)) {
-                if (struc.structureType === type) {
-                    return struc;
+            //console.log("getObjAtPos lookedfor",JSON.stringify(pos.lookFor(LOOK_STRUCTURES)));
+            for (let struct of pos.lookFor(LOOK_STRUCTURES)) {
+                if (struct.structureType === type) {
+                    return struct;
                 }
             }
         }

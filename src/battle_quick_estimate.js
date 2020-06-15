@@ -39,7 +39,11 @@ const Battle_quick_estimate = {
             console.log("turn:",turn,"friends hits left:", this.hitsAll(friends),
                 "enemies hits left:", this.hitsAll(enemies))
         }
-        return {turns: turn, friends: friends, enemies: enemies};
+        return {
+            turns: turn,
+            friends: friends,
+            enemies: enemies
+        };
     },
 
     getRangedPower: function(attackers, range) {

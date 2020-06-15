@@ -96,6 +96,7 @@ const agenda = {
                 //{ "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Policy},
                 //{ "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
+                //{ "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
                 { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS, type: gc.Activity.PolicyBlocker},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
                 { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS, type: gc.Activity.PolicyBlocker},
