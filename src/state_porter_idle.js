@@ -28,7 +28,7 @@ class StatePorterIdle extends StateCreep {
             return this.switchTo( gc.STATE_PORTER_FULL_IDLE);
         }
 
-        const governor = policy.getGouvernerPolicy(this.home);
+        const governor = policy.getGovernorPolicy(this.home);
         let colonies = governor.colonies;
         const info = this.nextHarvestContainer(
             colonies, race.partCount(this.creep, CARRY)*CARRY_CAPACITY

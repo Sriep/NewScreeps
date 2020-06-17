@@ -23,7 +23,7 @@ class StateReserverIdle extends StateCreep {
                 && CreepMemory.M(c).targetId
         });
 
-        const colonies = policy.getGouvernerPolicy(this.home).colonies;
+        const colonies = policy.getGovernorPolicy(this.home).colonies;
         let coloniesById = {};
         for (let colony of colonies) {
             if (colony.name !== this.home) {

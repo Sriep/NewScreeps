@@ -39,6 +39,7 @@ class PolicyForeignOffice extends PolicyBase {
     }
 
     enact() {
+        return;
         this.checkInsurgencies();
         this.checkPatrols();
         this.checkColonyDefence();
@@ -62,7 +63,9 @@ class PolicyForeignOffice extends PolicyBase {
                 }
             });
             if (insurgents.length > 0) {
-                this.insurgencies[roomName] = insurgents;
+                for (let insurgent of insurgents) {
+                    this.insurgencies[roomName].push(insurgent.name);
+                }
                 this.sendInsurgentAlert(roomName, insurgents);
             }
             this.sendPatrol(roomName)

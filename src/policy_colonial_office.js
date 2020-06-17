@@ -40,8 +40,9 @@ class PolicyColonialOffice extends PolicyBase {
     }
 
     enact() {
+        return
         if ((Game.time + this.id) % 100 !== 0) {
-            //return;
+            return;
         }
         this.lookForNewColonies();
     };
@@ -91,7 +92,7 @@ class PolicyColonialOffice extends PolicyBase {
         let candidates = [];
         for (let spawnRoom in fRoom.m.paths) {
             const valueTF = fRoom.value(spawnRoom,true, false);
-            const governor = policy.getGouvernerPolicy(spawnRoom);
+            const governor = policy.getGovernorPolicy(spawnRoom);
             if (valueTF.profitParts > governor.minColonyProfitParts() ||
                 valueTF.netParts < governor.minFreeColonyParts()) {
                 candidates.push({ "name": spawnRoom, "valueTF": valueTF, "governor": governor })

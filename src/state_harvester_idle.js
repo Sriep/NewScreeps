@@ -18,7 +18,7 @@ class StateHarvesterIdle extends StateCreep {
 
     enact() {
         console.log(this.creep.name, "STATE_HARVESTER_IDLE");
-        const colonies =  policy.getGouvernerPolicy(this.home).colonies;
+        const colonies =  policy.getGovernorPolicy(this.home).colonies;
         const nextPost = this.nextFreeHarvesterPost(colonies);
         //console.log(this.creep.name, "STATE_HARVESTER_IDLE nextPost", JSON.stringify(nextPost));
         if (nextPost) {

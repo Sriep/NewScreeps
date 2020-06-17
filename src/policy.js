@@ -175,7 +175,7 @@ const policy = {
         return undefined;
     },
 
-    getGouvernerPolicy : function(home) {
+    getGovernorPolicy : function(home) {
         for (let id in Memory.policies) {
             if (Memory.policies[id].m.home === home &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {

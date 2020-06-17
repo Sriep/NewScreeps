@@ -228,7 +228,7 @@ class PolicyPorters  extends PolicyBase {
         let minHarvesters = 0;
         let maxHarvesters = 0;
         this.m.curProduction = {};
-        const governor = policy.getGouvernerPolicy(this.home);
+        const governor = policy.getGovernorPolicy(this.home);
         const colonies = governor.colonies;
         for (let colonyObj of colonies) {
             let colonyResources;

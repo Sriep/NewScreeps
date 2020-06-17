@@ -22,7 +22,7 @@ class PolicyBuildExtractors extends PolicyBase {
 
     enact() {
         //console.log("POLICY_BUILD_EXTRACTORS this", JSON.stringify(this));
-        const colonies = policy.getGouvernerPolicy(this.home).colonies;
+        const colonies = policy.getGovernorPolicy(this.home).colonies;
         this.m.finished = true;
         for (let colonyInfo of colonies) {
             const colony = Game.rooms[colonyInfo.name];
