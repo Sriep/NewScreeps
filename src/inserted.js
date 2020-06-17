@@ -8,10 +8,10 @@
 
 //const budget = require("budget");
 //const construction = require("construction");
-//const policy = require("policy");
-const gc = require("gc");
+const policy = require("policy");
+//const gc = require("gc");
 //const gf = require("gf");
-const race = require("race");
+//const race = require("race");
 
 const inserted = {
     top: function () {
@@ -19,6 +19,8 @@ const inserted = {
     },
 
     bottom: function () {
+        //const gouven = policy.getGouvernerPolicy("W7N7")
+        //console.log("gouren W7N7", JSON.stringify(gouven))
         //console.log("--------- piers inserted------------");
 
 /*

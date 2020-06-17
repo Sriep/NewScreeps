@@ -20,7 +20,7 @@ class PolicyColonialOffice extends PolicyBase {
 
     initilise() {
         super.initilise();
-        if (policy.getPoliciesByType(gc.POLICY_COLONIAL_OFFICE > 0)) {
+        if (policy.getPoliciesByType(gc.POLICY_COLONIAL_OFFICE) > 0) {
             return false
         }
         this.m.colonies = [];
@@ -41,16 +41,18 @@ class PolicyColonialOffice extends PolicyBase {
 
     enact() {
         if ((Game.time + this.id) % 100 !== 0) {
-            return;
+            //return;
         }
         this.lookForNewColonies();
     };
 
     lookForNewColonies() {
+        //console.log("look for new colonies");
         for (let flagName in Game.flags) {
             if (gf.validateRoomName(flagName)) {
-                if (!Game.flags[flagName].memory.owned
-                    && !Game.flags[flagName].memory.spawnRoom) {
+                //console.log("look for new colonies validateRoomName",flagName);
+                if (/*!Game.flags[flagName].memory.owned
+                    &&*/ !Game.flags[flagName].memory.spawnRoom) {
                     this.checkRoom(flagName);
                 }
             }
@@ -70,19 +72,21 @@ class PolicyColonialOffice extends PolicyBase {
     };
 
     decolonise(colony) {
-        this.m.colonies = this.m.colonies.filter( c => { c.colony.name !== colony });
+        //console.log(colony,"colony", "this.m.colonies",JSON.stringify(this.m.colonies));
+        this.m.colonies = this.m.colonies.filter( c => { c.name !== colony });
         FlagRoom.getNew(colony).spawnRoom = undefined;
     }
 
     colonise(colony, spawnRoom) {
+        //console.log(colony,"colonise spawnRoom", spawnRoom, "this.m.colonies",JSON.stringify(this.m.colonies));
         if (!this.m.colonies.some(c => (c.colony === colony))) {
-            this.m.colonies.push({name:colony, owner:spawnRoom});
+            this.m.colonies.push( { name:colony, owner:spawnRoom } );
         }
         FlagRoom.getNew(colony).spawnRoom = spawnRoom;
     }
 
     checkRoom(roomName) {
-        //console.log("checkRoom", home);
+        //console.log("checkRoom", roomName);
         const fRoom = new FlagRoom(roomName);
         let candidates = [];
         for (let spawnRoom in fRoom.m.paths) {
@@ -101,7 +105,7 @@ class PolicyColonialOffice extends PolicyBase {
             const newColony = candidate.governor.requestAddColony(fRoom);
             //console.log("checkRoom requestAddColony",JSON.stringify(newColony));
             if (newColony.added) {
-                //this.colonise(home, candidate.name);
+                this.colonise(roomName, candidate.name);
                 if (Game.rooms[roomName]) {
                     this.build(
                         Game.rooms[roomName],

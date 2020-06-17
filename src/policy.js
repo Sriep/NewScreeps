@@ -18,7 +18,7 @@ const policy = {
     //M : Memory.policies,
 
     enactPolicies: function() {
-        console.log("enactPolicies");
+        //console.log("enactPolicies");
         if (undefined === Memory.policies) {
             Memory.policies = {};
         }
@@ -35,7 +35,7 @@ const policy = {
             //}
 
             //console.log("enact policies id", id, "type", Memory.policies[id].type);
-            console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
+            //console.log("policy enactPolicies", id, "policy", JSON.stringify(Memory.policies[id]));
             const Policy = require("policy_" + Memory.policies[id].type);
             const policy = new Policy(id, Memory.policies[id]);
             //console.log("policy id",id,"type",policy.type);
@@ -165,9 +165,9 @@ const policy = {
         return Memory.nextPolicyId;
     },
 
-    getRoomEconomyPolicy : function(roomName) {
+    getRoomEconomyPolicy : function(home) {
         for (let id in Memory.policies) {
-            if ((Memory.policies[id].home === roomName &&
+            if ((Memory.policies[id].m.home === home &&
                 gc.ECONOMIES.includes(Memory.policies[id].type))) {
                 return this.getPolicy(id);
             }
@@ -175,22 +175,19 @@ const policy = {
         return undefined;
     },
 
-    getGouvernerPolicy : function(roomName) {
+    getGouvernerPolicy : function(home) {
         for (let id in Memory.policies) {
-            //console.log("getGouvernerPolicy home", home, "home",
-            //     Memory.policies[id].home, "type", Memory.policies[id].type);
-            if (Memory.policies[id].m.home === roomName &&
+            if (Memory.policies[id].m.home === home &&
                 Memory.policies[id].type === gc.POLICY_GOVERN) {
                 return this.getPolicy(id);
             }
         }
-        //console.log("getGouvernerPolicy dropped though", home)
         return undefined;
     },
 
     getMiningPolicy :  function(roomName) {
         for (let id in Memory.policies) {
-            if (Memory.policies[id].home === roomName &&
+            if (Memory.policies[id].m.home === roomName &&
                 Memory.policies[id].type === gc.POLICY_MINE_ROOM) {
                 return this.getPolicy(id);
             }

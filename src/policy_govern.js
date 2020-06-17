@@ -9,7 +9,7 @@ const policy = require("./policy");
 const gf = require("./gf");
 const flag = require("./flag");
 const FlagRoom = require("./flag_room");
-const PolicyBase = require("policy_base");
+const PolicyBase = require("./policy_base");
 
 class PolicyGovern extends PolicyBase {
     constructor (id, data) {
@@ -27,6 +27,9 @@ class PolicyGovern extends PolicyBase {
         this.m.colonies = [{ "name" : this.home }];
         this.m.agendaName = gc.AGENDA_DEFAULT;
         this.m[gc.ACTIVITY_MINE_COLONIES] = false;
+        this.m[gc.ACTIVITY_RESERVED_COLONIES] = false;
+        this.m[gc.ACTIVITY_SCIENTIST] = false;
+        this.m[gc.ACTIVITY_COLONY_ROADS] = false;
         this.m.parts = 0;
         return true;
     };
@@ -58,7 +61,7 @@ class PolicyGovern extends PolicyBase {
     enact() {
         //console.log("POLICY_GOVERN enact this colonies", JSON.stringify(this.m.colonies));
         //console.log("POLICY_GOVERN enact this", JSON.stringify(this),"super", super.this);
-        console.log("PolicyGovern this.m", JSON.stringify(this.m));
+        //console.log("PolicyGovern this.m", JSON.stringify(this.m));
         this.govern();
         this.refreshRoomInfo();
     };
@@ -103,10 +106,10 @@ class PolicyGovern extends PolicyBase {
 
     refreshRoomInfo() {
         const economicPolicy = policy.getRoomEconomyPolicy(this.home);
-        //console.log("refreshRoomInfo economicPolicy", JSON.stringify(economicPolicy));
+        //console.log("gouvern", this.home,"refreshRoomInfo economicPolicy", JSON.stringify(economicPolicy));
         if (economicPolicy) {
             const budget =  economicPolicy.localBudget();
-            //console.log("refreshRoomInfo budget", JSON.stringify(budget));
+            console.log("refreshRoomInfo budget", JSON.stringify(budget));
             if (budget) {
                 this.m.colonies[0] = budget;
             }
@@ -125,7 +128,7 @@ class PolicyGovern extends PolicyBase {
     requestAddColony(fRoom) {
         //console.log("POLICY_GOVERN requestAddColony ", fRoom.name,"fRoom", JSON.stringify(fRoom));
         if (!this.m[gc.ACTIVITY_MINE_COLONIES] || this.home === fRoom.name) {
-            console.log("this.m[gc.ACTIVITY_MINE_COLONIES]",this.m[gc.ACTIVITY_MINE_COLONIES]);
+            //console.log("this.m[gc.ACTIVITY_MINE_COLONIES]",this.m[gc.ACTIVITY_MINE_COLONIES]);
             return {added: false}
         }
         const value = fRoom.value(
@@ -137,7 +140,7 @@ class PolicyGovern extends PolicyBase {
         if (value.profitParts < gc.COLONY_PROFIT_PART_MARGIN
             || !this.checkPaybackByNextUpgrade(value)) {
             //console.log("POLICY_GOVERN this.checkPaybackByNextUpgrade(value)]",this.checkPaybackByNextUpgrade(value),
-            //    "value.profitParts",value.profitParts,"gc.COLONY_PROFIT_PART_MARGIN",gc.COLONY_PROFIT_PART_MARGIN)
+            //   "value.profitParts",value.profitParts,"gc.COLONY_PROFIT_PART_MARGIN",gc.COLONY_PROFIT_PART_MARGIN)
             return {added: false}
         }
 
@@ -173,6 +176,7 @@ class PolicyGovern extends PolicyBase {
     };
 
     updateColonies() {
+        //console.log("POLOCY_GOUVERN updateColonies");
         this.refreshRoomInfo();
         for (let i in this.m.colonies) {
             const fRoom = flag.getRoom(colonies[i].name);
@@ -203,10 +207,10 @@ class PolicyGovern extends PolicyBase {
     };
 
     decolonise(index) {
-        gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.home,
-            "Invalid spawn room setting", JSON.stringify(Game.flags[colony.name].memory));
-        this.m.colonies.splice(index, 0);
-        policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE).decolonise(colony.name);
+        //gf.assertEq(Game.flags[colony.name].memory.spawnRoom, this.home,
+        //    "Invalid spawn room setting", JSON.stringify(Game.flags[colony.name].memory));
+        policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE).decolonise(this.colonies[index].name);
+        this.m.colonies.splice(index, 1);
     };
 
     partsSuppliedLT() {

@@ -15,7 +15,11 @@ class StateHarvesterTransfer extends StateCreep {
     }
 
     enact() {
-        //console.log("STATE_HARVESTER_TRANSFER2", this.targetId);
+        if (this.creep.store.getUsedCapacity() === 0) {
+            this.switchTo(gc.STATE_HARVESTER_HARVEST)
+        }
+
+        //console.log(this.creep.name,"STATE_HARVESTER_TRANSFER2", this.targetId);
         if (!this.targetId) {
             return this.switchTo( gc.STATE_HARVESTER_IDLE);
         }
@@ -23,14 +27,18 @@ class StateHarvesterTransfer extends StateCreep {
         const scPos = gf.roomPosFromPos(fRoom.getSourceContainerPos(this.targetId));
         const container = state.findContainerAt(scPos);
         if (!container) {
+            //console.log(this.creep.name,"StateHarvesterTransfer switch harvest build")
             return this.switchTo(gc.STATE_HARVESTER_BUILD)
         }
 
         if (container.hits < container.hitsMax * gc.CONTAINER_REPAIR_THRESHOLD) {
+            //console.log(this.creep.name,"StateHarvesterTransfer switch harvest reapair");
             return this.switchTo( gc.STATE_HARVESTER_REPAIR)
         }
-
+        //console.log(this.creep.name, "creep store",JSON.stringify(this.creep.store));
+        //console.log(this.creep.name,"StateHarvesterTransfer transfer containertype",container.structureType, "store",JSON.stringify(container.store));
         const result = this.creep.transfer(container, RESOURCE_ENERGY);
+        //console.log("harvest result",result);
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.
                 break;

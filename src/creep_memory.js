@@ -144,6 +144,13 @@ class CreepMemory {
         this.creep.memory.direction = v
     }
 
+    get squad() {
+        return this.creep.memory.squad
+    }
+    set squad(v) {
+        this.creep.memory.squad = v
+    }
+
     get nextRoom() {
         return this.creep.memory.nextRoom
     }

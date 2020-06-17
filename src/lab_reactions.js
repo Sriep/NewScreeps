@@ -38,8 +38,8 @@ const lr = {
     },
 
     mapReagentsToLabs : function(reagentMap, numLabs, baseLabs, labMap) {
-        console.log("mapReagentsToLabs", JSON.stringify(reagentMap), "numLabs", numLabs
-            ,"baseLabs",baseLabs,"labMap", JSON.stringify(labMap));
+        //console.log("mapReagentsToLabs", JSON.stringify(reagentMap), "numLabs", numLabs
+        //    ,"baseLabs",baseLabs,"labMap", JSON.stringify(labMap));
         return this.mapReagentsToLabsI(
             [],
             reagentMap,
@@ -52,8 +52,8 @@ const lr = {
     },
 
     mapReagentsToLabsI : function (mappedSoFar, map, labsInRange, labsLeft, rightStack, labMap, leafLabs) {
-        console.log("mapReagentsToLabsI leftMap", JSON.stringify(map),"mapped so far", mappedSoFar,
-            "rightStack", JSON.stringify(rightStack),"labs in range", JSON.stringify(labsInRange),"labsLeft",JSON.stringify(labsLeft));
+        //console.log("mapReagentsToLabsI leftMap", JSON.stringify(map),"mapped so far", mappedSoFar,
+        //    "rightStack", JSON.stringify(rightStack),"labs in range", JSON.stringify(labsInRange),"labsLeft",JSON.stringify(labsLeft));
         if (labsInRange.length === 0 || labsLeft.length === 0) {
             //console.log("returning",JSON.stringify({ ok:false }));
             return { ok:false }

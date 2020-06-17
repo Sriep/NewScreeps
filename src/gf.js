@@ -224,6 +224,10 @@ const gf = {
                 && objFlag.secondaryColor === gc.FLAG_CLEAR_OBJ.secondaryColor
         }
         return false;
+    },
+
+    rcl(roomName) {
+        return Game.rooms[roomName].controller.level
     }
 
 };

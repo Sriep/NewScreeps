@@ -91,18 +91,19 @@ const agenda = {
                 { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
             ],
             [ //2
-                { "activity": gc.POLICY_PORTERS, type: gc.Activity.PolicyReplacement},
-                { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
+                { "activity": gc.POLICY_HARVESTERS, type: gc.Activity.PolicyReplacement},
+                { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS, type: gc.Activity.PolicyBlocker},
                 //{ "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Policy},
+                //{ "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+                { "activity": gc.POLICY_PORTERS, type: gc.Activity.PolicyReplacement},
+                { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
+                { "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
+                { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS, type: gc.Activity.PolicyBlocker},
+                { "activity" : gc.POLICY_FOREIGN_OFFICE, type: gc.Activity.Policy},
                 //{ "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
-                //{ "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-                { "activity": gc.POLICY_BUILD_SOURCE_CONTAINERS, type: gc.Activity.PolicyBlocker},
-                { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-                { "activity": gc.POLICY_BUILD_CONTROLLER_CONTAINERS, type: gc.Activity.PolicyBlocker},
                 { "activity": gc.ACTIVITY_MINE_COLONIES, type: gc.Activity.Flag},
                 //{ "activity": gc.POLICY_COLONIAL_OFFICE, type: gc.Activity.Policy},
-                { "activity": gc.POLICY_EXPLORE, type: gc.Activity.Policy},
                 { "activity": gc.ACTIVITY_FINISHED, type: gc.Activity.Control}
             ],
             [ //3
@@ -171,6 +172,7 @@ const agenda = {
                 { "activity": gc.POLICY_BUILD_EXTRACTORS, type: gc.Activity.PolicyBlocker},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LAB}},
+                { "activity": gc.ACTIVITY_SCIENTIST, type: gc.Activity.Flag},
                 { "activity": gc.POLICY_LABS, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_BUILD_ROADS, type: gc.Activity.PolicyBlocker, "params" : {
                         "fromFind" :C.FIND_SOURCES,

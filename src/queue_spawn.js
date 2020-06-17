@@ -42,6 +42,7 @@ class SpawnQueue {
                 }
                 const name = data.name + "_" + this.m.nextCreepId.toString();
                 const result = spawnObj.spawnCreep(data.body, name, data.opts);
+                console.log(name,"spawn creep result", result, "data", JSON.stringify(data));
                 if (result === OK) {
                     this.m.nextCreepId = this.m.nextCreepId +1;
                 }

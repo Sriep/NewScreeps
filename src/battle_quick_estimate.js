@@ -10,11 +10,13 @@ const Battle_quick_estimate = {
 
      //body [{ boost: RESOURCE_UTRIUM_ACID, type: C.ATTACK, hits : 100}]
     quickCombat: function(friends, enemies, maxTurns, log) {
+        friends = JSON.parse(JSON.stringify(friends));
+        enemies = JSON.parse(JSON.stringify(enemies));
         let range = gc.RANGE_RANGED_ATTACK;
         maxTurns = maxTurns ? maxTurns : gc.MAX_SIM_BATTLE_LENGTH;
         let turn = 0;
-        enemies = this.cleanupCombatants(enemies);
         friends = this.cleanupCombatants(friends);
+        enemies = this.cleanupCombatants(enemies);
         while (friends.length > 0 && enemies.length > 0 && turn < maxTurns) {
             let friendsPower, enemyPower;
             if (range > 1) {

@@ -81,6 +81,7 @@ class PolicyPorters  extends PolicyBase {
         flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
         if (cWorker < 2) {
+            console.log("cWorkes < 2",cWorker);
             if (cWorker < C.CREEP_LIFE_TIME/10 || (harvesters === 0 && cPorter === 0 )) {
                 policy.sendOrderToQueue(
                     room,
@@ -108,16 +109,16 @@ class PolicyPorters  extends PolicyBase {
         const canBuildUpgrader = wUpgrader < resources.uW && isUpgradeContainer && isSpaceForPorterToReachContainer;
 
         const canBuildReserver = rReserver < resources.cR - 0.2;
-        //console.log("pp upgradeContainerPos", fRoom.upgradePosts.length);
+        console.log("pp upgradeContainerPos", fRoom.upgradePosts.length);
         console.log("pp wHarvester",wHarvester,"cWorker",cWorker, "cPorter", cPorter,"wUpgrader",wUpgrader,"rReserver",rReserver);
 
-        //console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
+        console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
         if (canBuildHarvesters
             && (!canBuildWorkers || wHarvester <= cWorker)
             && (!canBuildPorters || wHarvester <= cPorter)
             && (!canBuildUpgrader || wHarvester <= 5*wUpgrader)) {
-            //console.log("pp next build harvester","canBuildWorkers",canBuildWorkers,"wHarvester",wHarvester ,"<=cWorker",
-            //    cWorker, "canBuildPorters",canBuildPorters,"wHarvester",wHarvester, "<=cPorter", cPorter);
+            console.log("pp next build harvester","canBuildWorkers",canBuildWorkers,"wHarvester",wHarvester ,"<=cWorker",
+                cWorker, "canBuildPorters",canBuildPorters,"wHarvester",wHarvester, "<=cPorter", cPorter);
             if (race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable) <= room.energyCapacityAvailable) {
                 policy.sendOrderToQueue(
                     room,
@@ -349,6 +350,13 @@ class PolicyPorters  extends PolicyBase {
             this.m.localResoures.uW,
             this.m.localResoures.wW
         );
+        //console.log("local budget",JSON.stringify({
+        //    "name" : this.home,
+        //    "profit" : profit,
+        //    "parts" : parts,
+        //    "profitpart" : profit/parts,
+        //    "spawnPartsLT" : spawnCapacity,
+        //}));
         return {
             "name" : this.home,
             "profit" : profit,

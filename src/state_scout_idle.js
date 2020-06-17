@@ -13,7 +13,7 @@ class StateScoutIdle  extends StateCreep {
     }
 
     enact() {
-        //console.log("STATE_SCOUT_IDLE");
+        //console.log(this.creep.name,"STATE_SCOUT_IDLE pos", this.creep.pos);
         if (!this.direction) {
             this.direction = TOP;
         }

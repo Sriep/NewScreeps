@@ -96,6 +96,7 @@ function buildingAct() {
 
 function moveCreeps() {
     for (let name in Game.creeps) {
+        //console.log(name,"creep pos", Game.creeps[name].pos);
         //console.log("move creeps before", name);
         state.enactCreep(Game.creeps[name]);
         //console.log("move creeps after", name);

@@ -4,8 +4,10 @@
  * @author Piers Shepperson
  */
 const gc = require("./gc");
+const gf = require("./gf");
 const CreepMemory = require("./creep_memory");
 const state = require("./state");
+const cache = require("./cache");
 
 class StateCreep extends CreepMemory {
     constructor(creep) {

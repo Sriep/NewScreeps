@@ -126,8 +126,8 @@ const gc = {
     MAX_EC_4WORK_HARVESTER: 600,
     ASSIGN_HARVESTER_BUFFER: 33,
     //                          250 500 800  1800
-    COLONY_PATROL_EC_SUPPORT: [ 0, 0,  0,  800, 1200, 1500, 1800, 1800, 1800 ],
-    COLONY_PATROL_PART_SUPPORT: [ 0, 0,  0,  12, 18, 24, 27, 27, 27 ],
+    COLONY_PATROL_EC_SUPPORT:  1800, //[ 0, 0,  0,  800, 1200, 1500, 1800, 1800, 1800 ],
+    COLONY_PATROL_PART_SUPPORT:  27,// [ 0, 0,  0,  12, 18, 24, 27, 27, 27 ],
 
     // flags
     FLAG_SOURCE: "source",
@@ -353,19 +353,20 @@ const gc = {
     BUILD_ROAD_SPAWN_CONTROLLER: pgc.BUILD_ROAD_SPAWN_CONTROLLER,
     BUILD_ROAD_SOURCE_TOWERS: pgc.BUILD_ROAD_SOURCE_TOWERS,
 
-    Activity : {
+    Activity : Object.freeze({
         "Flag": "Flag",
         "Policy" :"Policy",
         "PolicyBlocker" : "PolicyBlocker",
         "PolicyReplacement" : "PolicyReplacement",
         "Control" : "Control",
-    },
+    }),
     // Msc
     ACTIVITY_FINISHED: "finished",
     ACTIVITY_MINE_COLONIES: "mine_colonies",
     ACTIVITY_RESERVED_COLONIES: "reserved_colonies",
     ACTIVITY_COLONY_ROADS: "colony_roads",
     ACTIVITY_FLEXI_HARVESTERS: "flexi_harvesters",
+    ACTIVITY_SCIENTIST: "scientist",
     ACTIVITY_DISALLOWED: "disallowed",
     // policies
     POLICY_GOVERN: pgc.POLICY_GOVERN,
@@ -442,8 +443,8 @@ const gc = {
     SPAWN_TIME_RESERVE: 50, // 50 complete guess.
     MIN_ENERGY_TO_MINE: 1000, // guess
     COLONY_PROFIT_MARGIN: 500,
-    COLONY_PROFIT_PART_MARGIN: 10,
-    COLONY_PARTS_MARGIN: 80,
+    COLONY_PROFIT_PART_MARGIN: 20,
+    COLONY_PARTS_MARGIN: 50,
     REPLACEMENT_COLONY_PROFITPARTS: 50,
     PORTER_FUDGE_FACTOR: 1.5,
     MAX_COLONY_DISTANCE: 4,

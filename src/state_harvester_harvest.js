@@ -17,11 +17,13 @@ class StateHarvesterHarvest extends StateCreep {
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST dPath", JSON.stringify(cache.deserialisePath(this.m.path)));
         //console.log(this.creep.name, "STATE_HARVESTER_HARVEST store", JSON.stringify(this.creep.store));
         if (!state.spaceForHarvest(this.creep)) {
+            //console.log(this.creep.name,"STATE_HARVESTER_HARVEST no space",this.creep.store);
             return this.switchTo( gc.STATE_HARVESTER_TRANSFER);
         }
         const source = Game.getObjectById(this.targetId);
 
         const result = this.creep.harvest(source);
+        //console.log(this.creep.name,"StateHarvesterHarvest result", result, "sourec id", source.id);
         switch (result) {
             case OK:                        // The operation has been scheduled successfully.
                 break;

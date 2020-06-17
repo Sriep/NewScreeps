@@ -21,7 +21,7 @@ class PolicyForeignOffice extends PolicyBase {
 
     initilise() {
         super.initilise();
-        if (policy.getPoliciesByType(gc.POLICY_FOREIGN_OFFICE > 0)) {
+        if (policy.getPoliciesByType(gc.POLICY_FOREIGN_OFFICE) > 0) {
             return false
         }
         this.m.insurgencies = {};
@@ -132,10 +132,10 @@ class PolicyForeignOffice extends PolicyBase {
 
     strength(creeps) {
         let strength = 0;
-        for (let creep of creeps) {
-            strength += race.partCount(creep, C.ATTACK);
-            strength += race.partCount(creep, C.ATTACK_POWER);
-            strength += race.partCount(creep, C.HEAL);
+        for (let i in creeps) {
+            strength += race.partCount(creeps[i], C.ATTACK);
+            strength += race.partCount(creeps[i], C.ATTACK_POWER);
+            strength += race.partCount(creeps[i], C.HEAL);
         }
         return strength;
     }
@@ -143,11 +143,15 @@ class PolicyForeignOffice extends PolicyBase {
     checkColonyDefence() {
         this.m.colonyDef = [];
         const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
+        if (!colonialOffice) {
+            return;
+        }
         for (let colony of colonialOffice.colonies) {
             const defence = { attack:0, heal:0 };
             const room = Game.rooms[colony.name];
             if (!room) {
                 this.m.colonyDef.push(defence);
+                continue;
             }
             for (let creep of room.find(C.FIND_MY_CREEPS, {
                 filter: creep => {

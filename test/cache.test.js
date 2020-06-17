@@ -75,6 +75,7 @@ describe("cache", function() {
             for (let i in dPathW7N7) {
                 assert.strictEqual(dPathW7N7[i].x, pathW7N7.path[i].x);
                 assert.strictEqual(dPathW7N7[i].y, pathW7N7.path[i].y);
+                //console.log("path roomName",dPathW7N7[i].roomName, pathW7N7.path[i].roomName)
                 assert.strictEqual(dPathW7N7[i].roomName, pathW7N7.path[i].roomName);
             }
             //console.log("dPathW7N7\t", JSON.stringify(dPathW7N7))

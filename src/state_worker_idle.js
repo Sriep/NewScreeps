@@ -39,6 +39,7 @@ class StateWorkerIdle extends StateCreep {
         }
 
         if (economy.constructionRepairLeft(room, false) > 0) {
+            //console.log(this.creep.name,"STATE_WORKER_IDLE", room, "constructionRepairLeft")
             return this.enactOld();
         }
 
@@ -53,6 +54,7 @@ class StateWorkerIdle extends StateCreep {
     };
 
     findNewRoom() {
+        //console.log(this.creep.name,"STATE_WORKER_IDLE findNewRoom");
         const governor = policy.getGouvernerPolicy(this.home);
         let colonies = governor.m.colonies;
         for (let i = 1 ; i < colonies.length ; i++) {

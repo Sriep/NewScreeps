@@ -279,7 +279,7 @@ class FlagRoom {
     };
 
     _valueDefenceCost (spawnRoom, value) {
-        if (this.keepLair()) {
+        if (this.keepLair) {
             const keys = (Object.keys(this.local.sources));
             let keeperBaneCost = race.getCost(gc.RACE_PALADIN, 10000,11);
             const d = this.paths(spawnRoom)[keys[0]][this.PathTo.Spawn].cost;
@@ -289,14 +289,16 @@ class FlagRoom {
             value["netEnergy"] = value["netEnergy"] - keeperBaneCost;
             value["netParts"] = value["netParts"] + 50;
             value["profitParts"] = value["netEnergy"]/value["netParts"];
+        } else {
+            //const rcl = Game.rooms[spawnRoom].controller.level;
+            const militaryEcSupport = gc.COLONY_PATROL_EC_SUPPORT;//[rcl];
+            const militaryPartSupport = gc.COLONY_PATROL_PART_SUPPORT;//[rcl];
+            value["runningCostCreeps"] = value["runningCostCreeps"] + militaryEcSupport;
+            value["netEnergy"] = value["netEnergy"] - militaryEcSupport;
+            value["netParts"] = value["netParts"] + militaryPartSupport;
+            value["profitParts"] = value["netEnergy"]/value["netParts"];
         }
-        const rcl = Game.rooms[spawnRoom].controller.level;
-        const militaryEcSupport = gc.COLONY_PATROL_EC_SUPPORT[rcl];
-        const militaryPartSupport = gc.COLONY_PATROL_PART_SUPPORT[rcl];
-        value["runningCostCreeps"] = value["runningCostCreeps"] + militaryEcSupport;
-        value["netEnergy"] = value["netEnergy"] - militaryEcSupport;
-        value["netParts"] = value["netParts"] + militaryPartSupport;
-        value["profitParts"] = value["netEnergy"]/value["netParts"];
+
     };
 
     getSPath (roomName, id, pathTo, reverse) {

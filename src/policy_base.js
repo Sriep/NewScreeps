@@ -4,7 +4,7 @@
  * @author Piers Shepperson
  */
 
-const policy = require("policy");
+const policy = require("./policy");
 
 class PolicyBase {
     constructor(id, data) {
@@ -32,6 +32,7 @@ class PolicyBase {
     draftReplacement() {
         return this;
     };
+
 }
 
 module.exports = PolicyBase;
