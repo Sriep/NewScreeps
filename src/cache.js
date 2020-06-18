@@ -18,11 +18,8 @@ const cache = {
 
     path(from, toArray, name, range, useRoad, cachePath) {
         console.log("cache path from", from, "name", name);
-        //console.log("path from", from, "to length", toArray.length, "name", name, "useRoad", useRoad, "redo", redo);
-        //console.log("toArray",JSON.stringify(toArray));
         if (toArray.length === 0) {
-            //console.log("path toArray.length === 0 toArray", JSON.stringify(toArray));
-            return undefined;
+             return undefined;
         }
         if (!name) {
             name = toArray[0].id;
@@ -30,28 +27,6 @@ const cache = {
         if (!range) {
             range = 1
         }
-        //let flag;
-        //if (cacheResult) {
-        //    flag = Game.flags[from.id];
-        //    //console.log("path stored in", toArray[0].room.name)
-        //    if (!flag.memory[toArray[0].room.name]) {
-        //        flag.memory[toArray[0].room.name] ={};
-        //    }
-        //    if (!flag.memory[toArray[0].room.name][name]) {
-        //        flag.memory[toArray[0].room.name][name] ={};
-        //    }
-        //}
-        //const tag = useRoad ? "road" : "noroad";
-        //if (cacheResult && !redo && flag.memory[toArray[0].room.name][name][tag]) {
-        //    const cachedPath =  flag.memory[toArray[0].room.name][name][tag];
-        //    return {
-        //        path: this.deserialisePath(cachedPath.path),
-        //        ops: cachedPath.ops,
-        //        cost: cachedPath.cost,
-        //        incomplete: cachedPath.incomplete,
-        //    }
-        //}
-
         let goals = _.map(toArray, function(to) {
             return { pos: to.pos, range: range };
         });
@@ -159,9 +134,6 @@ const cache = {
     distance: function(from, toArray, name, range, useRoad, redo, cacheResult) {
         const p = this.path(from, toArray, "distance" + name, range, useRoad, redo, cacheResult);
         if (!p) {
-            //console.log("cache distance from", from.id, "toArraylength", toArray.length, "name", name,
-            //    "range", range, "userRoad", useRoad, "redo", redo, "cacheR", cacheResult)
-            //console.log("cache distance p", JSON.stringify(p))
             return
         }
         if (!p.incomplete) {
@@ -208,8 +180,6 @@ const cache = {
             return
         }
         return this.sPoint(pos) + pos.roomName;
-        //console.log("sPos room", this.sPoint(pos) + this.sRoomName(pos.home));
-        //return this.sPoint(pos) + this.sRoomName(pos.home)
     },
 
     dPosRn: function (str) {
@@ -217,9 +187,7 @@ const cache = {
             return
         }
         const code = str.charCodeAt(0);
-        //console.log(str,"dPosRn room", this.dRoomName(str.substring(1)) );
         return new RoomPosition(code % 50, Math.floor(code / 50), str.substring(1))
-        ////return new RoomPosition(code % 50, Math.floor(code / 50), this.dRoomName(str.substring(1)))
     },
 
     dPos: function (str, roomName) {
@@ -227,7 +195,6 @@ const cache = {
             return
         }
         const point = this.dPoint(str);
-        //console.log("dPos str|", JSON.stringify(str), "|home", home, "point", JSON.stringify(point))
         return new RoomPosition(point.x, point.y, roomName)
     },
 
@@ -239,9 +206,7 @@ const cache = {
         if (!str) {
             return
         }
-        //console.log("cache dPoint", JSON.stringify(str));
         const code = str.charCodeAt(0);
-        //console.log("dPoint code",code);
         return {"x": code % 50, "y": Math.floor(code / 50)};
     },
 
@@ -362,7 +327,6 @@ const cache = {
                     rSplit.NS = rSplit.NS === "N" ? "S" : "N";
                 }
             }
-            //path.push(new RoomPosition(x, y, gf.roomNameFromSplit(rSplit)));
             path.push({x:x, y:y, roomName:gf.roomNameFromSplit(rSplit)});
             lastX = x;
             lastY = y;
