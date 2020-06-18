@@ -368,7 +368,6 @@ const budget = {
     },
 
     harvesterWsRoom : function (homeRoom, useRoad) {
-        console.log("arvesterWsRoom");
         const sources = homeRoom.find(C.FIND_SOURCES);
         let wsRoom = 0;
         for (let i in sources) {

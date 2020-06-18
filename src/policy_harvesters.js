@@ -11,7 +11,7 @@ const race = require("race");
 const flag = require("flag");
 const state = require("state");
 const PolicyBase = require("policy_base");
-const FlagRoom = require("flag_room")
+const FlagRoom = require("flag_room");
 
 class PolicyHarvesters extends PolicyBase {
     constructor (id, data) {
@@ -48,11 +48,14 @@ class PolicyHarvesters extends PolicyBase {
         }
         const wHarvesterLife = race.ticksLeftByPart(this.parentId, gc.RACE_HARVESTER, WORK);
         console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife);
-        const budgetHarvesterWsLt = budget.harvesterWsRoom(room, false)*CREEP_LIFE_TIME;
+
+        const budgetHarvesterWsLt = this.harvesterWsRoom(false)*CREEP_LIFE_TIME;
+        //const budgetHarvesterWsLt = budget.harvesterWsRoom(room, false)*CREEP_LIFE_TIME;
+
         const rationHtoW = budget.workersRoomRationHtoW(room, room,false);
 
-        const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
-        console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife,"rationHtoW",rationHtoW,"rationHtoW*wHarvesterLife",rationHtoW*wHarvesterLife)
+        //const wHProportionOfBudget = wHarvesterLife/budgetHarvesterWsLt;
+        console.log("ph cWorkerLife",cWorkerLife,"wHarvesterLife",wHarvesterLife,"rationHtoW",rationHtoW,"rationHtoW*wHarvesterLife",rationHtoW*wHarvesterLife);
         if (this.isHarvestContainer(room)) {
             if (cWorkerLife < rationHtoW*wHarvesterLife) {
                 policy.sendOrderToQueue(
@@ -94,7 +97,6 @@ class PolicyHarvesters extends PolicyBase {
 
     isHarvestContainer(room) {
         const fRoom = new FlagRoom(room.name);
-        let posts = 0;
         for (let sourceId in fRoom.sources) {
             const pos = fRoom.getSourceContainerPos(sourceId);
             if (pos && state.findContainerAt(gf.roomPosFromPos(pos))) {
@@ -110,6 +112,17 @@ class PolicyHarvesters extends PolicyBase {
 
     budget() {
         //return budget.harvesterRoom(Game.rooms[this.home]);
+    };
+
+    harvesterWsRoom(useRoad) {
+        useRoad = !!useRoad;
+        if (this.m.harvesterWsRoom && this.m.harvesterWsRoom[useRoad]) {
+            return this.m.harvesterWsRoom[useRoad]
+        } else {
+            this.m.harvesterWsRoom = {};
+            this.m.harvesterWsRoom[true] = budget.harvesterWsRoom(Game.rooms[this.home], true);
+            this.m.harvesterWsRoom[false] = budget.harvesterWsRoom(Game.rooms[this.home], false);
+        }
     };
 
 }

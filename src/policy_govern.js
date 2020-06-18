@@ -109,7 +109,7 @@ class PolicyGovern extends PolicyBase {
         //console.log("gouvern", this.home,"refreshRoomInfo economicPolicy", JSON.stringify(economicPolicy));
         if (economicPolicy) {
             const budget =  economicPolicy.localBudget();
-            console.log("refreshRoomInfo budget", JSON.stringify(budget));
+            //console.log("refreshRoomInfo budget", JSON.stringify(budget));
             if (budget) {
                 this.m.colonies[0] = budget;
             }

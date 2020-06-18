@@ -40,7 +40,6 @@ class PolicyColonialOffice extends PolicyBase {
     }
 
     enact() {
-        return
         if ((Game.time + this.id) % 100 !== 0) {
             return;
         }

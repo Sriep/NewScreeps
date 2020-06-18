@@ -8,7 +8,7 @@
 
 //const budget = require("budget");
 //const construction = require("construction");
-const policy = require("policy");
+//const policy = require("policy");
 //const gc = require("gc");
 //const gf = require("gf");
 //const race = require("race");
@@ -38,9 +38,7 @@ const inserted = {
         console.log("piers memory", JSON.stringify(Memory));
         console.log("piers memory rooms", JSON.stringify(Memory.rooms));
         console.log("piers memory after");
-
  */
-
 /*
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER
