@@ -147,6 +147,8 @@ class PolicyGovern extends PolicyBase {
         let coloniesDropped = 0;
         let partsDropped = 0;
         while (this.m.parts - partsDropped + value.netParts > this.partsSuppliedLT() - gc.COLONY_PARTS_MARGIN) {
+            //console.log("name",fRoom.name,"this parts",this.m.parts, "partsDropped", partsDropped, "value.netParts", value.netParts);
+
             const lowestProfitParts = this.m.colonies[this.m.colonies.length-coloniesDropped-1].profitpart;
             if (value.profitParts <= lowestProfitParts + gc.REPLACEMENT_COLONY_PROFITPARTS) {
                 //console.log("POLICY_GOVERN addColony failed at spawn room part limit");
@@ -176,7 +178,7 @@ class PolicyGovern extends PolicyBase {
     };
 
     updateColonies() {
-        //console.log("POLOCY_GOUVERN updateColonies");
+        console.log("POLICY_GOVERN updateColonies");
         this.refreshRoomInfo();
         for (let i in this.m.colonies) {
             const fRoom = flag.getRoom(colonies[i].name);

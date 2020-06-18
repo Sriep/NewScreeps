@@ -41,7 +41,7 @@ class PolicyColonialOffice extends PolicyBase {
 
     enact() {
         if ((Game.time + this.id) % 100 !== 0) {
-            return;
+            //return;
         }
         this.lookForNewColonies();
     };

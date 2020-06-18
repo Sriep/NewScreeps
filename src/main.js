@@ -111,7 +111,7 @@ function enactPolicies() {
 
 function spawnCreeps() {
     for (let i in Game.spawns) {
-        console.log(i,"spawn", JSON.stringify(Game.spawns[i]));
+        //console.log(i,"spawn", JSON.stringify(Game.spawns[i]));
         if (!Game.spawns[i].spawning) {
             flag.getSpawnQueue(Game.spawns[i].room.name).spawnNext(Game.spawns[i]);
         }

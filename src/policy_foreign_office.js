@@ -39,10 +39,9 @@ class PolicyForeignOffice extends PolicyBase {
     }
 
     enact() {
-        return;
         this.checkInsurgencies();
-        this.checkPatrols();
-        this.checkColonyDefence();
+        //this.checkPatrols();
+        //this.checkColonyDefence();
     };
 
     checkInsurgencies() {
@@ -63,12 +62,13 @@ class PolicyForeignOffice extends PolicyBase {
                 }
             });
             if (insurgents.length > 0) {
+                this.insurgencies[roomName] = [];
                 for (let insurgent of insurgents) {
                     this.insurgencies[roomName].push(insurgent.name);
                 }
                 this.sendInsurgentAlert(roomName, insurgents);
             }
-            this.sendPatrol(roomName)
+            //this.sendPatrol(roomName)
         }
     };
 
@@ -196,7 +196,7 @@ class PolicyForeignOffice extends PolicyBase {
             this.id,
             gc.STATE_SWORDSMAN_IDLE,
         );
-        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable)
+        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable);
         let strength = 0;
         strength += bodyCounts[C.ATTACK] ? bodyCounts[C.ATTACK] : 0;
         strength += bodyCounts[C.RANGED_ATTACK] ? bodyCounts[C.RANGED_ATTACK] : 0;
@@ -216,7 +216,7 @@ class PolicyForeignOffice extends PolicyBase {
             this.id,
             gc.STATE_SWORDSMAN_IDLE,
         );
-        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable)
+        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable);
         let strength = 0;
         strength += bodyCounts[C.ATTACK] ? bodyCounts[C.ATTACK] : 0;
         strength += bodyCounts[C.RANGED_ATTACK] ? bodyCounts[C.RANGED_ATTACK] : 0;

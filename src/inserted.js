@@ -23,7 +23,6 @@ const inserted = {
         //const govern = policy.getGovernorPolicy("W7N7")
         //console.log("gouren W7N7", JSON.stringify(gouven))
         //console.log("--------- piers inserted------------");
-
 /*
         //Memory.test = {};
         delete Memory.records;
@@ -38,7 +37,7 @@ const inserted = {
         console.log("piers memory", JSON.stringify(Memory));
         console.log("piers memory rooms", JSON.stringify(Memory.rooms));
         console.log("piers memory after");
- */
+*/
 /*
         const workers = _.filter(Game.creeps, c => {
             return race.getRace(c) === gc.RACE_WORKER
