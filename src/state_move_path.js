@@ -64,10 +64,7 @@ class StateMovePath  extends StateCreep {
                 if (path2.x === this.creep.pos.x && path2.y === this.creep.pos.y) {
                     //this.creep.say("change rooms");
                     this.path = this.path.substr(2);
-                    //path.shift();
-                    //path.shift();
                 } else {
-                    //this.creep.say("lost");
                     return this.switchToMoveToPath(
                         this.path, this.targetPos, this.moveRange, this.nextState,
                     )

@@ -39,12 +39,12 @@ class PolicyForeignOffice extends PolicyBase {
     }
 
     enact() {
-        if ((Game.time + id) % gc.FO_CHECK_FOR_INSURGENCIES !== 0) {
+        if ((Game.time + this.id) % gc.FO_CHECK_FOR_INSURGENCIES !== 0) {
             this.checkInsurgencies();
         }
 
         //this.checkPatrols();
-        if ((Game.time + id) % gc.FO_SURVEY_COLONY_DEFENCE_RATE !== 0) {
+        if ((Game.time + this.id) % gc.FO_SURVEY_COLONY_DEFENCE_RATE !== 0) {
             this.surveyColonyDefence();
         }
 

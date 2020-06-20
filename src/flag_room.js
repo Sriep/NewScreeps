@@ -176,23 +176,23 @@ class FlagRoom {
         const spawns = spawnRoom.find(C.FIND_MY_SPAWNS);
         for (let source of sources) {
             paths[source.id] = {};
-            paths[source.id][this.PathTo.Spawn] = cache.path(source, spawns, spawnRoom+" spawn7", 1, false, true);
-            paths[source.id][this.PathTo.SpawnRoad] = cache.path(source, spawns, spawnRoom+" spawn8", 1, true, true);
-            paths[source.id][this.PathTo.Controller]= cache.path(source, [spawnRoom.controller], spawnRoom+" spawn9", 1, true, true);
-            paths[source.id][this.PathTo.ControllerRoad] = cache.path(source, [spawnRoom.controller], spawnRoom+" spawn10", 1, true, true);
+            paths[source.id][this.PathTo.Spawn] = cache.path(source, spawns,  1, false, true);
+            paths[source.id][this.PathTo.SpawnRoad] = cache.path(source, spawns,  1, true, true);
+            paths[source.id][this.PathTo.Controller]= cache.path(source, [spawnRoom.controller], 1, true, true);
+            paths[source.id][this.PathTo.ControllerRoad] = cache.path(source, [spawnRoom.controller],  1, true, true);
         }
         const minerals = home.find(C.FIND_MINERALS);
         if (minerals.length > 0) {
             paths[minerals[0].id] = {};
-            paths[minerals[0].id][this.PathTo.Spawn] = cache.path(minerals[0], spawns, spawnRoom+" spawn11", 1, false, true);
-            paths[minerals[0].id][this.PathTo.SpawnRoad] = cache.path(minerals[0], spawns, spawnRoom+" spawn12", 1, true, true);
-            paths[minerals[0].id][this.PathTo.Controller] = cache.path(minerals[0], [spawnRoom.controller], spawnRoom+" spawn13", 1, false, true);
-            paths[minerals[0].id][this.PathTo.ControllerRoad] = cache.path(minerals[0], [spawnRoom.controller], spawnRoom+" spawn14", 1, true, true)
+            paths[minerals[0].id][this.PathTo.Spawn] = cache.path(minerals[0], spawns,  1, false, true);
+            paths[minerals[0].id][this.PathTo.SpawnRoad] = cache.path(minerals[0], spawns,  1, true, true);
+            paths[minerals[0].id][this.PathTo.Controller] = cache.path(minerals[0], [spawnRoom.controller],  1, false, true);
+            paths[minerals[0].id][this.PathTo.ControllerRoad] = cache.path(minerals[0], [spawnRoom.controller], 1, true, true)
         }
         if (home.controller) {
             paths[home.controller.id] = {};
-            paths[home.controller.id][this.PathTo.Spawn] = cache.path(home.controller, spawns, spawnRoom+" spawn15", 1, false, true);
-            paths[home.controller.id][this.PathTo.SpawnRoad] = cache.path(home.controller, spawns, spawnRoom+" spawn16", 1, true, true)
+            paths[home.controller.id][this.PathTo.Spawn] = cache.path(home.controller, spawns,  1, false, true);
+            paths[home.controller.id][this.PathTo.SpawnRoad] = cache.path(home.controller, spawns, 1, true, true)
         }
         return paths;
     };

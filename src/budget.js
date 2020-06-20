@@ -119,13 +119,13 @@ const budget = {
             return values;
         }
         for (let source of sources) {
-            sourcePathNoRoad.push(cache.path(source, spawns, roomName+" spawn1", 1, false).cost);
-            sourcePathsRoad.push(cache.path(source, spawns, roomName+ "spawn2", 1, true).cost);
-            controllerPathNoRoad.push(cache.path(source, [home.controller], roomName+" spawn3", 1, false).cost);
-            controllerPathRoad.push(cache.path(source, [home.controller], roomName+" spawn4", 1, true).cost);
-            homeDistance += cache.path(source, [room.controller], roomName+" spawn5", 1, false).cost;
+            sourcePathNoRoad.push(cache.path(source, spawns,  1, false).cost);
+            sourcePathsRoad.push(cache.path(source, spawns, 1, true).cost);
+            controllerPathNoRoad.push(cache.path(source, [home.controller], 1, false).cost);
+            controllerPathRoad.push(cache.path(source, [home.controller], 1, true).cost);
+            homeDistance += cache.path(source, [room.controller],  1, false).cost;
         }
-        const disControllerSpawn = cache.path(room.controller, spawns, roomName+" spawn6", 1, false).cost;
+        const disControllerSpawn = cache.path(room.controller, spawns, 1, false).cost;
         homeDistance = homeDistance/sources.length;
 
         for (let i in sources) {

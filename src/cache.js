@@ -16,13 +16,10 @@ const cache = {
         return global[name];
     },
 
-    path(from, toArray, name, range, useRoad, cachePath) {
-        console.log("cache path from", from, "name", name);
+    path(from, toArray, range, useRoad, cachePath, now) {
+        //console.log("cache path from", from, "name", name);
         if (toArray.length === 0) {
              return undefined;
-        }
-        if (!name) {
-            name = toArray[0].id;
         }
         if (!range) {
             range = 1
@@ -31,11 +28,16 @@ const cache = {
             return { pos: to.pos, range: range };
         });
         let pfPath;
-        if (useRoad) {
+        if (now) {
             pfPath = PathFinder.search(from.pos, goals, {
                 maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
-                plainCost: 1,
-                swampCost: 1,
+                plainCost: 2,
+                swampCost: 10,
+                roomCallback: this.costMatrixNow,
+            })
+        } else if (useRoad) {
+            pfPath = PathFinder.search(from.pos, goals, {
+                maxCost: gc.MAX_HARVESTER_ROUTE_LENGTH,
                 roomCallback: this.getCostMatrixRoad,
             })
         } else {
@@ -66,6 +68,23 @@ const cache = {
 
     costMatrixRoad: {},
 
+    costMatrixNow: function(roomName) {
+        let costs = new PathFinder.CostMatrix;
+        Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES).forEach(function (site) {
+            if (site.structureType === STRUCTURE_ROAD) {
+                costs.set(site.pos.x, site.pos.y, 1);
+            } else if (site.structureType !== STRUCTURE_CONTAINER
+                && (site.structureType !== STRUCTURE_RAMPART || !site.my)) {
+                costs.set(site.pos.x, site.pos.y, 0xff);
+            }
+        });
+
+        Game.rooms[roomName].find(FIND_CREEPS).forEach(function(creep) {
+            costs.set(creep.pos.x, creep.pos.y, 0xff);
+        });
+        return costs;
+    },
+
     getCostMatrixRoad: function(roomName) {
         if (!this.costMatrixRoad) {
             this.costMatrixRoad = {}
@@ -78,7 +97,7 @@ const cache = {
         }
         let costs = new PathFinder.CostMatrix;
         Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES).forEach(function (site) {
-             if (site.structureType === STRUCTURE_ROAD
+             if (site.structureType !== STRUCTURE_ROAD
                 && site.structureType !== STRUCTURE_CONTAINER
                 && (site.structureType !== STRUCTURE_RAMPART ||  !site.my)) {
                 costs.set(site.pos.x, site.pos.y, 0xff);
@@ -86,7 +105,7 @@ const cache = {
         });
 
         Game.rooms[roomName].find(FIND_STRUCTURES).forEach(function(struct) {
-            if (struct.structureType === STRUCTURE_ROAD
+            if (struct.structureType !== STRUCTURE_ROAD
                 && struct.structureType !== STRUCTURE_CONTAINER
                 && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
                 costs.set(struct.pos.x, struct.pos.y, 0xff);
@@ -118,21 +137,12 @@ const cache = {
             }
         });
 
-        Game.rooms[roomName].find(FIND_STRUCTURES).forEach(function(struct) {
-            if (struct.structureType === STRUCTURE_ROAD) {
-                costs.set(struct.pos.x, struct.pos.y, 1);
-            } else if (struct.structureType !== STRUCTURE_CONTAINER
-                    && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
-                costs.set(struct.pos.x, struct.pos.y, 0xff);
-            }
-        });
-
         this.costMatrix[roomName] = costs;
         return costs;
     },
 
     distance: function(from, toArray, name, range, useRoad, redo, cacheResult) {
-        const p = this.path(from, toArray, "distance" + name, range, useRoad, redo, cacheResult);
+        const p = this.path(from, toArray, range, useRoad, redo, cacheResult);
         if (!p) {
             return
         }
