@@ -39,9 +39,16 @@ class PolicyForeignOffice extends PolicyBase {
     }
 
     enact() {
-        this.checkInsurgencies();
+        if ((Game.time + id) % gc.FO_CHECK_FOR_INSURGENCIES !== 0) {
+            this.checkInsurgencies();
+        }
+
         //this.checkPatrols();
-        //this.checkColonyDefence();
+        if ((Game.time + id) % gc.FO_SURVEY_COLONY_DEFENCE_RATE !== 0) {
+            this.surveyColonyDefence();
+        }
+
+
     };
 
     checkInsurgencies() {
@@ -52,8 +59,12 @@ class PolicyForeignOffice extends PolicyBase {
                 continue;
             }
             if (room.find(C.FIND_HOSTILE_STRUCTURES, {
+                filter: { structureType: STRUCTURE_KEEPER_LAIR }}).length > 0) {
+                continue; // todo
+            }
+            if (room.find(C.FIND_HOSTILE_STRUCTURES, {
                 filter: { structureType: STRUCTURE_INVADER_CORE }}).length > 0) {
-                continue;
+                continue; // todo
             }
             const insurgents = room.find(FIND_HOSTILE_CREEPS, {
                 filter: object => {
@@ -68,7 +79,7 @@ class PolicyForeignOffice extends PolicyBase {
                 }
                 this.sendInsurgentAlert(roomName, insurgents);
             }
-            //this.sendPatrol(roomName)
+            this.sendPatrol(roomName)
         }
     };
 
@@ -125,14 +136,14 @@ class PolicyForeignOffice extends PolicyBase {
         }
         return strength;
     }
-
+/*
     checkPatrols() {
         const patrols = _.filter(Game.creeps, c => {
             return CreepMemory.M(c).state === gc.STATE_PATROL
         })
 
     };
-
+*/
     strength(creeps) {
         let strength = 0;
         for (let i in creeps) {
@@ -143,7 +154,7 @@ class PolicyForeignOffice extends PolicyBase {
         return strength;
     }
 
-    checkColonyDefence() {
+    surveyColonyDefence() {
         this.m.colonyDef = [];
         const colonialOffice = policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
         if (!colonialOffice) {
@@ -224,7 +235,28 @@ class PolicyForeignOffice extends PolicyBase {
         return strength
     }
 
+    buildArcher(spawnRoom) {
+        const data = {
+            "body": race.body(gc.RACE_ARCHER, spawnRoom.energyCapacityAvailable),
+            "opts": {"memory": {}},
+            "name": gc.RACE_ARCHER + spawnRoom.energyCapacityAvailable.toString(),
+        };
+        flag.getSpawnQueue(this.home).addSpawn(
+            data,
+            gc.SPAWN_PRIORITY_FOREIGN,
+            this.id,
+            gc.STATE_ARCHER_IDLE,
+        );
+        const bodyCounts = race.getBodyCounts(gc.RACE_SWORDSMAN, spawnRoom.energyCapacityAvailable);
+        let strength = 0;
+        strength += bodyCounts[C.ATTACK] ? bodyCounts[C.ATTACK] : 0;
+        strength += bodyCounts[C.RANGED_ATTACK] ? bodyCounts[C.RANGED_ATTACK] : 0;
+        strength += bodyCounts[C.HEAL] ? bodyCounts[C.HEAL] : 0;
+        return strength
+    }
+
 }
+
 if (gc.USE_PROFILER && !gc.UNIT_TEST) {
     const profiler = require('screeps-profiler');
     profiler.registerClass(PolicyForeignOffice, 'PolicyForeignOffice');

@@ -42,6 +42,10 @@ class PolicyGovern extends PolicyBase {
         return this.m.agendaIndex
     }
 
+    set agendaIndex(v) {
+        this.m.agendaIndex = v;
+    }
+
     get colonies() {
         return JSON.parse(JSON.stringify(this.m.colonies))
     }
@@ -71,12 +75,14 @@ class PolicyGovern extends PolicyBase {
             this.m.rcl = Game.rooms[this.home].controller.level;
             this.m.agendaIndex = -1;
         }
-        this.m.agendaIndex = agenda.enact(
+        this.agendaIndex = agenda.enact(
             this.id,
             this.agenda,
             Game.rooms[this.home].controller.level,
             this.agendaIndex
         );
+        console.log("policy gouvern agendaIndex", this.agendaIndex, "item",
+        JSON.stringify(agenda.agendas["default_1"][Game.rooms[this.home].controller.level][this.agendaIndex]))
     };
 
     countParts() {

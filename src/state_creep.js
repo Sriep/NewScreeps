@@ -158,6 +158,17 @@ class StateCreep extends CreepMemory {
         }
     }
 
+    pathBlocked(pos) {
+        for (let item of pos.look()) {
+            if (item.type === "structure"
+                && item.structure.structureType !== C.STRUCTURE_ROAD
+                && item.structure.structureType !== C.STRUCTURE_CONTAINER
+                && (item.structure.structureType !== C.STRUCTURE_RAMPART && item.structure.my)) {
+                return true;
+            }
+        }
+    }
+
 
 }
 

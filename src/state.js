@@ -29,24 +29,7 @@ const state = {
         const creepState = new StateConstructor(creep);
         creepState.enact();
     },
-/*
-    enactObj : function(obj, memory) {
-        if (this.stackDepth > gc.MAX_STATE_STACK) {
-            return;
-        }
-        this.stackDepth++;
-        if (!memory.state) {
-            console.log("memory", JSON.stringify(memory));
-            return gf.fatalError("error! creep" +JSON.stringify(obj) + "with no state " + JSON.stringify(memory));
-        }
 
-        let requireString = "state_" + memory.state;
-        requireString = "./" + requireString;
-        const StateConstructor = require(requireString);
-        const objState = new StateConstructor(obj);
-        objState.enact();
-    },
-*/
     indexClosestApproachToPath: function(pos, path) {
         let lastX, lastY;
         const ranges = [];
@@ -158,8 +141,10 @@ const state = {
     }
 
 };
+
 if (gc.USE_PROFILER && !gc.UNIT_TEST) {
     const profiler = require("screeps-profiler");
     profiler.registerObject(state, 'state');
 }
+
 module.exports = state;

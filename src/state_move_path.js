@@ -6,7 +6,6 @@
 
 const gf = require("gf");
 const cache = require("cache");
-const move = require("state_move");
 const StateCreep = require("./state_creep");
 
 class StateMovePath  extends StateCreep {
@@ -35,7 +34,7 @@ class StateMovePath  extends StateCreep {
         if (path0.x === this.creep.pos.x && path0.y === this.creep.pos.y) {
             const dPathPos1 = cache.deserialisePosAt(this.path,1, this.creep.pos.roomName);
             //console.log(this.creep.name, "path0", JSON.stringify(path0) ,"path1",dPathPos1,"room",this.creep.pos.home);
-            if (move.pathBlocked(dPathPos1)) {
+            if (this.pathBlocked(dPathPos1)) {
                 this.recalculatePath();
                  return this.switchToMovePos(
                     this.creep, this.targetPos, this.moveRange, this.nextState,

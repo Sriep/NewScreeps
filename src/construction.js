@@ -121,7 +121,7 @@ const construction = {
         } else {
             to = room.find(toFind);
         }
-        const terrain = Game.map.getRoomTerrain(room.name)
+        const terrain = Game.map.getRoomTerrain(room.name);
         for (let f of from) {
             for (let t of to) {
                 this.buildRoad(f,t,terrain)
@@ -133,7 +133,18 @@ const construction = {
         const path = from.pos.findPathTo(to, { ignoreCreeps: true, ignoreRoads: true});
         for(let step in path) {
             if  (terrain.get(path[step].x, path[step].y) !== C.TERRAIN_MASK_WALL) {
-                from.room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+                const pos = new RoomPosition(path[step].x, path[step].y, from.room.name);
+                const sites = pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                let i = 0;
+                for ( ; i < sites.length ; i++ ) {
+                    if (sites[i].structureType === STRUCTURE_ROAD) {
+                        break;
+                    }
+                }
+                if (sites.length === 0 || sites.length >= i )
+                {
+                    from.room.createConstructionSite(path[step].x, path[step].y, STRUCTURE_ROAD);
+                }
             }
         }
     },

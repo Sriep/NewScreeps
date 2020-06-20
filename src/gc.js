@@ -83,7 +83,7 @@ const gc = {
     RACE_PORTER: "porter",
     RACE_SCOUT: "scout",
     RACE_RESERVER: "reserver",
-    RACE_LORRY: "lorry",
+    RACE_ARCHER: "archer",
     RACE_SCIENTIST: "scientist",
     RACE_PALADIN: "paladin",
     RACE_SWORDSMAN: "swordsman",
@@ -428,6 +428,8 @@ const gc = {
     FREE_HARVESTER_POST_CACHE_RATE: 10,
     COLONIAL_OFFICE_RATE: 1,
     FOREIGN_OFFICE_RATE: 1,
+    FO_SURVEY_COLONY_DEFENCE_RATE:  47,
+    FO_CHECK_FOR_INSURGENCIES: 3,
 
     // Thresholds
     TOWER_REFILL_THRESHOLD: 0.8,
@@ -558,14 +560,14 @@ const gc = {
     //WALL: "wall",
 
     DELTA_DIRECTION: {
-        1 : {x:0, y:-1},
-        2 : {x:1, y:-1},
-        3 : {x:1, y:0 },
-        4 : {x:1, y:1 },
-        5 : {x:0, y:1 },
-        6 : {x:-1, y:1 },
-        7 : {x:-1, y:0 },
-        8 : {x:-1, y:-1 }
+        [C.TOP]             : {x:0, y:-1},
+        [C.TOP_RIGHT]       : {x:1, y:-1},
+        [C.RIGHT]           : {x:1, y:0 },
+        [C.BOTTOM_RIGHT]    : {x:1, y:1 },
+        [C.BOTTOM]          : {x:0, y:1 },
+        [C.BOTTOM_LEFT]     : {x:-1, y:1 },
+        [C.LEFT]            : {x:-1, y:0 },
+        [C.TOP_LEFT]        : {x:-1, y:-1 }
     },
 
     //creep body bases

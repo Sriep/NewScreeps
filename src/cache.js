@@ -295,7 +295,6 @@ const cache = {
                 }
             }
             path.push(new RoomPosition(x, y, gf.roomNameFromSplit(rSplit)));
-            //path.push({x:x, y:y, home:gf.roomNameFromSplit(rSplit)});
             lastX = x;
             lastY = y;
         }
