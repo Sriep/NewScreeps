@@ -41,6 +41,8 @@ class moveCreeps {
     }
 
     moveToPos(creep, x, y, ops) {
+        const pos = new RoomPosition(x, y, creep.room.name);
+        
         this.registerIntent(creep)
     }
 

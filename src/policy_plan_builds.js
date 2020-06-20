@@ -22,10 +22,12 @@ class PolicyPlanBuilds extends PolicyBase {
 
     enact() {
         console.log("POLICY_PLAN_BUILDS enact");
-        //const sources = Game.rooms[this.home].find(FIND_SOURCES);
-        //if (sources.length < 2) {
-        //    return;
-        //}
+        if (gc.SIM_ROOM) {
+            const sources = Game.rooms[this.home].find(FIND_SOURCES);
+            if (sources.length < 2) {
+                return;
+            }
+        }
         const fRoom = new FlagOwnedRoom(this.home);
         const spawns = Game.rooms[this.home].find(FIND_MY_SPAWNS);
         fRoom.placeCentre(gc.TILE_CENTRE,spawns.length > 0 ? spawns[0].pos : undefined);

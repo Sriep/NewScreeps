@@ -75,6 +75,7 @@ const gc = {
     TICK_NUMBER: "tick number",
     USE_PROFILER: false,
     UNIT_TEST: false,
+    SIM_ROOM: ture,
 
     // Races
     RACE_WORKER: "worker",
