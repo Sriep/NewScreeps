@@ -29,7 +29,7 @@ class StateMoveTarget  extends StateCreep {
 
         if (this.creep.pos.inRangeTo(target.pos, this.moveRange)) {
             //console.log(this.creep.name,"STATE_MOVE_TARGET creep", JSON.stringify(this.creep.pos), "cloes to", JSON.stringify(target.pos))
-            return this.switchTo( this.nextState)
+            return this.switchTo(this.nextState)
         }
         const result = this.creep.moveTo(target, {reusePath: 5});
         //console.log(this.creep.name,"STATE_MOVE_TARGET move result", result);

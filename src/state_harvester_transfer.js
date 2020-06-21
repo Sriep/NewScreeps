@@ -16,7 +16,7 @@ class StateHarvesterTransfer extends StateCreep {
 
     enact() {
         if (this.creep.store.getUsedCapacity() === 0) {
-            this.switchTo(gc.STATE_HARVESTER_HARVEST)
+            return this.switchTo(gc.STATE_HARVESTER_HARVEST)
         }
 
         //console.log(this.creep.name,"STATE_HARVESTER_TRANSFER2", this.targetId);

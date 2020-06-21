@@ -328,7 +328,7 @@ const gc = {
     RANGE_HEAL: 3,
     RANGE_REACTION: 2,
     RANGE_RETREAT_RANGE: 4,
-    RANGE_MOVE_TO_ROOM: 50,
+    RANGE_MOVE_TO_ROOM: 20,
 
     // Sizes
     LINKING_BUILDER_SIZE: 5,

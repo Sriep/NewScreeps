@@ -27,7 +27,7 @@ class StateHealerIdle extends StateCreep {
         const foreignOffice =  policy.getPolicyByType(gc.POLICY_COLONIAL_OFFICE);
         const roomToPatrol = foreignOffice.nextPatrolRoute(creep);
         if (roomToPatrol === this.room.name) {
-            this.switchTo(gc.STATE_PATROL)
+            return this.switchTo(gc.STATE_PATROL)
         }
         this.switchMoveToRoom(roomToPatrol, 20,  gc.STATE_HEALER_IDLE)
     };

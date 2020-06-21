@@ -23,7 +23,7 @@ class StateFindBoost  extends StateCreep {
             if (!race.creepBoosted(this.creep, boost.resource)) {
                 for (let lab of labs) {
                     if (lab.mineralType === boost.resource) {
-                        this.switchToMovePos(
+                        return this.switchToMovePos(
                             lab.pos,
                             gc.RANGE_BOOST,
                             gc.STATE_BOOST_CREEP,

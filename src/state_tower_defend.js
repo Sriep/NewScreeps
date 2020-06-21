@@ -14,7 +14,7 @@ class StateTowerDefend extends StateBuilding {
 
     enact() {
         if (this.tower.room.find(FIND_HOSTILE_CREEPS).length === 0) {
-            state.switchTo(this.tower,  gc.STATE_TOWER_IDLE)
+            return state.switchTo(this.tower,  gc.STATE_TOWER_IDLE)
         }
         if (this.tower.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
             return

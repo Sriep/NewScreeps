@@ -15,7 +15,7 @@ class StateWorkerRepair  extends StateCreep {
     enact() {
         //console.log(this.creep.name,"STATE_WORKER_REPAIR")
         if (this.creep.store.getUsedCapacity() === 0) {
-            return this.switchTo( gc.STATE_WORKER_IDLE);
+            return this.switchTo(gc.STATE_WORKER_IDLE);
         }
         const target = Game.getObjectById(this.targetId);
         if (!target) {

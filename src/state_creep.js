@@ -29,7 +29,7 @@ class StateCreep extends CreepMemory {
     }
 
     switchMoveToRoom(roomName, nextState) {
-        this.switchToMoveFlag(Game.flags[roomName],24, nextState,);
+        this.switchToMoveFlag(Game.flags[roomName],gc.RANGE_MOVE_TO_ROOM, nextState,);
     }
 
     switchToMoveFlag(flag, range, nextState) {

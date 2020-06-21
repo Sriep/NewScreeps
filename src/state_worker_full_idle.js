@@ -14,7 +14,7 @@ class StateWorkerFullIdle  extends StateCreep {
     }
 
     enact() {
-        //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE")
+        //console.log(this.creep.name, "in STATE_WORKER_FULL_IDLE",this.home);
         const home = Game.rooms[this.home];
         if (home.controller.ticksToDowngrade
             < gc.EMERGENCY_DOWNGRADING_THRESHOLD) {

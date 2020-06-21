@@ -20,10 +20,10 @@ class StateWorkerIdle extends StateCreep {
     }
 
     enact() {
-        //console.log(this.creep.name,"STATE_WORKER_IDLE");
+        console.log(this.creep.name,"STATE_WORKER_IDLE");
         const room = Game.rooms[this.home];
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            this.switchTo(this.memory, gc.STATE_WORKER_FULL_IDLE);
+            return this.switchTo(gc.STATE_WORKER_FULL_IDLE);
         }
 
         if (room.controller.level === 1 && room.controller.my) {
@@ -68,10 +68,6 @@ class StateWorkerIdle extends StateCreep {
     };
 
     enactOld() {
-        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-            return this.switchTo( gc.STATE_WORKER_FULL_IDLE);
-        }
-
         const drop = this.creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: { structureType: FIND_DROPPED_RESOURCES }
         });
