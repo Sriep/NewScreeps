@@ -165,19 +165,21 @@ class StatePorterIdle extends StateCreep {
                 }
             }
             let cPos = colonyRoom.mineralContainerPos;
+            console.log("listHarvestContainers colonyRoom.mineral", JSON.stringify(colonyRoom.mineral));
             if (cPos) {
                 cPos = gf.roomPosFromPos(cPos, colony.name);
                 const container  = state.findContainerAt(cPos);
                 if (container) {
                     containerInfo.push({
-                        "porters" : porters.filter( c => CreepMemory.M(c).targetId === colonyRoom.m.mineral.id).length,
+                        "porters" : porters.filter( c => CreepMemory.M(c).targetId === colonyRoom.mineral.id).length,
                         "pos" : cPos,
-                        "id" : colonyRoom.m.mineral.id,
+                        "id" : colonyRoom.mineral.id,
                         "container" : state.findContainerAt(cPos)
                     })
                 }
             }
         }
+        console.log("listHarvestContainers return", JSON.stringify(containerInfo));
         return containerInfo;
     };
 
