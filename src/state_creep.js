@@ -3,6 +3,7 @@
  * Created by piers on 05/06/2020
  * @author Piers Shepperson
  */
+const C = require("./Constants");
 const gc = require("./gc");
 const gf = require("./gf");
 const CreepMemory = require("./creep_memory");

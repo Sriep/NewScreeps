@@ -51,7 +51,6 @@ const agenda = {
             [gc.Activity.PolicyBlocker] : {
                 "enact": this.activateNewPolicy,
                 "check": function (activity, parnetId)  {
-                    //console.log("PolicyBlocker chack");
                     return !policy.hasChildType(parnetId, activity);
                 }
             },

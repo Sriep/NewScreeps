@@ -20,7 +20,7 @@ class StateWorkerIdle extends StateCreep {
     }
 
     enact() {
-        console.log(this.creep.name,"STATE_WORKER_IDLE");
+        //console.log(this.creep.name,"STATE_WORKER_IDLE");
         const room = Game.rooms[this.home];
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
             return this.switchTo(gc.STATE_WORKER_FULL_IDLE);

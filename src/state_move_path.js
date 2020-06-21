@@ -3,7 +3,7 @@
  * Created by piers on 28/04/2020
  * @author Piers Shepperson
  */
-
+const C = require("./Constants");
 const gf = require("gf");
 const cache = require("cache");
 const StateCreep = require("./state_creep");
@@ -76,20 +76,20 @@ class StateMovePath  extends StateCreep {
         //console.log(this.creep.name,"creep pos", this.creep.pos,"moveByPath path", JSON.stringify(posPath), this.creep.pos.home, "new path", this.m.path);
         const result = this.creep.moveByPath(posPath);
         switch (result) {
-            case OK:
+            case C.OK:
                 break;
-            case  ERR_NOT_OWNER:
+            case  C.ERR_NOT_OWNER:
                 return gf.fatalError("ERR_NOT_OWNER");
-            case ERR_BUSY:
+            case C.ERR_BUSY:
                 return ERR_BUSY;
-            case ERR_NOT_FOUND:
+            case C.ERR_NOT_FOUND:
                 return gf.fatalError("ERR_NOT_FOUND");
-            case ERR_INVALID_ARGS:
+            case C.ERR_INVALID_ARGS:
                 return gf.fatalError("ERR_INVALID_ARGS");
-            case ERR_TIRED:
+            case C.ERR_TIRED:
                 //this.creep.say("tired");
-                return ERR_TIRED;
-            case ERR_NO_BODYPART:
+                return C.ERR_TIRED;
+            case C.ERR_NO_BODYPART:
                 return gf.fatalError("ERR_NO_BODYPART");
             default:
                 return gf.fatalError("moveByPath unrecognised return|", result,"|");
