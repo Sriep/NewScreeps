@@ -37,7 +37,7 @@ class StateMovePath  extends StateCreep {
             if (this.pathBlocked(dPathPos1)) {
                 this.recalculatePath();
                  return this.switchToMovePos(
-                    this.creep, this.targetPos, this.moveRange, this.nextState,
+                    this.targetPos, this.moveRange, this.nextState,
                 )
             }
             //this.creep.say("rest");

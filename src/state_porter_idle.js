@@ -165,7 +165,7 @@ class StatePorterIdle extends StateCreep {
                 }
             }
             let cPos = colonyRoom.mineralContainerPos;
-            console.log("listHarvestContainers colonyRoom.mineral", JSON.stringify(colonyRoom.mineral));
+            //console.log("listHarvestContainers colonyRoom.mineral", JSON.stringify(colonyRoom.mineral));
             if (cPos) {
                 cPos = gf.roomPosFromPos(cPos, colony.name);
                 const container  = state.findContainerAt(cPos);
@@ -179,7 +179,7 @@ class StatePorterIdle extends StateCreep {
                 }
             }
         }
-        console.log("listHarvestContainers return", JSON.stringify(containerInfo));
+        //console.log("listHarvestContainers return", JSON.stringify(containerInfo));
         return containerInfo;
     };
 

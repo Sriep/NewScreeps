@@ -17,6 +17,11 @@ class StateMovePos extends StateCreep {
     }
 
     enact() {
+        //console.log(this.creep.name,"StateMovePos at", this.creep.pos,"target",this.targetPos,"range", JSON.stringify(this.moveRange));
+        if (!this.targetPos && this.targetId) {
+            //console.log(this.creep.name,"StateMovePos targetId", this.targetId);
+            this.targetPos = Game.getObjectById(this.targetId).pos
+        }
         if (this.creep.pos.inRangeTo(this.targetPos, this.moveRange)) {
             if (this.nextState === gc.STATE_MOVE_PATH) {
                 return this.switchToMoveByPath(

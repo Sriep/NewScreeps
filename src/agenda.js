@@ -168,7 +168,7 @@ const agenda = {
             ],
             [ //6
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_EXTENSION}},
-                { "activity": gc.POLICY_BUILD_EXTRACTORS, type: gc.Activity.PolicyBlocker},
+                { "activity": gc.POLICY_BUILD_EXTRACTORS, type: gc.Activity.Policy},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LINK}},
                 { "activity": gc.POLICY_BUILD_STRUCTURE, type: gc.Activity.PolicyBlocker, "params": {"structureType":C.STRUCTURE_LAB}},
                 { "activity": gc.ACTIVITY_SCIENTIST, type: gc.Activity.Flag},

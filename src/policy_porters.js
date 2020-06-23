@@ -50,11 +50,11 @@ class PolicyPorters  extends PolicyBase {
         }
         //}
         this.spawns(room, this.m.resources);
-        console.log("POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
+        //console.log("POLICY_PORTERS production vector", JSON.stringify(this.m.curProduction))
     };
 
     spawns(room, resources) {
-        console.log("pp spawns resources", JSON.stringify(resources));
+        //console.log("pp spawns resources", JSON.stringify(resources));
         this.m.buildsFinished = false;
 
         const harvesters = policy.getCreeps(this.parentId, gc.RACE_HARVESTER).length;
@@ -76,7 +76,7 @@ class PolicyPorters  extends PolicyBase {
         console.log("pp spawns harvesters",harvesters,"workers",workers,"porters",porters,
             "reservers",reservers,"pp spawns wHarvester",wHarvester,"cWorker",cWorker,
             "cPorter",cPorter,"rReserver",rReserver);
-        console.log("pp spawns energy",room.energyAvailable,"capacity",room.energyCapacityAvailable);
+        //console.log("pp spawns energy",room.energyAvailable,"capacity",room.energyCapacityAvailable);
         console.log("minHarvesters", resources.minHarvesters, "maxHarvesters", resources.maxHarvesters, "minReserves", resources.minReservers);
         flag.getSpawnQueue(this.home).clearMy(this.parentId);
 
@@ -109,16 +109,16 @@ class PolicyPorters  extends PolicyBase {
         const canBuildUpgrader = wUpgrader < resources.uW && isUpgradeContainer && isSpaceForPorterToReachContainer;
 
         const canBuildReserver = rReserver < resources.cR - 0.2;
-        console.log("pp upgradeContainerPos", fRoom.upgradePosts.length);
-        console.log("pp wHarvester",wHarvester,"cWorker",cWorker, "cPorter", cPorter,"wUpgrader",wUpgrader,"rReserver",rReserver);
+        //console.log("pp upgradeContainerPos", fRoom.upgradePosts.length);
+        //console.log("pp wHarvester",wHarvester,"cWorker",cWorker, "cPorter", cPorter,"wUpgrader",wUpgrader,"rReserver",rReserver);
 
-        console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
+        //console.log("pp spawns canBuildHarvesters", canBuildHarvesters,"harvesters", harvesters, "maxh", resources.maxHarvesters)
         if (canBuildHarvesters
             && (!canBuildWorkers || wHarvester <= cWorker)
             && (!canBuildPorters || wHarvester <= cPorter)
             && (!canBuildUpgrader || wHarvester <= 5*wUpgrader)) {
-            console.log("pp next build harvester","canBuildWorkers",canBuildWorkers,"wHarvester",wHarvester ,"<=cWorker",
-                cWorker, "canBuildPorters",canBuildPorters,"wHarvester",wHarvester, "<=cPorter", cPorter);
+            //console.log("pp next build harvester","canBuildWorkers",canBuildWorkers,"wHarvester",wHarvester ,"<=cWorker",
+            //   cWorker, "canBuildPorters",canBuildPorters,"wHarvester",wHarvester, "<=cPorter", cPorter);
             if (race.getCost(gc.RACE_HARVESTER, room.energyCapacityAvailable) <= room.energyCapacityAvailable) {
                 policy.sendOrderToQueue(
                     room,

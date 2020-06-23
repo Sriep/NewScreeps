@@ -22,9 +22,9 @@ class StatePorterFullIdle extends StateCreep {
 
         if (this.creep.room.name !== this.home) {
             if (this.pathName && this.pathId) {
-                console.log("STATE_PORTER_FULL_IDLE pathId",this.pathId,"pathName",this.pathName);
+                //console.log("STATE_PORTER_FULL_IDLE pathId",this.pathId,"pathName",this.pathName);
                 const obj = Game.getObjectById(this.pathId);
-                console.log("STATE_PORTER_FULL_IDLE obj", obj);
+                //console.log("STATE_PORTER_FULL_IDLE obj", obj);
                 if (obj && obj.pos.getRangeTo(this.creep.pos) < 5) {
                     const pathName = this.pathName;
                     const pathId = this.pathId;

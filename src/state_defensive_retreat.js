@@ -16,7 +16,7 @@ class StateDefensiveRetreat extends StateCreep {
 
     enact() {
         const foreignOffice = policy.getPolicyByType(gc.POLICY_FOREIGN_OFFICE);
-        const insurgents = foreignOffice.insurgents[this.creep.room.name];
+        const insurgents = foreignOffice.insurgencies[this.creep.room.name];
         let direction;
         if (insurgents) {
             for (let insurgent of insurgents) {
